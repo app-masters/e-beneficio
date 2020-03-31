@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "typeRoots": ["./src/typings", "./src/types", "./node_modules/@types"],
+    "outDir": "./dist",
+    "allowJs": true,
+    "target": "es5",
+    "lib": ["es5", "ES2017.Object", "ESNext"],
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "strictNullChecks": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "noEmitOnError": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": false,
+    "noImplicitThis": true,
+    "noImplicitAny": true
+  },
+  "exclude": ["dist", "node_modules", "build"],
+  "include": ["./src/**/*", "./tests/**/*", "./database/**/*"]
+}
