@@ -3,6 +3,10 @@
     {
       "directory": "./backend",
       "changeProcessCWD": true
+    },
+    {
+      "directory": "./frontend",
+      "changeProcessCWD": true
     }
   ],
   // Ref: https://create-react-app.dev/docs/setting-up-your-editor/#displaying-lint-output-in-the-editor
