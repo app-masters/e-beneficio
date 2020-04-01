@@ -2,6 +2,13 @@
 
 ## Getting started
 
+Clone the project and work on the created folder.
+
+```
+git clone git@github.com:TiagoGouvea/resources4vulnerables.git
+cd resources4vulnerables
+```
+
 ### Backend
 
 Inside the folder `/backend`, create the `.env` file using the keys on the `.env.example` and filling with your local data.
@@ -9,14 +16,21 @@ Inside the folder `/backend`, create the `.env` file using the keys on the `.env
 With the node and npm installed: 
 
 ```
-git clone git@github.com:TiagoGouvea/resources4vulnerables.git
-cd resources4vulnerables/backend
+cd backend
 npm install
 npm start
 ```
 
 ### Frontend
-// TBD
+Inside the folder `/frontend`, create the `.env` file using the keys on the `.env.example` and filling with your local data.
+
+With the node and npm installed: 
+
+```
+cd frontend
+npm install
+npm start
+```
 
 
 ## Documentation
