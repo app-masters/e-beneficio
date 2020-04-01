@@ -1,0 +1,46 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    // Ref: https://create-react-app.dev/docs/setting-up-your-editor/#visual-studio-code
+    // If you get warnings in this object, install "Debugger for chrome" extension
+    {
+      "name": "React",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/src",
+      "sourceMapPathOverrides": {
+        "webpack:///src/*": "${webRoot}/*"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug server",
+      "program": "${workspaceRoot}/backend/node_modules/ts-node-dev/bin/ts-node-dev",
+      "args": [
+        "--inspect",
+        "--respawn",
+        "--transpileOnly",
+        "--no-notify",
+        "--project",
+        "${workspaceRoot}\\backend\\tsconfig.json",
+        "${workspaceRoot}\\backend\\src\\index.ts"
+      ],
+      "protocol": "inspector",
+      "internalConsoleOptions": "openOnSessionStart",
+      "port": 9229,
+      "restart": true,
+      "cwd": "${workspaceRoot}/backend"
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach to backend",
+      "protocol": "inspector",
+      "port": 9229,
+      "restart": true,
+      "cwd": "${workspaceRoot}/backend"
+    }
+  ]
+}

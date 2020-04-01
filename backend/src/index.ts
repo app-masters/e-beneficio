@@ -7,7 +7,6 @@ import http from 'http';
 import routes from './routes';
 import logging from './utils/logging';
 
-
 require('dotenv').config();
 
 if (!process.env.DB_DATABASE) {
@@ -82,9 +81,7 @@ const onError = (error: ErrnoException): void => {
  * API initialization success callback
  */
 const onListening = (): void => {
-  logging.info(
-    `Up and running - ${process.env.NODE_ENV} - http://${process.env.HOSTNAME}:${process.env.PORT}`
-  );
+  logging.info(`Up and running - ${process.env.NODE_ENV} - http://${process.env.HOSTNAME}:${process.env.PORT}`);
 };
 
 // Initializing API

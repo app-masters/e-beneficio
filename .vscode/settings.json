@@ -1,0 +1,15 @@
+{
+  "eslint.workingDirectories": [
+    {
+      "directory": "./backend",
+      "changeProcessCWD": true
+    }
+  ],
+  // Ref: https://create-react-app.dev/docs/setting-up-your-editor/#displaying-lint-output-in-the-editor
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ]
+}
