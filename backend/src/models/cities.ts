@@ -35,7 +35,7 @@ export const create = (values: City | SequelizeCity): Promise<SequelizeCity> => 
  */
 export const updateById = async (id: string | number, values: City | SequelizeCity): Promise<SequelizeCity> => {
   // The update return an array [count, item[]], so I'm destructuring to get the updated city
-  const [, [city]] = await db.cities.update(values, { where: { id } });
+  const [, [city]] = await db.cities.update(values, { where: { id }, returning: true });
   return city;
 };
 
