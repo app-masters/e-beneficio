@@ -1,6 +1,6 @@
 import db from '../../src/schemas';
 
-const list = [{ title: 'Juiz de Fora/MG' }];
+const list = [{ title: 'Juiz de Fora/MG' }, { title: 'Belo Horizonte/MG' }];
 
 /**
  * Seed the cities table
@@ -16,8 +16,10 @@ const seed = async () => {
     if (itemsToCreate.length > 0) {
       await db.cities.bulkCreate(itemsToCreate);
     }
+    console.log(`[seed] Cities: Sedeed successfully - ${itemsToCreate.length} new created`);
+  } else {
+    console.log(`[seed] Cities: Nothing to seed`);
   }
-  console.log('[seed] Cities: Sedeed successfully');
 };
 
 export default { seed };

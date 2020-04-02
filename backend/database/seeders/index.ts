@@ -1,10 +1,19 @@
 import citySeed from './cities';
+import placeSeed from './places';
+import placeStoreSeed from './placeStores';
 
 /**
  * Seed all tables
  */
 const seedAll = async () => {
-  await citySeed.seed();
+  // Development seed
+  if (process.env.NODE_ENV === 'development') {
+    await citySeed.seed();
+    await placeSeed.seed();
+    await placeStoreSeed.seed();
+  }
+  // Production seed
+  // ...
 };
 
 seedAll()

@@ -32,8 +32,14 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"title\": \"Belo Horizonte/MG\"\n}",
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "Belo Horizonte/MG",
+									"type": "text"
+								}
+							],
 							"options": {
 								"raw": {
 									"language": "json"
@@ -49,7 +55,7 @@
 								"cities"
 							]
 						},
-						"description": "Create a new city using the defined data"
+						"description": "Create a new item using the defined data"
 					},
 					"response": []
 				},
@@ -59,8 +65,14 @@
 						"method": "PUT",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"title\": \"Juiz de Fora/MG\"\n}",
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "Juiz de Fora/MG",
+									"type": "text"
+								}
+							],
 							"options": {
 								"raw": {
 									"language": "json"
@@ -77,7 +89,7 @@
 								"{{cityId}}"
 							]
 						},
-						"description": "Update city using the defined data and unique ID"
+						"description": "Update item using the defined data and unique ID"
 					},
 					"response": []
 				},
@@ -95,7 +107,7 @@
 								"cities"
 							]
 						},
-						"description": "List of all cities without any filter"
+						"description": "List of all items without any filter"
 					},
 					"response": []
 				},
@@ -114,7 +126,7 @@
 								"{{cityId}}"
 							]
 						},
-						"description": "Get city detail using the unique ID"
+						"description": "Get item detail using the unique ID"
 					},
 					"response": []
 				},
@@ -123,15 +135,6 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"title\": \"Juiz de Fora/MG\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrl}}/cities/{{cityId}}",
 							"host": [
@@ -142,12 +145,382 @@
 								"{{cityId}}"
 							]
 						},
-						"description": "Delete city using the unique ID"
+						"description": "Delete item using the unique ID"
 					},
 					"response": []
 				}
 			],
 			"description": "Cities covered by the application",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "42aa2627-0008-48c0-ad44-4a91cfe57720",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "9ac24a10-1275-4ed0-9854-34fbb33175ca",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Places",
+			"item": [
+				{
+					"name": "/places",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bbd3d500-1773-4ed2-848c-89f003013227",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.id) {",
+									"    pm.environment.set('placeId', jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "Baraky Corporation",
+									"type": "text"
+								},
+								{
+									"key": "cityId",
+									"value": "{{cityId}}",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/places",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"places"
+							]
+						},
+						"description": "Create a new item using the defined data"
+					},
+					"response": []
+				},
+				{
+					"name": "/places/:id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "Baraky Corp.",
+									"type": "text"
+								},
+								{
+									"key": "cityId",
+									"value": "{{cityId}}",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/places/{{placeId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"places",
+								"{{placeId}}"
+							]
+						},
+						"description": "Update item using the defined data and unique ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/places",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/places",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"places"
+							]
+						},
+						"description": "List of all items without any filter"
+					},
+					"response": []
+				},
+				{
+					"name": "/places/:id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/places/{{placeId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"places",
+								"{{placeId}}"
+							]
+						},
+						"description": "Get item detail using the unique ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/places/:id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/places/{{placeId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"places",
+								"{{placeId}}"
+							]
+						},
+						"description": "Delete item using the unique ID"
+					},
+					"response": []
+				}
+			],
+			"description": "Places that the family can go to use the benefit",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "42aa2627-0008-48c0-ad44-4a91cfe57720",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "9ac24a10-1275-4ed0-9854-34fbb33175ca",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Place Stores",
+			"item": [
+				{
+					"name": "/place-stores",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bbd3d500-1773-4ed2-848c-89f003013227",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.id) {",
+									"    pm.environment.set('placeStoreId', jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "BC Centro",
+									"type": "text"
+								},
+								{
+									"key": "cityId",
+									"value": "{{cityId}}",
+									"type": "text"
+								},
+								{
+									"key": "placeId",
+									"value": "{{placeId}}",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/place-stores",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"place-stores"
+							]
+						},
+						"description": "Create a new item using the defined data"
+					},
+					"response": []
+				},
+				{
+					"name": "/place-stores/:id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "BC Granbery",
+									"type": "text"
+								},
+								{
+									"key": "cityId",
+									"value": "{{cityId}}",
+									"type": "text"
+								},
+								{
+									"key": "placeId",
+									"value": "{{placeId}}",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/place-stores/{{placeStoreId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"place-stores",
+								"{{placeStoreId}}"
+							]
+						},
+						"description": "Update item using the defined data and unique ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/place-stores",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/place-stores",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"place-stores"
+							]
+						},
+						"description": "List of all items without any filter"
+					},
+					"response": []
+				},
+				{
+					"name": "/place-stores/:id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/place-stores/{{placeStoreId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"place-stores",
+								"{{placeStoreId}}"
+							]
+						},
+						"description": "Get item detail using the unique ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/place-stores/:id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/place-stores/{{placeStoreId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"place-stores",
+								"{{placeStoreId}}"
+							]
+						},
+						"description": "Delete item using the unique ID"
+					},
+					"response": []
+				}
+			],
+			"description": "Stores covered by the application, where the family can use the benefit",
 			"event": [
 				{
 					"listen": "prerequest",
