@@ -1,4 +1,5 @@
 import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize';
+import { isHash, encrypt } from '../utils/crypt';
 
 // Simple item type
 export interface User {
@@ -84,8 +85,16 @@ const tableName = 'Users';
 export const initUserSchema = (sequelize: Sequelize): SequelizeUserModel => {
   const Schema = sequelize.define(tableName, attributes, { timestamps: true }) as SequelizeUserModel;
 
+  // Sequelize hooks
+  Schema.addHook('beforeSave', async (person: SequelizeUser) => {
+    // Hash the user password if it's not hashed yet
+    if (person.password && !isHash(person.password)) {
+      person.password = await encrypt(person.password);
+    }
+  });
+
+  // Sequelize relations
   Schema.associate = (models): void => {
-    // Sequelize relations
     Schema.belongsTo(models.cities, {
       foreignKey: 'cityId',
       as: 'city'
