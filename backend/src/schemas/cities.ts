@@ -55,7 +55,14 @@ export const initCitySchema = (sequelize: Sequelize): SequelizeCityModel => {
 
   Schema.associate = (models): void => {
     // Sequelize relations
-    void models; // Remove this line and add the relations with other tables here
+    Schema.hasMany(models.places, {
+      foreignKey: 'cityId',
+      as: 'places'
+    });
+    Schema.hasMany(models.placeStores, {
+      foreignKey: 'cityId',
+      as: 'placeStores'
+    });
   };
 
   return Schema;
