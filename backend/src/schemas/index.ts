@@ -2,6 +2,7 @@ import { Sequelize, Options } from 'sequelize';
 import { initCitySchema } from './cities';
 import { initPlaceSchema } from './places';
 import { initPlaceStoreSchema } from './placeStores';
+import { initUserSchema } from './users';
 
 import * as config from '../../database/config';
 
@@ -11,7 +12,8 @@ const sequelize = new Sequelize(config as Options);
 const db = {
   cities: initCitySchema(sequelize),
   places: initPlaceSchema(sequelize),
-  placeStores: initPlaceStoreSchema(sequelize)
+  placeStores: initPlaceStoreSchema(sequelize),
+  users: initUserSchema(sequelize)
 };
 
 // Creating DB relations
