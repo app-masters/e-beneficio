@@ -1,12 +1,12 @@
 import db from '../schemas';
-import { City, SequelizeCity } from '../schemas/cities';
+import { Place, SequelizePlace } from '../schemas/places';
 
 /**
  * Get all items on the table without any filter
  * @returns Promise<List of items>
  */
-export const getAll = (): Promise<SequelizeCity[]> => {
-  return db.cities.findAll();
+export const getAll = (): Promise<SequelizePlace[]> => {
+  return db.places.findAll();
 };
 
 /**
@@ -14,8 +14,8 @@ export const getAll = (): Promise<SequelizeCity[]> => {
  * @param id unique ID of the desired item
  * @returns Promise<Item>
  */
-export const getById = (id: string | number): Promise<SequelizeCity> => {
-  return db.cities.findByPk(id);
+export const getById = (id: string | number): Promise<SequelizePlace> => {
+  return db.places.findByPk(id);
 };
 
 /**
@@ -23,8 +23,8 @@ export const getById = (id: string | number): Promise<SequelizeCity> => {
  * @param values object with the new item data
  * @returns Promise<Item>
  */
-export const create = (values: City | SequelizeCity): Promise<SequelizeCity> => {
-  return db.cities.create(values);
+export const create = (values: Place | SequelizePlace): Promise<SequelizePlace> => {
+  return db.places.create(values);
 };
 
 /**
@@ -33,9 +33,9 @@ export const create = (values: City | SequelizeCity): Promise<SequelizeCity> => 
  * @param values object with the new data
  * @returns Promise<Item>
  */
-export const updateById = async (id: string | number, values: City | SequelizeCity): Promise<SequelizeCity> => {
-  // The update return an array [count, item[]], so I'm destructuring to get the updated city
-  const [, [item]] = await db.cities.update(values, { where: { id }, returning: true });
+export const updateById = async (id: string | number, values: Place | SequelizePlace): Promise<SequelizePlace> => {
+  // The update return an array [count, item[]], so I'm destructuring to get the updated place
+  const [, [item]] = await db.places.update(values, { where: { id }, returning: true });
   return item;
 };
 
@@ -44,5 +44,5 @@ export const updateById = async (id: string | number, values: City | SequelizeCi
  * @param id unique ID of the desired item
  */
 export const deleteById = (id: string | number): void => {
-  db.cities.destroy({ where: { id } });
+  db.places.destroy({ where: { id } });
 };
