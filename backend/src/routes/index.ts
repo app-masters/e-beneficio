@@ -4,6 +4,7 @@ import moment from 'moment';
 import cityRoutes from './cities';
 import placeRoutes from './places';
 import placeStoreRoutes from './placeStores';
+import userRoutes from './users';
 
 const router = express.Router();
 
@@ -18,5 +19,6 @@ router.get('/', (req, res) =>
 router.use('/cities', cityRoutes);
 router.use('/places', placeRoutes);
 router.use('/place-stores', placeStoreRoutes);
+router.use('/users', userRoutes);
 
 export default router;
