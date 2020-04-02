@@ -4,6 +4,7 @@ import { initPlaceSchema } from './places';
 import { initPlaceStoreSchema } from './placeStores';
 import { initUserSchema } from './users';
 import { initInstitutionSchema } from './institutions';
+import { initBenefitSchema } from './benefits';
 
 import * as config from '../../database/config';
 
@@ -15,7 +16,8 @@ const db = {
   places: initPlaceSchema(sequelize),
   placeStores: initPlaceStoreSchema(sequelize),
   users: initUserSchema(sequelize),
-  institutions: initInstitutionSchema(sequelize)
+  institutions: initInstitutionSchema(sequelize),
+  benefits: initBenefitSchema(sequelize)
 };
 
 // Creating DB relations

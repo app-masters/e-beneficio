@@ -55,6 +55,10 @@ export const initCitySchema = (sequelize: Sequelize): SequelizeCityModel => {
       foreignKey: 'cityId',
       as: 'users'
     });
+    Schema.hasMany(models.institutions, {
+      foreignKey: 'cityId',
+      as: 'institutions'
+    });
   };
 
   return Schema;
