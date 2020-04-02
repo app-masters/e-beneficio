@@ -60,7 +60,7 @@ const seed = async () => {
       })
       .filter(Boolean) as User[];
     if (itemsToCreate.length > 0) {
-      await db.users.bulkCreate(itemsToCreate);
+      await db.users.bulkCreate(itemsToCreate, { individualHooks: true });
     }
     console.log(`[seed] Users: Seeded successfully - ${itemsToCreate.length} new created`);
   } else {

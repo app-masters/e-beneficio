@@ -2,10 +2,122 @@
 	"info": {
 		"_postman_id": "35add2ef-63d1-43a0-bb30-2f11844ecab4",
 		"name": "Resources 4 Vulnerables",
-		"description": "Endpoints of the project",
+		"description": "Endpoints of the project\n\nTo be able to make the requests other than the auth, you will need to send the JWT token on the header of the request as:\n```JSON\n\"Authorization\": \"Bearer {{token}}\"\n```\n\n\nThe token can be obtained using the auth requests.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "/auth/login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e3789afa-0407-4a1d-a963-344cb5d238ef",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.token) {",
+									"    pm.environment.set('authToken', jsonData.token);",
+									"}",
+									"if (jsonData && jsonData.refreshToken) {",
+									"    pm.environment.set('refreshToken', jsonData.refreshToken);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "admin@login.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "admin@login",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Log in the user using the email and password"
+					},
+					"response": []
+				},
+				{
+					"name": "/auth/token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e3789afa-0407-4a1d-a963-344cb5d238ef",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.token) {",
+									"    pm.environment.set('authToken', jsonData.token);",
+									"}",
+									"if (jsonData && jsonData.refreshToken) {",
+									"    pm.environment.set('refreshToken', jsonData.refreshToken);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "refreshToken",
+									"value": "{{refreshToken}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/token",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"token"
+							]
+						},
+						"description": "Log in the user using the email and password"
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication routes to allow the user to get or refresh the JWT",
+			"protocolProfileBehavior": {}
+		},
 		{
 			"name": "Cities",
 			"item": [
@@ -858,6 +970,16 @@
 			"response": []
 		}
 	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{authToken}}",
+				"type": "string"
+			}
+		]
+	},
 	"event": [
 		{
 			"listen": "prerequest",
