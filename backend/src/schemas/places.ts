@@ -3,6 +3,7 @@ import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize'
 // Simple item type
 export interface Place {
   readonly id?: number;
+  cityId: number;
   title: string;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
@@ -25,21 +26,17 @@ export const attributes = {
     primaryKey: true,
     autoIncrement: true
   },
+  cityId: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: 'Cities',
+      id: 'id'
+    },
+    allowNull: false
+  },
   title: {
     type: DataTypes.STRING,
     allowNull: false
-  },
-  createdAt: {
-    type: DataTypes.DATE,
-    allowNull: true
-  },
-  updatedAt: {
-    type: DataTypes.DATE,
-    allowNull: true
-  },
-  deletedAt: {
-    type: DataTypes.DATE,
-    allowNull: true
   }
 };
 

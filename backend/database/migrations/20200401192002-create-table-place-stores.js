@@ -28,6 +28,14 @@ module.exports = {
         },
         allowNull: false
       },
+      address: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      cnpj: {
+        type: Sequelize.STRING(50),
+        allowNull: true
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: true

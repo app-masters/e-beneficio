@@ -14,15 +14,14 @@ const list = [
 const seed = async () => {
   const alreadyCreated = await db.placeStores.findAll();
   if (alreadyCreated.length < list.length) {
-    const cities = await db.cities.findAll();
     const places = await db.places.findAll();
     const itemsToCreate = list
       .map((item, index) => {
         const created = alreadyCreated.find((dbItem) => dbItem.title === item.title);
         if (created) return null; // Item is already created, don't create it again
-        const cityIndex = (index + 1) % cities.length; // Getting a cityId from the list
-        const placeIndex = (index + 1) % places.length; // Getting a placeId from the list
-        return { ...item, cityId: cities[cityIndex].id, placeId: places[placeIndex].id };
+        const placeIndex = index % places.length; // Getting a placeId from the list
+        const place = places[placeIndex];
+        return { ...item, placeId: place.id, cityId: place.cityId };
       })
       .filter(Boolean) as PlaceStore[];
     if (itemsToCreate.length > 0) {
