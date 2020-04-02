@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "35add2ef-63d1-43a0-bb30-2f11844ecab4",
+		"_postman_id": "40b5d2cf-41e9-4dab-a67b-7b37283b02d4",
 		"name": "Resources 4 Vulnerables",
 		"description": "Endpoints of the project\n\nTo be able to make the requests other than the auth, you will need to send the JWT token on the header of the request as:\n```JSON\n\"Authorization\": \"Bearer {{token}}\"\n```\n\n\nThe token can be obtained using the auth requests.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -41,11 +41,13 @@
 								{
 									"key": "email",
 									"value": "admin@login.com",
+									"description": "Registered email",
 									"type": "text"
 								},
 								{
 									"key": "password",
 									"value": "admin@login",
+									"description": "Non-hashed password",
 									"type": "text"
 								}
 							]
@@ -62,7 +64,52 @@
 						},
 						"description": "Log in the user using the email and password"
 					},
-					"response": []
+					"response": [
+						{
+							"name": "/auth/login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "email",
+											"value": "admin@login.com",
+											"description": "Registered email",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "admin@login",
+											"description": "Non-hashed password",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/login?",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									],
+									"query": [
+										{
+											"key": "",
+											"value": null
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNTg1ODU3OTU0LCJleHAiOjE1ODU4NTgyNTR9.P8GFrNl8LpdzcnhYIlt2Yf0gqjfdsfrfZDqFaoJwZkk\",\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNTg1ODU3OTU0LCJleHAiOjE1ODYyODk5NTR9.4ei-Qph_0sBVesVXNVB9xQa2qUohMu_Sd9LQCyYNneA\",\n    \"user\": {\n        \"id\": 1,\n        \"cityId\": 1,\n        \"placeStoreId\": null,\n        \"cpf\": \"00000000000\",\n        \"name\": \"Usuário admin\",\n        \"role\": \"admin\",\n        \"email\": \"admin@login.com\",\n        \"password\": \"$2a$08$criG7dYn64PoLkYHBQyFfuBQ14k/bb1QAoW1qmJYkpAZ4MxrZPtN.\",\n        \"active\": true,\n        \"createdAt\": \"2020-04-02T16:43:20.928Z\",\n        \"updatedAt\": \"2020-04-02T16:43:20.928Z\"\n    }\n}"
+						}
+					]
 				},
 				{
 					"name": "/auth/token",
@@ -96,6 +143,7 @@
 								{
 									"key": "refreshToken",
 									"value": "{{refreshToken}}",
+									"description": "Refresh token provided on login or other token request",
 									"type": "text"
 								}
 							]
@@ -515,11 +563,13 @@
 								{
 									"key": "address",
 									"value": "Rua Central, Bairro Centro",
+									"description": "Just the first line of the address",
 									"type": "text"
 								},
 								{
 									"key": "cnpj",
 									"value": "0000",
+									"description": "Brazilian company register",
 									"type": "text"
 								}
 							],
@@ -586,11 +636,13 @@
 								{
 									"key": "address",
 									"value": "Rua Central, Bairro Centro",
+									"description": "Just the first line of the address",
 									"type": "text"
 								},
 								{
 									"key": "cnpj",
 									"value": "0000",
+									"description": "Brazilian company register",
 									"type": "text"
 								}
 							],
@@ -743,11 +795,13 @@
 								{
 									"key": "cpf",
 									"value": "00000000000",
+									"description": "Brazilian personal register",
 									"type": "text"
 								},
 								{
 									"key": "role",
 									"value": "admin",
+									"description": "Possible values: admin | manager | financial | operator",
 									"type": "text"
 								},
 								{
@@ -829,11 +883,13 @@
 								{
 									"key": "cpf",
 									"value": "00000000000",
+									"description": "Brazilian personal register",
 									"type": "text"
 								},
 								{
 									"key": "role",
 									"value": "admin",
+									"description": "Possible values: admin | manager | financial | operator",
 									"type": "text"
 								},
 								{
@@ -1135,6 +1191,228 @@
 			"protocolProfileBehavior": {}
 		},
 		{
+			"name": "Benefits",
+			"item": [
+				{
+					"name": "/benefits",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bbd3d500-1773-4ed2-848c-89f003013227",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set('benefitId', jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "institutionId",
+									"value": "{{institutionId}}",
+									"type": "text"
+								},
+								{
+									"key": "title",
+									"value": "Municipal Social Help",
+									"type": "text"
+								},
+								{
+									"key": "groupName",
+									"value": "Extreme Poverty",
+									"type": "text"
+								},
+								{
+									"key": "month",
+									"value": "3",
+									"type": "text"
+								},
+								{
+									"key": "year",
+									"value": "2020",
+									"type": "text"
+								},
+								{
+									"key": "value",
+									"value": "500",
+									"description": "Individual money value in BRL",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/benefits",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"benefits"
+							]
+						},
+						"description": "Create a new item using the defined data"
+					},
+					"response": []
+				},
+				{
+					"name": "/benefits/:id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "institutionId",
+									"value": "{{institutionId}}",
+									"type": "text"
+								},
+								{
+									"key": "title",
+									"value": "Municipal Social Help",
+									"type": "text"
+								},
+								{
+									"key": "groupName",
+									"value": "Extreme Poverty",
+									"type": "text"
+								},
+								{
+									"key": "month",
+									"value": "3",
+									"type": "text"
+								},
+								{
+									"key": "year",
+									"value": "2020",
+									"type": "text"
+								},
+								{
+									"key": "value",
+									"value": "500",
+									"description": "Individual money value in BRL",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/benefits/{{benefitId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"benefits",
+								"{{benefitId}}"
+							]
+						},
+						"description": "Update item using the defined data and unique ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/benefits",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/benefits",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"benefits"
+							]
+						},
+						"description": "List of all items without any filter"
+					},
+					"response": []
+				},
+				{
+					"name": "/benefits/:id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/benefits/{{benefitId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"benefits",
+								"{{benefitId}}"
+							]
+						},
+						"description": "Get item detail using the unique ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/benefits/:id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/benefits/{{benefitId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"benefits",
+								"{{benefitId}}"
+							]
+						},
+						"description": "Delete item using the unique ID"
+					},
+					"response": []
+				}
+			],
+			"description": "Benefits that the families can use in the places",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "42aa2627-0008-48c0-ad44-4a91cfe57720",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "9ac24a10-1275-4ed0-9854-34fbb33175ca",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
 			"name": "/",
 			"request": {
 				"method": "GET",
@@ -1184,50 +1462,56 @@
 	],
 	"variable": [
 		{
-			"id": "af8a04ae-2e00-4530-b492-6afb6ba69a9a",
+			"id": "88b1f248-2c16-47a4-8e49-9c3564c81d80",
 			"key": "baseUrl",
 			"value": "http://localhost:3001",
 			"type": "string"
 		},
 		{
-			"id": "123aa7e8-a7e3-43ea-9cfb-35c18eb5e204",
+			"id": "0dc8e3a7-2be7-4cf0-869a-f33c99b0ef9f",
 			"key": "authToken",
 			"value": "_token_",
 			"type": "string"
 		},
 		{
-			"id": "d9155b13-99d9-4d49-a2b2-02090a558a7f",
+			"id": "d39db918-5e32-4699-bd42-82685be2f343",
 			"key": "refreshToken",
 			"value": "_token_",
 			"type": "string"
 		},
 		{
-			"id": "5d41362a-386e-447e-9c70-68c4941727ee",
+			"id": "cea889d6-bde6-44c2-be00-becc3463eb90",
 			"key": "cityId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "651848ff-9893-44b5-b7ae-cbe2a3fd15ba",
+			"id": "65493d00-1226-4779-a7c8-9b5258a6a416",
 			"key": "placeId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "e50ccce1-d7d9-4a7d-ab33-ec8edeca436b",
+			"id": "58313e64-61c3-4e09-bce5-b53edecb0294",
 			"key": "placeStoreId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "2a9d8975-959e-4838-a4f9-3e4eb947b1dd",
+			"id": "fa23300b-f197-446a-b1f4-e475e538107f",
 			"key": "userId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "d5a9d6e6-e4f4-43b4-8eb9-130851acee2a",
+			"id": "3bd9c5cf-59cb-42ac-afcb-fbb43653174d",
 			"key": "institutionId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"id": "48056013-429a-491e-8f08-ba38984fc9e2",
+			"key": "benefitId",
 			"value": "1",
 			"type": "string"
 		}

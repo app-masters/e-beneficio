@@ -1,19 +1,23 @@
 import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize';
 
 // Simple item type
-export interface Institution {
+export interface Benefit {
   readonly id?: number;
-  cityId: number;
+  institutionId: number;
+  groupName: string;
   title: string;
+  month: number;
+  year: number;
+  value: number;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
 }
 // Sequelize returns type
-export type SequelizeInstitution = Institution & Model;
+export type SequelizeBenefit = Benefit & Model;
 // Sequelize model type
-export type SequelizeInstitutionModel = typeof Model & {
-  new (values?: object, options?: BuildOptions): SequelizeInstitution;
+export type SequelizeBenefitModel = typeof Model & {
+  new (values?: object, options?: BuildOptions): SequelizeBenefit;
   associate: (models: { [key: string]: ModelCtor<Model> }) => void;
 };
 
@@ -26,39 +30,51 @@ export const attributes = {
     primaryKey: true,
     autoIncrement: true
   },
-  cityId: {
+  institutionId: {
     type: DataTypes.INTEGER,
     references: {
-      model: 'Cities',
+      model: 'Institutions',
       id: 'id'
     },
+    allowNull: false
+  },
+  groupName: {
+    type: DataTypes.STRING,
     allowNull: false
   },
   title: {
     type: DataTypes.STRING,
     allowNull: false
+  },
+  month: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  year: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  value: {
+    type: DataTypes.FLOAT,
+    allowNull: false
   }
 };
 
-const tableName = 'Institutions';
+const tableName = 'Benefits';
 
 /**
  * Sequelize model initializer function
  * @param sequelize - Sequelize instance
  * @returns Schema - Sequelize model
  */
-export const initInstitutionSchema = (sequelize: Sequelize): SequelizeInstitutionModel => {
-  const Schema = sequelize.define(tableName, attributes, { timestamps: true }) as SequelizeInstitutionModel;
+export const initBenefitSchema = (sequelize: Sequelize): SequelizeBenefitModel => {
+  const Schema = sequelize.define(tableName, attributes, { timestamps: true }) as SequelizeBenefitModel;
 
   Schema.associate = (models): void => {
     // Sequelize relations
-    Schema.belongsTo(models.cities, {
-      foreignKey: 'cityId',
-      as: 'city'
-    });
-    Schema.hasMany(models.benefits, {
+    Schema.belongsTo(models.institutions, {
       foreignKey: 'institutionId',
-      as: 'benefits'
+      as: 'institution'
     });
   };
 
