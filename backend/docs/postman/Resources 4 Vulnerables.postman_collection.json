@@ -2,6 +2,7 @@
 	"info": {
 		"_postman_id": "35add2ef-63d1-43a0-bb30-2f11844ecab4",
 		"name": "Resources 4 Vulnerables",
+		"description": "Endpoints of the project",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -398,6 +399,16 @@
 									"key": "placeId",
 									"value": "{{placeId}}",
 									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "Rua Central, Bairro Centro",
+									"type": "text"
+								},
+								{
+									"key": "cnpj",
+									"value": "0000",
+									"type": "text"
 								}
 							],
 							"options": {
@@ -421,6 +432,24 @@
 				},
 				{
 					"name": "/place-stores/:id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bbd3d500-1773-4ed2-848c-89f003013227",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.id) {",
+									"    pm.environment.set('placeStoreId', jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "PUT",
 						"header": [],
@@ -429,7 +458,7 @@
 							"urlencoded": [
 								{
 									"key": "title",
-									"value": "BC Granbery",
+									"value": "BC Centro",
 									"type": "text"
 								},
 								{
@@ -440,6 +469,16 @@
 								{
 									"key": "placeId",
 									"value": "{{placeId}}",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "Rua Central, Bairro Centro",
+									"type": "text"
+								},
+								{
+									"key": "cnpj",
+									"value": "0000",
 									"type": "text"
 								}
 							],
@@ -459,7 +498,7 @@
 								"{{placeStoreId}}"
 							]
 						},
-						"description": "Update item using the defined data and unique ID"
+						"description": "Update an item using the defined data and the unique ID"
 					},
 					"response": []
 				},
@@ -546,6 +585,264 @@
 			"protocolProfileBehavior": {}
 		},
 		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "/users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bbd3d500-1773-4ed2-848c-89f003013227",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.id) {",
+									"    pm.environment.set('userId', jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "João Baraky",
+									"type": "text"
+								},
+								{
+									"key": "cityId",
+									"value": "{{cityId}}",
+									"type": "text"
+								},
+								{
+									"key": "placeStoreId",
+									"value": "{{placeStoreId}}",
+									"type": "text"
+								},
+								{
+									"key": "cpf",
+									"value": "00000000000",
+									"type": "text"
+								},
+								{
+									"key": "role",
+									"value": "admin",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "user@admin.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "1234",
+									"type": "text"
+								},
+								{
+									"key": "active",
+									"value": "true",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
+							]
+						},
+						"description": "Create a new item using the defined data"
+					},
+					"response": []
+				},
+				{
+					"name": "/users/:id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bbd3d500-1773-4ed2-848c-89f003013227",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.id) {",
+									"    pm.environment.set('userId', jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "João Baraky",
+									"type": "text"
+								},
+								{
+									"key": "cityId",
+									"value": "{{cityId}}",
+									"type": "text"
+								},
+								{
+									"key": "placeStoreId",
+									"value": "{{placeStoreId}}",
+									"type": "text"
+								},
+								{
+									"key": "cpf",
+									"value": "00000000000",
+									"type": "text"
+								},
+								{
+									"key": "role",
+									"value": "admin",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "user@admin.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "1234",
+									"type": "text"
+								},
+								{
+									"key": "active",
+									"value": "true",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}"
+							]
+						},
+						"description": "Update item using the defined data and unique ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
+							]
+						},
+						"description": "List of all items without any filter"
+					},
+					"response": []
+				},
+				{
+					"name": "/users/:id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}"
+							]
+						},
+						"description": "Get item detail using the unique ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/users/:id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}"
+							]
+						},
+						"description": "Delete item using the unique ID"
+					},
+					"response": []
+				}
+			],
+			"description": "User that will log on the system: Admin and Store users",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "42aa2627-0008-48c0-ad44-4a91cfe57720",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "9ac24a10-1275-4ed0-9854-34fbb33175ca",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
 			"name": "/",
 			"request": {
 				"method": "GET",
@@ -559,6 +856,28 @@
 				"description": "API base URL"
 			},
 			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "adae17f8-0f9b-480e-9765-acfa50b4be39",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "658bd9ce-d4f4-4fff-92c6-5e5a942a57f8",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
 		}
 	],
 	"protocolProfileBehavior": {}

@@ -16,7 +16,7 @@ const seed = async () => {
     if (itemsToCreate.length > 0) {
       await db.cities.bulkCreate(itemsToCreate);
     }
-    console.log(`[seed] Cities: Sedeed successfully - ${itemsToCreate.length} new created`);
+    console.log(`[seed] Cities: Seeded successfully - ${itemsToCreate.length} new created`);
   } else {
     console.log(`[seed] Cities: Nothing to seed`);
   }

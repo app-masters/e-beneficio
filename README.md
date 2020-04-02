@@ -52,3 +52,11 @@ cd backend
 npm run migrate
 npm run seed
 ```
+
+`IMPORTANT:` When seeding for the first time, the seed for the `users` will create a login and password for each available role so you can use it to login on the frontend. The default data is:
+
+```
+Role: admin or manager or financial or operator
+Email: {role}@login.com
+Password: {role}@login
+```
