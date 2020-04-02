@@ -2,6 +2,7 @@ import citySeed from './cities';
 import placeSeed from './places';
 import placeStoreSeed from './placeStores';
 import userSeed from './users';
+import institutionSeed from './institutions';
 
 /**
  * Seed all tables
@@ -13,6 +14,7 @@ const seedAll = async () => {
     await placeSeed.seed();
     await placeStoreSeed.seed();
     await userSeed.seed();
+    await institutionSeed.seed();
   }
   // Production seed
   // ...
