@@ -22,10 +22,10 @@
 									"",
 									"// SET ENV VARS",
 									"if (jsonData && jsonData.token) {",
-									"    pm.environment.set('authToken', jsonData.token);",
+									"    pm.collectionVariables.set('authToken', jsonData.token);",
 									"}",
 									"if (jsonData && jsonData.refreshToken) {",
-									"    pm.environment.set('refreshToken', jsonData.refreshToken);",
+									"    pm.collectionVariables.set('refreshToken', jsonData.refreshToken);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -77,10 +77,10 @@
 									"",
 									"// SET ENV VARS",
 									"if (jsonData && jsonData.token) {",
-									"    pm.environment.set('authToken', jsonData.token);",
+									"    pm.collectionVariables.set('authToken', jsonData.token);",
 									"}",
 									"if (jsonData && jsonData.refreshToken) {",
-									"    pm.environment.set('refreshToken', jsonData.refreshToken);",
+									"    pm.collectionVariables.set('refreshToken', jsonData.refreshToken);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -134,7 +134,7 @@
 									"",
 									"// SET ENV VARS",
 									"if (jsonData && jsonData.id) {",
-									"    pm.environment.set('cityId', jsonData.id);",
+									"    pm.collectionVariables.set('cityId', jsonData.id);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -304,7 +304,7 @@
 									"",
 									"// SET ENV VARS",
 									"if (jsonData && jsonData.id) {",
-									"    pm.environment.set('placeId', jsonData.id);",
+									"    pm.collectionVariables.set('placeId', jsonData.id);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -484,7 +484,7 @@
 									"",
 									"// SET ENV VARS",
 									"if (jsonData && jsonData.id) {",
-									"    pm.environment.set('placeStoreId', jsonData.id);",
+									"    pm.collectionVariables.set('placeStoreId', jsonData.id);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -555,7 +555,7 @@
 									"",
 									"// SET ENV VARS",
 									"if (jsonData && jsonData.id) {",
-									"    pm.environment.set('placeStoreId', jsonData.id);",
+									"    pm.collectionVariables.set('placeStoreId', jsonData.id);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -712,7 +712,7 @@
 									"",
 									"// SET ENV VARS",
 									"if (jsonData && jsonData.id) {",
-									"    pm.environment.set('userId', jsonData.id);",
+									"    pm.collectionVariables.set('userId', jsonData.id);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -798,7 +798,7 @@
 									"",
 									"// SET ENV VARS",
 									"if (jsonData && jsonData.id) {",
-									"    pm.environment.set('userId', jsonData.id);",
+									"    pm.collectionVariables.set('userId', jsonData.id);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -955,6 +955,186 @@
 			"protocolProfileBehavior": {}
 		},
 		{
+			"name": "Institutions",
+			"item": [
+				{
+					"name": "/institutions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bbd3d500-1773-4ed2-848c-89f003013227",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set('institutionId', jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "Government",
+									"type": "text"
+								},
+								{
+									"key": "cityId",
+									"value": "{{cityId}}",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/institutions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"institutions"
+							]
+						},
+						"description": "Create a new item using the defined data"
+					},
+					"response": []
+				},
+				{
+					"name": "/institutions/:id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "Government",
+									"type": "text"
+								},
+								{
+									"key": "cityId",
+									"value": "{{cityId}}",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/institutions/{{institutionId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"institutions",
+								"{{institutionId}}"
+							]
+						},
+						"description": "Update item using the defined data and unique ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/institutions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/institutions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"institutions"
+							]
+						},
+						"description": "List of all items without any filter"
+					},
+					"response": []
+				},
+				{
+					"name": "/institutions/:id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/institutions/{{institutionId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"institutions",
+								"{{institutionId}}"
+							]
+						},
+						"description": "Get item detail using the unique ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/institutions/:id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/institutions/{{institutionId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"institutions",
+								"{{institutionId}}"
+							]
+						},
+						"description": "Delete item using the unique ID"
+					},
+					"response": []
+				}
+			],
+			"description": "Institutions that will generate the benefits for the families",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "42aa2627-0008-48c0-ad44-4a91cfe57720",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "9ac24a10-1275-4ed0-9854-34fbb33175ca",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
 			"name": "/",
 			"request": {
 				"method": "GET",
@@ -1000,6 +1180,56 @@
 					""
 				]
 			}
+		}
+	],
+	"variable": [
+		{
+			"id": "af8a04ae-2e00-4530-b492-6afb6ba69a9a",
+			"key": "baseUrl",
+			"value": "http://localhost:3001",
+			"type": "string"
+		},
+		{
+			"id": "123aa7e8-a7e3-43ea-9cfb-35c18eb5e204",
+			"key": "authToken",
+			"value": "_token_",
+			"type": "string"
+		},
+		{
+			"id": "d9155b13-99d9-4d49-a2b2-02090a558a7f",
+			"key": "refreshToken",
+			"value": "_token_",
+			"type": "string"
+		},
+		{
+			"id": "5d41362a-386e-447e-9c70-68c4941727ee",
+			"key": "cityId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"id": "651848ff-9893-44b5-b7ae-cbe2a3fd15ba",
+			"key": "placeId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"id": "e50ccce1-d7d9-4a7d-ab33-ec8edeca436b",
+			"key": "placeStoreId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"id": "2a9d8975-959e-4838-a4f9-3e4eb947b1dd",
+			"key": "userId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"id": "d5a9d6e6-e4f4-43b4-8eb9-130851acee2a",
+			"key": "institutionId",
+			"value": "1",
+			"type": "string"
 		}
 	],
 	"protocolProfileBehavior": {}

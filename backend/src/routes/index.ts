@@ -9,6 +9,7 @@ import cityRoutes from './cities';
 import placeRoutes from './places';
 import placeStoreRoutes from './placeStores';
 import userRoutes from './users';
+import institutionRoutes from './institutions';
 
 const router = express.Router();
 
@@ -25,5 +26,6 @@ router.use('/cities', jwtMiddleware, cityRoutes);
 router.use('/places', jwtMiddleware, placeRoutes);
 router.use('/place-stores', jwtMiddleware, placeStoreRoutes);
 router.use('/users', jwtMiddleware, userRoutes);
+router.use('/institutions', jwtMiddleware, institutionRoutes);
 
 export default router;
