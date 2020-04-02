@@ -14,7 +14,7 @@ const seed = async () => {
       .map((item, index) => {
         const created = alreadyCreated.find((dbItem) => dbItem.title === item.title);
         if (created) return null; // Item is already created, don't create it again
-        const cityIndex = (index + 1) % cities.length; // Getting a cityId from the list
+        const cityIndex = index % cities.length; // Getting a cityId from the list
         return { ...item, cityId: cities[cityIndex].id };
       })
       .filter(Boolean) as Place[];
