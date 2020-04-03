@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import moment from 'moment';
 import momentBR from 'moment/locale/pt-br';
 import { ThemeProvider } from 'styled-components';
+import { Provider } from 'react-redux';
+
 import { GlobalStyles } from './styles/globalStyles';
 import { Theme } from './styles/theme';
 
@@ -15,7 +17,9 @@ const App = () => {
   return (
     <ThemeProvider theme={Theme}>
       <GlobalStyles />
-      <h1>Welcome</h1>
+      <Provider store={{}}>
+        <h1>Welcome</h1>
+      </Provider>
     </ThemeProvider>
   );
 };
