@@ -21,13 +21,13 @@ const PrivateRouter: React.FC<{}> = (props) => {
 
   return (
     <AdminLayout loading={loading}>
-      <Switch>
+      <>
         {/* Place routes */}
         <Route path="/estabelecimentos" component={PlaceList} />
         <Route path="/estabelecimentos/:id" component={PlaceForm} />
         {/* Dashboard */}
         <Route path="/" component={DashboardPage} exact />
-      </Switch>
+      </>
     </AdminLayout>
   );
 };
