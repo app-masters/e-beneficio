@@ -3,6 +3,7 @@ import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppState } from '../redux/rootReducer';
 import { User } from '../interfaces/user';
+import { AdminLayout } from '../components/AdminLayout';
 
 // Pages
 import { LoginPage } from './login';
@@ -17,14 +18,16 @@ const PrivateRouter: React.FC<{}> = (props) => {
   useEffect(() => {
     // On first render, try to renewal the token
     dispatch(doGetToken());
-  }, []);
+  }, [dispatch]);
   return (
     <BrowserRouter>
-      <Switch>
-        <Route path="*">
-          <div>Você está dentro do sistema</div>
-        </Route>
-      </Switch>
+      <AdminLayout>
+        <Switch>
+          <Route path="*">
+            <div>Você está dentro do sistema</div>
+          </Route>
+        </Switch>
+      </AdminLayout>
     </BrowserRouter>
   );
 };
