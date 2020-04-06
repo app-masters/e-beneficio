@@ -9,8 +9,6 @@ const parsedAuthRedux: AppState['authReducer'] | undefined = parsedReduxPersist
   ? JSON.parse(parsedReduxPersist.authReducer)
   : undefined;
 
-debugger;
-
 /**
  * Default axios instance
  */
