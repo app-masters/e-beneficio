@@ -20,27 +20,27 @@ interface RouteItem {
 
 const routes: RouteItem[] = [
   {
-    path: '/',
+    path: '/beneficions',
     icon: () => <AccountBookFilled />,
     name: 'Beneficios'
   },
   {
-    path: '/',
+    path: '/familias',
     icon: () => <AccountBookFilled />,
     name: 'Famílias'
   },
   {
-    path: '/',
+    path: '/lojas',
     icon: () => <AccountBookFilled />,
     name: 'Lojas'
   },
   {
-    path: '/',
+    path: '/estabelecimentos/criar',
     icon: () => <AccountBookFilled />,
     name: 'Estabelecimentos'
   },
   {
-    path: '/',
+    path: '/relatorios',
     icon: () => <AccountBookFilled />,
     name: 'Relatórios'
   }
@@ -79,7 +79,9 @@ const menuItem = (item: RouteItem, parentPath: string) => {
       </SubMenu>
     )
   ) : (
-    <Menu.Item key={key}>{innerItem()}</Menu.Item>
+    <Menu.Item key={key}>
+      <Link to={key}>{innerItem()}</Link>
+    </Menu.Item>
   );
 };
 
