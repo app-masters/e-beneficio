@@ -11,6 +11,7 @@ import { DashboardPage } from './dashboard';
 import { PlaceList } from './places/list';
 import { PlaceForm } from './places/form';
 import { useRefreshToken } from '../utils/auth';
+import { LogoutPage } from './logout';
 
 /**
  * Router available only for logged users
@@ -22,6 +23,7 @@ const PrivateRouter: React.FC<{}> = (props) => {
   return (
     <AdminLayout loading={loading}>
       <>
+        <Route path="/logout" component={LogoutPage} />
         {/* Place routes */}
         <Route path="/estabelecimentos" component={PlaceList} />
         <Route path="/estabelecimentos/:id" component={PlaceForm} />
