@@ -35,7 +35,7 @@ const routes: RouteItem[] = [
     name: 'Lojas'
   },
   {
-    path: '/estabelecimentos/criar',
+    path: '/estabelecimentos',
     icon: () => <AccountBookFilled />,
     name: 'Estabelecimentos'
   },
