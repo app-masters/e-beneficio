@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Card, Input, Button, Form, Typography } from 'antd';
 
-import { doLoginUser } from '../../redux/auth/actions';
+import { requestLoginUser } from '../../redux/auth/actions';
 import { AppState } from '../../redux/rootReducer';
 
 import { FormContainer, PageContainer } from './styles';
@@ -49,7 +49,7 @@ export const LoginPage: React.FC<{}> = (props) => {
               size="large"
               loading={loading}
               type="primary"
-              onClick={() => dispatch(doLoginUser(email, password))}
+              onClick={() => dispatch(requestLoginUser(email, password))}
               style={{ width: '100%' }}
             >
               Entrar

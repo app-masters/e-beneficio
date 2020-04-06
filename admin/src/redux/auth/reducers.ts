@@ -1,6 +1,12 @@
 import { createReducer } from '@reduxjs/toolkit';
-import * as TYPES from './types';
-import { LoginUserSuccessAction, LoginUserFailedAction, GetTokenSuccessAction, GetTokenFailedAction } from './actions';
+import {
+  doLoginUser,
+  doLoginUserSuccess,
+  doLoginUserFailed,
+  doGetToken,
+  doGetTokenSuccess,
+  doGetTokenFailed
+} from './actions';
 import { User } from '../../interfaces/user';
 
 export interface AuthReducerState {
@@ -16,30 +22,30 @@ const initialState = {
 };
 
 export default createReducer<AuthReducerState>(initialState, {
-  [TYPES.LOGIN_USER]: (state: AuthReducerState) => {
+  [doLoginUser.toString()]: (state: AuthReducerState) => {
     state.loading = true;
     state.error = undefined;
   },
-  [TYPES.LOGIN_USER_SUCCESS]: (state: AuthReducerState, action: LoginUserSuccessAction) => {
+  [doLoginUserSuccess.toString()]: (state: AuthReducerState, action) => {
     state.loading = false;
-    state.token = action.response.token;
-    state.refreshToken = action.response.refreshToken;
-    state.user = action.response.user;
+    state.token = action.payload.token;
+    state.refreshToken = action.payload.refreshToken;
+    state.user = action.payload.user;
   },
-  [TYPES.LOGIN_USER_FAILED]: (state: AuthReducerState, action: LoginUserFailedAction) => {
+  [doLoginUserFailed.toString()]: (state: AuthReducerState, action) => {
     state.loading = false;
-    state.error = action.error;
+    state.error = action.payload;
   },
-  [TYPES.GET_TOKEN]: (state: AuthReducerState) => {
+  [doGetToken.toString()]: (state: AuthReducerState) => {
     state.loading = true;
   },
-  [TYPES.GET_TOKEN_SUCCESS]: (state: AuthReducerState, action: GetTokenSuccessAction) => {
+  [doGetTokenSuccess.toString()]: (state: AuthReducerState, action) => {
     state.loading = false;
-    state.token = action.response.token;
-    state.refreshToken = action.response.refreshToken;
-    state.user = action.response.user;
+    state.token = action.payload.token;
+    state.refreshToken = action.payload.refreshToken;
+    state.user = action.payload.user;
   },
-  [TYPES.GET_TOKEN_FAILED]: (state: AuthReducerState) => {
+  [doGetTokenFailed.toString()]: (state: AuthReducerState) => {
     state.loading = false;
     // Token failed, log out the user
     state.token = undefined;

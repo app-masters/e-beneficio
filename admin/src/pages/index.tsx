@@ -1,12 +1,15 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { BrowserRouter, Switch, Route, RouteProps } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppState } from '../redux/rootReducer';
 import { User } from '../interfaces/user';
+import { requestGetToken } from '../redux/auth/actions';
 
 // Pages
 import { LoginPage } from './login';
-import { doGetToken } from '../redux/auth/actions';
+import { DashboardPage } from './dashboard';
+import { PlaceList } from './places/list';
+import { PlaceForm } from './places/form';
 
 /**
  * Router available only for logged users
@@ -16,15 +19,19 @@ const PrivateRouter: React.FC<{}> = (props) => {
   const dispatch = useDispatch();
   useEffect(() => {
     // On first render, try to renewal the token
-    dispatch(doGetToken());
+    dispatch(requestGetToken());
   }, []);
+  // TODO: better handle the first render to avoid requests without the token
+  const loading = useSelector<AppState, boolean>((state) => state.authReducer.loading);
+  if (loading) return null;
+
   return (
     <BrowserRouter>
-      <Switch>
-        <Route path="*">
-          <div>Você está dentro do sistema</div>
-        </Route>
-      </Switch>
+      {/* Place routes */}
+      <Route path="/estabelecimentos" component={PlaceList} />
+      <Route path="/estabelecimentos/:id" component={PlaceForm} />
+      {/* Dashboard */}
+      <Route path="/" component={DashboardPage} exact />
     </BrowserRouter>
   );
 };
