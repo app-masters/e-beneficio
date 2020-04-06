@@ -28,7 +28,13 @@ module.exports = {
     ],
     'jsdoc/require-description': [2],
     '@typescript-eslint/no-var-requires': 'off',
-    'react/no-unescaped-entities': 'off'
+    'react/no-unescaped-entities': 'off',
+    'prettier/prettier': [
+      'error',
+      {
+        endOfLine: 'auto' // Fixes mismatching windows/unix file end of lines
+      }
+    ]
   },
   overrides: [
     {
