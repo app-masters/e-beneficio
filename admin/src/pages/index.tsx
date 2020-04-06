@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Switch, Route, RouteProps } from 'react-router-dom';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppState } from '../redux/rootReducer';
 import { User } from '../interfaces/user';
 import { requestGetToken } from '../redux/auth/actions';
+import { AdminLayout } from '../components/AdminLayout';
 
 // Pages
 import { LoginPage } from './login';
@@ -27,11 +28,13 @@ const PrivateRouter: React.FC<{}> = (props) => {
 
   return (
     <BrowserRouter>
-      {/* Place routes */}
-      <Route path="/estabelecimentos" component={PlaceList} />
-      <Route path="/estabelecimentos/:id" component={PlaceForm} />
-      {/* Dashboard */}
-      <Route path="/" component={DashboardPage} exact />
+      <AdminLayout>
+        {/* Place routes */}
+        <Route path="/estabelecimentos" component={PlaceList} />
+        <Route path="/estabelecimentos/:id" component={PlaceForm} />
+        {/* Dashboard */}
+        <Route path="/" component={DashboardPage} exact />
+      </AdminLayout>
     </BrowserRouter>
   );
 };
