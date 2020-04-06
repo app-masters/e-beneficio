@@ -46,32 +46,46 @@ export const requestGetPlace = (id?: number): ThunkResult<void> => {
 /**
  * Save place Thunk action
  */
-export const requestSavePlace = (item: Place): ThunkResult<void> => {
+export const requestSavePlace = (
+  item: Pick<Place, 'title' | 'id'>,
+  onSuccess?: () => void,
+  onFailure?: (error?: Error) => void
+): ThunkResult<void> => {
   return async (dispatch, getState) => {
     try {
       // Start request - starting loading state
       dispatch(doDeletePlace());
       // Get logged user cityId
       const user = getState().authReducer.user as User;
-      item = { ...item, cityId: user.cityId };
 
       // Request
       let response;
       if (item.id) {
-        response = await backend.put<Place>(`/places/${item.id}`, item, { params: { cityId: user.cityId } });
+        response = await backend.put<Place>(
+          `/places/${item.id}`,
+          { ...item, cityId: user.cityId },
+          { params: { cityId: user.cityId } }
+        );
       } else {
-        response = await backend.post<Place>(`/places/`, item, { params: { cityId: user.cityId } });
+        response = await backend.post<Place>(
+          `/places`,
+          { ...item, cityId: user.cityId },
+          { params: { cityId: user.cityId } }
+        );
       }
       if (response && response.data) {
         // Request finished
         dispatch(doSavePlaceSuccess(response.data)); // Dispatch result
+        if (onSuccess) onSuccess();
       } else {
         // Request without response - probably won't happen, but cancel the request
         dispatch(doSavePlaceFailed());
+        if (onFailure) onFailure();
       }
     } catch (error) {
       // Request failed: dispatch error
       dispatch(doSavePlaceFailed(error));
+      if (onFailure) onFailure(error);
     }
   };
 };

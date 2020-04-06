@@ -1,11 +1,22 @@
 import axios from 'axios';
 import { TokenResponse } from '../interfaces/auth';
+import { PERSIST_KEY } from '../lib/constraints';
+import { AppState } from '../redux/rootReducer';
+
+const reduxPersist = localStorage.getItem(`persist:${PERSIST_KEY}`);
+const parsedReduxPersist = reduxPersist ? JSON.parse(reduxPersist) : undefined;
+const parsedAuthRedux: AppState['authReducer'] | undefined = parsedReduxPersist
+  ? JSON.parse(parsedReduxPersist.authReducer)
+  : undefined;
+
+debugger;
 
 /**
  * Default axios instance
  */
 const backend = axios.create({
-  baseURL: process.env.REACT_APP_ENV_BACKEND_HOST
+  baseURL: process.env.REACT_APP_ENV_BACKEND_HOST,
+  headers: parsedAuthRedux && parsedAuthRedux.token ? { Authorization: `Bearer ${parsedAuthRedux.token}` } : undefined
 });
 
 /**

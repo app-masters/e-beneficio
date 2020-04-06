@@ -1,9 +1,16 @@
+import { Form, Input, Modal, Alert } from 'antd';
+import { useFormik } from 'formik';
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
-import { Modal } from 'antd';
-import { AppState } from '../../redux/rootReducer';
 import { Place } from '../../interfaces/place';
+import yup from '../../lib/yup';
+import { AppState } from '../../redux/rootReducer';
+import { requestSavePlace } from '../../redux/place/actions';
+
+const schema = yup.object().shape({
+  title: yup.string().label('Título').required()
+});
 
 /**
  * Dashboard page component
@@ -12,15 +19,55 @@ import { Place } from '../../interfaces/place';
 export const PlaceForm: React.FC<RouteComponentProps<{ id: string }>> = (props) => {
   const history = useHistory();
   const isCreating = props.match.params.id === 'criar';
+  const dispatch = useDispatch();
+
   // Redux state
-  // const place = useSelector<AppState, Place | undefined>((state) =>
-  //   state.placeReducer.list.filter((item) => item.id === props.match.params.id)
-  // );
+  const place = useSelector<AppState, Place | undefined>(({ placeReducer }) =>
+    placeReducer.list.find((item) => item.id === Number(props.match.params.id))
+  );
+
+  const loading = useSelector<AppState, boolean>(({ placeReducer }) => placeReducer.loading);
+
+  const { handleSubmit, handleChange, values, getFieldMeta, submitForm, status, errors, touched } = useFormik({
+    initialValues: place || {
+      title: ''
+    },
+    validationSchema: schema,
+    onSubmit: (values, { setStatus }) => {
+      setStatus();
+      dispatch(
+        requestSavePlace(
+          values,
+          () => history.push('/estabelecimentos'),
+          () => setStatus('Ocorreu um erro ao realizar a requisição.')
+        )
+      );
+    }
+  });
+
+  const titleMeta = getFieldMeta('title');
+
   return (
     <Modal
       title={isCreating ? 'Criar' : 'Editar'}
       visible={true}
       onCancel={() => history.push('/estabelecimentos')}
-    ></Modal>
+      onOk={submitForm}
+      confirmLoading={loading}
+      okType={errors && Object.keys(errors).length > 0 && touched ? 'danger' : 'primary'}
+    >
+      {status && <Alert message="Erro no formulário" description={status} type="error" />}
+      <form onSubmit={handleSubmit}>
+        <Form layout="vertical">
+          <Form.Item
+            label={'Título'}
+            validateStatus={!!titleMeta.error && !!titleMeta.touched ? 'error' : ''}
+            help={!!titleMeta.error && !!titleMeta.touched ? titleMeta.error : undefined}
+          >
+            <Input id="title" name="title" onChange={handleChange} value={values.title} onPressEnter={submitForm} />
+          </Form.Item>
+        </Form>
+      </form>
+    </Modal>
   );
 };
