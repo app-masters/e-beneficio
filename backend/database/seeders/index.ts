@@ -1,9 +1,10 @@
-import citySeed from './cities';
-import placeSeed from './places';
-import placeStoreSeed from './placeStores';
-import userSeed from './users';
-import institutionSeed from './institutions';
-import benefitSeed from './benefits';
+import cities from './cities';
+import places from './places';
+import placeStores from './placeStores';
+import users from './users';
+import institutions from './institutions';
+import benefits from './benefits';
+import families from './families';
 
 /**
  * Seed all tables
@@ -11,12 +12,13 @@ import benefitSeed from './benefits';
 const seedAll = async () => {
   // Development seed
   if (process.env.NODE_ENV === 'development') {
-    await citySeed.seed();
-    await placeSeed.seed();
-    await placeStoreSeed.seed();
-    await userSeed.seed();
-    await institutionSeed.seed();
-    await benefitSeed.seed();
+    await cities.seed();
+    await places.seed();
+    await placeStores.seed();
+    await users.seed();
+    await institutions.seed();
+    await benefits.seed();
+    await families.seed();
   }
   // Production seed
   // ...

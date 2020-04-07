@@ -11,6 +11,7 @@ import placeStoreRoutes from './placeStores';
 import userRoutes from './users';
 import institutionRoutes from './institutions';
 import benefitRoutes from './benefits';
+import familyRoutes from './families';
 
 const router = express.Router();
 
@@ -29,5 +30,6 @@ router.use('/place-stores', jwtMiddleware, placeStoreRoutes);
 router.use('/users', jwtMiddleware, userRoutes);
 router.use('/institutions', jwtMiddleware, institutionRoutes);
 router.use('/benefits', jwtMiddleware, benefitRoutes);
+router.use('/families', jwtMiddleware, familyRoutes);
 
 export default router;
