@@ -9,7 +9,7 @@
       "changeProcessCWD": true
     },
     {
-      "directory": "./frontend",
+      "directory": "./app",
       "changeProcessCWD": true
     }
   ],
