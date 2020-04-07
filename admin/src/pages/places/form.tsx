@@ -4,7 +4,7 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
 import { Place } from '../../interfaces/place';
-import yup from '../../lib/yup';
+import yup from '../../utils/yup';
 import { AppState } from '../../redux/rootReducer';
 import { requestSavePlace } from '../../redux/place/actions';
 

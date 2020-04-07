@@ -1,10 +1,19 @@
 import { Layout, Menu, Popover, Button } from 'antd';
-import { AccountBookFilled, MenuUnfoldOutlined, MenuFoldOutlined, LogoutOutlined } from '@ant-design/icons';
+import {
+  MenuUnfoldOutlined,
+  MenuFoldOutlined,
+  LogoutOutlined,
+  BarChartOutlined,
+  ShopOutlined,
+  SolutionOutlined,
+  IdcardOutlined,
+  CarryOutOutlined
+} from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
 import { Flex } from '../Flex';
 import { FixSider, Logo, LogoWrapper, MenuHeight, MenuIcon } from './styles';
 import { Link, useLocation } from 'react-router-dom';
-import { localStorageConstraints } from '../../lib/constraints';
+import { localStorageConstraints } from '../../utils/constraints';
 import { useTheme } from 'styled-components';
 
 const { Sider } = Layout;
@@ -21,27 +30,27 @@ interface RouteItem {
 const routes: RouteItem[] = [
   {
     path: '/beneficions',
-    icon: () => <AccountBookFilled />,
+    icon: () => <CarryOutOutlined />,
     name: 'Beneficios'
   },
   {
     path: '/familias',
-    icon: () => <AccountBookFilled />,
+    icon: () => <IdcardOutlined />,
     name: 'Famílias'
   },
   {
     path: '/lojas',
-    icon: () => <AccountBookFilled />,
+    icon: () => <ShopOutlined />,
     name: 'Lojas'
   },
   {
     path: '/estabelecimentos',
-    icon: () => <AccountBookFilled />,
+    icon: () => <SolutionOutlined />,
     name: 'Estabelecimentos'
   },
   {
     path: '/relatorios',
-    icon: () => <AccountBookFilled />,
+    icon: () => <BarChartOutlined />,
     name: 'Relatórios'
   }
 ];
@@ -102,10 +111,10 @@ export const Sidebar: React.FC = () => {
     <FixSider>
       <Sider collapsible theme="light" trigger={null} collapsed={collapsed} width={300}>
         <div>
-          <LogoWrapper collapsed={collapsed}>
+          {/* <LogoWrapper collapsed={collapsed}>
             <Logo show={!collapsed} src="/logo.png" alt="Admin logo" />
             <Logo show={collapsed} src="/logo-compact.png" alt="Admin logo collapsed" />
-          </LogoWrapper>
+          </LogoWrapper> */}
           <MenuIcon onClick={() => setCollapsed(!collapsed)}>
             {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           </MenuIcon>
