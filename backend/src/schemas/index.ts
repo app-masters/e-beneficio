@@ -6,6 +6,7 @@ import { initUserSchema } from './users';
 import { initInstitutionSchema } from './institutions';
 import { initBenefitSchema } from './benefits';
 import { initFamilySchema } from './families';
+import { initConsumptionSchema } from './consumptions';
 
 import * as config from '../../database/config';
 
@@ -19,7 +20,8 @@ const db = {
   users: initUserSchema(sequelize),
   institutions: initInstitutionSchema(sequelize),
   benefits: initBenefitSchema(sequelize),
-  families: initFamilySchema(sequelize)
+  families: initFamilySchema(sequelize),
+  consumptions: initConsumptionSchema(sequelize)
 };
 
 // Creating DB relations
