@@ -5,6 +5,7 @@ import users from './users';
 import institutions from './institutions';
 import benefits from './benefits';
 import families from './families';
+import consumptions from './consumptions';
 
 /**
  * Seed all tables
@@ -19,6 +20,7 @@ const seedAll = async () => {
     await institutions.seed();
     await benefits.seed();
     await families.seed();
+    await consumptions.seed();
   }
   // Production seed
   // ...
