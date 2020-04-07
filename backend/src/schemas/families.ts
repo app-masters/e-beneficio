@@ -81,6 +81,10 @@ export const initFamilySchema = (sequelize: Sequelize): SequelizeFamilyModel => 
       foreignKey: 'cityId',
       as: 'city'
     });
+    Schema.hasMany(models.consumptions, {
+      foreignKey: 'familyId',
+      as: 'consumptions'
+    });
   };
 
   return Schema;
