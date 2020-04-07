@@ -2,9 +2,9 @@ import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize'
 
 // Simple item type
 export interface PlaceStore {
-  readonly id?: number;
-  cityId: number;
-  placeId: number;
+  readonly id?: number | string;
+  cityId: number | string;
+  placeId: number | string;
   title: string;
   address: string;
   cnpj: string;
