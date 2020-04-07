@@ -1,52 +1,24 @@
-import * as TYPES from './types';
+import { createAction } from '@reduxjs/toolkit';
 import { TokenResponse } from '../../interfaces/auth';
 import { ThunkResult } from '../store';
 import { backend, setAuthorization } from '../../utils/networking';
 
-// Action typing
-export interface LoginUserSuccessAction {
-  type: typeof TYPES.LOGIN_USER_SUCCESS;
-  response: TokenResponse;
-}
-export interface LoginUserFailedAction {
-  type: typeof TYPES.LOGIN_USER_FAILED;
-  error?: Error;
-}
-export interface GetTokenSuccessAction {
-  type: typeof TYPES.GET_TOKEN_SUCCESS;
-  response: TokenResponse;
-}
-export interface GetTokenFailedAction {
-  type: typeof TYPES.GET_TOKEN_FAILED;
-  error?: Error;
-}
-
-/**
- * Login success simple action
- * @param response TokenResponse
- */
-const doLoginUserSuccess = (response: LoginUserSuccessAction['response']): LoginUserSuccessAction => ({
-  type: TYPES.LOGIN_USER_SUCCESS,
-  response
-});
-
-/**
- * Login failed simple action
- * @param error Error instance
- */
-const doLoginUserFailed = (error?: LoginUserFailedAction['error']): LoginUserFailedAction => ({
-  type: TYPES.LOGIN_USER_FAILED,
-  error
-});
+// Simple actions and types
+export const doLoginUser = createAction<void>('auth/LOGIN_USER');
+export const doLoginUserSuccess = createAction<TokenResponse>('auth/LOGIN_USER_SUCCESS');
+export const doLoginUserFailed = createAction<Error | undefined>('auth/LOGIN_USER_FAILED');
+export const doGetToken = createAction<void>('auth/GET_TOKEN');
+export const doGetTokenSuccess = createAction<TokenResponse>('auth/GET_TOKEN_SUCCESS');
+export const doGetTokenFailed = createAction<Error | undefined>('auth/GET_TOKEN_FAILED');
 
 /**
  * Login user thunk action
  */
-export const doLoginUser = (email: string, password: string): ThunkResult<void> => {
+export const requestLoginUser = (email: string, password: string): ThunkResult<void> => {
   return async (dispatch) => {
     try {
       // Start request - starting loading state
-      dispatch({ type: TYPES.LOGIN_USER });
+      dispatch(doLoginUser());
       const response = await backend.post<TokenResponse>('/auth/login', { email, password });
       if (response && response.data) {
         // Request finished
@@ -64,31 +36,13 @@ export const doLoginUser = (email: string, password: string): ThunkResult<void> 
 };
 
 /**
- * Login success simple action
- * @param response TokenResponse
- */
-const doGetTokenSuccess = (response: GetTokenSuccessAction['response']): GetTokenSuccessAction => ({
-  type: TYPES.GET_TOKEN_SUCCESS,
-  response
-});
-
-/**
- * Login failed simple action
- * @param error Error instance
- */
-const doGetTokenFailed = (error?: GetTokenFailedAction['error']): GetTokenFailedAction => ({
-  type: TYPES.GET_TOKEN_FAILED,
-  error
-});
-
-/**
  * Token renewal process - call on token expiration and on the return to the app
  */
-export const doGetToken = (): ThunkResult<void> => {
+export const requestGetToken = (): ThunkResult<void> => {
   return async (dispatch, getState) => {
     try {
       // Start request - starting loading state
-      dispatch({ type: TYPES.GET_TOKEN });
+      dispatch(doGetToken());
       // Getting refresh token from the state
       const refreshToken = getState().authReducer.refreshToken;
       if (!refreshToken) {

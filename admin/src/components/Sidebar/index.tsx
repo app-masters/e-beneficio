@@ -1,10 +1,19 @@
 import { Layout, Menu, Popover, Button } from 'antd';
-import { AccountBookFilled, MenuUnfoldOutlined, MenuFoldOutlined, LogoutOutlined } from '@ant-design/icons';
+import {
+  MenuUnfoldOutlined,
+  MenuFoldOutlined,
+  LogoutOutlined,
+  BarChartOutlined,
+  ShopOutlined,
+  SolutionOutlined,
+  IdcardOutlined,
+  CarryOutOutlined
+} from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
 import { Flex } from '../Flex';
 import { FixSider, Logo, LogoWrapper, MenuHeight, MenuIcon } from './styles';
 import { Link, useLocation } from 'react-router-dom';
-import { localStorageConstraints } from '../../lib/constraints';
+import { localStorageConstraints } from '../../utils/constraints';
 import { useTheme } from 'styled-components';
 
 const { Sider } = Layout;
@@ -20,28 +29,28 @@ interface RouteItem {
 
 const routes: RouteItem[] = [
   {
-    path: '/',
-    icon: () => <AccountBookFilled />,
+    path: '/beneficions',
+    icon: () => <CarryOutOutlined />,
     name: 'Beneficios'
   },
   {
-    path: '/',
-    icon: () => <AccountBookFilled />,
+    path: '/familias',
+    icon: () => <IdcardOutlined />,
     name: 'Famílias'
   },
   {
-    path: '/',
-    icon: () => <AccountBookFilled />,
+    path: '/lojas',
+    icon: () => <ShopOutlined />,
     name: 'Lojas'
   },
   {
-    path: '/',
-    icon: () => <AccountBookFilled />,
+    path: '/estabelecimentos',
+    icon: () => <SolutionOutlined />,
     name: 'Estabelecimentos'
   },
   {
-    path: '/',
-    icon: () => <AccountBookFilled />,
+    path: '/relatorios',
+    icon: () => <BarChartOutlined />,
     name: 'Relatórios'
   }
 ];
@@ -79,7 +88,9 @@ const menuItem = (item: RouteItem, parentPath: string) => {
       </SubMenu>
     )
   ) : (
-    <Menu.Item key={key}>{innerItem()}</Menu.Item>
+    <Menu.Item key={key}>
+      <Link to={key}>{innerItem()}</Link>
+    </Menu.Item>
   );
 };
 
@@ -100,10 +111,10 @@ export const Sidebar: React.FC = () => {
     <FixSider>
       <Sider collapsible theme="light" trigger={null} collapsed={collapsed} width={300}>
         <div>
-          <LogoWrapper collapsed={collapsed}>
+          {/* <LogoWrapper collapsed={collapsed}>
             <Logo show={!collapsed} src="/logo.png" alt="Admin logo" />
             <Logo show={collapsed} src="/logo-compact.png" alt="Admin logo collapsed" />
-          </LogoWrapper>
+          </LogoWrapper> */}
           <MenuIcon onClick={() => setCollapsed(!collapsed)}>
             {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           </MenuIcon>
