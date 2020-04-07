@@ -1,5 +1,5 @@
 {
-  "name": "admin",
+  "name": "frontend",
   "version": "0.0.1",
   "private": true,
   "dependencies": {
@@ -51,7 +51,7 @@
     "prettier-check": "^2.0.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "PORT=3030 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "checks": "npm run check-prettier && npm run check-lint && npm run check-typescript",
