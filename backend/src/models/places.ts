@@ -1,65 +1,71 @@
 import db from '../schemas';
 import { Place, SequelizePlace } from '../schemas/places';
-import { User } from '../schemas/users';
+import { City } from '../schemas/cities';
 
 /**
  * Get all items on the table without any filter
- * @param cityId requested city ID
+ * @param cityId logged user city ID
  * @returns Promise<List of items>
  */
-export const getAll = (cityId: number): Promise<SequelizePlace[]> => {
+export const getAll = (cityId: NonNullable<City['id']>): Promise<SequelizePlace[]> => {
   return db.places.findAll({ where: { cityId } });
 };
 
 /**
  * Get a single item using the unique ID
  * @param id unique ID of the desired item
+ * @param cityId logged user city ID
  * @returns Promise<Item>
  */
-export const getById = (id: string | number): Promise<SequelizePlace> => {
-  return db.places.findByPk(id);
+export const getById = async (
+  id: NonNullable<Place['id']>,
+  cityId: NonNullable<City['id']>
+): Promise<SequelizePlace | null> => {
+  const item = await db.places.findByPk(id);
+  if (item?.cityId === cityId) return item;
+  return null;
 };
 
 /**
  * Function to create a new row on the table
  * @param values object with the new item data
+ * @param cityId logged user city ID
  * @returns Promise<Item>
  */
-export const create = (values: Place | SequelizePlace): Promise<SequelizePlace> => {
-  return db.places.create(values);
+export const create = (values: Place | SequelizePlace, cityId: NonNullable<City['id']>): Promise<SequelizePlace> => {
+  return db.places.create({ ...values, cityId });
 };
 
 /**
  * Function to update a row on the table by the unique ID
  * @param id unique ID of the desired item
  * @param values object with the new data
+ * @param cityId logged user city ID
  * @returns Promise<Item>
  */
-export const updateById = async (id: string | number, values: Place | SequelizePlace): Promise<SequelizePlace> => {
-  // The update return an array [count, item[]], so I'm destructuring to get the updated place
-  const [, [item]] = await db.places.update(values, { where: { id }, returning: true });
-  return item;
+export const updateById = async (
+  id: NonNullable<Place['id']>,
+  values: Place | SequelizePlace,
+  cityId: NonNullable<City['id']>
+): Promise<SequelizePlace | null> => {
+  // Check if item is on the city
+  const cityItem = getById(id, cityId);
+  if (cityItem) {
+    // The update return an array [count, item[]], so I'm destructuring to get the updated place
+    const [, [item]] = await db.places.update(values, { where: { id }, returning: true });
+    return item;
+  }
+  return null;
 };
 
 /**
  * Function to delete a row on the table by the unique ID
- * @param id unique ID of the desired item
+ * @param id unique ID of the desired item *
+ * @param cityId logged user city ID
  */
-export const deleteById = (id: string | number): void => {
-  db.places.destroy({ where: { id } });
-};
-
-/**
- * Check if item belongs tot he user city
- * @param id unique ID of the desired item
- * @param user user ID
- */
-export const checkItemCity = async (id: string | number, user?: User): Promise<SequelizePlace> => {
-  // Check user
-  if (!user || !user.cityId) throw { status: 401, message: 'Invalid request' };
-  // Request item
-  const item = await getById(id);
-  // Throw error if item is from another city
-  if (!item || item.cityId !== user.cityId) throw { status: 404, message: 'Not found' };
-  return item;
+export const deleteById = async (id: NonNullable<Place['id']>, cityId: NonNullable<City['id']>): Promise<void> => {
+  const cityItem = getById(id, cityId);
+  if (cityItem) {
+    await db.places.destroy({ where: { id } });
+  }
 };

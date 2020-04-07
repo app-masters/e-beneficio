@@ -2,8 +2,8 @@ import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize'
 
 // Simple item type
 export interface Benefit {
-  readonly id?: number;
-  institutionId: number;
+  readonly id?: number | string;
+  institutionId: number | string;
   groupName: string;
   title: string;
   month: number;
