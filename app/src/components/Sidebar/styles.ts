@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import media from '../../styles/media';
 
 export const LogoWrapper = styled.div<{ collapsed?: boolean }>`
   max-width: 100%;
@@ -25,12 +26,16 @@ export const MenuIcon = styled.span`
   font-size: 16px;
   position: absolute;
   top: ${(props) => props.theme.spacing.md};
-  right: -16px;
   padding: ${(props) => props.theme.spacing.xs} ${(props) => props.theme.spacing.sm};
   background-color: ${(props) => props.theme.colors['@primary-color']};
   border-radius: 50%;
   box-shadow: ${(props) => props.theme.colors['@box-shadow-base']};
   cursor: pointer;
+  right: -46px;
+
+  ${media('lg')} {
+    right: -16px;
+  }
 `;
 
 export const FixSider = styled.div`
