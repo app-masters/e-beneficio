@@ -1,34 +1,36 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { AppState } from '../redux/rootReducer';
 import { User } from '../interfaces/user';
 import { AdminLayout } from '../components/AdminLayout';
 
 // Pages
 import { LoginPage } from './login';
-import { doGetToken } from '../redux/auth/actions';
+import { DashboardPage } from './dashboard';
+import { PlaceList } from './places/list';
+import { PlaceForm } from './places/form';
+import { useRefreshToken } from '../utils/auth';
+import { LogoutPage } from './logout';
 
 /**
  * Router available only for logged users
  * @param props component props
  */
 const PrivateRouter: React.FC<{}> = (props) => {
-  const dispatch = useDispatch();
-  useEffect(() => {
-    // On first render, try to renewal the token
-    dispatch(doGetToken());
-  }, [dispatch]);
+  const loading = useRefreshToken();
+
   return (
-    <BrowserRouter>
-      <AdminLayout>
-        <Switch>
-          <Route path="*">
-            <div>Você está dentro do sistema</div>
-          </Route>
-        </Switch>
-      </AdminLayout>
-    </BrowserRouter>
+    <AdminLayout loading={loading}>
+      <>
+        <Route path="/logout" component={LogoutPage} />
+        {/* Place routes */}
+        <Route path="/estabelecimentos" component={PlaceList} />
+        <Route path="/estabelecimentos/:id" component={PlaceForm} />
+        {/* Dashboard */}
+        <Route path="/" component={DashboardPage} exact />
+      </>
+    </AdminLayout>
   );
 };
 
@@ -38,13 +40,11 @@ const PrivateRouter: React.FC<{}> = (props) => {
  */
 const PublicRouter: React.FC<{}> = (props) => {
   return (
-    <BrowserRouter>
-      <Switch>
-        <Route path="*">
-          <LoginPage />
-        </Route>
-      </Switch>
-    </BrowserRouter>
+    <Switch>
+      <Route path="*">
+        <LoginPage />
+      </Route>
+    </Switch>
   );
 };
 
@@ -54,8 +54,10 @@ const PublicRouter: React.FC<{}> = (props) => {
  */
 export const Router: React.FC<{}> = (props) => {
   const user = useSelector<AppState, User | undefined>((state) => state.authReducer.user);
-  if (user && user.role === 'admin') {
-    return <PrivateRouter {...props} />;
-  }
-  return <PublicRouter {...props} />;
+
+  return (
+    <BrowserRouter>
+      {user && user.role === 'admin' ? <PrivateRouter {...props} /> : <PublicRouter {...props} />}
+    </BrowserRouter>
+  );
 };
