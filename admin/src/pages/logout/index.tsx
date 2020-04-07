@@ -12,7 +12,7 @@ export const LogoutPage: React.FC = () => {
 
   useEffect(() => {
     dispatch(doGetTokenFailed());
-    history.push('/login');
+    history.push('/');
   }, [dispatch, history]);
 
   return <div>Deslogando...</div>;

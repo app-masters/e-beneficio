@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { TokenResponse } from '../interfaces/auth';
-import { PERSIST_KEY } from '../lib/constraints';
+import { PERSIST_KEY } from './constraints';
 import { AppState } from '../redux/rootReducer';
 
 const reduxPersist = localStorage.getItem(`persist:${PERSIST_KEY}`);
