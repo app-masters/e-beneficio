@@ -1,10 +1,10 @@
-import { Button, Card, Table, Typography } from 'antd';
-import moment from 'moment';
 import React, { useEffect } from 'react';
+import { Button, Card, Table, Typography, Alert } from 'antd';
+import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Place } from '../../interfaces/place';
-import { requestGetPlace } from '../../redux/place/actions';
+import { requestGetPlace, requestDeletePlace } from '../../redux/place/actions';
 import { AppState } from '../../redux/rootReducer';
 import { ActionWrapper, PageContainer } from './styles';
 
@@ -38,14 +38,17 @@ export const PlaceList: React.FC<{}> = (props) => {
             render={(data: Place['createdAt']) => moment(data as Date).fromNow()}
           />
           <Table.Column
-            render={(item: Place) => (
-              <ActionWrapper>
-                <Link to={`/estabelecimentos/${item.id}/editar`}>
-                  <Button>Editar</Button>
-                </Link>
-                <Button danger>Excluir</Button>
-              </ActionWrapper>
-            )}
+            render={(item: Place) => {
+              return (
+                <ActionWrapper>
+                  <Link to={`/estabelecimentos/${item.id}/editar`}>
+                    <Button>Editar</Button>
+                  </Link>
+                  {/* TODO: Add alert on delete */}
+                  <Button danger onClick={() => dispatch(requestDeletePlace(item.id as number))}>Excluir</Button>
+                </ActionWrapper>
+              );
+            }}
           />
         </Table>
       </Card>
