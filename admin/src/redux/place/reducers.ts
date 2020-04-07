@@ -11,6 +11,7 @@ import {
   doDeletePlaceFailed
 } from './actions';
 import { Place } from '../../interfaces/place';
+import moment from 'moment';
 
 export interface PlaceReducerState {
   list: Place[];
@@ -23,6 +24,15 @@ const initialState = {
   loading: false
 };
 
+const addToList = (item: Place | null, list: Place[]) => {
+  if (item) {
+    list = list.filter((listItem) => listItem.id !== item.id);
+    list.unshift(item);
+  }
+  list = list.sort((a, b) => moment(b.createdAt as Date).diff(moment(a.createdAt as Date)));
+  return list;
+};
+
 export default createReducer<PlaceReducerState>(initialState, {
   // Get actions
   [doGetPlace.toString()]: (state) => {
@@ -33,13 +43,10 @@ export default createReducer<PlaceReducerState>(initialState, {
     state.loading = false;
     if (Array.isArray(action.payload)) {
       // User got the list
-      state.list = action.payload;
+      state.list = addToList(null,action.payload);
     } else {
       // User got a single item
-      const place = action.payload;
-      const { list } = state;
-      list.filter((item) => item.id !== place.id).unshift(place);
-      state.list = list;
+      state.list = addToList(action.payload, state.list);
     }
   },
   [doGetPlaceFailed.toString()]: (state, action) => {
@@ -53,7 +60,7 @@ export default createReducer<PlaceReducerState>(initialState, {
   },
   [doSavePlaceSuccess.toString()]: (state, action) => {
     state.loading = false;
-    state.list = state.list.map((item) => (item.id === action.payload.id ? action.payload : item));
+    state.list = addToList(action.payload, state.list);
   },
   [doSavePlaceFailed.toString()]: (state, action) => {
     state.loading = false;
