@@ -2,8 +2,8 @@ import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize'
 
 // Simple item type
 export interface Place {
-  readonly id?: number;
-  cityId: number;
+  readonly id?: number | string;
+  cityId: number | string;
   title: string;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;

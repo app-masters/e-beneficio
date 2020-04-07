@@ -225,7 +225,7 @@ type DoneFunction<T> = (error: Error | null, id: T) => void;
  * @param user Authenticating user
  * @param done Finishing Passport callback
  */
-const serializeUser = async (user: User, done: DoneFunction<number>) => {
+const serializeUser = async (user: User, done: DoneFunction<User['id']>) => {
   done(null, user.id || 0);
 };
 
