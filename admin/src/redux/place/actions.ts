@@ -28,7 +28,7 @@ export const requestGetPlace = (id?: number): ThunkResult<void> => {
       // Get logged user cityId
       const user = getState().authReducer.user as User;
       // Request
-      const response = await backend.get<Place | Place[]>(`/places/${id || ''}`, { params: { cityId: user.cityId } });
+      const response = await backend.get<Place | Place[]>(`/places/${id || ''}`);
       if (response && response.data) {
         // Request finished
         dispatch(doGetPlaceSuccess(response.data)); // Dispatch result
@@ -61,17 +61,9 @@ export const requestSavePlace = (
       // Request
       let response;
       if (item.id) {
-        response = await backend.put<Place>(
-          `/places/${item.id}`,
-          { ...item, cityId: user.cityId },
-          { params: { cityId: user.cityId } }
-        );
+        response = await backend.put<Place>(`/places/${item.id}`, { ...item, cityId: user.cityId });
       } else {
-        response = await backend.post<Place>(
-          `/places`,
-          { ...item, cityId: user.cityId },
-          { params: { cityId: user.cityId } }
-        );
+        response = await backend.post<Place>(`/places`, { ...item, cityId: user.cityId });
       }
       if (response && response.data) {
         // Request finished
@@ -101,7 +93,7 @@ export const requestDeletePlace = (id: number): ThunkResult<void> => {
       // Get logged user cityId
       const user = getState().authReducer.user as User;
       // Request
-      await backend.delete<void>(`/places/${id || ''}`, { params: { cityId: user.cityId } });
+      await backend.delete<void>(`/places/${id || ''}`);
       // Finished
       dispatch(doDeletePlaceSuccess({ id })); // Dispatch result
     } catch (error) {
