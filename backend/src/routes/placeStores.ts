@@ -9,7 +9,8 @@ const router = express.Router({ mergeParams: true });
  */
 router.get('/', async (req, res) => {
   try {
-    const items = await placeStoreModel.getAll();
+    if (!req.user?.cityId) throw Error('User without selected city');
+    const items = await placeStoreModel.getAll(req.user.cityId);
     res.send(items);
   } catch (error) {
     logging.error(error);
@@ -22,7 +23,8 @@ router.get('/', async (req, res) => {
  */
 router.get('/:id', async (req, res) => {
   try {
-    const item = await placeStoreModel.getById(req.params.id);
+    if (!req.user?.cityId) throw Error('User without selected city');
+    const item = await placeStoreModel.getById(req.params.id, req.user.cityId);
     if (!item) {
       res.status(404).send('Not found');
     }
@@ -38,7 +40,8 @@ router.get('/:id', async (req, res) => {
  */
 router.post('/', async (req, res) => {
   try {
-    const item = await placeStoreModel.create(req.body);
+    if (!req.user?.cityId) throw Error('User without selected city');
+    const item = await placeStoreModel.create(req.body, req.user.cityId);
     res.send(item);
   } catch (error) {
     logging.error(error);
@@ -51,7 +54,8 @@ router.post('/', async (req, res) => {
  */
 router.put('/:id', async (req, res) => {
   try {
-    const item = await placeStoreModel.updateById(req.params.id, req.body);
+    if (!req.user?.cityId) throw Error('User without selected city');
+    const item = await placeStoreModel.updateById(req.params.id, req.body, req.user.cityId);
     res.send(item);
   } catch (error) {
     logging.error(error);
@@ -64,7 +68,8 @@ router.put('/:id', async (req, res) => {
  */
 router.delete('/:id', async (req, res) => {
   try {
-    await placeStoreModel.deleteById(req.params.id);
+    if (!req.user?.cityId) throw Error('User without selected city');
+    await placeStoreModel.deleteById(req.params.id, req.user.cityId);
     res.send({ success: true });
   } catch (error) {
     logging.error(error);

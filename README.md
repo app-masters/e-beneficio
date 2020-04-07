@@ -36,7 +36,7 @@ npm start
 ## Documentation
 
 ### Endpoints
-The list of available endpoints can be easily accessed on the folder `/backend/docs/postman` or using [this link](https://documenter.getpostman.com/view/3342022/SzYZ1yrY?version=latest).
+The list of available endpoints can be easily accessed on the folder `/backend/docs/postman` or using [this link](https://documenter.getpostman.com/view/3342022/SzYaVdaV).
 
 ### Database
 You can easily run a local postgres database using the docker and the docker-compose with the file on the `backend/docs`.

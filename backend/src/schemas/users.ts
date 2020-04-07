@@ -3,9 +3,9 @@ import { isHash, encrypt } from '../utils/crypt';
 
 // Simple item type
 export interface User {
-  readonly id?: number;
-  cityId: number;
-  placeStoreId?: number;
+  readonly id?: number | string;
+  cityId: number | string;
+  placeStoreId?: number | string;
   name?: string;
   cpf: string;
   role: string;
