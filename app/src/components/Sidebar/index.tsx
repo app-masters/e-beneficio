@@ -11,7 +11,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from 'styled-components';
 import { localStorageConstraints } from '../../utils/constraints';
-import { Flex } from '../Flex';
+import { Flex } from '../flex';
 import { FixSider, MenuHeight, MenuIcon } from './styles';
 import { useWindowDimensions } from '../../utils/viewport';
 import { breakpoints } from '../../styles/theme';
@@ -29,19 +29,14 @@ interface RouteItem {
 
 const routes: RouteItem[] = [
   {
-    path: '/beneficions',
+    path: '/consumo',
     icon: () => <CarryOutOutlined />,
-    name: 'Validar consumo'
+    name: 'Informar consumo'
   },
   {
     path: '/relatorios',
     icon: () => <BarChartOutlined />,
     name: 'Relatórios'
-  },
-  {
-    path: '/consumo',
-    icon: () => <ShopOutlined />,
-    name: 'Consumo'
   }
 ];
 
