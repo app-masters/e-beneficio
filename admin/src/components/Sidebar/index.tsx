@@ -1,20 +1,20 @@
-import { Layout, Menu, Popover, Button } from 'antd';
 import {
-  MenuUnfoldOutlined,
-  MenuFoldOutlined,
-  LogoutOutlined,
   BarChartOutlined,
-  ShopOutlined,
-  SolutionOutlined,
+  CarryOutOutlined,
   IdcardOutlined,
-  CarryOutOutlined
+  LogoutOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  ShopOutlined,
+  SolutionOutlined
 } from '@ant-design/icons';
+import { Button, Layout, Menu, Popover } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { Flex } from '../Flex';
-import { FixSider, Logo, LogoWrapper, MenuHeight, MenuIcon } from './styles';
 import { Link, useLocation } from 'react-router-dom';
-import { localStorageConstraints } from '../../utils/constraints';
 import { useTheme } from 'styled-components';
+import { localStorageConstraints } from '../../utils/constraints';
+import { Flex } from '../Flex';
+import { FixSider, MenuHeight, MenuIcon } from './styles';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
@@ -29,7 +29,7 @@ interface RouteItem {
 
 const routes: RouteItem[] = [
   {
-    path: '/beneficions',
+    path: '/beneficios',
     icon: () => <CarryOutOutlined />,
     name: 'Beneficios'
   },

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Button, Card, Table, Typography, Alert } from 'antd';
+import { Button, Card, Table, Typography } from 'antd';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -45,7 +45,9 @@ export const PlaceList: React.FC<{}> = (props) => {
                     <Button>Editar</Button>
                   </Link>
                   {/* TODO: Add alert on delete */}
-                  <Button danger onClick={() => dispatch(requestDeletePlace(item.id as number))}>Excluir</Button>
+                  <Button danger onClick={() => dispatch(requestDeletePlace(item.id as number))}>
+                    Excluir
+                  </Button>
                 </ActionWrapper>
               );
             }}
