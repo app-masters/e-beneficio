@@ -1,7 +1,7 @@
 import { Spin, Layout } from 'antd';
 import React from 'react';
 import styled from 'styled-components';
-import { Sidebar } from '../Sidebar';
+import { Sidebar } from '../sidebar';
 import { SpinContainer } from './styles';
 const { Content } = Layout;
 

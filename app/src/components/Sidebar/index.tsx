@@ -1,20 +1,19 @@
-import { Layout, Menu, Popover, Button } from 'antd';
 import {
-  MenuUnfoldOutlined,
-  MenuFoldOutlined,
-  LogoutOutlined,
   BarChartOutlined,
-  ShopOutlined,
-  SolutionOutlined,
-  IdcardOutlined,
-  CarryOutOutlined
+  CarryOutOutlined,
+  LogoutOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined
 } from '@ant-design/icons';
+import { Button, Layout, Menu, Popover } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { Flex } from '../Flex';
-import { FixSider, Logo, LogoWrapper, MenuHeight, MenuIcon } from './styles';
 import { Link, useLocation } from 'react-router-dom';
-import { localStorageConstraints } from '../../utils/constraints';
 import { useTheme } from 'styled-components';
+import { localStorageConstraints } from '../../utils/constraints';
+import { Flex } from '../flex';
+import { FixSider, MenuHeight, MenuIcon } from './styles';
+import { useWindowDimensions } from '../../utils/viewport';
+import { breakpoints } from '../../styles/theme';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
@@ -29,9 +28,9 @@ interface RouteItem {
 
 const routes: RouteItem[] = [
   {
-    path: '/beneficions',
+    path: '/consumo',
     icon: () => <CarryOutOutlined />,
-    name: 'Validar consumo'
+    name: 'Informar consumo'
   },
   {
     path: '/relatorios',
@@ -85,6 +84,7 @@ const menuItem = (item: RouteItem, parentPath: string) => {
 export const Sidebar: React.FC = () => {
   const location = useLocation();
   const theme = useTheme();
+  const { width } = useWindowDimensions();
 
   // The collapse state for the sidebar
   const [collapsed, setCollapsed] = useState(
@@ -94,7 +94,16 @@ export const Sidebar: React.FC = () => {
 
   return (
     <FixSider>
-      <Sider collapsible theme="light" trigger={null} collapsed={collapsed} width={300}>
+      <Sider
+        collapsible
+        theme="light"
+        trigger={null}
+        collapsed={collapsed}
+        width={300}
+        // make it mobile friendly
+        breakpoint="lg"
+        collapsedWidth={width < breakpoints.medium ? '0' : undefined}
+      >
         <div>
           {/* <LogoWrapper collapsed={collapsed}>
             <Logo show={!collapsed} src="/logo.png" alt="Admin logo" />
