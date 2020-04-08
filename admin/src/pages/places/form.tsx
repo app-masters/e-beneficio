@@ -1,12 +1,12 @@
-import { Form, Input, Modal, Alert } from 'antd';
+import { Alert, Form, Input, Modal } from 'antd';
 import { useFormik } from 'formik';
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
 import { Place } from '../../interfaces/place';
-import yup from '../../utils/yup';
-import { AppState } from '../../redux/rootReducer';
 import { requestSavePlace } from '../../redux/place/actions';
+import { AppState } from '../../redux/rootReducer';
+import yup from '../../utils/yup';
 
 const schema = yup.object().shape({
   title: yup.string().label('Título').required()
