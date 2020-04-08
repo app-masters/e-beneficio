@@ -10,7 +10,7 @@ import {
   CarryOutOutlined
 } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
-import { Flex } from '../Flex';
+import { Flex } from '../flex';
 import { FixSider, Logo, LogoWrapper, MenuHeight, MenuIcon } from './styles';
 import { Link, useLocation } from 'react-router-dom';
 import { localStorageConstraints } from '../../utils/constraints';
