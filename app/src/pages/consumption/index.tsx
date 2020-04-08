@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { Alert, Button, Card, Descriptions, Form, Input, Typography } from 'antd';
+import React, { useState, useEffect, useRef } from 'react';
+import { Alert, Button, Card, Descriptions, Form, Input, Typography, InputNumber, Modal } from 'antd';
 import { useFormik } from 'formik';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import QrReader from 'react-qr-reader';
+import Webcam from 'react-webcam';
+import { QrcodeOutlined, CameraOutlined } from '@ant-design/icons';
 import { Flex } from '../../components/flex';
 import yup from '../../utils/yup';
 import { FamilyActions, PageContainer, FamilyWrapper } from './styles';
@@ -14,10 +17,22 @@ import { requestSaveConsumption } from '../../redux/consumption/actions';
 
 const schema = yup.object().shape({
   nfce: yup.string().label('Nota fiscal eletrônica').required(),
-  value: yup.string().label('Valor em reais').required(),
+  value: yup.number().label('Valor em reais').required(),
   proofImageUrl: yup.string().label('Link da imagem').required(),
   familyId: yup.string().label('Família').required('É preciso selecionar uma família ao digitar um NIS')
 });
+
+/**
+ * Clear NFCe QRCode result
+ * @param value url
+ */
+const handleQRCode = (value: string | null) => {
+  if (!value) return null;
+  // https://nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=31200417745613005462650030000484351494810435|2|1|1|d3bfca6136abee66286116203f747bc8e6fd3300
+  const nfce = value.split('nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=')[1];
+  if (!nfce) return null; // Not a valid nfce QRCode
+  return nfce.split('|')[0];
+};
 
 /**
  * Dashboard page component
@@ -26,10 +41,22 @@ const schema = yup.object().shape({
 export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (props) => {
   const dispatch = useDispatch();
   const history = useHistory();
+  const cameraRef = useRef(null);
+
+  // Local state
   const [nis, setNis] = useState('');
+  const [permission, setPermission] = useState('prompt');
+  const [showQRCodeModal, setShowQRCodeModal] = useState(false);
+  const [showCameraModal, setShowCameraModal] = useState(false);
   // Redux state
   const familyLoading = useSelector<AppState, boolean>((state) => state.familyReducer.loading);
   const family = useSelector<AppState, Family | null | undefined>((state) => state.familyReducer.item);
+
+  useEffect(() => {
+    navigator.permissions.query({ name: 'camera' }).then((value) => {
+      setPermission(value.state);
+    });
+  }, []);
 
   const {
     handleSubmit,
@@ -143,27 +170,106 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
             {values.familyId && (
               <>
                 <Form.Item
+                  label="NFCe"
+                  validateStatus={!!nfceMeta.error && !!nfceMeta.touched ? 'error' : ''}
+                  help={!!nfceMeta.error && !!nfceMeta.touched ? nfceMeta.error : undefined}
+                >
+                  <Input
+                    id="nfce"
+                    name="nfce"
+                    size="large"
+                    onChange={handleChange}
+                    value={values.nfce}
+                    onPressEnter={submitForm}
+                    addonAfter={
+                      <Button type="link" onClick={() => setShowQRCodeModal(true)} icon={<QrcodeOutlined />} />
+                    }
+                  />
+                  <Modal
+                    okButtonProps={{ disabled: true }}
+                    okText="Confirmar"
+                    cancelText="Cancelar"
+                    onCancel={() => setShowQRCodeModal(false)}
+                    visible={showQRCodeModal}
+                  >
+                    <>
+                      {showQRCodeModal && ( // Necessary to disable the camera
+                        <QrReader
+                          delay={200}
+                          resolution={800}
+                          onError={console.error}
+                          onScan={(item) => {
+                            const nfce = handleQRCode(item);
+                            if (nfce) {
+                              setFieldValue('nfce', nfce);
+                              setShowQRCodeModal(false);
+                            } else console.log(new Date().getTime(), 'reading...');
+                          }}
+                        />
+                      )}
+                      {process.env.NODE_ENV === 'development' ? 'Permission: ' + permission : null}
+                    </>
+                  </Modal>
+                </Form.Item>
+                <Form.Item
                   label="Valor da compra"
                   validateStatus={!!valueMeta.error && !!valueMeta.touched ? 'error' : ''}
                   help={!!valueMeta.error && !!valueMeta.touched ? valueMeta.error : undefined}
                 >
-                  <Input id="value" name="value" prefix="R$" onChange={handleChange} value={values.value} />
+                  <InputNumber
+                    style={{ width: '100%' }}
+                    id="value"
+                    name="value"
+                    size="large"
+                    onChange={(value) => setFieldValue('value', value)}
+                    value={Number(values.value)}
+                    decimalSeparator=","
+                    step={0.01}
+                    precision={2}
+                    formatter={(value) => `R$ ${value}`}
+                    parser={(value) => (value ? value.replace(/(R)|(\$)/g, '').trim() : '')}
+                  />
                 </Form.Item>
 
                 <Form.Item
-                  label="Link da imagem"
+                  label="Foto dos comprovantes"
                   validateStatus={!!imageMeta.error && !!imageMeta.touched ? 'error' : ''}
                   help={!!imageMeta.error && !!imageMeta.touched ? imageMeta.error : undefined}
                 >
-                  <Input id="proofImageUrl" name="proofImageUrl" onChange={handleChange} value={values.proofImageUrl} />
-                </Form.Item>
+                  <Input
+                    id="proofImageUrl"
+                    name="proofImageUrl"
+                    size="large"
+                    onChange={handleChange}
+                    value={values.proofImageUrl}
+                    addonAfter={
+                      <Button type="link" onClick={() => setShowCameraModal(true)} icon={<CameraOutlined />} />
+                    }
+                  />
 
-                <Form.Item
-                  label="Nota fiscal eletrônica"
-                  validateStatus={!!nfceMeta.error && !!nfceMeta.touched ? 'error' : ''}
-                  help={!!nfceMeta.error && !!nfceMeta.touched ? nfceMeta.error : undefined}
-                >
-                  <Input id="nfce" name="nfce" onChange={handleChange} value={values.nfce} onPressEnter={submitForm} />
+                  <Modal
+                    okText="Confirmar"
+                    cancelText="Cancelar"
+                    onCancel={() => setShowCameraModal(false)}
+                    onOk={() => {
+                      if (cameraRef && cameraRef.current) {
+                        // weird ts error
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+                        // @ts-ignore
+                        const imageUri = cameraRef.current.getScreenshot();
+                        setShowCameraModal(false);
+                        setFieldValue('proofImageUrl', imageUri);
+                      }
+                    }}
+                    visible={showCameraModal}
+                  >
+                    {showCameraModal && <Webcam audio={false} width="100%" ref={cameraRef} />}
+                  </Modal>
+                </Form.Item>
+                <Form.Item>
+                  {values.proofImageUrl.length > 0 && (
+                    <img alt="example" style={{ width: '100%', maxWidth: '600px' }} src={values.proofImageUrl} />
+                  )}
                 </Form.Item>
               </>
             )}
