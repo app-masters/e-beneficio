@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
-import { Button, Card, Table, Typography } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { Button, Card, Modal, Table, Typography } from 'antd';
 import moment from 'moment';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Place } from '../../interfaces/place';
-import { requestGetPlace, requestDeletePlace } from '../../redux/place/actions';
+import { requestDeletePlace, requestGetPlace } from '../../redux/place/actions';
 import { AppState } from '../../redux/rootReducer';
 import { ActionWrapper, PageContainer } from './styles';
 
@@ -45,7 +46,22 @@ export const PlaceList: React.FC<{}> = (props) => {
                     <Button>Editar</Button>
                   </Link>
                   {/* TODO: Add alert on delete */}
-                  <Button danger onClick={() => dispatch(requestDeletePlace(item.id as number))}>
+                  <Button
+                    danger
+                    onClick={() =>
+                      Modal.confirm({
+                        title: 'Você realmente quer deletar esse registro?',
+                        icon: <ExclamationCircleOutlined />,
+                        // content: 'Some descriptions',
+                        okText: 'Sim',
+                        okType: 'danger',
+                        cancelText: 'Não',
+                        onOk: () => {
+                          dispatch(requestDeletePlace(item.id as number));
+                        }
+                      })
+                    }
+                  >
                     Excluir
                   </Button>
                 </ActionWrapper>
