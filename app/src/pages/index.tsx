@@ -3,13 +3,14 @@ import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { AppState } from '../redux/rootReducer';
 import { User } from '../interfaces/user';
-import { AdminLayout } from '../components/AdminLayout';
+import { AdminLayout } from '../components/adminLayout';
 
 // Pages
 import { LoginPage } from './login';
 import { DashboardPage } from './dashboard';
 import { useRefreshToken } from '../utils/auth';
 import { LogoutPage } from './logout';
+import { ConsumptionForm } from './consumption';
 
 /**
  * Router available only for logged users
@@ -22,6 +23,7 @@ const PrivateRouter: React.FC<{}> = (props) => {
     <AdminLayout loading={loading}>
       <>
         <Route path="/logout" component={LogoutPage} />
+        <Route path="/consumo" component={ConsumptionForm} />
         {/* Dashboard */}
         <Route path="/" component={DashboardPage} exact />
       </>
@@ -52,7 +54,7 @@ export const Router: React.FC<{}> = (props) => {
 
   return (
     <BrowserRouter>
-      {user && user.role === 'admin' ? <PrivateRouter {...props} /> : <PublicRouter {...props} />}
+      {user && user.role !== 'admin' ? <PrivateRouter {...props} /> : <PublicRouter {...props} />}
     </BrowserRouter>
   );
 };

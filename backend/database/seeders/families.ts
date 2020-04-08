@@ -1,12 +1,13 @@
 import db from '../../src/schemas';
 import { Family } from '../../src/schemas/families';
+import moment from 'moment';
 
 const list = [
   {
     code: '10000000',
     groupName: 'extreme-poverty',
     responsibleName: 'JOSÉ ALMEIDA DA SILVA',
-    responsibleBirthday: new Date(),
+    responsibleBirthday: moment('01/01/1988', 'DD/MM/YYYY').toDate(),
     responsibleNis: '10000000000',
     responsibleMotherName: 'MARIA RITA DA SILVA'
   },
@@ -14,7 +15,7 @@ const list = [
     code: '20000000',
     groupName: 'poverty-line',
     responsibleName: 'MARIA ARAÚJO',
-    responsibleBirthday: new Date(),
+    responsibleBirthday: moment('06/07/1979', 'DD/MM/YYYY').toDate(),
     responsibleNis: '20000000000',
     responsibleMotherName: 'MARIA RITA DA SILVA'
   },
@@ -22,9 +23,17 @@ const list = [
     code: '30000000',
     groupName: 'cad',
     responsibleName: 'TEREZA DE JESUS',
-    responsibleBirthday: new Date(),
+    responsibleBirthday: moment('01/10/1978', 'DD/MM/YYYY').toDate(),
     responsibleNis: '30000000000',
     responsibleMotherName: 'MARIA RITA DA SILVA'
+  },
+  {
+    code: '1234',
+    groupName: 'cad',
+    responsibleName: 'JOÃO FERNANDO BARAKY',
+    responsibleBirthday: moment('20/12/1991', 'DD/MM/YYYY').toDate(),
+    responsibleNis: '1234',
+    responsibleMotherName: 'HILDA LÚCIA BARAKY'
   }
 ];
 
