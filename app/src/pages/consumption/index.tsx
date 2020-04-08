@@ -19,7 +19,8 @@ const schema = yup.object().shape({
   nfce: yup.string().label('Nota fiscal eletrônica').required(),
   value: yup.number().label('Valor em reais').required(),
   proofImageUrl: yup.string().label('Link da imagem').required(),
-  familyId: yup.string().label('Família').required('É preciso selecionar uma família ao digitar um NIS')
+  familyId: yup.string().label('Família').required('É preciso selecionar uma família ao digitar um NIS'),
+  birthday: yup.string().label('Aniversário')
 });
 
 /**
@@ -74,7 +75,8 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
       value: '',
       proofImageUrl: '',
       nisCode: '',
-      familyId: ''
+      familyId: '',
+      birthday: ''
     },
     validationSchema: schema,
     onSubmit: (values, { setStatus }) => {
@@ -100,6 +102,8 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
   const imageMeta = getFieldMeta('proofImageUrl');
   const nfceMeta = getFieldMeta('nfce');
 
+  const sameBirthday = moment(family?.responsibleBirthday).diff(moment(values.birthday, 'DD/MM/YYYY'), 'days') === 0;
+
   return (
     <PageContainer>
       <Card title={<Typography.Title>Informar consumo</Typography.Title>}>
@@ -114,18 +118,37 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
               maxLength={11}
               onPressEnter={() => {
                 setFieldValue('familyId', '');
+                setFieldValue('birthday', '');
                 dispatch(requestGetFamily(nis));
               }}
               onSearch={(value) => {
                 setFieldValue('familyId', '');
+                setFieldValue('birthday', '');
                 dispatch(requestGetFamily(value));
               }}
             />
           </Form.Item>
+          {family && (
+            <Form.Item
+              label="Aniversário do responsável"
+              validateStatus={values.birthday.length > 9 && !sameBirthday ? 'error' : ''}
+              help={values.birthday.length > 9 && !sameBirthday ? 'Aniversário incorreto' : ''}
+            >
+              <Input
+                style={{ width: '100%' }}
+                id="birthday"
+                name="birthday"
+                onChange={handleChange}
+                placeholder="DD/MM/YYYY"
+                // formatter={(value) => moment(value, 'DDMMYYYY').format('DD/MM/YYYY')}
+                // parser={(value: string) => moment(value, 'DD/MM/YYYY').format('DDMMYYYY')}
+              />
+            </Form.Item>
+          )}
         </Form>
         <form onSubmit={handleSubmit}>
           <Form layout="vertical">
-            {!values.familyId && !familyLoading && family && (
+            {!values.familyId && !familyLoading && family && sameBirthday && (
               <FamilyWrapper>
                 <Alert
                   type="info"
