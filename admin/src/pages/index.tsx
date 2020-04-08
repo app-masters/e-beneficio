@@ -3,7 +3,7 @@ import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { AppState } from '../redux/rootReducer';
 import { User } from '../interfaces/user';
-import { AdminLayout } from '../components/AdminLayout';
+import { AdminLayout } from '../components/adminLayout';
 
 // Pages
 import { LoginPage } from './login';
