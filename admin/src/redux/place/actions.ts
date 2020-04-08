@@ -1,8 +1,8 @@
 import { createAction } from '@reduxjs/toolkit';
-import { ThunkResult } from '../store';
-import { backend } from '../../utils/networking';
-import { User } from '../../interfaces/user';
 import { Place } from '../../interfaces/place';
+import { User } from '../../interfaces/user';
+import { backend } from '../../utils/networking';
+import { ThunkResult } from '../store';
 
 // Simple actions and types
 export const doGetPlace = createAction<void>('place/GET');
@@ -25,8 +25,6 @@ export const requestGetPlace = (id?: number): ThunkResult<void> => {
     try {
       // Start request - starting loading state
       dispatch(doGetPlace());
-      // Get logged user cityId
-      const user = getState().authReducer.user as User;
       // Request
       const response = await backend.get<Place | Place[]>(`/places/${id || ''}`);
       if (response && response.data) {
@@ -90,8 +88,6 @@ export const requestDeletePlace = (id: number): ThunkResult<void> => {
     try {
       // Start request - starting loading state
       dispatch(doGetPlace());
-      // Get logged user cityId
-      const user = getState().authReducer.user as User;
       // Request
       await backend.delete<void>(`/places/${id || ''}`);
       // Finished
