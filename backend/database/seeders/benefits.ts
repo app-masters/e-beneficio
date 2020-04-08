@@ -4,14 +4,14 @@ import { Benefit } from '../../src/schemas/benefits';
 const list = [
   {
     title: '[CAD25123] Auxilio municipal de alimentação',
-    groupName: 'Extrema pobreza',
+    groupName: 'extreme-poverty',
     month: 3,
     year: 2020,
     value: 500
   },
   {
     title: '[CAD25123] Auxilio municipal de alimentação',
-    groupName: 'Linha da pobreza',
+    groupName: 'poverty-line',
     month: 3,
     year: 2020,
     value: 300
