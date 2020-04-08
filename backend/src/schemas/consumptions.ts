@@ -1,22 +1,22 @@
 import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize';
 
 // Simple item type
-export interface PlaceStore {
+export interface Consumption {
   readonly id?: number | string;
-  cityId: number | string;
-  placeId: number | string;
-  title: string;
-  address: string;
-  cnpj: string;
+  familyId: number | string;
+  placeStoreId: number | string;
+  nfce: string;
+  value: number;
+  proofImageUrl?: string;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
 }
 // Sequelize returns type
-export type SequelizePlaceStore = PlaceStore & Model;
+export type SequelizeConsumption = Consumption & Model;
 // Sequelize model type
-export type SequelizePlaceStoreModel = typeof Model & {
-  new (values?: object, options?: BuildOptions): SequelizePlaceStore;
+export type SequelizeConsumptionModel = typeof Model & {
+  new (values?: object, options?: BuildOptions): SequelizeConsumption;
   associate: (models: { [key: string]: ModelCtor<Model> }) => void;
 };
 
@@ -29,63 +29,55 @@ export const attributes = {
     primaryKey: true,
     autoIncrement: true
   },
-  cityId: {
+  familyId: {
     type: DataTypes.INTEGER,
     references: {
-      model: 'Cities',
+      model: 'Families',
       id: 'id'
     },
     allowNull: false
   },
-  placeId: {
+  placeStoreId: {
     type: DataTypes.INTEGER,
     references: {
-      model: 'Places',
+      model: 'PlaceStores',
       id: 'id'
     },
     allowNull: false
   },
-  title: {
+  nfce: {
     type: DataTypes.STRING,
     allowNull: false
   },
-  address: {
-    type: DataTypes.STRING,
+  value: {
+    type: DataTypes.FLOAT,
     allowNull: false
   },
-  cnpj: {
-    type: DataTypes.STRING(50),
-    allowNull: false
+  proofImageUrl: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 };
 
-const tableName = 'PlaceStores';
+const tableName = 'Consumptions';
 
 /**
  * Sequelize model initializer function
  * @param sequelize - Sequelize instance
  * @returns Schema - Sequelize model
  */
-export const initPlaceStoreSchema = (sequelize: Sequelize): SequelizePlaceStoreModel => {
-  const Schema = sequelize.define(tableName, attributes, { timestamps: true }) as SequelizePlaceStoreModel;
+export const initConsumptionSchema = (sequelize: Sequelize): SequelizeConsumptionModel => {
+  const Schema = sequelize.define(tableName, attributes, { timestamps: true }) as SequelizeConsumptionModel;
 
   Schema.associate = (models): void => {
     // Sequelize relations
-    Schema.belongsTo(models.cities, {
-      foreignKey: 'cityId',
-      as: 'city'
+    Schema.belongsTo(models.families, {
+      foreignKey: 'familyId',
+      as: 'family'
     });
-    Schema.belongsTo(models.places, {
-      foreignKey: 'placeId',
-      as: 'place'
-    });
-    Schema.hasMany(models.users, {
+    Schema.belongsTo(models.placeStores, {
       foreignKey: 'placeStoreId',
-      as: 'users'
-    });
-    Schema.hasMany(models.consumptions, {
-      foreignKey: 'placeStoreId',
-      as: 'consumptions'
+      as: 'placeStore'
     });
   };
 

@@ -10,7 +10,7 @@
 			"name": "Auth",
 			"item": [
 				{
-					"name": "/auth/login",
+					"name": "/auth/login - Admin",
 					"event": [
 						{
 							"listen": "test",
@@ -22,10 +22,10 @@
 									"",
 									"// SET ENV VARS",
 									"if (jsonData && jsonData.token) {",
-									"    pm.collectionVariables.set('authToken', jsonData.token);",
+									"    pm.collectionVariables.set('authTokenAdmin', jsonData.token);",
 									"}",
 									"if (jsonData && jsonData.refreshToken) {",
-									"    pm.collectionVariables.set('refreshToken', jsonData.refreshToken);",
+									"    pm.collectionVariables.set('refreshTokenAdmin', jsonData.refreshToken);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -112,7 +112,7 @@
 					]
 				},
 				{
-					"name": "/auth/token",
+					"name": "/auth/token - Admin",
 					"event": [
 						{
 							"listen": "test",
@@ -124,10 +124,163 @@
 									"",
 									"// SET ENV VARS",
 									"if (jsonData && jsonData.token) {",
-									"    pm.collectionVariables.set('authToken', jsonData.token);",
+									"    pm.collectionVariables.set('authTokenAdmin', jsonData.token);",
 									"}",
 									"if (jsonData && jsonData.refreshToken) {",
-									"    pm.collectionVariables.set('refreshToken', jsonData.refreshToken);",
+									"    pm.collectionVariables.set('refreshTokenAdmin', jsonData.refreshToken);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "refreshToken",
+									"value": "{{refreshToken}}",
+									"description": "Refresh token provided on login or other token request",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/token",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"token"
+							]
+						},
+						"description": "Log in the user using the email and password"
+					},
+					"response": []
+				},
+				{
+					"name": "/auth/login - Operator",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e3789afa-0407-4a1d-a963-344cb5d238ef",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.token) {",
+									"    pm.collectionVariables.set('authTokenOperator', jsonData.token);",
+									"}",
+									"if (jsonData && jsonData.refreshToken) {",
+									"    pm.collectionVariables.set('refreshTokenOperator', jsonData.refreshToken);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "operator@login.com",
+									"description": "Registered email",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "operator@login",
+									"description": "Non-hashed password",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Log in the user using the email and password"
+					},
+					"response": [
+						{
+							"name": "/auth/login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "email",
+											"value": "admin@login.com",
+											"description": "Registered email",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "admin@login",
+											"description": "Non-hashed password",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/login?",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									],
+									"query": [
+										{
+											"key": "",
+											"value": null
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNTg1ODU3OTU0LCJleHAiOjE1ODU4NTgyNTR9.P8GFrNl8LpdzcnhYIlt2Yf0gqjfdsfrfZDqFaoJwZkk\",\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNTg1ODU3OTU0LCJleHAiOjE1ODYyODk5NTR9.4ei-Qph_0sBVesVXNVB9xQa2qUohMu_Sd9LQCyYNneA\",\n    \"user\": {\n        \"id\": 1,\n        \"cityId\": 1,\n        \"placeStoreId\": null,\n        \"cpf\": \"00000000000\",\n        \"name\": \"Usuário admin\",\n        \"role\": \"admin\",\n        \"email\": \"admin@login.com\",\n        \"password\": \"$2a$08$criG7dYn64PoLkYHBQyFfuBQ14k/bb1QAoW1qmJYkpAZ4MxrZPtN.\",\n        \"active\": true,\n        \"createdAt\": \"2020-04-02T16:43:20.928Z\",\n        \"updatedAt\": \"2020-04-02T16:43:20.928Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "/auth/token - Operator",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e3789afa-0407-4a1d-a963-344cb5d238ef",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.token) {",
+									"    pm.collectionVariables.set('authTokenOperator', jsonData.token);",
+									"}",
+									"if (jsonData && jsonData.refreshToken) {",
+									"    pm.collectionVariables.set('refreshTokenOperator', jsonData.refreshToken);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -373,7 +526,8 @@
 								{
 									"key": "cityId",
 									"value": "{{cityId}}",
-									"type": "text"
+									"type": "text",
+									"disabled": true
 								}
 							],
 							"options": {
@@ -411,7 +565,8 @@
 								{
 									"key": "cityId",
 									"value": "{{cityId}}",
-									"type": "text"
+									"type": "text",
+									"disabled": true
 								}
 							],
 							"options": {
@@ -553,7 +708,8 @@
 								{
 									"key": "cityId",
 									"value": "{{cityId}}",
-									"type": "text"
+									"type": "text",
+									"disabled": true
 								},
 								{
 									"key": "placeId",
@@ -626,7 +782,8 @@
 								{
 									"key": "cityId",
 									"value": "{{cityId}}",
-									"type": "text"
+									"type": "text",
+									"disabled": true
 								},
 								{
 									"key": "placeId",
@@ -785,7 +942,8 @@
 								{
 									"key": "cityId",
 									"value": "{{cityId}}",
-									"type": "text"
+									"type": "text",
+									"disabled": true
 								},
 								{
 									"key": "placeStoreId",
@@ -873,7 +1031,8 @@
 								{
 									"key": "cityId",
 									"value": "{{cityId}}",
-									"type": "text"
+									"type": "text",
+									"disabled": true
 								},
 								{
 									"key": "placeStoreId",
@@ -1047,7 +1206,8 @@
 								{
 									"key": "cityId",
 									"value": "{{cityId}}",
-									"type": "text"
+									"type": "text",
+									"disabled": true
 								}
 							],
 							"options": {
@@ -1085,7 +1245,8 @@
 								{
 									"key": "cityId",
 									"value": "{{cityId}}",
-									"type": "text"
+									"type": "text",
+									"disabled": true
 								}
 							],
 							"options": {
@@ -1413,6 +1574,177 @@
 			"protocolProfileBehavior": {}
 		},
 		{
+			"name": "Families",
+			"item": [
+				{
+					"name": "/families - Search by NIS",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7243e34e-59ec-4f42-8445-b3201463ec88",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set('familyId', jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/families?nis=10000000000",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"families"
+							],
+							"query": [
+								{
+									"key": "nis",
+									"value": "10000000000"
+								}
+							]
+						},
+						"description": "Search the family by the responsible unique NIS (Número de Identificação Social)"
+					},
+					"response": []
+				}
+			],
+			"description": "Families that will receive the benefits",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "42aa2627-0008-48c0-ad44-4a91cfe57720",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "9ac24a10-1275-4ed0-9854-34fbb33175ca",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Consumptions",
+			"item": [
+				{
+					"name": "/consumptions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7243e34e-59ec-4f42-8445-b3201463ec88",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set('consumptionId', jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authTokenOperator}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "familyId",
+									"value": "{{familyId}}",
+									"type": "text"
+								},
+								{
+									"key": "value",
+									"value": "49.99",
+									"type": "text"
+								},
+								{
+									"key": "nfce",
+									"value": "0000080202",
+									"type": "text"
+								},
+								{
+									"key": "proofImageUrl",
+									"value": "https://nstecnologia.com.br/blog/wp-content/uploads/2017/08/image2017-8-7-11-8-37.png",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/consumptions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"consumptions"
+							]
+						},
+						"description": "Search the family by the responsible unique NIS (Número de Identificação Social)"
+					},
+					"response": []
+				}
+			],
+			"description": "Families that will receive the benefits",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "42aa2627-0008-48c0-ad44-4a91cfe57720",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "9ac24a10-1275-4ed0-9854-34fbb33175ca",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
 			"name": "/",
 			"request": {
 				"method": "GET",
@@ -1433,7 +1765,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "{{authToken}}",
+				"value": "{{authTokenAdmin}}",
 				"type": "string"
 			}
 		]
@@ -1462,56 +1794,80 @@
 	],
 	"variable": [
 		{
-			"id": "88b1f248-2c16-47a4-8e49-9c3564c81d80",
+			"id": "56ea6468-5a88-47e1-8fc7-c133952f720b",
 			"key": "baseUrl",
 			"value": "http://localhost:3001",
 			"type": "string"
 		},
 		{
-			"id": "0dc8e3a7-2be7-4cf0-869a-f33c99b0ef9f",
-			"key": "authToken",
+			"id": "9e32fdd4-2b45-4f0d-8e32-cd75a09dda33",
+			"key": "authTokenAdmin",
 			"value": "_token_",
 			"type": "string"
 		},
 		{
-			"id": "d39db918-5e32-4699-bd42-82685be2f343",
-			"key": "refreshToken",
+			"id": "b373ada7-638b-4820-ac76-441d94042cd0",
+			"key": "refreshTokenAdmin",
 			"value": "_token_",
 			"type": "string"
 		},
 		{
-			"id": "cea889d6-bde6-44c2-be00-becc3463eb90",
+			"id": "80542032-0bab-4d25-851e-6cdf0008701f",
+			"key": "authTokenOperator",
+			"value": "_token_",
+			"type": "string"
+		},
+		{
+			"id": "26306ff8-d18a-4eea-93c1-5748960ec3be",
+			"key": "refreshTokenOperator",
+			"value": "_token_",
+			"type": "string"
+		},
+		{
+			"id": "206ddac6-710f-43c9-8a1b-4b234ceb6b7e",
 			"key": "cityId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "65493d00-1226-4779-a7c8-9b5258a6a416",
+			"id": "6f70f2d4-a649-4d8e-a48e-de703816d2ac",
 			"key": "placeId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "58313e64-61c3-4e09-bce5-b53edecb0294",
+			"id": "dcadf425-47b8-47ef-a7b5-04fd75d42470",
 			"key": "placeStoreId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "fa23300b-f197-446a-b1f4-e475e538107f",
+			"id": "887dabab-a574-46af-bbd6-e1017a26d477",
 			"key": "userId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "3bd9c5cf-59cb-42ac-afcb-fbb43653174d",
+			"id": "df129b84-df46-4aa2-bbf6-ba8d83698e55",
 			"key": "institutionId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "48056013-429a-491e-8f08-ba38984fc9e2",
+			"id": "adff4098-4659-4960-890f-4b6fa44f6cec",
 			"key": "benefitId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"id": "e7f9f9c5-9e7b-4ac6-b1fc-e090ba3892e1",
+			"key": "familyId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"id": "cf90d338-8850-4875-86b0-0b8ec1b827b0",
+			"key": "consumptionId",
 			"value": "1",
 			"type": "string"
 		}
