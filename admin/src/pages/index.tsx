@@ -14,6 +14,8 @@ import { useRefreshToken } from '../utils/auth';
 import { LogoutPage } from './logout';
 import { BenefitList } from './benefits/list';
 import { BenefitForm } from './benefits/form';
+import { PlaceStoreList } from './placeStore/list';
+import { PlaceStoreForm } from './placeStore/form';
 
 /**
  * Router available only for logged users
@@ -32,6 +34,9 @@ const PrivateRouter: React.FC<{}> = (props) => {
         {/* Benefit routes */}
         <Route path="/beneficios" component={BenefitList} />
         <Route path="/beneficios/:id" component={BenefitForm} />
+        {/* Store routes */}
+        <Route path="/lojas" component={PlaceStoreList} />
+        <Route path="/lojas/:id" component={PlaceStoreForm} />
         {/* Dashboard */}
         <Route path="/" component={DashboardPage} exact />
       </>
