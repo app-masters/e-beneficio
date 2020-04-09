@@ -15,7 +15,7 @@ import { formatCNPJ } from '../../utils/string';
 const { Option } = Select;
 
 const schema = yup.object().shape({
-  title: yup.string().label('Nome').required(),
+  title: yup.string().label('Loja').required(),
   placeId: yup.number().label('Estabelecimento').required(),
   cnpj: yup.string().label('CNPJ').required(),
   address: yup.string().label('Endereço').required()
@@ -94,7 +94,7 @@ export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (pr
       <form onSubmit={handleSubmit}>
         <Form layout="vertical">
           <Form.Item
-            label={'Nome'}
+            label={'Loja'}
             validateStatus={!!titleMeta.error && !!titleMeta.touched ? 'error' : ''}
             help={!!titleMeta.error && !!titleMeta.touched ? titleMeta.error : undefined}
           >
