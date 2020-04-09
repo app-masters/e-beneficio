@@ -8,3 +8,10 @@ export const familyGroupList = {
   'poverty-line': { code: 2, title: 'Linha da pobreza' },
   cad: { code: 3, title: 'Perfil CAD único' }
 };
+
+export const roleList = {
+  admin: { title: 'Administrador' },
+  operator: { title: 'Operador' },
+  manager: { title: 'Gerente' },
+  financial: { title: 'Financeiro' }
+};
