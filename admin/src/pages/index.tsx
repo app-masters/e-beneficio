@@ -16,6 +16,8 @@ import { BenefitList } from './benefits/list';
 import { BenefitForm } from './benefits/form';
 import { PlaceStoreList } from './placeStore/list';
 import { PlaceStoreForm } from './placeStore/form';
+import { UserList } from './user/list';
+import { UserForm } from './user/form';
 
 /**
  * Router available only for logged users
@@ -37,6 +39,9 @@ const PrivateRouter: React.FC<{}> = (props) => {
         {/* Store routes */}
         <Route path="/lojas" component={PlaceStoreList} />
         <Route path="/lojas/:id" component={PlaceStoreForm} />
+        {/* User routes */}
+        <Route path="/usuarios" component={UserList} />
+        <Route path="/usuarios/:id" component={UserForm} />
         {/* Dashboard */}
         <Route path="/" component={DashboardPage} exact />
       </>
