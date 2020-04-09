@@ -18,7 +18,7 @@ const { Option } = Select;
 const schema = yup.object().shape({
   institutionId: yup.number().label('Instituição').required(),
   groupName: yup.string().label('Família').required(),
-  title: yup.string().label('Título').required(),
+  title: yup.string().label('Nome').required(),
   month: yup.number().label('Mês').required(),
   year: yup.number().label('Ano').required(),
   value: yup.string().label('Valor').required()
