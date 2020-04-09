@@ -7,7 +7,8 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   ShopOutlined,
-  SolutionOutlined
+  SolutionOutlined,
+  UserOutlined
 } from '@ant-design/icons';
 import { Button, Layout, Menu, Popover } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -56,8 +57,13 @@ const routes: RouteItem[] = [
   },
   {
     path: '/usuarios',
-    icon: () => <GroupOutlined />,
+    icon: () => <UserOutlined />,
     name: 'Usuários'
+  },
+  {
+    path: '/instituicoes',
+    icon: () => <GroupOutlined />,
+    name: 'Instituições'
   }
 ];
 

@@ -18,6 +18,8 @@ import { PlaceStoreList } from './placeStore/list';
 import { PlaceStoreForm } from './placeStore/form';
 import { UserList } from './user/list';
 import { UserForm } from './user/form';
+import { InstitutionForm } from './institutions/form';
+import { InstitutionList } from './institutions/list';
 
 /**
  * Router available only for logged users
@@ -42,6 +44,9 @@ const PrivateRouter: React.FC<{}> = (props) => {
         {/* User routes */}
         <Route path="/usuarios" component={UserList} />
         <Route path="/usuarios/:id" component={UserForm} />
+        {/* Institution routes */}
+        <Route path="/instituicoes" component={InstitutionList} />
+        <Route path="/instituicoes/:id" component={InstitutionForm} />
         {/* Dashboard */}
         <Route path="/" component={DashboardPage} exact />
       </>
