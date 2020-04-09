@@ -1,20 +1,20 @@
 import { createReducer } from '@reduxjs/toolkit';
 import {
-  doGetPlace,
-  doGetPlaceSuccess,
-  doGetPlaceFailed,
-  doSavePlace,
-  doSavePlaceSuccess,
-  doSavePlaceFailed,
-  doDeletePlace,
-  doDeletePlaceSuccess,
-  doDeletePlaceFailed
+  doGetBenefit,
+  doGetBenefitSuccess,
+  doGetBenefitFailed,
+  doSaveBenefit,
+  doSaveBenefitSuccess,
+  doSaveBenefitFailed,
+  doDeleteBenefit,
+  doDeleteBenefitSuccess,
+  doDeleteBenefitFailed
 } from './actions';
-import { Place } from '../../interfaces/place';
+import { Benefit } from '../../interfaces/benefit';
 import { addToList } from '../../utils/list';
 
-export interface PlaceReducerState {
-  list: Place[];
+export interface BenefitReducerState {
+  list: Benefit[];
   loading: boolean;
   error?: Error;
 }
@@ -24,14 +24,14 @@ const initialState = {
   loading: false
 };
 
-export default createReducer<PlaceReducerState>(initialState, (builder) =>
+export default createReducer<BenefitReducerState>(initialState, (builder) =>
   builder
     // Get actions
-    .addCase(doGetPlace, (state) => {
+    .addCase(doGetBenefit, (state) => {
       state.loading = true;
       state.error = undefined;
     })
-    .addCase(doGetPlaceSuccess, (state, action) => {
+    .addCase(doGetBenefitSuccess, (state, action) => {
       state.loading = false;
       if (Array.isArray(action.payload)) {
         // User got the list
@@ -41,33 +41,33 @@ export default createReducer<PlaceReducerState>(initialState, (builder) =>
         state.list = addToList(action.payload, state.list);
       }
     })
-    .addCase(doGetPlaceFailed, (state, action) => {
+    .addCase(doGetBenefitFailed, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     })
     // Save actions
-    .addCase(doSavePlace, (state) => {
+    .addCase(doSaveBenefit, (state) => {
       state.loading = true;
       state.error = undefined;
     })
-    .addCase(doSavePlaceSuccess, (state, action) => {
+    .addCase(doSaveBenefitSuccess, (state, action) => {
       state.loading = false;
       state.list = addToList(action.payload, state.list);
     })
-    .addCase(doSavePlaceFailed, (state, action) => {
+    .addCase(doSaveBenefitFailed, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     })
     // Delete actions
-    .addCase(doDeletePlace, (state) => {
+    .addCase(doDeleteBenefit, (state) => {
       state.loading = true;
       state.error = undefined;
     })
-    .addCase(doDeletePlaceSuccess, (state, action) => {
+    .addCase(doDeleteBenefitSuccess, (state, action) => {
       state.loading = false;
       state.list = state.list.filter((item) => item.id !== action.payload.id);
     })
-    .addCase(doDeletePlaceFailed, (state, action) => {
+    .addCase(doDeleteBenefitFailed, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     })
