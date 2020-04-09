@@ -1,6 +1,7 @@
 import {
   BarChartOutlined,
   CarryOutOutlined,
+  GroupOutlined,
   IdcardOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
@@ -52,6 +53,11 @@ const routes: RouteItem[] = [
     path: '/relatorios',
     icon: () => <BarChartOutlined />,
     name: 'Relatórios'
+  },
+  {
+    path: '/usuarios',
+    icon: () => <GroupOutlined />,
+    name: 'Usuários'
   }
 ];
 

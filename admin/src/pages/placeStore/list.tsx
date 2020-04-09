@@ -40,7 +40,6 @@ export const PlaceStoreList: React.FC<{}> = () => {
         }
       >
         <Table dataSource={list}>
-          <Table.Column title="Nome" dataIndex="title" />
           <Table.Column
             title="Estabelecimento"
             dataIndex="placeId"
@@ -52,6 +51,7 @@ export const PlaceStoreList: React.FC<{}> = () => {
               )
             }
           />
+          <Table.Column title="Loja" dataIndex="title" />
           <Table.Column title="CNPJ" dataIndex="cnpj" render={(data: PlaceStore['cnpj']) => formatCNPJ(data)} />
           <Table.Column title="Endereço" dataIndex="address" />
           <Table.Column
