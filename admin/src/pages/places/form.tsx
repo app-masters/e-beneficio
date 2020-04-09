@@ -9,7 +9,7 @@ import { AppState } from '../../redux/rootReducer';
 import yup from '../../utils/yup';
 
 const schema = yup.object().shape({
-  title: yup.string().label('Título').required()
+  title: yup.string().label('Nome').required()
 });
 
 /**
@@ -60,7 +60,7 @@ export const PlaceForm: React.FC<RouteComponentProps<{ id: string }>> = (props) 
       <form onSubmit={handleSubmit}>
         <Form layout="vertical">
           <Form.Item
-            label={'Título'}
+            label={'Nome'}
             validateStatus={!!titleMeta.error && !!titleMeta.touched ? 'error' : ''}
             help={!!titleMeta.error && !!titleMeta.touched ? titleMeta.error : undefined}
           >
