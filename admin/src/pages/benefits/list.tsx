@@ -4,29 +4,30 @@ import moment from 'moment';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Place } from '../../interfaces/place';
-import { requestDeletePlace, requestGetPlace } from '../../redux/place/actions';
+import { Benefit } from '../../interfaces/benefit';
+import { requestDeleteBenefit, requestGetBenefit } from '../../redux/benefit/actions';
 import { AppState } from '../../redux/rootReducer';
+import { familyGroupList } from '../../utils/constraints';
 import { ActionWrapper, PageContainer } from './styles';
 
 /**
  * List component
  * @param props component props
  */
-export const PlaceList: React.FC<{}> = (props) => {
+export const BenefitList: React.FC<{}> = (props) => {
   // Redux state
-  const list = useSelector<AppState, Place[]>((state) => state.placeReducer.list as Place[]);
+  const list = useSelector<AppState, Benefit[]>((state) => state.benefitReducer.list as Benefit[]);
   // Redux actions
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(requestGetPlace());
+    dispatch(requestGetBenefit());
   }, [dispatch]);
   return (
     <PageContainer>
       <Card
-        title={<Typography.Title>{`Estabelecimentos`}</Typography.Title>}
+        title={<Typography.Title>{`Benefícios`}</Typography.Title>}
         extra={
-          <Link to={`/estabelecimentos/criar`}>
+          <Link to={`/beneficios/criar`}>
             <Button type="primary">Criar</Button>
           </Link>
         }
@@ -34,15 +35,23 @@ export const PlaceList: React.FC<{}> = (props) => {
         <Table dataSource={list}>
           <Table.Column title="Nome" dataIndex="title" />
           <Table.Column
+            title="Grupo"
+            dataIndex="groupName"
+            render={(data: Benefit['groupName']) => familyGroupList[data]?.title || data}
+          />
+          <Table.Column title="Mês" dataIndex="month" />
+          <Table.Column title="Ano" dataIndex="year" />
+          <Table.Column title="Valor" dataIndex="value" render={(data: Benefit['value']) => `R$ ${data}`} />
+          <Table.Column
             title="Criado"
             dataIndex="createdAt"
-            render={(data: Place['createdAt']) => moment(data as Date).fromNow()}
+            render={(data: Benefit['createdAt']) => moment(data as Date).fromNow()}
           />
           <Table.Column
-            render={(item: Place) => {
+            render={(item: Benefit) => {
               return (
                 <ActionWrapper>
-                  <Link to={`/estabelecimentos/${item.id}/editar`}>
+                  <Link to={`/beneficios/${item.id}/editar`}>
                     <Button>Editar</Button>
                   </Link>
                   {/* TODO: Add alert on delete */}
@@ -57,7 +66,7 @@ export const PlaceList: React.FC<{}> = (props) => {
                         okType: 'danger',
                         cancelText: 'Não',
                         onOk: () => {
-                          dispatch(requestDeletePlace(item.id as number));
+                          dispatch(requestDeleteBenefit(item.id as number));
                         }
                       })
                     }
