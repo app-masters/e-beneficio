@@ -51,8 +51,9 @@ const routes: RouteItem[] = [
  * A function the will return a menu item or a sidebar item based on the given item properties
  * @param item The route item object with the route metadata from the route tree
  * @param parentPath the current menu path in the tree(accounting its parent)
+ * @param onClick callback for click
  */
-const menuItem = (item: RouteItem, parentPath: string) => {
+const menuItem = (item: RouteItem, parentPath: string, onClick: () => void) => {
   const key = `${parentPath}${item.path}`;
   const maxLength = 30;
   const name = item.name.length > maxLength ? `${item.name.slice(0, maxLength - 3)}...` : item.name;
@@ -67,7 +68,7 @@ const menuItem = (item: RouteItem, parentPath: string) => {
     </>
   );
 
-  const childItems = item.children?.map((navLink) => menuItem(navLink, key));
+  const childItems = item.children?.map((navLink) => menuItem(navLink, key, onClick));
 
   return item.children ? (
     item.group ? (
@@ -80,7 +81,7 @@ const menuItem = (item: RouteItem, parentPath: string) => {
       </SubMenu>
     )
   ) : (
-    <Menu.Item key={key} disabled={item.disabled}>
+    <Menu.Item key={key} disabled={item.disabled} onClick={onClick}>
       <Link to={key}>{innerItem()}</Link>
     </Menu.Item>
   );
@@ -124,7 +125,7 @@ export const Sidebar: React.FC = () => {
         <MenuHeight>
           <Menu theme="light" mode="inline" defaultSelectedKeys={[location ? location.pathname : '/']}>
             {/* Render the links based on the nav arrays */}
-            {routes.map((navLink) => menuItem(navLink, ''))}
+            {routes.map((navLink) => menuItem(navLink, '', () => setCollapsed(true)))}
           </Menu>
         </MenuHeight>
         <Flex vertical={collapsed} alignItems="center" gap="sm" justifyContent="space-between">
