@@ -5,14 +5,21 @@ const list = [
   {
     title: '[CAD25123] Auxilio municipal de alimentação',
     groupName: 'extreme-poverty',
-    month: 3,
+    month: 5,
     year: 2020,
-    value: 500
+    value: 600
   },
   {
     title: '[CAD25123] Auxilio municipal de alimentação',
     groupName: 'poverty-line',
-    month: 3,
+    month: 5,
+    year: 2020,
+    value: 400
+  },
+  {
+    title: '[CAD25123] Auxilio municipal de alimentação',
+    groupName: 'cad',
+    month: 5,
     year: 2020,
     value: 300
   }

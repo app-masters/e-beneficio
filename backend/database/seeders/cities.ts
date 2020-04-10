@@ -1,6 +1,6 @@
 import db from '../../src/schemas';
 
-const list = [{ title: 'Juiz de Fora/MG' }, { title: 'Belo Horizonte/MG' }];
+const list = [{ title: 'Juiz de Fora/MG' }];
 
 /**
  * Seed the cities table
