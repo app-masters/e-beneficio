@@ -31,4 +31,6 @@ Object.values(db).forEach((model) => {
   }
 });
 
+export { sequelize };
+
 export default db;

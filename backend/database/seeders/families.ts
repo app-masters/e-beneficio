@@ -2,7 +2,6 @@ import db from '../../src/schemas';
 import { Family } from '../../src/schemas/families';
 import moment from 'moment';
 import { importFamilyFromCSVFile } from '../../src/models/families';
-import { pathToFileURL } from 'url';
 
 const list = [
   {
