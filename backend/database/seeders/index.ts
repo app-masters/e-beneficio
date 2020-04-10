@@ -21,6 +21,7 @@ const seedAll = async () => {
     await benefits.seed();
     await families.seed();
     await consumptions.seed();
+    await families.csv(); // CSV example seed
   }
   // Production seed
   // ...
