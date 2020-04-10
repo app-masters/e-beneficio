@@ -61,6 +61,10 @@ export const addConsumption = async (
   const [consumption] = await db.consumptions.findAll({ where: { nfce: values.nfce } });
   if (consumption) return consumption; // Just retuning it for now
   // Checking everyting
+  if (values.value < 0) {
+    // Negative consumption
+    throw { status: 422, message: 'Compra não pode ter valor negativo' };
+  }
   const family = await db.families.findByPk(values.familyId);
   if (!family) {
     // Invalid family ID

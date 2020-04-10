@@ -10,4 +10,6 @@ export interface Family {
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
+  // Extra data
+  balance: number;
 }
