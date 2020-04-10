@@ -3,7 +3,8 @@ import {
   CarryOutOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
-  MenuUnfoldOutlined
+  MenuUnfoldOutlined,
+  HomeOutlined
 } from '@ant-design/icons';
 import { Button, Layout, Menu, Popover } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -24,9 +25,15 @@ interface RouteItem {
   icon?: () => React.ReactNode;
   name: string;
   children?: RouteItem[];
+  disabled?: boolean;
 }
 
 const routes: RouteItem[] = [
+  {
+    path: '/',
+    icon: () => <HomeOutlined />,
+    name: 'Início'
+  },
   {
     path: '/consumo',
     icon: () => <CarryOutOutlined />,
@@ -35,7 +42,8 @@ const routes: RouteItem[] = [
   {
     path: '/relatorios',
     icon: () => <BarChartOutlined />,
-    name: 'Relatórios'
+    name: 'Relatórios',
+    disabled: true
   }
 ];
 
@@ -63,7 +71,7 @@ const menuItem = (item: RouteItem, parentPath: string) => {
 
   return item.children ? (
     item.group ? (
-      <Menu.ItemGroup key={item.path} title={item.name}>
+      <Menu.ItemGroup key={item.path} title={item.name} disabled={item.disabled}>
         {childItems}
       </Menu.ItemGroup>
     ) : (
@@ -72,7 +80,7 @@ const menuItem = (item: RouteItem, parentPath: string) => {
       </SubMenu>
     )
   ) : (
-    <Menu.Item key={key}>
+    <Menu.Item key={key} disabled={item.disabled}>
       <Link to={key}>{innerItem()}</Link>
     </Menu.Item>
   );

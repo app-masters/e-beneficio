@@ -1,7 +1,7 @@
 import {
   BarChartOutlined,
   CarryOutOutlined,
-  GroupOutlined,
+  BankOutlined,
   IdcardOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
@@ -27,6 +27,7 @@ interface RouteItem {
   icon?: () => React.ReactNode;
   name: string;
   children?: RouteItem[];
+  disabled?: boolean;
 }
 
 const routes: RouteItem[] = [
@@ -36,9 +37,9 @@ const routes: RouteItem[] = [
     name: 'Beneficios'
   },
   {
-    path: '/familias',
-    icon: () => <IdcardOutlined />,
-    name: 'Famílias'
+    path: '/usuarios',
+    icon: () => <UserOutlined />,
+    name: 'Usuários'
   },
   {
     path: '/lojas',
@@ -51,19 +52,21 @@ const routes: RouteItem[] = [
     name: 'Estabelecimentos'
   },
   {
+    path: '/instituicoes',
+    icon: () => <BankOutlined />,
+    name: 'Instituições'
+  },
+  {
+    path: '/familias',
+    icon: () => <IdcardOutlined />,
+    name: 'Famílias',
+    disabled: true
+  },
+  {
     path: '/relatorios',
     icon: () => <BarChartOutlined />,
-    name: 'Relatórios'
-  },
-  {
-    path: '/usuarios',
-    icon: () => <UserOutlined />,
-    name: 'Usuários'
-  },
-  {
-    path: '/instituicoes',
-    icon: () => <GroupOutlined />,
-    name: 'Instituições'
+    name: 'Relatórios',
+    disabled: true
   }
 ];
 
@@ -91,7 +94,7 @@ const menuItem = (item: RouteItem, parentPath: string) => {
 
   return item.children ? (
     item.group ? (
-      <Menu.ItemGroup key={item.path} title={item.name}>
+      <Menu.ItemGroup key={item.path} title={item.name} disabled={item.disabled}>
         {childItems}
       </Menu.ItemGroup>
     ) : (
@@ -100,7 +103,7 @@ const menuItem = (item: RouteItem, parentPath: string) => {
       </SubMenu>
     )
   ) : (
-    <Menu.Item key={key}>
+    <Menu.Item key={key} disabled={item.disabled}>
       <Link to={key}>{innerItem()}</Link>
     </Menu.Item>
   );

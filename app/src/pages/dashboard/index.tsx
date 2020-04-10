@@ -1,9 +1,12 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Typography, Card } from 'antd';
+import { Card, Button } from 'antd';
+import { Link } from 'react-router-dom';
 import { AppState } from '../../redux/rootReducer';
-import { PageContainer } from './styles';
+import { PageContainer, ActionContainer } from './styles';
 import { User } from '../../interfaces/user';
+import { FamilySearch } from '../../components/familySearch';
+import { spacing } from '../../styles/theme';
 
 /**
  * Dashboard page component
@@ -14,8 +17,15 @@ export const DashboardPage: React.FC<{}> = (props) => {
   const user = useSelector<AppState, User>((state) => state.authReducer.user as User);
   return (
     <PageContainer>
-      <Card>
-        <Typography.Text>{`Bem vindo ${user.name}`}</Typography.Text>
+      <Card style={{ marginBottom: spacing.default }} title={`Bem vindo ${user.name}`}>
+        <ActionContainer>
+          <Button type="primary" size="large">
+            <Link to="/consumo">Informar novo consumo</Link>
+          </Button>
+        </ActionContainer>
+      </Card>
+      <Card title="Consultar saldo" style={{ marginBottom: spacing.default }}>
+        <FamilySearch />
       </Card>
     </PageContainer>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Alert, Button, Card, Descriptions, Form, Input, Typography, InputNumber, Modal } from 'antd';
+import { Alert, Button, Card, Form, Input, Typography, InputNumber, Modal } from 'antd';
 import { useFormik } from 'formik';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -8,16 +8,15 @@ import Webcam from 'react-webcam';
 import { QrcodeOutlined, CameraOutlined } from '@ant-design/icons';
 import { Flex } from '../../components/flex';
 import yup from '../../utils/yup';
-import { FamilyActions, PageContainer, FamilyWrapper } from './styles';
+import { PageContainer } from './styles';
 import { AppState } from '../../redux/rootReducer';
-import { requestGetFamily } from '../../redux/family/actions';
 import { Family } from '../../interfaces/family';
-import moment from 'moment';
 import { requestSaveConsumption } from '../../redux/consumption/actions';
+import { FamilySearch } from '../../components/familySearch';
 
 const schema = yup.object().shape({
   nfce: yup.string().label('Nota fiscal eletrônica').required(),
-  value: yup.number().label('Valor em reais').required(),
+  value: yup.number().label('Valor em reais').min(0).required(),
   proofImageUrl: yup.string().label('Link da imagem').required(),
   familyId: yup.string().label('Família').required('É preciso selecionar uma família ao digitar um NIS'),
   birthday: yup.string().label('Aniversário')
@@ -45,12 +44,10 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
   const cameraRef = useRef(null);
 
   // Local state
-  const [nis, setNis] = useState('');
   const [permission, setPermission] = useState('prompt');
   const [showQRCodeModal, setShowQRCodeModal] = useState(false);
   const [showCameraModal, setShowCameraModal] = useState(false);
   // Redux state
-  const familyLoading = useSelector<AppState, boolean>((state) => state.familyReducer.loading);
   const family = useSelector<AppState, Family | null | undefined>((state) => state.familyReducer.item);
 
   useEffect(() => {
@@ -72,7 +69,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
   } = useFormik({
     initialValues: {
       nfce: '',
-      value: '',
+      value: 0,
       proofImageUrl: '',
       nisCode: '',
       familyId: '',
@@ -90,8 +87,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
             familyId: values.familyId
           },
           () => {
-            window.alert('Consumo salvo com sucesso');
-            history.push('/');
+            Modal.success({ title: 'Consumo salvo com sucesso', onOk: () => history.push('/') });
           }
         )
       );
@@ -102,94 +98,15 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
   const imageMeta = getFieldMeta('proofImageUrl');
   const nfceMeta = getFieldMeta('nfce');
 
-  const sameBirthday = moment(family?.responsibleBirthday).diff(moment(values.birthday, 'DD/MM/YYYY'), 'days') === 0;
+  const invalidConsumptionValue = !!(family && values.value > 0 && values.value > family.balance);
 
   return (
     <PageContainer>
-      <Card title={<Typography.Title>Informar consumo</Typography.Title>}>
+      <Card title="Informar consumo">
         {status && <Alert message="Erro no formulário" description={status} type="error" />}
-        <Form layout="vertical">
-          <Form.Item label="Código NIS do responsável">
-            <Input.Search
-              loading={familyLoading}
-              enterButton
-              onChange={(event) => setNis(event.target.value)}
-              value={nis}
-              maxLength={11}
-              onPressEnter={() => {
-                setFieldValue('familyId', '');
-                setFieldValue('birthday', '');
-                dispatch(requestGetFamily(nis));
-              }}
-              onSearch={(value) => {
-                setFieldValue('familyId', '');
-                setFieldValue('birthday', '');
-                dispatch(requestGetFamily(value));
-              }}
-            />
-          </Form.Item>
-          {family && (
-            <Form.Item
-              label="Aniversário do responsável"
-              validateStatus={values.birthday.length > 9 && !sameBirthday ? 'error' : ''}
-              help={values.birthday.length > 9 && !sameBirthday ? 'Aniversário incorreto' : ''}
-            >
-              <Input
-                style={{ width: '100%' }}
-                id="birthday"
-                name="birthday"
-                onChange={handleChange}
-                placeholder="DD/MM/YYYY"
-                // formatter={(value) => moment(value, 'DDMMYYYY').format('DD/MM/YYYY')}
-                // parser={(value: string) => moment(value, 'DD/MM/YYYY').format('DDMMYYYY')}
-              />
-            </Form.Item>
-          )}
-        </Form>
         <form onSubmit={handleSubmit}>
           <Form layout="vertical">
-            {!values.familyId && !familyLoading && family && sameBirthday && (
-              <FamilyWrapper>
-                <Alert
-                  type="info"
-                  message={
-                    <div>
-                      <Descriptions layout="vertical" size="small" title="Família encontrada" colon={false} bordered>
-                        <Descriptions.Item label="Nome do responsável">{family.responsibleName}</Descriptions.Item>
-                        <Descriptions.Item label="Data de nascimento do responsável">
-                          {moment(family.responsibleBirthday).format('DD/MM/YYYY')}
-                        </Descriptions.Item>
-                        <Descriptions.Item label="Nome da mãe do responsável">
-                          {family.responsibleMotherName}
-                        </Descriptions.Item>
-                      </Descriptions>
-                      <FamilyActions>
-                        <Flex alignItems="center" justifyContent="flex-end" gap>
-                          <Typography.Paragraph strong>
-                            Os dados foram validados com o responsável?
-                          </Typography.Paragraph>
-                          <Button htmlType="button" type="primary" onClick={() => setFieldValue('familyId', family.id)}>
-                            Sim, confirmar
-                          </Button>
-                        </Flex>
-                      </FamilyActions>
-                    </div>
-                  }
-                />
-              </FamilyWrapper>
-            )}
-
-            {values.familyId && !familyLoading && family && (
-              <FamilyWrapper>
-                <Descriptions bordered size="small" title="Família Selecionada" layout="vertical">
-                  <Descriptions.Item label="Nome do responsável">{family.responsibleName}</Descriptions.Item>
-                  <Descriptions.Item label="Data de nascimento">
-                    {moment(family.responsibleBirthday).format('DD/MM/YYYY')}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Nome da mãe">{family.responsibleMotherName}</Descriptions.Item>
-                </Descriptions>
-              </FamilyWrapper>
-            )}
+            <FamilySearch onFamilySelect={(id) => setFieldValue('familyId', id)} />
             {values.familyId && (
               <>
                 <Form.Item
@@ -204,6 +121,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
                     onChange={handleChange}
                     value={values.nfce}
                     onPressEnter={submitForm}
+                    disabled
                     addonAfter={
                       <Button type="link" onClick={() => setShowQRCodeModal(true)} icon={<QrcodeOutlined />} />
                     }
@@ -236,8 +154,14 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
                 </Form.Item>
                 <Form.Item
                   label="Valor da compra"
-                  validateStatus={!!valueMeta.error && !!valueMeta.touched ? 'error' : ''}
-                  help={!!valueMeta.error && !!valueMeta.touched ? valueMeta.error : undefined}
+                  validateStatus={(!!valueMeta.error && !!valueMeta.touched) || invalidConsumptionValue ? 'error' : ''}
+                  help={
+                    !!valueMeta.error && !!valueMeta.touched
+                      ? valueMeta.error
+                      : invalidConsumptionValue
+                      ? 'Valor maior que saldo disponível'
+                      : undefined
+                  }
                 >
                   <InputNumber
                     style={{ width: '100%' }}
@@ -249,6 +173,8 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
                     decimalSeparator=","
                     step={0.01}
                     precision={2}
+                    min={0}
+                    // max={family?.balance}
                     formatter={(value) => `R$ ${value}`}
                     parser={(value) => (value ? value.replace(/(R)|(\$)/g, '').trim() : '')}
                   />
@@ -300,7 +226,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
           <Flex alignItems="center" justifyContent="flex-end">
             <Button
               htmlType="submit"
-              disabled={!!(errors && Object.keys(errors).length > 0 && touched) || !family}
+              disabled={!!(errors && Object.keys(errors).length > 0 && touched) || !family || invalidConsumptionValue}
               type="primary"
             >
               Confirmar consumo

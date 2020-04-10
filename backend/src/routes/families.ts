@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
     if (!req.user?.cityId) throw Error('User without selected city');
     const item = await familyModel.findByNis(req.query.nis, req.user.cityId);
     const balance = await consumptionModel.getFamilyBalance(item);
-    res.send({ ...item, balance });
+    res.send({ ...item.toJSON(), balance });
   } catch (error) {
     logging.error(error);
     res.status(500).send(error.message);
