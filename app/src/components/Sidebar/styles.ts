@@ -25,7 +25,7 @@ export const MenuIcon = styled.span`
   color: #fff;
   font-size: 16px;
   position: absolute;
-  top: ${(props) => props.theme.spacing.md};
+  bottom: ${(props) => props.theme.spacing.md};
   padding: ${(props) => props.theme.spacing.xs} ${(props) => props.theme.spacing.sm};
   background-color: ${(props) => props.theme.colors['@primary-color']};
   border-radius: 50%;
