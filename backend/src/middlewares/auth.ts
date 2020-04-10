@@ -18,13 +18,13 @@ export type TokenResponse = {
 const options: StrategyOptions & { tokenLifeTime?: string | number } = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: process.env.JWT_SECRET || 'undefined-secret',
-  tokenLifeTime: process.env.ACCESS_LIFETIME || '5m'
+  tokenLifeTime: process.env.ACCESS_LIFETIME || '5y' //'5m'
 };
 
 const refreshTokenOptions: StrategyOptions & { tokenLifeTime?: string | number } = {
   jwtFromRequest: ExtractJwt.fromBodyField('refreshToken'),
   secretOrKey: process.env.JWT_SECRET || 'undefined-refresh-secret',
-  tokenLifeTime: process.env.REFRESH_LIFETIME || '5d'
+  tokenLifeTime: process.env.REFRESH_LIFETIME || '5y' //'5d'
 };
 
 /**
@@ -81,7 +81,7 @@ const refreshTokenStrategy = new JWTStrategy(refreshTokenOptions, async (jwtPayl
  */
 export const loginWithEmailAndPassword = async (email: string, password: string): Promise<User> => {
   // Find user with same email
-  const [registeredUser] = await db.users.findAll({ where: { email } });
+  const [registeredUser] = await db.users.findAll({ where: { email: email.toLocaleLowerCase() } });
   // Checking if found a valid user
   if (!registeredUser) throw getError('noUserFoundWithValidEmail'); // User not found
 
