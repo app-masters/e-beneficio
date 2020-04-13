@@ -11,6 +11,10 @@
     {
       "directory": "./app",
       "changeProcessCWD": true
+    },
+    {
+      "directory": "./public",
+      "changeProcessCWD": true
     }
   ],
   // Ref: https://create-react-app.dev/docs/setting-up-your-editor/#displaying-lint-output-in-the-editor
