@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "40b5d2cf-41e9-4dab-a67b-7b37283b02d4",
 		"name": "Resources 4 Vulnerables",
-		"description": "Endpoints of the project\n\nTo be able to make the requests other than the auth, you will need to send the JWT token on the header of the request as:\n```JSON\n\"Authorization\": \"Bearer {{token}}\"\n```\n\n\nThe token can be obtained using the auth requests.",
+		"description": "Endpoints of the project\n",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -316,7 +316,29 @@
 					"response": []
 				}
 			],
-			"description": "Authentication routes to allow the user to get or refresh the JWT",
+			"description": "Authentication routes to allow the user to get or refresh the JWT.\n\n\nTo be able to make the requests other than the auth, you will need to send the JWT token on the header of the request as:\n```JSON\n\"Authorization\": \"Bearer {{token}}\"\n```\n",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "47d00904-64e2-45b4-b377-b1f06dc453f8",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "d4892237-2a45-42ba-8417-4453d20082a6",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
 			"protocolProfileBehavior": {}
 		},
 		{
@@ -1617,6 +1639,36 @@
 						"description": "Search the family by the responsible unique NIS (Número de Identificação Social)"
 					},
 					"response": []
+				},
+				{
+					"name": "/familes/file",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"description": "CSV file in the expected format",
+									"type": "file",
+									"src": "/Users/baraky/Projetos/resources4vulnerables/backend/docs/postman/files/families_example.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/families/file",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"families",
+								"file"
+							]
+						},
+						"description": "Send the CSV file with the family list that will be used to populate the database"
+					},
+					"response": []
 				}
 			],
 			"description": "Families that will receive the benefits",
@@ -1717,6 +1769,46 @@
 						"description": "Search the family by the responsible unique NIS (Número de Identificação Social)"
 					},
 					"response": []
+				},
+				{
+					"name": "/consumptions/image",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authTokenOperator}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"description": "Image file",
+									"type": "file",
+									"src": "/Users/baraky/Projetos/resources4vulnerables/backend/docs/postman/files/image_example.png"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/consumptions/image",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"consumptions",
+								"image"
+							]
+						},
+						"description": "Send consumption image and save it to the storage"
+					},
+					"response": []
 				}
 			],
 			"description": "Families that will receive the benefits",
@@ -1743,21 +1835,6 @@
 				}
 			],
 			"protocolProfileBehavior": {}
-		},
-		{
-			"name": "/",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{baseUrl}}",
-					"host": [
-						"{{baseUrl}}"
-					]
-				},
-				"description": "API base URL"
-			},
-			"response": []
 		}
 	],
 	"auth": {
@@ -1794,79 +1871,79 @@
 	],
 	"variable": [
 		{
-			"id": "56ea6468-5a88-47e1-8fc7-c133952f720b",
+			"id": "b91f6cda-1837-43d1-a3dc-06936decfe5c",
 			"key": "baseUrl",
 			"value": "http://localhost:3001",
 			"type": "string"
 		},
 		{
-			"id": "9e32fdd4-2b45-4f0d-8e32-cd75a09dda33",
+			"id": "78f3648c-af41-46c5-9d73-ea6ecc312385",
 			"key": "authTokenAdmin",
 			"value": "_token_",
 			"type": "string"
 		},
 		{
-			"id": "b373ada7-638b-4820-ac76-441d94042cd0",
+			"id": "8aa17548-7306-42f5-b03d-696239315e20",
 			"key": "refreshTokenAdmin",
 			"value": "_token_",
 			"type": "string"
 		},
 		{
-			"id": "80542032-0bab-4d25-851e-6cdf0008701f",
+			"id": "6a6514ee-7fcc-4ddd-93b0-01201764438b",
 			"key": "authTokenOperator",
 			"value": "_token_",
 			"type": "string"
 		},
 		{
-			"id": "26306ff8-d18a-4eea-93c1-5748960ec3be",
+			"id": "0bc2e8f5-7147-445c-8918-cc66a4ff21eb",
 			"key": "refreshTokenOperator",
 			"value": "_token_",
 			"type": "string"
 		},
 		{
-			"id": "206ddac6-710f-43c9-8a1b-4b234ceb6b7e",
+			"id": "553784e9-3160-4e15-8dd1-f27c8f4c3441",
 			"key": "cityId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "6f70f2d4-a649-4d8e-a48e-de703816d2ac",
+			"id": "ebed217b-7051-46eb-a5c8-26b8d9339a33",
 			"key": "placeId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "dcadf425-47b8-47ef-a7b5-04fd75d42470",
+			"id": "f6f85c8a-30d2-4f5e-948c-106eb02b1a2c",
 			"key": "placeStoreId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "887dabab-a574-46af-bbd6-e1017a26d477",
+			"id": "2d371aaa-f15a-4a51-a697-35d456c755e1",
 			"key": "userId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "df129b84-df46-4aa2-bbf6-ba8d83698e55",
+			"id": "76688c63-abbe-476e-975b-aa37021c2f3d",
 			"key": "institutionId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "adff4098-4659-4960-890f-4b6fa44f6cec",
+			"id": "e4f9f9c7-430e-4bd8-8346-4207711ec9de",
 			"key": "benefitId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "e7f9f9c5-9e7b-4ac6-b1fc-e090ba3892e1",
+			"id": "ee9b451c-45ef-491c-a01f-c0a1ef4b789c",
 			"key": "familyId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "cf90d338-8850-4875-86b0-0b8ec1b827b0",
+			"id": "595d83d3-a66b-4d63-a8bb-29db21f461b2",
 			"key": "consumptionId",
 			"value": "1",
 			"type": "string"
