@@ -5,6 +5,7 @@ import { jwtMiddleware } from '../middlewares/auth';
 
 // Sub-routers
 import authRoutes from './auth';
+import publicRoutes from './public';
 import cityRoutes from './cities';
 import placeRoutes from './places';
 import placeStoreRoutes from './placeStores';
@@ -25,6 +26,7 @@ router.get('/', (req, res) =>
 );
 // Sub-routers
 router.use('/auth', authRoutes);
+router.use('/public', publicRoutes);
 router.use('/cities', jwtMiddleware, cityRoutes);
 router.use('/places', jwtMiddleware, placeRoutes);
 router.use('/place-stores', jwtMiddleware, placeStoreRoutes);

@@ -8,7 +8,7 @@ import { City } from '../schemas/cities';
  * @returns Promise<List of items>
  */
 export const getAll = (cityId: NonNullable<City['id']>): Promise<SequelizePlaceStore[]> => {
-  return db.placeStores.findAll({ where: { cityId } });
+  return db.placeStores.findAll({ where: { cityId }, include: [{ model: db.places, as: 'place' }] });
 };
 
 /**
