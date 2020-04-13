@@ -20,4 +20,25 @@ router.get('/', async (req, res) => {
   }
 });
 
+/**
+ * Upload CSV file with family list
+ */
+router.post('/file', async (req, res) => {
+  try {
+    if (!req.user?.cityId) throw Error('User without selected city');
+    if (!req.files || Object.keys(req.files).length === 0) {
+      return res.status(400).send('No files were uploaded.');
+    }
+    let file = req.files.file;
+    if (Array.isArray(file)) {
+      file = file[0];
+    }
+    const data = await familyModel.importFamilyFromCSVFile(file.tempFilePath, req.user.cityId);
+    return res.send(data);
+  } catch (error) {
+    logging.error(error);
+    return res.status(error.status || 500).send(error.message);
+  }
+});
+
 export default router;

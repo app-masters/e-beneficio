@@ -3,6 +3,8 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
 import http from 'http';
+import fileUpload from 'express-fileupload';
+import path from 'path';
 
 import routes from './routes';
 import logging from './utils/logging';
@@ -34,6 +36,14 @@ const init = (listeningCallback: () => void, errorCallback: (error: Error) => vo
     );
     app.use(bodyParser.urlencoded({ extended: true, limit: '20mb' }));
     app.use(bodyParser.json({ limit: '20mb' }));
+    app.use(
+      fileUpload({
+        limits: { fileSize: 10 * 1024 * 1024 },
+        useTempFiles: true,
+        tempFileDir: `${path.dirname(__dirname)}/database/storage/`,
+        preserveExtension: true
+      })
+    );
     // Initializing routes
     app.use(routes);
     // Server start
