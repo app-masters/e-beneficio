@@ -4,6 +4,7 @@ import { Family, SequelizeFamily } from '../schemas/families';
 import { City } from '../schemas/cities';
 import { getFamilyGroupByCode } from '../utils/constraints';
 import moment from 'moment';
+import logging from '../utils/logging';
 
 /**
  * Get all items on the table without any filter
@@ -89,6 +90,7 @@ export const importFamilyFromCSVFile = async (
             } catch (error) {
               reportResult.wrong++;
               reportResult.report.push(`[linha:${lineNumber}]: Error - ${error.message}`);
+              logging.error(error);
             }
           };
 
@@ -96,6 +98,7 @@ export const importFamilyFromCSVFile = async (
         },
         (error: Error): void => {
           reject(error);
+          logging.error(error);
         },
         () => {
           reportResult.finished = true;
