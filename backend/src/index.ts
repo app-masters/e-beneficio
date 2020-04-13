@@ -48,6 +48,7 @@ const init = (listeningCallback: () => void, errorCallback: (error: Error) => vo
     app.use(routes);
     // Server start
     const server = http.createServer(app);
+    server.setTimeout(6 * 60 * 60 * 1000);
     server.listen(process.env.PORT);
     server.on('error', errorCallback);
     server.on('listening', listeningCallback);
