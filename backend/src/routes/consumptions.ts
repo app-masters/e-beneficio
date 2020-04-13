@@ -32,7 +32,7 @@ router.post('/image', async (req, res) => {
     if (Array.isArray(image)) {
       image = image[0];
     }
-    const data = uploadFile('image', `consumption${req.user?.placeStoreId}_${new Date().getTime()}`, image);
+    const data = await uploadFile('image', `consumption${req.user?.placeStoreId}_${new Date().getTime()}`, image);
     return res.send(data);
   } catch (error) {
     logging.error(error);
