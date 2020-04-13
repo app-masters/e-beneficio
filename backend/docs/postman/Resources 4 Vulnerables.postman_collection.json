@@ -342,6 +342,68 @@
 			"protocolProfileBehavior": {}
 		},
 		{
+			"name": "Public",
+			"item": [
+				{
+					"name": "/public/families",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/public/families?nis=10000000000&cityId=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"public",
+								"families"
+							],
+							"query": [
+								{
+									"key": "nis",
+									"value": "10000000000",
+									"description": "Family code"
+								},
+								{
+									"key": "cityId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Get family using the NIS code and the city ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/public/place-stores",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/public/place-stores?cityId=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"public",
+								"place-stores"
+							],
+							"query": [
+								{
+									"key": "cityId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Get list of place-stores on the city"
+					},
+					"response": []
+				}
+			],
+			"description": "Public endpoints that don't need an authorization token to be requested",
+			"protocolProfileBehavior": {}
+		},
+		{
 			"name": "Cities",
 			"item": [
 				{
@@ -1632,7 +1694,8 @@
 							"query": [
 								{
 									"key": "nis",
-									"value": "10000000000"
+									"value": "10000000000",
+									"description": "Family code"
 								}
 							]
 						},
@@ -1733,8 +1796,8 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
+							"mode": "formdata",
+							"formdata": [
 								{
 									"key": "familyId",
 									"value": "{{familyId}}",
@@ -1742,18 +1805,18 @@
 								},
 								{
 									"key": "value",
-									"value": "49.99",
+									"value": "50",
 									"type": "text"
 								},
 								{
 									"key": "nfce",
-									"value": "0000080202",
+									"value": "00000",
 									"type": "text"
 								},
 								{
-									"key": "proofImageUrl",
-									"value": "https://nstecnologia.com.br/blog/wp-content/uploads/2017/08/image2017-8-7-11-8-37.png",
-									"type": "text"
+									"key": "image",
+									"type": "file",
+									"src": "/Users/baraky/Projetos/resources4vulnerables/backend/docs/postman/files/image_example.png"
 								}
 							]
 						},
@@ -1871,79 +1934,79 @@
 	],
 	"variable": [
 		{
-			"id": "b91f6cda-1837-43d1-a3dc-06936decfe5c",
+			"id": "8f8b9f03-db86-4912-9c20-4eb5572032c9",
 			"key": "baseUrl",
 			"value": "http://localhost:3001",
 			"type": "string"
 		},
 		{
-			"id": "78f3648c-af41-46c5-9d73-ea6ecc312385",
+			"id": "66f89bc1-3fa2-40d4-92fe-17f51b955b77",
 			"key": "authTokenAdmin",
 			"value": "_token_",
 			"type": "string"
 		},
 		{
-			"id": "8aa17548-7306-42f5-b03d-696239315e20",
+			"id": "7fb15057-abcb-4943-bcb2-b7b5d5920e9d",
 			"key": "refreshTokenAdmin",
 			"value": "_token_",
 			"type": "string"
 		},
 		{
-			"id": "6a6514ee-7fcc-4ddd-93b0-01201764438b",
+			"id": "2f3c954f-5b09-4c9d-8117-bda557d358be",
 			"key": "authTokenOperator",
 			"value": "_token_",
 			"type": "string"
 		},
 		{
-			"id": "0bc2e8f5-7147-445c-8918-cc66a4ff21eb",
+			"id": "43a248f6-44f4-4fa3-aeb6-999c40ff3a43",
 			"key": "refreshTokenOperator",
 			"value": "_token_",
 			"type": "string"
 		},
 		{
-			"id": "553784e9-3160-4e15-8dd1-f27c8f4c3441",
+			"id": "e51a6cf5-4559-489d-8411-77472ec0a57c",
 			"key": "cityId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "ebed217b-7051-46eb-a5c8-26b8d9339a33",
+			"id": "1d6fa280-6ad8-4d20-9c90-fff941afbf04",
 			"key": "placeId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "f6f85c8a-30d2-4f5e-948c-106eb02b1a2c",
+			"id": "b414a11a-46d3-4da7-a2c2-952fd550dc15",
 			"key": "placeStoreId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "2d371aaa-f15a-4a51-a697-35d456c755e1",
+			"id": "3b5fc6db-1cb9-4fed-92e4-16e4438d65eb",
 			"key": "userId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "76688c63-abbe-476e-975b-aa37021c2f3d",
+			"id": "bfbfd3c2-331d-4f89-8ff4-d920f59a8824",
 			"key": "institutionId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "e4f9f9c7-430e-4bd8-8346-4207711ec9de",
+			"id": "84188a15-0bac-41d0-aec1-bc43c643fabd",
 			"key": "benefitId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "ee9b451c-45ef-491c-a01f-c0a1ef4b789c",
+			"id": "0ffb0209-59a3-446a-b8c8-5cf967634f9a",
 			"key": "familyId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "595d83d3-a66b-4d63-a8bb-29db21f461b2",
+			"id": "b1bdcf52-d1ce-4ab2-a981-89f8e24eadfc",
 			"key": "consumptionId",
 			"value": "1",
 			"type": "string"

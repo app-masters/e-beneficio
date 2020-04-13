@@ -59,7 +59,11 @@ export const addConsumption = async (
 ): Promise<SequelizeConsumption> => {
   // TODO: this is the main function of the entire application, but for now will be really basic
   const [consumption] = await db.consumptions.findAll({ where: { nfce: values.nfce } });
-  if (consumption) return consumption; // Just retuning it for now
+  if (consumption) {
+    logging.warning('Adding consumption with duplicated NFCe', { consumption: consumption.toJSON(), values });
+    // return consumption; // Just retuning it for now
+  }
+
   // Checking everyting
   if (values.value < 0) {
     // Negative consumption

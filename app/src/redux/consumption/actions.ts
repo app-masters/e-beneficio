@@ -21,8 +21,28 @@ export const requestSaveConsumption = (
       // Start request - starting loading state
       dispatch(doSaveConsumption());
 
+      if (!item.proofImageUrl) {
+        throw new Error('Image is required');
+      }
+
+      // Adding image as File on the form
+      const file = await fetch(item.proofImageUrl)
+        .then((res) => res.blob())
+        .then((blob) => {
+          const file = new File([blob], 'File name', { type: 'image/png' });
+          return file;
+        });
+
+      const data = new FormData();
+      data.append('familyId', item.familyId.toString());
+      data.append('nfce', item.nfce);
+      data.append('value', item.value.toString());
+      data.append('image', file);
+
       // Request
-      const response = await backend.post<Consumption>(`/consumptions`, item);
+      const response = await backend.post<Consumption>(`/consumptions`, data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
 
       if (response && response.data) {
         // Request finished
