@@ -11,6 +11,7 @@ yarn-error.log*
 .idea
 build/
 data/
+**/storage/**
 
 # Dependency directories
 node_modules/
@@ -41,3 +42,6 @@ pids
 
 # Docker
 docker-compose.yml
+
+# Google cloud credential
+storage-**-service-account.json

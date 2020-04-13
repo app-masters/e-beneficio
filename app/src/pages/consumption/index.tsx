@@ -13,6 +13,7 @@ import { AppState } from '../../redux/rootReducer';
 import { Family } from '../../interfaces/family';
 import { requestSaveConsumption } from '../../redux/consumption/actions';
 import { FamilySearch } from '../../components/familySearch';
+import { uploadFile } from '../../utils/networking';
 
 const schema = yup.object().shape({
   nfce: yup.string().label('Nota fiscal eletrônica').required(),
@@ -200,12 +201,14 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
                     okText="Confirmar"
                     cancelText="Cancelar"
                     onCancel={() => setShowCameraModal(false)}
-                    onOk={() => {
+                    onOk={async () => {
                       if (cameraRef && cameraRef.current) {
                         // weird ts error
                         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
                         // @ts-ignore
                         const imageUri = cameraRef.current.getScreenshot();
+                        const file = await uploadFile('/consumptions/image', imageUri);
+                        console.log(file);
                         setShowCameraModal(false);
                         setFieldValue('proofImageUrl', imageUri);
                       }
