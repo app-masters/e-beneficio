@@ -7,6 +7,7 @@ import benefitReducer from './benefit/reducers';
 import institutionReducer from './institution/reducers';
 import placeStoreReducer from './placeStore/reducers';
 import userReducer from './user/reducers';
+import familiesReducer from './families/reducers';
 
 const rootReducer = combineReducers({
   authReducer,
@@ -14,7 +15,8 @@ const rootReducer = combineReducers({
   benefitReducer,
   institutionReducer,
   placeStoreReducer,
-  userReducer
+  userReducer,
+  familiesReducer
 });
 
 export type AppState = ReturnType<typeof rootReducer>;

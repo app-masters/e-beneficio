@@ -59,8 +59,7 @@ const routes: RouteItem[] = [
   {
     path: '/familias',
     icon: () => <IdcardOutlined />,
-    name: 'Famílias',
-    disabled: true
+    name: 'Famílias'
   },
   {
     path: '/relatorios',
