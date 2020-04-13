@@ -21,10 +21,9 @@ export const uploadFile = async (folder: EnumFileFolder, name: string, file: Upl
     const remoteFileName = `${folder}/${name}.${file.mimetype.split('/')[1]}`;
     // Upload to storage
     const data = await storage.upload(file.tempFilePath, remoteFileName);
-    console.log('DATA', data);
     if (!data) return false;
     fs.unlinkSync(file.tempFilePath);
-    return { photoUrl: data };
+    return { url: data };
   } catch (error) {
     logging.critical(error);
     console.error(error);
