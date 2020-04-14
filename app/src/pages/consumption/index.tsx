@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Alert, Button, Card, Form, Input, Typography, InputNumber, Modal } from 'antd';
+import { Alert, Button, Card, Form, Input, InputNumber, Modal, Typography } from 'antd';
 import { useFormik } from 'formik';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -13,7 +13,6 @@ import { AppState } from '../../redux/rootReducer';
 import { Family } from '../../interfaces/family';
 import { requestSaveConsumption } from '../../redux/consumption/actions';
 import { FamilySearch } from '../../components/familySearch';
-import { uploadFile } from '../../utils/networking';
 
 const schema = yup.object().shape({
   nfce: yup.string().label('Nota fiscal eletrônica').required(),
@@ -149,7 +148,6 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
                           }}
                         />
                       )}
-                      {process.env.NODE_ENV === 'development' ? 'Permission: ' + permission : null}
                     </>
                   </Modal>
                 </Form.Item>
@@ -182,21 +180,17 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
                 </Form.Item>
 
                 <Form.Item
-                  label="Foto dos comprovantes"
                   validateStatus={!!imageMeta.error && !!imageMeta.touched ? 'error' : ''}
                   help={!!imageMeta.error && !!imageMeta.touched ? imageMeta.error : undefined}
                 >
-                  <Input
-                    id="proofImageUrl"
-                    name="proofImageUrl"
+                  <Button
                     size="large"
-                    onChange={handleChange}
-                    value={values.proofImageUrl}
-                    addonAfter={
-                      <Button type="link" onClick={() => setShowCameraModal(true)} icon={<CameraOutlined />} />
-                    }
-                  />
-
+                    style={{ width: '100%' }}
+                    onClick={() => setShowCameraModal(true)}
+                    icon={<CameraOutlined />}
+                  >
+                    {values.proofImageUrl ? 'Alterar foto dos comprovantes' : 'Adicionar foto dos comprovantes'}
+                  </Button>
                   <Modal
                     okText="Confirmar"
                     cancelText="Cancelar"
@@ -207,8 +201,6 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
                         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
                         // @ts-ignore
                         const imageUri = cameraRef.current.getScreenshot();
-                        const file = await uploadFile('/consumptions/image', imageUri);
-                        console.log(file);
                         setShowCameraModal(false);
                         setFieldValue('proofImageUrl', imageUri);
                       }
@@ -216,6 +208,13 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
                     visible={showCameraModal}
                   >
                     {showCameraModal && <Webcam audio={false} width="100%" ref={cameraRef} />}
+                    <Typography.Paragraph>
+                      Na foto, tentar mostrar:
+                      <ul>
+                        <li>Nota fiscal</li>
+                        <li>Documento do comprador</li>
+                      </ul>
+                    </Typography.Paragraph>
                   </Modal>
                 </Form.Item>
                 <Form.Item>
