@@ -1,9 +1,9 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { doGetPlaceStore, doGetPlaceStoreSuccess, doGetPlaceStoreFailed } from './actions';
-import { Place } from '../../interfaces/place';
+import { PlaceStore } from '../../interfaces/placeStore';
 
 export interface PlaceReducerState {
-  item?: Place | null; // Place | null | undefined
+  item?: [PlaceStore] | null; // PlaceStore | null | undefined
   loading: boolean;
   error?: Error;
 }

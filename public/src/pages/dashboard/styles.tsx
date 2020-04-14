@@ -1,9 +1,5 @@
 import styled from 'styled-components';
 
-export const InputStyle = {
-  minWidth: window.innerWidth * 0.3
-};
-
 export const PanelStyle = {
   backgroundColor: '#00000000'
 };
