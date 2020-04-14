@@ -2,8 +2,18 @@
 .DS_Store
 **/.idea/
 **/dist/
+
+# Ignore react bundles
+#admin/build/
+#app/build/
+#public/build/
+
+# Ignore react bundles on frontend project
 frontend/admin/
 frontend/place/
+frontend/portal/
+
+# Ignore deployment sensible data
 /deployment/.env.backend
 /deployment/.env.frontend
 
