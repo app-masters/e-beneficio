@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Typography } from 'antd';
+import { Form, Button, Input, Typography } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
-import { FamilyWrapper, PriceStyle, PriceLabelStyle } from './styles';
+import { FamilyWrapper, InfoContainer, PriceStyle, PriceLabelStyle, HowToHeaderContainer, HowToLabel } from './styles';
 import { AppState } from '../../redux/rootReducer';
 import { requestGetFamily } from '../../redux/family/actions';
 import { Family } from '../../interfaces/family';
@@ -81,6 +81,11 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
             Não encontramos nenhuma família utilizando esse NIS. Tenha certeza que é o NIS do responsável familiar para
             conseguir consultar o saldo.
           </Text>
+          <InfoContainer>
+            <Button danger href={'#info'} style={{ backgroundColor: '#F9F9F9' }}>
+              Mais informações
+            </Button>
+          </InfoContainer>
         </FamilyWrapper>
       )}
 
@@ -88,6 +93,17 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
         <FamilyWrapper>
           <Text style={PriceLabelStyle}>{'Saldo disponível: '}</Text>
           <Text style={PriceStyle}>{`R$${(family.balance || 0).toFixed(2).replace('.', ',')}`}</Text>
+
+          <HowToHeaderContainer>
+            <HowToLabel>
+              Você poderá gastar seus créditos dentre os estabelecimentos cadastrados, lembre-se de informar que faz
+              parte do programa antes de passar as compras pelo caixa!
+            </HowToLabel>
+          </HowToHeaderContainer>
+
+          <Button href={'#establishment'} style={{ backgroundColor: '#F9F9F9' }}>
+            Ver Estabelecimentos
+          </Button>
         </FamilyWrapper>
       )}
     </>
