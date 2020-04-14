@@ -1,15 +1,21 @@
 import styled from 'styled-components';
 import media from '../../styles/media';
 
-export const ErrorMessageStyle = {
-  display: 'flex',
-  justifyContent: 'center',
-  color: '#e74c3c'
+export const PriceLabelStyle = {
+  fontSize: '14pt' as '14pt'
 };
 
-export const InputStyle = {
-  minWidth: window.innerWidth * 0.3
+export const PriceStyle = {
+  color: '#00B41E',
+  fontWeight: 'bold' as 'bold',
+  fontSize: '15pt' as '15pt'
 };
+
+export const InfoContainer = styled.div`
+  display: flex;
+  margin-top: ${(props) => props.theme.spacing.sm};
+  justify-content: center;
+`;
 
 export const PageContainer = styled.div`
   padding: ${(props) => props.theme.spacing.sm};
@@ -42,6 +48,7 @@ export const ActionWrapper = styled.div`
 
 export const FamilyWrapper = styled.div`
   margin-bottom: ${(props) => props.theme.spacing.md};
+  text-align: center;
 `;
 
 export const FamilyActions = styled.div`
@@ -53,4 +60,15 @@ export const FamilyActions = styled.div`
       margin-bottom: 0 !important;
     }
   }
+`;
+
+export const HowToHeaderContainer = styled.div`
+  display: flex;
+  text-align: center;
+  margin-top: ${(props) => props.theme.spacing.sm};
+  margin-bottom: ${(props) => props.theme.spacing.sm};
+`;
+
+export const HowToLabel = styled.label`
+  font-size: 10pt;
 `;

@@ -1872,6 +1872,47 @@
 						"description": "Send consumption image and save it to the storage"
 					},
 					"response": []
+				},
+				{
+					"name": "/consumptions/report",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/consumptions/report?minDate=02-20-2020&maxDate=05-30-2020&placeId=1&placeStoreId=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"consumptions",
+								"report"
+							],
+							"query": [
+								{
+									"key": "minDate",
+									"value": "02-20-2020",
+									"description": "Any format that the moment.js will understand"
+								},
+								{
+									"key": "maxDate",
+									"value": "05-30-2020",
+									"description": "Any format that the moment.js will understand"
+								},
+								{
+									"key": "placeId",
+									"value": "1",
+									"description": "Optional if sending the placeStoreId"
+								},
+								{
+									"key": "placeStoreId",
+									"value": "1",
+									"description": "Optional if sending the placeId"
+								}
+							]
+						},
+						"description": "Report about the consumptions in the defined interval"
+					},
+					"response": []
 				}
 			],
 			"description": "Families that will receive the benefits",
@@ -1934,79 +1975,79 @@
 	],
 	"variable": [
 		{
-			"id": "8f8b9f03-db86-4912-9c20-4eb5572032c9",
+			"id": "2af6650f-3dfa-4f1f-b114-02611287b93c",
 			"key": "baseUrl",
 			"value": "http://localhost:3001",
 			"type": "string"
 		},
 		{
-			"id": "66f89bc1-3fa2-40d4-92fe-17f51b955b77",
+			"id": "74e0c9eb-3be9-421c-b8dc-f5fb6f0a5c5b",
 			"key": "authTokenAdmin",
 			"value": "_token_",
 			"type": "string"
 		},
 		{
-			"id": "7fb15057-abcb-4943-bcb2-b7b5d5920e9d",
+			"id": "77c4144f-6a9e-4c50-b61c-687946d16ead",
 			"key": "refreshTokenAdmin",
 			"value": "_token_",
 			"type": "string"
 		},
 		{
-			"id": "2f3c954f-5b09-4c9d-8117-bda557d358be",
+			"id": "1e259092-7ad8-4402-b4ad-663fa846521d",
 			"key": "authTokenOperator",
 			"value": "_token_",
 			"type": "string"
 		},
 		{
-			"id": "43a248f6-44f4-4fa3-aeb6-999c40ff3a43",
+			"id": "02ba6842-96b8-469e-916b-44a1d9727af7",
 			"key": "refreshTokenOperator",
 			"value": "_token_",
 			"type": "string"
 		},
 		{
-			"id": "e51a6cf5-4559-489d-8411-77472ec0a57c",
+			"id": "1537c02b-f565-49b2-ac44-e8e11afb5390",
 			"key": "cityId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "1d6fa280-6ad8-4d20-9c90-fff941afbf04",
+			"id": "877065b5-4c66-4091-8717-72b6f05e5c5b",
 			"key": "placeId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "b414a11a-46d3-4da7-a2c2-952fd550dc15",
+			"id": "c3e5765f-eeb9-4715-96ff-ec8e425921be",
 			"key": "placeStoreId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "3b5fc6db-1cb9-4fed-92e4-16e4438d65eb",
+			"id": "253be4cc-aa56-459d-bf52-20ebe10c22f9",
 			"key": "userId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "bfbfd3c2-331d-4f89-8ff4-d920f59a8824",
+			"id": "b41c84af-d9e2-423f-bd4f-96746087ce6c",
 			"key": "institutionId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "84188a15-0bac-41d0-aec1-bc43c643fabd",
+			"id": "2e11e0c8-8466-4a14-b9c4-db7d410007a0",
 			"key": "benefitId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "0ffb0209-59a3-446a-b8c8-5cf967634f9a",
+			"id": "09e3c99c-7a4d-455d-9d63-9fdf5cbb1053",
 			"key": "familyId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "b1bdcf52-d1ce-4ab2-a981-89f8e24eadfc",
+			"id": "2b4b0e48-f051-43c7-bc6d-cd912fb70083",
 			"key": "consumptionId",
 			"value": "1",
 			"type": "string"

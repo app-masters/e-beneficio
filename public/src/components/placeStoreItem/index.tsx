@@ -1,9 +1,9 @@
 import React from 'react';
 import { PlaceStore } from '../../interfaces/placeStore';
-import { Card } from 'antd';
-import { ItemContainer } from './styles';
+import { Card, Typography } from 'antd';
+import { ItemContainer, CardStyle, CardTitleStyle, CardSubTitleStyle } from './styles';
 
-const { Meta } = Card;
+const { Text } = Typography;
 
 /**
  * Place search component
@@ -11,10 +11,11 @@ const { Meta } = Card;
  */
 export const PlaceStoreItem: React.FC<PlaceStore> = (props) => {
   return (
-    <Card>
+    <Card bodyStyle={CardStyle}>
       <ItemContainer>
-        <Meta title={props.place.title} />
-        <Meta title={props.title} description={props.address} />
+        <Text style={CardTitleStyle}>{props.place.title}</Text>
+        <Text style={CardSubTitleStyle}>{props.title}</Text>
+        <Text style={CardSubTitleStyle}>{props.address}</Text>
       </ItemContainer>
     </Card>
   );
