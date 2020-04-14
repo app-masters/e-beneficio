@@ -4,6 +4,7 @@ import { Family, SequelizeFamily } from '../schemas/families';
 import { City } from '../schemas/cities';
 import { getFamilyGroupByCode } from '../utils/constraints';
 import moment from 'moment';
+import logging from '../utils/logging';
 
 /**
  * Get all items on the table without any filter
@@ -54,13 +55,13 @@ export const importFamilyFromCSVFile = async (
               if (json['cod_parentesco_rf_pessoa'] !== '1') {
                 // We're only saving people that are the responsible for the family (RF)
                 reportResult.wrong++;
-                reportResult.report.push(`[linha:${lineNumber}]: Pessoa ${json['nom_pessoa']} não é um RF`);
+                reportResult.report.push(`[linha: ${lineNumber}] Pessoa ${json['nom_pessoa']} não é um RF`);
                 return;
               }
               if (!getFamilyGroupByCode(json.d['fx_rfpc'])) {
                 reportResult.wrong++;
                 reportResult.report.push(
-                  `[linha:${lineNumber}]: Família ${json['cod_familiar_fam']} está com um valor inválido de fx_rfpc`
+                  `[linha: ${lineNumber}] Família ${json['cod_familiar_fam']} está com um valor inválido de fx_rfpc`
                 );
               }
               // Converting CSV format to DB format
@@ -88,7 +89,8 @@ export const importFamilyFromCSVFile = async (
               }
             } catch (error) {
               reportResult.wrong++;
-              reportResult.report.push(`[linha:${lineNumber}]: Error - ${error.message}`);
+              reportResult.report.push(`[linha: ${lineNumber}] Erro inesperado: ${error.message}`);
+              logging.error(error);
             }
           };
 
@@ -96,6 +98,7 @@ export const importFamilyFromCSVFile = async (
         },
         (error: Error): void => {
           reject(error);
+          logging.error(error);
         },
         () => {
           reportResult.finished = true;
