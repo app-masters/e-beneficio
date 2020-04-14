@@ -85,11 +85,9 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
 
       {familyId && !familyLoading && family && (
         <FamilyWrapper>
-          <Descriptions bordered size="small" title="Família Selecionada" layout="vertical">
-            <Descriptions.Item label="Saldo disponível">
-              <Typography.Paragraph strong>{`R$${(family.balance || 0)
-                .toFixed(2)
-                .replace('.', ',')}`}</Typography.Paragraph>
+          <Descriptions bordered size="small">
+            <Descriptions.Item label="Saldo disponível" style={{ verticalAlign: 'center' }}>
+              {`R$${(family.balance || 0).toFixed(2).replace('.', ',')}`}
             </Descriptions.Item>
           </Descriptions>
         </FamilyWrapper>
