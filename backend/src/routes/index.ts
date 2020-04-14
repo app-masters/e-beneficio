@@ -1,6 +1,6 @@
 import express from 'express';
 import moment from 'moment';
-// Midlewares
+// Middleware
 import { jwtMiddleware } from '../middlewares/auth';
 
 // Sub-routers
@@ -24,6 +24,7 @@ router.get('/', (req, res) =>
     now: moment().format()
   })
 );
+router.get('/ping', (req, res) => res.send('pong pong'));
 // Sub-routers
 router.use('/auth', authRoutes);
 router.use('/public', publicRoutes);

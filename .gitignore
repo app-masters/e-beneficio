@@ -1,2 +1,10 @@
 # Mac files
 .DS_Store
+**/.idea/
+backend/admin-build/
+**/dist/
+frontend/admin/
+frontend/place/
+/deployment/.env.backend
+/deployment/.env.frontend
+

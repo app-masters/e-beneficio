@@ -68,4 +68,30 @@ const seed = async () => {
   }
 };
 
-export default { seed };
+/**
+ * Seed admin user
+ */
+const seedAdmin = async () => {
+  const alreadyCreated = await db.users.findAll();
+  if (alreadyCreated.length == 0) {
+    const [city] = await db.cities.findAll();
+    const itemsToCreate = list
+      .filter((item) => item.role === 'admin')
+      .map((item) => {
+        const password = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        const user = { ...item, cityId: city.id, password };
+        console.log(`[seed] Admin User will be created with data:`);
+        console.log(`       Role -      ${user.role}`);
+        console.log(`       Email -     ${user.email}`);
+        console.log(`       Password -  ${user.password}`);
+        return user;
+      })
+      .filter(Boolean) as User[];
+    await db.users.bulkCreate(itemsToCreate, { individualHooks: true });
+    console.log(`[seed] Users: Seeded successfully - ${itemsToCreate.length} new created`);
+  } else {
+    console.log(`[seed] Users: Nothing to seed`);
+  }
+};
+
+export default { seed, seedAdmin };
