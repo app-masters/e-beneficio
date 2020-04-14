@@ -12,7 +12,7 @@ export type ThunkResult<R> = ThunkAction<R, AppState, undefined, Action>;
 const persistConfig = {
   key: PERSIST_KEY,
   storage,
-  blacklist: ['familyReducer', 'placeStoreReducer']
+  blacklist: ['familyReducer']
 } as PersistConfig<AppState>;
 
 // Persist all the reducers
