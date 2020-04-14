@@ -2,11 +2,11 @@ import db from '../../src/schemas';
 import { PlaceStore } from '../../src/schemas/placeStores';
 
 const list = [
-  { title: 'Unidade Centro' },
-  { title: 'Unidade Granbery' },
-  { title: 'Shopping Cidade' },
-  { title: 'Rodoviária' }
-];
+  { title: 'Unidade Centro', cnpj: '0000001', address: 'Avenida Central, 2502 - Centro' },
+  { title: 'Unidade Novo Recanto', cnpj: '0000002', address: 'Rua São Paulo, 99 - Novo Recanto' },
+  { title: 'Shopping Cidade', cnpj: '0000003', address: 'Avenida Central, 22 - Alvorada' },
+  { title: 'Rodoviária', cnpj: '0000004', address: 'Avenida Brasil, 2 - Novo Jardim' }
+] as PlaceStore[];
 
 /**
  * Seed the place stores table
