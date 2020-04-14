@@ -26,9 +26,7 @@ router.get('/families', async (req, res) => {
  */
 router.get('/place-stores', async (req, res) => {
   try {
-    console.log('place-stores-here!!!!!!!!');
     const list = await placeStoreModel.getAll(req.query.cityId);
-    console.log('lentght', list.length);
     res.send(list);
   } catch (error) {
     logging.error(error);

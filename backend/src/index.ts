@@ -37,55 +37,6 @@ const init = (listeningCallback: () => void, errorCallback: (error: Error) => vo
     app.use(bodyParser.urlencoded({ extended: true, limit: '20mb' }));
     app.use(bodyParser.json({ limit: '20mb' }));
 
-    // Show url (nginx issue)
-    app.use(function (req, res, next) {
-      console.log(req.method + ' ' + req.url);
-
-      /**
-       * testing
-       */
-      // @ts-ignore
-      const cleanup = () => {
-        res.removeListener('finish', logFn);
-        res.removeListener('close', abortFn);
-        res.removeListener('error', errorFn);
-      };
-      /**
-       * testing
-       */
-      // @ts-ignore
-      const logFn = () => {
-        cleanup();
-        const logger = getLoggerForStatusCode(res.statusCode);
-        logger(`${res.statusCode} ${res.statusMessage}; ${res.get('Content-Length') || 0}b sent`);
-      };
-      /**
-       * testing
-       */
-      // @ts-ignore
-      const abortFn = () => {
-        cleanup();
-        console.warn('Request aborted by the client');
-      };
-
-      /**
-       * testing
-       *
-       * @param err
-       */
-      // @ts-ignore
-      const errorFn = (err) => {
-        cleanup();
-        console.error(`Request pipeline error: ${err}`);
-      };
-
-      res.on('finish', logFn); // successful pipeline (regardless of its response)
-      res.on('close', abortFn); // aborted pipeline
-      res.on('error', errorFn); // pipeline internal error
-
-      next();
-    });
-
     app.use(
       fileUpload({
         limits: { fileSize: 10 * 1024 * 1024 },
@@ -148,18 +99,3 @@ const onListening = (): void => {
 
 // Initializing API
 init(onListening, onError);
-
-/**
- * Do it
- * @param statusCode
- */
-const getLoggerForStatusCode = (statusCode: number) => {
-  if (statusCode >= 500) {
-    return console.error.bind(console);
-  }
-  if (statusCode >= 400) {
-    return console.warn.bind(console);
-  }
-
-  return console.log.bind(console);
-};
