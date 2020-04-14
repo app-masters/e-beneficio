@@ -1,13 +1,24 @@
 import db from '../schemas';
 import { User, SequelizeUser } from '../schemas/users';
 import { City } from '../schemas/cities';
+import { Place } from '../schemas/places';
 
 /**
  * Get all items on the table without any filter
  * @param cityId logged user city ID
+ * @param placeId logged user place ID
  * @returns Promise<List of items>
  */
-export const getAll = (cityId: NonNullable<City['id']>): Promise<SequelizeUser[]> => {
+export const getAll = (
+  cityId: NonNullable<City['id']>,
+  placeId?: NonNullable<Place['id']>
+): Promise<SequelizeUser[]> => {
+  if (placeId) {
+    return db.users.findAll({
+      where: { cityId },
+      include: [{ model: db.placeStores, as: 'placeStore', where: { placeId } }]
+    });
+  }
   return db.users.findAll({ where: { cityId } });
 };
 

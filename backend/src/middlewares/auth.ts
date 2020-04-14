@@ -34,6 +34,28 @@ const refreshTokenOptions: StrategyOptions & { tokenLifeTime?: string | number }
 const tokenList: { [key: string]: TokenResponse } = {};
 
 /**
+ * Return user prepared to the login
+ * @param id unique user ID
+ * @returns populated User
+ */
+const getLoggedUserById = (id: User['id']) => {
+  return db.users.findByPk(id, { include: [{ model: db.placeStores, as: 'placeStore' }] });
+};
+
+/**
+ * Return user prepared to the login
+ * @param email unique user Email
+ * @returns populated User
+ */
+const getLoggedUserByEmail = async (email: NonNullable<User['email']>) => {
+  const [user] = await db.users.findAll({
+    where: { email: email.toLocaleLowerCase() },
+    include: [{ model: db.placeStores, as: 'placeStore' }]
+  });
+  return user;
+};
+
+/**
  * JWT strategy - Used on JWT middleware to validate the user
  */
 const jwtStrategy = new JWTStrategy(options, async (jwtPayload, done) => {
@@ -41,7 +63,7 @@ const jwtStrategy = new JWTStrategy(options, async (jwtPayload, done) => {
   if (!jwtPayload.id) return done(null, false);
   try {
     // Finding user on local DB
-    const user = await db.users.findByPk(jwtPayload.id);
+    const user = await getLoggedUserById(jwtPayload.id);
     if (user) {
       // User found on DB
       return done(null, user.toJSON());
@@ -61,7 +83,7 @@ const refreshTokenStrategy = new JWTStrategy(refreshTokenOptions, async (jwtPayl
   if (!jwtPayload.id) return done(null, false);
   try {
     // Finding user on local DB
-    const user = await db.users.findByPk(jwtPayload.id);
+    const user = await getLoggedUserById(jwtPayload.id);
     if (user) {
       // User found on DB
       return done(null, user.toJSON());
@@ -81,7 +103,7 @@ const refreshTokenStrategy = new JWTStrategy(refreshTokenOptions, async (jwtPayl
  */
 export const loginWithEmailAndPassword = async (email: string, password: string): Promise<User> => {
   // Find user with same email
-  const [registeredUser] = await db.users.findAll({ where: { email: email.toLocaleLowerCase() } });
+  const registeredUser = await getLoggedUserByEmail(email);
   // Checking if found a valid user
   if (!registeredUser) throw getError('noUserFoundWithValidEmail'); // User not found
 
@@ -237,7 +259,7 @@ const serializeUser = async (user: User, done: DoneFunction<User['id']>) => {
 const deserializeUser = async (id: User['id'], done: DoneFunction<object | boolean>) => {
   try {
     // Finding user on local DB
-    const user = await db.users.findByPk(id as number);
+    const user = await getLoggedUserById(id as number);
     if (user) {
       // User found on DB
       return done(null, user.toJSON());
