@@ -1,7 +1,6 @@
 # Mac files
 .DS_Store
 **/.idea/
-backend/admin-build/
 **/dist/
 frontend/admin/
 frontend/place/

@@ -1,10 +1,11 @@
 FROM node:11-alpine AS build
 WORKDIR /var/www
+RUN mkdir -p ./backend/dist
 COPY ./backend/package.json .
 # COPY ./backend/package-lock.json .
 RUN npm install
 COPY ./backend/. .
-RUN npm build
+RUN npm run build
 
 FROM node:11-alpine
 WORKDIR /var/www
