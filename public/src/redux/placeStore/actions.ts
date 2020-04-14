@@ -3,8 +3,6 @@ import { ThunkResult } from '../store';
 import { backend } from '../../utils/networking';
 import { PlaceStore } from '../../interfaces/placeStore';
 
-import axios from 'axios';
-
 // Simple actions and types
 export const doGetPlaceStore = createAction<void>('placeStore/GET');
 export const doGetPlaceStoreSuccess = createAction<PlaceStore | PlaceStore[]>('placeStore/GET_SUCCESS');
