@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Alert, Button, Card, Form, Input, InputNumber, Modal, Typography } from 'antd';
+import { Alert, Button, Card, Form, Input, InputNumber, Modal, Typography, Checkbox } from 'antd';
 import { useFormik } from 'formik';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -19,7 +19,8 @@ const schema = yup.object().shape({
   value: yup.number().label('Valor em reais').min(0).required(),
   proofImageUrl: yup.string().label('Link da imagem').required(),
   familyId: yup.string().label('Família').required('É preciso selecionar uma família ao digitar um NIS'),
-  birthday: yup.string().label('Aniversário')
+  birthday: yup.string().label('Aniversário'),
+  acceptCheck: yup.boolean().required('Accept')
 });
 
 /**
@@ -65,7 +66,8 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
     status,
     errors,
     touched,
-    setFieldValue
+    setFieldValue,
+    getFieldProps
   } = useFormik({
     initialValues: {
       nfce: '',
@@ -73,7 +75,8 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
       proofImageUrl: '',
       nisCode: '',
       familyId: '',
-      birthday: ''
+      birthday: '',
+      acceptCheck: false
     },
     validationSchema: schema,
     onSubmit: (values, { setStatus }) => {
@@ -88,7 +91,8 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
           },
           () => {
             Modal.success({ title: 'Consumo salvo com sucesso', onOk: () => history.push('/') });
-          }
+          },
+          () => setStatus('Ocorreu um erro ao confirmar consumo.')
         )
       );
     }
@@ -97,6 +101,9 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
   const valueMeta = getFieldMeta('value');
   const imageMeta = getFieldMeta('proofImageUrl');
   const nfceMeta = getFieldMeta('nfce');
+
+  const acceptCheckMeta = getFieldMeta('acceptCheck');
+  const acceptCheckField = getFieldProps('acceptCheck');
 
   const invalidConsumptionValue = !!(family && values.value > 0 && values.value > family.balance);
 
@@ -217,10 +224,18 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
                     </Typography.Paragraph>
                   </Modal>
                 </Form.Item>
-                <Form.Item>
-                  {values.proofImageUrl.length > 0 && (
+                {values.proofImageUrl.length > 0 && (
+                  <Form.Item>
                     <img alt="example" style={{ width: '100%', maxWidth: '600px' }} src={values.proofImageUrl} />
-                  )}
+                  </Form.Item>
+                )}
+                <Form.Item
+                  validateStatus={!!acceptCheckMeta.error && !!acceptCheckMeta.touched ? 'error' : ''}
+                  help={!!acceptCheckMeta.error && !!acceptCheckMeta.touched ? acceptCheckMeta.error : undefined}
+                >
+                  <Checkbox checked={values.acceptCheck} {...acceptCheckField}>
+                    Apenas itens contemplados pelo o programa estão incluídos na compra que está sendo inserida
+                  </Checkbox>
                 </Form.Item>
               </>
             )}
@@ -228,7 +243,12 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
           <Flex alignItems="center" justifyContent="flex-end">
             <Button
               htmlType="submit"
-              disabled={!!(errors && Object.keys(errors).length > 0 && touched) || !family || invalidConsumptionValue}
+              disabled={
+                !!(errors && Object.keys(errors).length > 0 && touched) ||
+                !family ||
+                invalidConsumptionValue ||
+                !values.acceptCheck
+              }
               type="primary"
             >
               Confirmar consumo
