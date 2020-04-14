@@ -1,26 +1,25 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Alert, Button, Card, Form, Input, InputNumber, Modal, Typography, Checkbox } from 'antd';
+import { CameraOutlined, QrcodeOutlined } from '@ant-design/icons';
+import { Alert, Button, Card, Checkbox, Form, Input, InputNumber, Modal, Typography } from 'antd';
 import { useFormik } from 'formik';
-import { RouteComponentProps, useHistory } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useEffect, useRef, useState } from 'react';
 import QrReader from 'react-qr-reader';
+import { useDispatch, useSelector } from 'react-redux';
+import { RouteComponentProps, useHistory } from 'react-router-dom';
 import Webcam from 'react-webcam';
-import { QrcodeOutlined, CameraOutlined } from '@ant-design/icons';
+import { FamilySearch } from '../../components/familySearch';
 import { Flex } from '../../components/flex';
-import yup from '../../utils/yup';
-import { PageContainer } from './styles';
-import { AppState } from '../../redux/rootReducer';
 import { Family } from '../../interfaces/family';
 import { requestSaveConsumption } from '../../redux/consumption/actions';
-import { FamilySearch } from '../../components/familySearch';
+import { AppState } from '../../redux/rootReducer';
+import yup from '../../utils/yup';
+import { PageContainer } from './styles';
 
 const schema = yup.object().shape({
   nfce: yup.string().label('Nota fiscal eletrônica').required(),
   value: yup.number().label('Valor em reais').min(0).required(),
   proofImageUrl: yup.string().label('Link da imagem').required(),
   familyId: yup.string().label('Família').required('É preciso selecionar uma família ao digitar um NIS'),
-  birthday: yup.string().label('Aniversário'),
-  acceptCheck: yup.boolean().required('Accept')
+  birthday: yup.string().label('Aniversário')
 });
 
 /**
@@ -45,7 +44,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
   const cameraRef = useRef(null);
 
   // Local state
-  const [permission, setPermission] = useState('prompt');
+  const [, setPermission] = useState('prompt');
   const [showQRCodeModal, setShowQRCodeModal] = useState(false);
   const [showCameraModal, setShowCameraModal] = useState(false);
   // Redux state
@@ -81,20 +80,23 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
     validationSchema: schema,
     onSubmit: (values, { setStatus }) => {
       setStatus();
-      dispatch(
-        requestSaveConsumption(
-          {
-            nfce: values.nfce,
-            value: Number(values.value),
-            proofImageUrl: values.proofImageUrl,
-            familyId: values.familyId
-          },
-          () => {
-            Modal.success({ title: 'Consumo salvo com sucesso', onOk: () => history.push('/') });
-          },
-          () => setStatus('Ocorreu um erro ao confirmar consumo.')
-        )
-      );
+      const invalidConsumptionValue = !!(family && values.value > 0 && values.value > family.balance);
+      if (!family || invalidConsumptionValue || !values.acceptCheck) {
+        dispatch(
+          requestSaveConsumption(
+            {
+              nfce: values.nfce,
+              value: Number(values.value),
+              proofImageUrl: values.proofImageUrl,
+              familyId: values.familyId
+            },
+            () => {
+              Modal.success({ title: 'Consumo salvo com sucesso', onOk: () => history.push('/') });
+            },
+            () => setStatus('Ocorreu um erro ao confirmar consumo.')
+          )
+        );
+      }
     }
   });
 
