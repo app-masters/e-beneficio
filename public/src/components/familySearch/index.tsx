@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Descriptions, Form, Input, Typography } from 'antd';
+import { Form, Button, Input, Typography } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
-import { FamilyWrapper, InputStyle, ErrorMessageStyle } from './styles';
+import { FamilyWrapper, InfoContainer, PriceStyle, PriceLabelStyle, HowToHeaderContainer, HowToLabel } from './styles';
 import { AppState } from '../../redux/rootReducer';
 import { requestGetFamily } from '../../redux/family/actions';
 import { Family } from '../../interfaces/family';
+
+const { Text } = Typography;
 
 type ComponentProps = {
   onFamilySelect?: (id: Family['id']) => void;
@@ -53,13 +55,14 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
   return (
     <>
       <Form layout="vertical">
-        <Form.Item style={InputStyle} label="Código NIS do responsável">
+        <Form.Item>
           <Input.Search
             loading={familyLoading}
             enterButton
             onChange={(event) => setNis(event.target.value)}
             value={nis}
             maxLength={11}
+            placeholder="Código NIS do responsável"
             onPressEnter={() => {
               changeFamilyId(undefined);
               dispatch(requestGetFamily(nis, cityId));
@@ -74,22 +77,33 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
 
       {familyError && !familyLoading && (
         <FamilyWrapper>
-          <Descriptions size="small" layout="vertical">
-            <Descriptions.Item style={ErrorMessageStyle}>
-              Não encontramos nenhuma família utilizando esse NIS. Tenha certeza que é o NIS do responsável familiar
-              para conseguir consultar o saldo.
-            </Descriptions.Item>
-          </Descriptions>
+          <Text type="danger">
+            Não encontramos nenhuma família utilizando esse NIS. Tenha certeza que é o NIS do responsável familiar para
+            conseguir consultar o saldo.
+          </Text>
+          <InfoContainer>
+            <Button danger href={'#info'} style={{ backgroundColor: '#F9F9F9' }}>
+              Mais informações
+            </Button>
+          </InfoContainer>
         </FamilyWrapper>
       )}
 
       {familyId && !familyLoading && family && (
         <FamilyWrapper>
-          <Descriptions bordered size="small">
-            <Descriptions.Item label="Saldo disponível" style={{ verticalAlign: 'center' }}>
-              {`R$${(family.balance || 0).toFixed(2).replace('.', ',')}`}
-            </Descriptions.Item>
-          </Descriptions>
+          <Text style={PriceLabelStyle}>{'Saldo disponível: '}</Text>
+          <Text style={PriceStyle}>{`R$${(family.balance || 0).toFixed(2).replace('.', ',')}`}</Text>
+
+          <HowToHeaderContainer>
+            <HowToLabel>
+              Você poderá gastar seus créditos dentre os estabelecimentos cadastrados, lembre-se de informar que faz
+              parte do programa antes de passar as compras pelo caixa!
+            </HowToLabel>
+          </HowToHeaderContainer>
+
+          <Button href={'#establishment'} style={{ backgroundColor: '#F9F9F9' }}>
+            Ver Estabelecimentos
+          </Button>
         </FamilyWrapper>
       )}
     </>
