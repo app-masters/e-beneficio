@@ -19,18 +19,18 @@ export const HeaderContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  padding: ${(props) => props.theme.spacing.sm};
   background-color: #fff;
 `;
 
 export const EstablishmentContainer = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: ${(props) => props.theme.spacing.sm};
 `;
 
 export const InfoContainer = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: ${(props) => props.theme.spacing.sm};
 `;
