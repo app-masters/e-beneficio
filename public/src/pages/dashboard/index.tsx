@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { PageHeader, Button, Col, Row, Input, Form } from 'antd';
+import { PageHeader, Collapse, List, Button, Col, Row, Input, Form } from 'antd';
 import {
   PageContainer,
   HeaderContainer,
   ActionContainer,
   InputStyle,
+  PanelActionContainer,
   EstablishmentContainer,
-  InfoContainer
+  InfoContainer,
+  PanelStyle
 } from './styles';
 import { PlaceStoreItem } from '../../components/placeStoreItem';
 import { PlaceStore } from '../../interfaces/placeStore';
 import { requestGetPlaceStore } from '../../redux/placeStore/actions';
 import { Place } from '../../interfaces/place';
 import { useDispatch } from 'react-redux';
+
+const { Panel } = Collapse;
 
 const cardData = Array.from(Array(5)).map((item, index) => {
   const obj: PlaceStore = {
@@ -28,6 +32,12 @@ const cardData = Array.from(Array(5)).map((item, index) => {
   };
   return obj;
 });
+
+const text = `
+  A dog is a type of domesticated animal.
+  Known for its loyalty and faithfulness,
+  it can be found as a welcome guest in many households across the world.
+`;
 
 /**
  * Dashboard page component
@@ -72,13 +82,29 @@ export const DashboardPage: React.FC<{}> = (props) => {
 
       <InfoContainer id="info">
         <PageHeader title="Informações de uso" />
-        <label>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-          magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-          consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
-          est laborum.
-        </label>
+        <Collapse bordered={false} style={PanelStyle}>
+          <Panel header="Tenho direito ao benefício?" key="1">
+            {text}
+            <List
+              itemLayout="horizontal"
+              dataSource={[1, 2, 3, 4, 5]}
+              renderItem={(item, index) => (
+                <List.Item>
+                  <List.Item.Meta title={'item.title' + index} />
+                </List.Item>
+              )}
+            />
+          </Panel>
+          <Panel header="Obter mais informações." key="2">
+            {text}
+            <PanelActionContainer>
+              <Button>MailTo</Button>
+              <Button type="link" href="https://www.pjf.mg.gov.br/jfcontracoronavirus/index.php">
+                pjf.mg.gov.br
+              </Button>
+            </PanelActionContainer>
+          </Panel>
+        </Collapse>
       </InfoContainer>
     </PageContainer>
   );
