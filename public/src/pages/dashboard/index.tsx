@@ -1,5 +1,5 @@
-import React from 'react';
-import { PageHeader, Card, Button, Col, Row, Input, Form } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { PageHeader, Button, Col, Row, Input, Form } from 'antd';
 import {
   PageContainer,
   HeaderContainer,
@@ -8,22 +8,42 @@ import {
   EstablishmentContainer,
   InfoContainer
 } from './styles';
+import { PlaceStoreItem } from '../../components/placeStoreItem';
+import { PlaceStore } from '../../interfaces/placeStore';
+import { requestGetPlaceStore } from '../../redux/placeStore/actions';
+import { Place } from '../../interfaces/place';
+import { useDispatch } from 'react-redux';
 
-const cardData = [
-  { id: 1, name: 'Bahamas Teste 1', address: 'Rua de Teste para Teste 1' },
-  { id: 2, name: 'Bahamas Teste 2', address: 'Rua de Teste para Teste 2' },
-  { id: 3, name: 'Bahamas Teste 3', address: 'Rua de Teste para Teste 3' },
-  { id: 4, name: 'Bahamas Teste 4', address: 'Rua de Teste para Teste 4' },
-  { id: 5, name: 'Bahamas Teste 5', address: 'Rua de Teste para Teste 5' }
-];
-
-const { Meta } = Card;
+const cardData = Array.from(Array(5)).map((item, index) => {
+  const obj: PlaceStore = {
+    cityId: index,
+    placeId: index,
+    title: 'Unidade Centro ' + index,
+    address: 'Address Store ' + index,
+    cnpj: 'CNPJ Store ' + index,
+    place: {
+      cityId: index,
+      title: 'Rede de Supermercados Silva ' + index
+    } as Place
+  };
+  return obj;
+});
 
 /**
  * Dashboard page component
  * @param props component props
  */
 export const DashboardPage: React.FC<{}> = (props) => {
+  const dispatch = useDispatch();
+  const [listOfPlacesStore, setPlacesStore] = useState([]);
+
+  useEffect(() => {
+    const cityId = process.env.REACT_APP_ENV_CITY_ID;
+    // dispatch(requestGetPlaceStore(cityId));
+    const result = cardData as any;
+    setPlacesStore(result);
+  }, []);
+
   return (
     <PageContainer>
       <HeaderContainer>
@@ -38,18 +58,18 @@ export const DashboardPage: React.FC<{}> = (props) => {
           <Button href={'#info'}>Saiba mais</Button>
         </ActionContainer>
       </HeaderContainer>
+
       <EstablishmentContainer id="establishment">
-        <PageHeader title="Estabelecimentos" />
+        <PageHeader title="Estabelecimentos" subTitle="Lugares onde é possível consumir os créditos disponíveis." />
         <Row gutter={[8, 8]}>
-          {cardData.map((item) => (
-            <Col key={item.id} xs={24} sm={24} md={8} lg={8} xl={8}>
-              <Card>
-                <Meta title={item.name} description={item.address} />
-              </Card>
+          {listOfPlacesStore.map((item, index) => (
+            <Col key={index} xs={24} sm={24} md={8} lg={8} xl={8}>
+              <PlaceStoreItem {...item} />
             </Col>
           ))}
         </Row>
       </EstablishmentContainer>
+
       <InfoContainer id="info">
         <PageHeader title="Informações de uso" />
         <label>
