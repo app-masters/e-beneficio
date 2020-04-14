@@ -1,6 +1,7 @@
 import db from '../schemas';
 import { Place, SequelizePlace } from '../schemas/places';
 import { City } from '../schemas/cities';
+import { PlaceStore } from '../schemas/placeStores';
 
 /**
  * Get all items on the table without any filter
@@ -24,6 +25,20 @@ export const getById = async (
   const item = await db.places.findByPk(id);
   if (item?.cityId === cityId) return item;
   return null;
+};
+
+/**
+ * Get a single item using the children place store ID
+ * @param placeStoreId unique ID linked to the desired item
+ * @returns Promise<Item>
+ */
+export const getByPlaceStoreId = async (
+  placeStoreId: NonNullable<PlaceStore['id']>
+): Promise<SequelizePlace | undefined> => {
+  const [item] = await db.places.findAll({
+    include: [{ model: db.placeStores, as: 'placeStores', where: { id: placeStoreId } }]
+  });
+  return item;
 };
 
 /**
