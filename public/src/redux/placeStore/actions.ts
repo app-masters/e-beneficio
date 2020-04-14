@@ -3,6 +3,8 @@ import { ThunkResult } from '../store';
 import { backend } from '../../utils/networking';
 import { PlaceStore } from '../../interfaces/placeStore';
 
+import axios from 'axios';
+
 // Simple actions and types
 export const doGetPlaceStore = createAction<void>('placeStore/GET');
 export const doGetPlaceStoreSuccess = createAction<PlaceStore | PlaceStore[]>('placeStore/GET_SUCCESS');
@@ -17,7 +19,7 @@ export const requestGetPlaceStore = (cityId: string): ThunkResult<void> => {
       // Start request - starting loading state
       dispatch(doGetPlaceStore());
       // Request
-      const response = await backend.get<PlaceStore>(`/place/place-store`, { params: { 'city-id': cityId } });
+      const response = await backend.get<PlaceStore>(`/public/place-stores`, { params: { cityId } });
       if (response && response.data) {
         // Request finished
         dispatch(doGetPlaceStoreSuccess(response.data)); // Dispatch result

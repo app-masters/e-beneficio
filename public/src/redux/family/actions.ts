@@ -11,13 +11,13 @@ export const doGetFamilyFailed = createAction<Error | undefined>('family/GET_FAI
 /**
  * Get family Thunk action
  */
-export const requestGetFamily = (nis: string): ThunkResult<void> => {
+export const requestGetFamily = (nis: string, cityId: string): ThunkResult<void> => {
   return async (dispatch) => {
     try {
       // Start request - starting loading state
       dispatch(doGetFamily());
       // Request
-      const response = await backend.get<Family>(`/families`, { params: { nis } });
+      const response = await backend.get<Family>(`/public/families`, { params: { nis, cityId } });
       if (response && response.data) {
         // Request finished
         dispatch(doGetFamilySuccess(response.data)); // Dispatch result
