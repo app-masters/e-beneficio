@@ -81,7 +81,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
     onSubmit: (values, { setStatus }) => {
       setStatus();
       const invalidConsumptionValue = !!(family && values.value > 0 && values.value > family.balance);
-      if (!family || invalidConsumptionValue || !values.acceptCheck) {
+      if (!(!family || invalidConsumptionValue || !values.acceptCheck)) {
         dispatch(
           requestSaveConsumption(
             {
