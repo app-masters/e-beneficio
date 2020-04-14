@@ -1,20 +1,16 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# Ignore react bundles on frontend project
-
-
-/build/
-
 # dependencies
 /node_modules
 /.pnp
 .pnp.js
 
-# testing
-/coverage
+/admin/
+/place/
+/portal/
 
 # production
-/build
+/build/
 
 # misc
 .DS_Store
