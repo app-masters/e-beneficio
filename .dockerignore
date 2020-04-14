@@ -5,5 +5,3 @@
 **/*.log
 **/.git
 **/.env
-#build
-#dist

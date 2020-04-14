@@ -13,13 +13,13 @@ cd ..
 ## Set GCP compute zone
 gcloud config set compute/zone ${ZONE}
 
-#### BACKEND
-#echo -e "\n# 1/8 - Building and tagging backend dockerfile...\n"
-#docker build -f deployment/backend.Dockerfile -t ${BACKEND_IMAGE_TAG} .
-#docker tag ${BACKEND_IMAGE_TAG} ${BACKEND_CONTAINER_IMAGE}
-#
-#echo -e "\n# 2/8 - Pushing docker image to Google Container Registry...\n"
-#docker push ${BACKEND_CONTAINER_IMAGE}
+### BACKEND
+echo -e "\n# 1/8 - Building and tagging backend dockerfile...\n"
+docker build -f deployment/backend.Dockerfile -t ${BACKEND_IMAGE_TAG} .
+docker tag ${BACKEND_IMAGE_TAG} ${BACKEND_CONTAINER_IMAGE}
+
+echo -e "\n# 2/8 - Pushing docker image to Google Container Registry...\n"
+docker push ${BACKEND_CONTAINER_IMAGE}
 
 ### FRONTEND
 ## build and copy admin

@@ -1,6 +1,9 @@
 import express from 'express';
 import moment from 'moment';
-// Middleware
+import Sequelize from 'sequelize';
+import logging from '../utils/logging';
+import { sequelize } from '../schemas';
+// Midlewares
 import { jwtMiddleware } from '../middlewares/auth';
 
 // Sub-routers
@@ -24,7 +27,22 @@ router.get('/', (req, res) =>
     now: moment().format()
   })
 );
-router.get('/ping', (req, res) => res.send('pong pong'));
+router.get(
+  '/health',
+  // Returning data to the request
+  async (req, res) => {
+    const result = { database: false, databaseTime: null, serverTime: moment().format() };
+    try {
+      const [{ now }] = await sequelize.query('select now() as now', { type: Sequelize.QueryTypes.SELECT });
+      result.databaseTime = now;
+      result.database = true;
+    } catch (e) {
+      console.log(e.message);
+      logging.error('Health check error', { e });
+    }
+    res.send(result);
+  }
+);
 // Sub-routers
 router.use('/auth', authRoutes);
 router.use('/public', publicRoutes);
