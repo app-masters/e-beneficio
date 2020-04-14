@@ -1,6 +1,16 @@
 import styled from 'styled-components';
 import media from '../../styles/media';
 
+export const ErrorMessageStyle = {
+  display: 'flex',
+  justifyContent: 'center',
+  color: '#e74c3c'
+};
+
+export const InputStyle = {
+  minWidth: window.innerWidth * 0.3
+};
+
 export const PageContainer = styled.div`
   padding: ${(props) => props.theme.spacing.sm};
 
