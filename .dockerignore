@@ -1,0 +1,9 @@
+**/node_modules
+**/.nvmrc
+.vscode
+**/README.md
+**/*.log
+**/.git
+**/.env
+#build
+#dist

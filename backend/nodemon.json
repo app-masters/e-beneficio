@@ -3,11 +3,12 @@
     "**/*.test.ts",
     "**/*.spec.ts",
     ".git",
-    "node_modules"
+    "node_modules",
+    "admin-build"
   ],
   "watch": [
     "src"
   ],
-  "exec": "ts-node src/index.ts",
+  "exec": "ts-node-dev src/index.ts",
   "ext": "ts"
 }

@@ -11,8 +11,8 @@ import consumptions from './consumptions';
  * Seed all tables
  */
 const seedAll = async () => {
-  // Development seed
   if (process.env.NODE_ENV === 'development') {
+    // Development seed
     await cities.seed();
     await places.seed();
     await placeStores.seed();
@@ -22,9 +22,11 @@ const seedAll = async () => {
     await families.seed();
     await consumptions.seed();
     await families.csv(); // CSV example seed
+  } else {
+    // Production seed - one city and admin user
+    await cities.seed();
+    await users.seedAdmin();
   }
-  // Production seed
-  // ...
 };
 
 console.log('[seed] Started ---');

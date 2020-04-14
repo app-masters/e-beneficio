@@ -2,6 +2,7 @@
   "name": "admin",
   "version": "0.0.1",
   "private": true,
+  "homepage": "/admin/",
   "dependencies": {
     "@ant-design/icons": "^4.0.5",
     "@reduxjs/toolkit": "^1.3.2",
@@ -53,6 +54,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build:dev": "sh -ac '. .env.dev; react-scripts build'",
     "test": "react-scripts test",
     "checks": "npm run check-prettier && npm run check-lint && npm run check-typescript",
     "check-prettier": "prettier-check \"src/**/*.{js,ts,tsx}\"",
