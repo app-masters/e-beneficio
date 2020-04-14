@@ -1,14 +1,14 @@
 import styled from 'styled-components';
 import media from '../../styles/media';
 
-export const ErrorMessageStyle = {
-  display: 'flex',
-  justifyContent: 'center',
-  color: '#e74c3c'
+export const PriceLabelStyle = {
+  fontSize: '15pt' as '15pt'
 };
 
-export const InputStyle = {
-  minWidth: window.innerWidth * 0.3
+export const PriceStyle = {
+  color: '#00B41E',
+  fontWeight: 'bold' as 'bold',
+  fontSize: '16pt' as '16pt'
 };
 
 export const PageContainer = styled.div`
@@ -42,6 +42,7 @@ export const ActionWrapper = styled.div`
 
 export const FamilyWrapper = styled.div`
   margin-bottom: ${(props) => props.theme.spacing.md};
+  text-align: center;
 `;
 
 export const FamilyActions = styled.div`
