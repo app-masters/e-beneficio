@@ -1,0 +1,25 @@
+name: Test -  Gcloud permissions
+on:
+  push:
+    branches:
+      - devops-fixes
+      - devops-tests
+
+# https://help.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables
+
+jobs:
+  test_permissions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          project_id: "covid19jf"
+      - run: gcloud components install --quiet beta
+      - run: gcloud info
+      - run: gcloud beta compute ssh "resources-dev-2" --zone "us-central1-a" --command="pwd && ls"
+
+#          service_account_email: ${{ secrets.GCP_SA_EMAIL_INSTANCE }}
+#          service_account_key: ${{ secrets.GCP_SA_KEY_INSTANCE }}
+#      - run: echo "$GCP_SSH_KEY_PHORMAR_DEV_PRIV" > ./id_rsa
+#      - run: echo "$GCP_SSH_KEY_PHORMAR_DEV_PUB" > ./id_rsa.pub
+# project will vary according to branch
