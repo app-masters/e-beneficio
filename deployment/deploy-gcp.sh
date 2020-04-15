@@ -27,16 +27,16 @@ if hash nvm 2>/dev/null; then
 fi
 cd ..
 
-### Set GCP compute zone
-#gcloud config set compute/zone ${ZONE}
-#
-#### BACKEND
-#echo -e "\n# 1/9 - Building and tagging backend dockerfile...\n"
-#docker build -f deployment/backend.Dockerfile -t ${BACKEND_IMAGE_TAG} .
-#docker tag ${BACKEND_IMAGE_TAG} ${BACKEND_CONTAINER_IMAGE}
-#
-#echo -e "\n# 2/9 - Pushing docker image to Google Container Registry...\n"
-#docker push ${BACKEND_CONTAINER_IMAGE}
+## Set GCP compute zone
+gcloud config set compute/zone ${ZONE}
+
+### BACKEND
+echo -e "\n# 1/9 - Building and tagging backend dockerfile...\n"
+docker build -f deployment/backend.Dockerfile -t ${BACKEND_IMAGE_TAG} .
+docker tag ${BACKEND_IMAGE_TAG} ${BACKEND_CONTAINER_IMAGE}
+
+echo -e "\n# 2/9 - Pushing docker image to Google Container Registry...\n"
+docker push ${BACKEND_CONTAINER_IMAGE}
 #
 ### FRONTEND
 ## build and copy admin

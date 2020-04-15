@@ -1,4 +1,4 @@
 # Ignore deployment sensible data
 .env.backend
 .env.frontend
-
+*.json
