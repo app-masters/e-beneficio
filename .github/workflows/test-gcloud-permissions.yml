@@ -14,13 +14,17 @@ jobs:
     steps:
       - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
+          service_account_email: ${{ secrets.GCP_SA_EMAIL_TEST_1 }}
+          service_account_key: ${{ secrets.GCP_SA_KEY_TEST_1 }}
           project_id: "covid19jf"
+          export_default_credentials: true
       - run: gcloud components install --quiet beta
       - run: gcloud info
       - run: gcloud beta compute ssh "resources-dev-2" --zone "us-central1-a" --command="pwd && ls"
 
-#          service_account_email: ${{ secrets.GCP_SA_EMAIL_INSTANCE }}
-#          service_account_key: ${{ secrets.GCP_SA_KEY_INSTANCE }}
+
 #      - run: echo "$GCP_SSH_KEY_PHORMAR_DEV_PRIV" > ./id_rsa
 #      - run: echo "$GCP_SSH_KEY_PHORMAR_DEV_PUB" > ./id_rsa.pub
 # project will vary according to branch
+
+# test-account-1 -  test-account-1@covid19jf.iam.gserviceaccount.com  GCP_SA_KEY_TEST_1     instanceadmin + computeadmin
