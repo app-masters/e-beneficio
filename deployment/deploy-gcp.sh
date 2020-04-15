@@ -14,7 +14,7 @@ fi
 ENV=$1
 if [[ ${ENV} == "master" ]]; then
    ENV="production";
-elif [[ ${ENV} == "dev" ]]; then
+elif [[ ${ENV} == "dev" ] || [ ${ENV} == "devops" ]]; then
    ENV="dev-online";
 fi
 
