@@ -5,6 +5,7 @@ import { FamilyWrapper, InfoContainer, PriceStyle, PriceLabelStyle, HowToHeaderC
 import { AppState } from '../../redux/rootReducer';
 import { requestGetFamily } from '../../redux/family/actions';
 import { Family } from '../../interfaces/family';
+import { Flex } from '../flex';
 
 const { Text } = Typography;
 
@@ -77,14 +78,12 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
 
       {familyError && !familyLoading && (
         <FamilyWrapper>
-          <Text type="danger">
+          <Text>
             Não encontramos nenhuma família utilizando esse NIS. Tenha certeza que é o NIS do responsável familiar para
-            conseguir consultar o saldo.
+            conseguir consultar o saldo
           </Text>
           <InfoContainer>
-            <Button danger href={'#info'} style={{ backgroundColor: '#F9F9F9' }}>
-              Mais informações
-            </Button>
+            <Button href={'#info'}>Mais informações</Button>
           </InfoContainer>
         </FamilyWrapper>
       )}
@@ -96,14 +95,13 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
 
           <HowToHeaderContainer>
             <HowToLabel>
-              Você poderá gastar seus créditos dentre os estabelecimentos cadastrados, lembre-se de informar que faz
-              parte do programa antes de passar as compras pelo caixa!
+              Para utilizar os seus créditos, vá até um dos estabelecimentos parceiros e informe que faz parte do
+              programa
             </HowToLabel>
           </HowToHeaderContainer>
-
-          <Button href={'#establishment'} style={{ backgroundColor: '#F9F9F9' }}>
-            Ver Estabelecimentos
-          </Button>
+          <Flex justifyContent="center">
+            <Button href={'#establishment'}>Ver Estabelecimentos</Button>
+          </Flex>
         </FamilyWrapper>
       )}
     </>

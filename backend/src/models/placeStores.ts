@@ -15,7 +15,11 @@ export const getAll = (
 ): Promise<SequelizePlaceStore[]> => {
   return db.placeStores.findAll({
     where: placeId ? { cityId, placeId } : { cityId },
-    include: [{ model: db.places, as: 'place' }]
+    include: [{ model: db.places, as: 'place' }],
+    order: [
+      [{ model: db.places, as: 'place' }, 'title', 'ASC'],
+      ['title', 'ASC']
+    ]
   });
 };
 
