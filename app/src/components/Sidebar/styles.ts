@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import media from '../../styles/media';
 
 export const LogoWrapper = styled.div<{ collapsed?: boolean }>`
@@ -57,4 +57,31 @@ export const FixSider = styled.div`
 
 export const MenuHeight = styled.div`
   overflow: auto;
+`;
+
+export const fadeIn = keyframes`
+  100% {
+    opacity: 1;
+  }
+`;
+
+export const fadeOut = keyframes`
+  100% {
+    opacity: 0;
+  }
+`;
+
+export const CollapseWrapper = styled.div<{ collapsed?: boolean }>`
+  width: 100%;
+  height: 100%;
+  ${(props) =>
+    props.collapsed
+      ? css`
+          animation: ${fadeIn} 0.5s ease-out 0s both;
+          opacity: 0;
+        `
+      : css`
+          animation: ${fadeOut} 0.5s ease-out 0s both;
+          opacity: 1;
+        `}
 `;
