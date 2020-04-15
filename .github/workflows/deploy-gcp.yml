@@ -1,17 +1,20 @@
-name: Test -  Gcloud permissions
+name: Deploy to GCP
 on:
   push:
     branches:
-      - devops-fixes
-      - devops-tests
+      - dev
+      - staging
+      - master
       - devops
 
-# https://help.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables
-
 jobs:
-  test_permissions:
+  deploy_gcp:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "11.x"
       - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
           service_account_email: ${{ secrets.GCP_SA_EMAIL_TEST_3 }}
@@ -19,8 +22,16 @@ jobs:
           project_id: "covid19jf"
           export_default_credentials: true
       - run: gcloud components install --quiet beta
-      - run: gcloud info
-      - run: gcloud beta compute ssh "resources-dev-2" --zone "us-central1-a" --command="pwd && ls"
+
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
+      - name: Build, push and refresh
+        run: |
+          cd deployment
+          ./deploy-gcp.sh ${{ steps.extract_branch.outputs.branch }}
 
 
 #      - run: echo "$GCP_SSH_KEY_PHORMAR_DEV_PRIV" > ./id_rsa
