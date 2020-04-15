@@ -2,7 +2,8 @@ import styled from 'styled-components';
 import backgroundImage from '../../assets/banner.jpg';
 
 export const PanelStyle = {
-  backgroundColor: '#00000000'
+  backgroundColor: '#00000000',
+  marginTop: 0
 };
 
 export const HeaderContainer = styled.div`
@@ -10,7 +11,7 @@ export const HeaderContainer = styled.div`
   flex-direction: column;
   align-items: center;
   background-image: url(${backgroundImage});
-  background-position: center;
+  background-position: bottom;
   background-size: cover;
   background-repeat: no-repeat;
   box-shadow: 0px 0px 2px black;
@@ -37,6 +38,7 @@ export const PanelActionContainer = styled.div`
   display: flex;
   width: 100%;
   justify-content: center;
+  padding: ${(props) => props.theme.spacing.md};
 `;
 
 export const ActionContainer = styled.div`

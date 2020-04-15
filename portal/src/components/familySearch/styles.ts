@@ -47,7 +47,7 @@ export const ActionWrapper = styled.div`
 `;
 
 export const FamilyWrapper = styled.div`
-  margin-bottom: ${(props) => props.theme.spacing.md};
+  /* margin-bottom: ${(props) => props.theme.spacing.md}; */
 `;
 
 export const FamilyActions = styled.div`

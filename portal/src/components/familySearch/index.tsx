@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Input, Typography } from 'antd';
+import { Form, Button, Input, Typography, Card } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { FamilyWrapper, InfoContainer, PriceStyle, PriceLabelStyle, HowToHeaderContainer, HowToLabel } from './styles';
 import { AppState } from '../../redux/rootReducer';
@@ -78,30 +78,34 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
 
       {familyError && !familyLoading && (
         <FamilyWrapper>
-          <Text>
-            Não encontramos nenhuma família utilizando esse NIS. Tenha certeza que é o NIS do responsável familiar para
-            conseguir consultar o saldo
-          </Text>
-          <InfoContainer>
-            <Button href={'#info'}>Mais informações</Button>
-          </InfoContainer>
+          <Card>
+            <Text>
+              Não encontramos nenhuma família utilizando esse NIS. Tenha certeza que é o NIS do responsável familiar
+              para conseguir consultar o saldo
+            </Text>
+            <InfoContainer>
+              <Button href={'#info'}>Mais informações</Button>
+            </InfoContainer>
+          </Card>
         </FamilyWrapper>
       )}
 
       {familyId && !familyLoading && family && (
         <FamilyWrapper>
-          <Text style={PriceLabelStyle}>{'Saldo disponível: '}</Text>
-          <Text style={PriceStyle}>{`R$${(family.balance || 0).toFixed(2).replace('.', ',')}`}</Text>
+          <Card>
+            <Text style={PriceLabelStyle}>{'Saldo disponível: '}</Text>
+            <Text style={PriceStyle}>{`R$${(family.balance || 0).toFixed(2).replace('.', ',')}`}</Text>
 
-          <HowToHeaderContainer>
-            <HowToLabel>
-              Para utilizar os seus créditos, vá até um dos estabelecimentos parceiros e informe que faz parte do
-              programa
-            </HowToLabel>
-          </HowToHeaderContainer>
-          <Flex justifyContent="center">
-            <Button href={'#establishment'}>Ver Estabelecimentos</Button>
-          </Flex>
+            <HowToHeaderContainer>
+              <HowToLabel>
+                Para utilizar os seus créditos, vá até um dos estabelecimentos parceiros e informe que faz parte do
+                programa
+              </HowToLabel>
+            </HowToHeaderContainer>
+            <Flex justifyContent="center">
+              <Button href={'#establishment'}>Ver Estabelecimentos</Button>
+            </Flex>
+          </Card>
         </FamilyWrapper>
       )}
     </>
