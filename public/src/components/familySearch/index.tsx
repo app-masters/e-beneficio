@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { Alert, Button, Descriptions, Form, Input, Typography } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Form, Button, Input, Typography } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
-import { Flex } from '../flex';
-import { FamilyActions, FamilyWrapper } from './styles';
+import { FamilyWrapper, InfoContainer, PriceStyle, PriceLabelStyle, HowToHeaderContainer, HowToLabel } from './styles';
 import { AppState } from '../../redux/rootReducer';
 import { requestGetFamily } from '../../redux/family/actions';
 import { Family } from '../../interfaces/family';
-import moment from 'moment';
+
+const { Text } = Typography;
 
 type ComponentProps = {
   onFamilySelect?: (id: Family['id']) => void;
@@ -23,12 +23,13 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
   // Local state
   const [nis, setNis] = useState('');
   const [familyId, setFamilyId] = useState<Family['id']>();
-  const [birthday, setBirthday] = useState('');
   // Redux state
   const familyLoading = useSelector<AppState, boolean>((state) => state.familyReducer.loading);
+  const familyError = useSelector<AppState, Error | undefined>((state) => state.familyReducer.error);
   const family = useSelector<AppState, Family | null | undefined>((state) => state.familyReducer.item);
 
-  const sameBirthday = moment(family?.responsibleBirthday).diff(moment(birthday, 'DD/MM/YYYY'), 'days') === 0;
+  // .env
+  const cityId = process.env.REACT_APP_ENV_CITY_ID as string;
 
   /**
    * Use callback on the change of the familyId
@@ -41,86 +42,68 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
     }
   };
 
+  useEffect(() => {
+    if (family) {
+      const { id } = family;
+      setFamilyId(id);
+      if (props.onFamilySelect) {
+        props.onFamilySelect(id);
+      }
+    }
+  }, [props, family]);
+
   return (
     <>
       <Form layout="vertical">
-        <Form.Item label="Código NIS do responsável">
+        <Form.Item>
           <Input.Search
             loading={familyLoading}
             enterButton
             onChange={(event) => setNis(event.target.value)}
             value={nis}
             maxLength={11}
+            placeholder="Código NIS do responsável"
             onPressEnter={() => {
               changeFamilyId(undefined);
-              setBirthday('');
-              dispatch(requestGetFamily(nis));
+              dispatch(requestGetFamily(nis, cityId));
             }}
             onSearch={(value) => {
               changeFamilyId(undefined);
-              setBirthday('');
-              dispatch(requestGetFamily(value));
+              dispatch(requestGetFamily(value, cityId));
             }}
           />
         </Form.Item>
-        {family && (
-          <Form.Item
-            label="Aniversário do responsável"
-            validateStatus={birthday.length > 9 && !sameBirthday ? 'error' : ''}
-            help={birthday.length > 9 && !sameBirthday ? 'Aniversário incorreto' : ''}
-          >
-            <Input
-              style={{ width: '100%' }}
-              id="birthday"
-              name="birthday"
-              onChange={(event) => setBirthday(event.target.value)}
-              placeholder="DD/MM/YYYY"
-            />
-          </Form.Item>
-        )}
       </Form>
-      {!familyId && !familyLoading && family && sameBirthday && (
+
+      {familyError && !familyLoading && (
         <FamilyWrapper>
-          <Alert
-            type="info"
-            message={
-              <div>
-                <Descriptions layout="vertical" size="small" title="Família encontrada" colon={false} bordered>
-                  <Descriptions.Item label="Nome do responsável">{family.responsibleName}</Descriptions.Item>
-                  <Descriptions.Item label="Data de nascimento do responsável">
-                    {moment(family.responsibleBirthday).format('DD/MM/YYYY')}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Nome da mãe do responsável">
-                    {family.responsibleMotherName}
-                  </Descriptions.Item>
-                </Descriptions>
-                <FamilyActions>
-                  <Flex alignItems="center" justifyContent="flex-end" gap>
-                    <Typography.Paragraph strong>Os dados foram validados com o responsável?</Typography.Paragraph>
-                    <Button htmlType="button" type="primary" onClick={() => changeFamilyId(family.id)}>
-                      Sim, confirmar
-                    </Button>
-                  </Flex>
-                </FamilyActions>
-              </div>
-            }
-          />
+          <Text type="danger">
+            Não encontramos nenhuma família utilizando esse NIS. Tenha certeza que é o NIS do responsável familiar para
+            conseguir consultar o saldo.
+          </Text>
+          <InfoContainer>
+            <Button danger href={'#info'} style={{ backgroundColor: '#F9F9F9' }}>
+              Mais informações
+            </Button>
+          </InfoContainer>
         </FamilyWrapper>
       )}
+
       {familyId && !familyLoading && family && (
         <FamilyWrapper>
-          <Descriptions bordered size="small" title="Família Selecionada" layout="vertical">
-            <Descriptions.Item label="Nome do responsável">{family.responsibleName}</Descriptions.Item>
-            <Descriptions.Item label="Data de nascimento">
-              {moment(family.responsibleBirthday).format('DD/MM/YYYY')}
-            </Descriptions.Item>
-            <Descriptions.Item label="Nome da mãe">{family.responsibleMotherName}</Descriptions.Item>
-            <Descriptions.Item label="Saldo disponível">
-              <Typography.Paragraph strong>{`R$${(family.balance || 0)
-                .toFixed(2)
-                .replace('.', ',')}`}</Typography.Paragraph>
-            </Descriptions.Item>
-          </Descriptions>
+          <Text style={PriceLabelStyle}>{'Saldo disponível: '}</Text>
+          <Text style={PriceStyle}>{`R$${(family.balance || 0).toFixed(2).replace('.', ',')}`}</Text>
+
+          <HowToHeaderContainer>
+            <HowToLabel>
+              Você poderá gastar seus créditos dentre os estabelecimentos cadastrados, lembre-se de informar que faz
+              parte do programa antes de passar as compras pelo caixa!
+            </HowToLabel>
+          </HowToHeaderContainer>
+
+          <Button href={'#establishment'} style={{ backgroundColor: '#F9F9F9' }}>
+            Ver Estabelecimentos
+          </Button>
         </FamilyWrapper>
       )}
     </>

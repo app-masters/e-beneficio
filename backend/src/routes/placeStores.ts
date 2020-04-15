@@ -1,6 +1,8 @@
 import express from 'express';
 import logging from '../utils/logging';
+import * as placeModel from '../models/places';
 import * as placeStoreModel from '../models/placeStores';
+import { Place } from '../schemas/places';
 
 const router = express.Router({ mergeParams: true });
 
@@ -10,7 +12,12 @@ const router = express.Router({ mergeParams: true });
 router.get('/', async (req, res) => {
   try {
     if (!req.user?.cityId) throw Error('User without selected city');
-    const items = await placeStoreModel.getAll(req.user.cityId);
+    let place: Place | undefined;
+    if (req.user.placeStoreId) {
+      // If user is linked to a place store, return only the other place stores of his store
+      place = await placeModel.getByPlaceStoreId(req.user.placeStoreId);
+    }
+    const items = await placeStoreModel.getAll(req.user.cityId, place ? place.id : undefined);
     res.send(items);
   } catch (error) {
     logging.error(error);

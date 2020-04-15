@@ -1,11 +1,13 @@
-import { Alert, Form, Input, Modal, Select, Spin, Checkbox } from 'antd';
+import { Alert, Checkbox, Form, Input, Modal, Select, Spin } from 'antd';
 import { useFormik } from 'formik';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
 import { InputFormatter } from '../../components/inputFormatter';
+import { Place } from '../../interfaces/place';
 import { PlaceStore } from '../../interfaces/placeStore';
 import { User } from '../../interfaces/user';
+import { requestGetPlace } from '../../redux/place/actions';
 import { requestGetPlaceStore } from '../../redux/placeStore/actions';
 import { AppState } from '../../redux/rootReducer';
 import { requestSaveUser } from '../../redux/user/actions';
@@ -39,6 +41,7 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
   const loading = useSelector<AppState, boolean>(({ userReducer }) => userReducer.loading);
   const placeStoreLoading = useSelector<AppState, boolean>(({ placeStoreReducer }) => placeStoreReducer.loading);
   const placeStoreList = useSelector<AppState, PlaceStore[]>(({ placeStoreReducer }) => placeStoreReducer.list);
+  const placeList = useSelector<AppState, Place[]>(({ placeReducer }) => placeReducer.list);
 
   // Redux actions
   const dispatch = useDispatch();
@@ -46,7 +49,11 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
     if (!placeStoreList || placeStoreList.length <= 0) {
       dispatch(requestGetPlaceStore());
     }
-  }, [dispatch, placeStoreList]);
+
+    if (!placeList || placeList.length <= 0) {
+      dispatch(requestGetPlace());
+    }
+  }, [dispatch, placeStoreList, placeList]);
 
   const {
     handleSubmit,
@@ -112,6 +119,14 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
             <Input id="name" name="name" onChange={handleChange} value={values.name} onPressEnter={submitForm} />
           </Form.Item>
 
+          <Form.Item
+            label={'Email'}
+            validateStatus={!!emailMeta.error && !!emailMeta.touched ? 'error' : ''}
+            help={!!emailMeta.error && !!emailMeta.touched ? emailMeta.error : undefined}
+          >
+            <Input id="email" name="email" onChange={handleChange} value={values.email} onPressEnter={submitForm} />
+          </Form.Item>
+
           {isCreating && (
             <Form.Item
               label={'Senha'}
@@ -145,14 +160,6 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
           </Form.Item>
 
           <Form.Item
-            label={'Email'}
-            validateStatus={!!emailMeta.error && !!emailMeta.touched ? 'error' : ''}
-            help={!!emailMeta.error && !!emailMeta.touched ? emailMeta.error : undefined}
-          >
-            <Input id="email" name="email" onChange={handleChange} value={values.email} onPressEnter={submitForm} />
-          </Form.Item>
-
-          <Form.Item
             label={'Loja'}
             validateStatus={!!placeStoreMeta.error && !!placeStoreMeta.touched ? 'error' : ''}
             help={!!placeStoreMeta.error && !!placeStoreMeta.touched ? placeStoreMeta.error : undefined}
@@ -175,6 +182,9 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
                 placeStoreList.length > 0 &&
                 placeStoreList.map((placeStore) => (
                   <Option key={placeStore.id} value={placeStore.id?.toString() || '-1'}>
+                    {placeList && placeList.length > 0
+                      ? `${placeList.find((place) => place.id === placeStore.placeId)?.title} - `
+                      : ''}
                     {placeStore.title}
                   </Option>
                 ))}
