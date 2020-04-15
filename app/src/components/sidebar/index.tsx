@@ -4,7 +4,9 @@ import {
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  HomeOutlined
+  HomeOutlined,
+  UserOutlined,
+  ShopOutlined
 } from '@ant-design/icons';
 import { Button, Layout, Menu, Popover } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -15,6 +17,9 @@ import { Flex } from '../flex';
 import { FixSider, MenuHeight, MenuIcon, CollapseWrapper } from './styles';
 import { useWindowDimensions } from '../../utils/viewport';
 import { breakpoints } from '../../styles/theme';
+import { User } from '../../interfaces/user';
+import { AppState } from '../../redux/rootReducer';
+import { useSelector } from 'react-redux';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
@@ -27,25 +32,6 @@ interface RouteItem {
   children?: RouteItem[];
   disabled?: boolean;
 }
-
-const routes: RouteItem[] = [
-  {
-    path: '/',
-    icon: () => <HomeOutlined />,
-    name: 'Início'
-  },
-  {
-    path: '/consumo',
-    icon: () => <CarryOutOutlined />,
-    name: 'Informar consumo'
-  },
-  {
-    path: '/relatorios',
-    icon: () => <BarChartOutlined />,
-    name: 'Relatórios',
-    disabled: true
-  }
-];
 
 /**
  * A function the will return a menu item or a sidebar item based on the given item properties
@@ -94,6 +80,41 @@ export const Sidebar: React.FC = (props) => {
   const location = useLocation();
   const theme = useTheme();
   const { width } = useWindowDimensions();
+
+  const currentUser = useSelector<AppState, User>((state) => state.authReducer.user as User);
+  const routes: RouteItem[] = [
+    {
+      path: '/',
+      icon: () => <HomeOutlined />,
+      name: 'Início'
+    },
+    {
+      path: '/consumo',
+      icon: () => <CarryOutOutlined />,
+      name: 'Informar consumo'
+    },
+    {
+      path: '/relatorios',
+      icon: () => <BarChartOutlined />,
+      name: 'Relatórios',
+      disabled: true
+    }
+  ];
+
+  const adminRoutes: RouteItem[] = [
+    {
+      path: '/usuarios',
+      icon: () => <UserOutlined />,
+      name: 'Usuários',
+      disabled: currentUser.role !== 'manager'
+    },
+    {
+      path: '/lojas',
+      icon: () => <ShopOutlined />,
+      name: 'Lojas',
+      disabled: currentUser.role !== 'manager'
+    }
+  ];
 
   // The collapse state for the sidebar
   const [collapsed, setCollapsed] = useState(
