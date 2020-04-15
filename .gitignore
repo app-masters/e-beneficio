@@ -2,9 +2,3 @@
 .DS_Store
 **/.idea/
 **/dist/
-
-
-# Ignore deployment sensible data
-/deployment/.env.backend
-/deployment/.env.frontend
-
