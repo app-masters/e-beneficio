@@ -33,15 +33,12 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
   const isCreating = props.match.params.id === 'criar';
 
   // Redux state
-  const currentUser = useSelector<AppState, User>((state) => state.authReducer.user as User);
   const user = useSelector<AppState, User | undefined>(({ userReducer }) =>
     userReducer.list.find((item) => item.id === Number(props.match.params.id))
   );
   const loading = useSelector<AppState, boolean>(({ userReducer }) => userReducer.loading);
   const placeStoreLoading = useSelector<AppState, boolean>(({ placeStoreReducer }) => placeStoreReducer.loading);
-  const placeStoreList = useSelector<AppState, PlaceStore[]>(({ placeStoreReducer }) =>
-    placeStoreReducer.list.filter((f) => f.id === currentUser.placeStoreId)
-  );
+  const placeStoreList = useSelector<AppState, PlaceStore[]>(({ placeStoreReducer }) => placeStoreReducer.list);
 
   // Redux actions
   const dispatch = useDispatch();
