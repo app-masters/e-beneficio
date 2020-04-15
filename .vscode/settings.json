@@ -13,7 +13,7 @@
       "changeProcessCWD": true
     },
     {
-      "directory": "./public",
+      "directory": "./portal",
       "changeProcessCWD": true
     }
   ],
