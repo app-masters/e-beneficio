@@ -14,8 +14,8 @@ jobs:
     steps:
       - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
-          service_account_email: ${{ secrets.GCP_SA_EMAIL_TEST_1 }}
-          service_account_key: ${{ secrets.GCP_SA_KEY_TEST_1 }}
+          service_account_email: ${{ secrets.GCP_SA_EMAIL_TEST_2 }}
+          service_account_key: ${{ secrets.GCP_SA_KEY_TEST_2 }}
           project_id: "covid19jf"
           export_default_credentials: true
       - run: gcloud components install --quiet beta
@@ -27,4 +27,14 @@ jobs:
 #      - run: echo "$GCP_SSH_KEY_PHORMAR_DEV_PUB" > ./id_rsa.pub
 # project will vary according to branch
 
+# test-account-2 -  test-account-2@covid19jf.iam.gserviceaccount.com  GCP_SA_KEY_TEST_1    iam.serviceAccountUser + iam.serviceAccountAdmin
+
+
 # test-account-1 -  test-account-1@covid19jf.iam.gserviceaccount.com  GCP_SA_KEY_TEST_1     instanceadmin + computeadmin
+#  Updating project ssh metadata...
+#  ........................................................................................................failed.
+#  Updating instance ssh metadata...
+#  ..........failed.
+#ERROR: (gcloud.beta.compute.ssh) Could not add SSH key to instance metadata:
+#         - The user does not have access to service account '884116399104-compute@developer.gserviceaccount.com'.  User: '***'.  Ask a project owner to grant you the iam.serviceAccountUser role on the service account
+
