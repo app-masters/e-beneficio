@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import backgroundImage from '../../assets/public-backgroundimage.jpg';
+import backgroundImage from '../../assets/banner.jpg';
 
 export const PanelStyle = {
   backgroundColor: '#00000000'
@@ -7,7 +7,6 @@ export const PanelStyle = {
 
 export const HeaderContainer = styled.div`
   display: flex;
-  height: 25%;
   flex-direction: column;
   align-items: center;
   background-image: url(${backgroundImage});
@@ -15,6 +14,7 @@ export const HeaderContainer = styled.div`
   background-size: cover;
   background-repeat: no-repeat;
   box-shadow: 0px 0px 2px black;
+  margin-bottom: ${(props) => props.theme.spacing.md};
 `;
 
 export const HeaderContent = styled.div`
@@ -22,7 +22,7 @@ export const HeaderContent = styled.div`
   width: 100%;
   height: 100%;
   flex-direction: column;
-  background-color: #00000055;
+  background-color: #00000080;
   justify-content: center;
   text-align: center;
   padding: ${(props) => props.theme.spacing.lg};
@@ -49,10 +49,19 @@ export const BodyContainer = styled.div`
   display: flex;
   flex-direction: column;
   padding: ${(props) => props.theme.spacing.sm};
+  margin-bottom: ${(props) => props.theme.spacing.default};
 `;
 
 export const Container = styled.div`
-  max-width: 1200px;
+  max-width: 800px;
+  width: 100%;
   align-self: center;
 `;
 
+export const LogoContainer = styled.div`
+  margin-bottom: ${(props) => props.theme.spacing.sm};
+  img {
+    width: 70px;
+    height: 70px;
+  }
+`;

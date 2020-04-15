@@ -1,5 +1,5 @@
 {
-  "name": "app",
+  "name": "portal",
   "version": "0.0.1",
   "private": true,
   "dependencies": {
