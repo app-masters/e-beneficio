@@ -1,0 +1,49 @@
+name: Test -  Gcloud permissions
+on:
+  push:
+    branches:
+      - devops-fixes
+      - devops-tests
+      - devops
+
+# https://help.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables
+
+jobs:
+  test_permissions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          service_account_email: ${{ secrets.GCP_SA_EMAIL_TEST_3 }}
+          service_account_key: ${{ secrets.GCP_SA_KEY_TEST_3 }}
+          project_id: "covid19jf"
+          export_default_credentials: true
+      - run: gcloud components install --quiet beta
+      - run: gcloud info
+      - run: gcloud beta compute ssh "resources-dev-2" --zone "us-central1-a" --command="pwd && ls"
+
+
+#      - run: echo "$GCP_SSH_KEY_PHORMAR_DEV_PRIV" > ./id_rsa
+#      - run: echo "$GCP_SSH_KEY_PHORMAR_DEV_PUB" > ./id_rsa.pub
+# project will vary according to branch
+
+# test-account-3 + compute-admin + updated metadata with "enable-oslogin"
+
+# test-account-3 -  test-account-3@covid19jf.iam.gserviceaccount.com      iam.serviceAccountUser +  roles/compute.osAdminLogin(compute.instances.get)
+#https://github.com/TiagoGouvea/resources4vulnerable/runs/589027832?check_suite_focus=true
+#ERROR: (gcloud.beta.compute.ssh) Could not fetch resource:
+#         - Required 'compute.instances.get' permission for 'projects/covid19jf/zones/us-central1-a/instances/resources-dev-2'
+
+# test-account-2 -  test-account-2@covid19jf.iam.gserviceaccount.com    iam.serviceAccountUser + iam.serviceAccountAdmin
+# https://github.com/TiagoGouvea/resources4vulnerable/runs/588991144?check_suite_focus=true
+#ERROR: (gcloud.beta.compute.ssh) Could not fetch resource:
+# - Required 'compute.instances.get' permission for 'projects/covid19jf/zones/us-central1-a/instances/resources-dev-2'
+
+# test-account-1 -  test-account-1@covid19jf.iam.gserviceaccount.com  GCP_SA_KEY_TEST_1     instanceadmin + computeadmin
+#  Updating project ssh metadata...
+#  ........................................................................................................failed.
+#  Updating instance ssh metadata...
+#  ..........failed.
+#ERROR: (gcloud.beta.compute.ssh) Could not add SSH key to instance metadata:
+#         - The user does not have access to service account '884116399104-compute@developer.gserviceaccount.com'.  User: '***'.  Ask a project owner to grant you the iam.serviceAccountUser role on the service account
+
