@@ -67,7 +67,7 @@ export const DashboardPage: React.FC<{}> = (props) => {
                 O programa Mercardo Popular oferece suporte para famílias em situação de vulnerabilidade, permitindo
                 comprar produtos nos estabelecimentos parceiros utilizando apenas o saldo do programa.
               </Paragraph>
-              <Paragraph>
+              <Paragraph style={{ marginBottom: 0 }}>
                 Para saber se você tem direito, escreva o código NIS do responsável familiar e veja seu saldo
                 disponível.
               </Paragraph>
@@ -113,7 +113,7 @@ export const DashboardPage: React.FC<{}> = (props) => {
                     link e estaremos prontos para te ajudar
                   </Text>
                   <PanelActionContainer>
-                    <Button type="link" href={process.env.REACT_APP_ENV_INFO_LINK} target="_blank">
+                    <Button href={process.env.REACT_APP_ENV_INFO_LINK} target="_blank">
                       Saiba mais
                     </Button>
                   </PanelActionContainer>
@@ -146,7 +146,7 @@ export const DashboardPage: React.FC<{}> = (props) => {
               Esse projeto é open-source e você pode contribuir com ele indo no repositório no{' '}
               <a href="https://github.com/TiagoGouvea/resources4vulnerable">GitHub</a>
             </Paragraph>
-            <Paragraph style={{ textAlign: 'center' }}>
+            <Paragraph style={{ textAlign: 'center', fontSize: '12px' }}>
               Feito pela <a href="https://appmasters.io/pt">App Masters</a> para a{' '}
               <a href="https://www.pjf.mg.gov.br/">Prefeitura de Juiz de Fora</a>
             </Paragraph>
