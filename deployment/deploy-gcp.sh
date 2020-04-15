@@ -30,14 +30,14 @@ cd ..
 ## Set GCP compute zone
 gcloud config set compute/zone ${ZONE}
 
-### BACKEND
-echo -e "\n# 1/9 - Building and tagging backend dockerfile...\n"
-docker build -f deployment/backend.Dockerfile -t ${BACKEND_IMAGE_TAG} .
-docker tag ${BACKEND_IMAGE_TAG} ${BACKEND_CONTAINER_IMAGE}
-
-echo -e "\n# 2/9 - Pushing docker image to Google Container Registry...\n"
-docker push ${BACKEND_CONTAINER_IMAGE}
+#### BACKEND
+#echo -e "\n# 1/9 - Building and tagging backend dockerfile...\n"
+#docker build -f deployment/backend.Dockerfile -t ${BACKEND_IMAGE_TAG} .
+#docker tag ${BACKEND_IMAGE_TAG} ${BACKEND_CONTAINER_IMAGE}
 #
+#echo -e "\n# 2/9 - Pushing docker image to Google Container Registry...\n"
+#docker push ${BACKEND_CONTAINER_IMAGE}
+##
 ### FRONTEND
 ## build and copy admin
 #echo -e "\n# 3/9 - Building admin...\n"
@@ -77,9 +77,19 @@ docker push ${BACKEND_CONTAINER_IMAGE}
 ### FILES AND FINAL PULL
 echo -e "\n# 8/9 - Copying config files to remote machine...\n"
 cd deployment
-gcloud compute scp ./docker-compose.yml ${INSTANCE_NAME}:~
-gcloud compute scp ./${ENV}/.env.backend ${INSTANCE_NAME}:~
-gcloud compute scp ./${ENV}/nginx.conf ${INSTANCE_NAME}:~
+gcloud compute scp ./docker-compose.yml ${INSTANCE_NAME}:${REMOTE_PATH}
+FILE=./${ENV}/.env.backend
+if test -f "$FILE"; then
+    gcloud compute scp ${FILE} ${INSTANCE_NAME}:${REMOTE_PATH}
+else
+    echo "Not sending ${FILE}";
+fi
+FILE=./${ENV}/nginx.conf
+if test -f "$FILE"; then
+    gcloud compute scp ${FILE} ${INSTANCE_NAME}:${REMOTE_PATH}
+else
+    echo "Not sending ${FILE}";
+fi
 
 echo -e "\n\n# 9/9 - Updating remote machine...\n"
-gcloud compute ssh ${INSTANCE_NAME} --command="docker-compose down && docker-compose pull && docker-compose up --remove-orphans"
+gcloud compute ssh ${INSTANCE_NAME} --command="cd ${REMOTE_PATH} && ls -la && docker image prune -a --force && docker-compose down && docker-compose pull && docker-compose up --remove-orphans"
