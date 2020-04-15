@@ -1,18 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Alert, Button, Card, Form, Input, Typography, InputNumber, Modal } from 'antd';
+import { CameraOutlined, QrcodeOutlined } from '@ant-design/icons';
+import { Alert, Button, Card, Checkbox, Form, Input, InputNumber, Modal, Typography } from 'antd';
 import { useFormik } from 'formik';
-import { RouteComponentProps, useHistory } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useEffect, useRef, useState } from 'react';
 import QrReader from 'react-qr-reader';
+import { useDispatch, useSelector } from 'react-redux';
+import { RouteComponentProps, useHistory } from 'react-router-dom';
 import Webcam from 'react-webcam';
-import { QrcodeOutlined, CameraOutlined } from '@ant-design/icons';
+import { FamilySearch } from '../../components/familySearch';
 import { Flex } from '../../components/flex';
-import yup from '../../utils/yup';
-import { PageContainer } from './styles';
-import { AppState } from '../../redux/rootReducer';
 import { Family } from '../../interfaces/family';
 import { requestSaveConsumption } from '../../redux/consumption/actions';
-import { FamilySearch } from '../../components/familySearch';
+import { AppState } from '../../redux/rootReducer';
+import yup from '../../utils/yup';
+import { PageContainer } from './styles';
 
 const schema = yup.object().shape({
   nfce: yup.string().label('Nota fiscal eletrônica').required(),
@@ -44,7 +44,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
   const cameraRef = useRef(null);
 
   // Local state
-  const [permission, setPermission] = useState('prompt');
+  const [, setPermission] = useState('prompt');
   const [showQRCodeModal, setShowQRCodeModal] = useState(false);
   const [showCameraModal, setShowCameraModal] = useState(false);
   // Redux state
@@ -65,7 +65,8 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
     status,
     errors,
     touched,
-    setFieldValue
+    setFieldValue,
+    getFieldProps
   } = useFormik({
     initialValues: {
       nfce: '',
@@ -73,30 +74,38 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
       proofImageUrl: '',
       nisCode: '',
       familyId: '',
-      birthday: ''
+      birthday: '',
+      acceptCheck: false
     },
     validationSchema: schema,
     onSubmit: (values, { setStatus }) => {
       setStatus();
-      dispatch(
-        requestSaveConsumption(
-          {
-            nfce: values.nfce,
-            value: Number(values.value),
-            proofImageUrl: values.proofImageUrl,
-            familyId: values.familyId
-          },
-          () => {
-            Modal.success({ title: 'Consumo salvo com sucesso', onOk: () => history.push('/') });
-          }
-        )
-      );
+      const invalidConsumptionValue = !!(family && values.value > 0 && values.value > family.balance);
+      if (!(!family || invalidConsumptionValue || !values.acceptCheck)) {
+        dispatch(
+          requestSaveConsumption(
+            {
+              nfce: values.nfce,
+              value: Number(values.value),
+              proofImageUrl: values.proofImageUrl,
+              familyId: values.familyId
+            },
+            () => {
+              Modal.success({ title: 'Consumo salvo com sucesso', onOk: () => history.push('/') });
+            },
+            () => setStatus('Ocorreu um erro ao confirmar consumo.')
+          )
+        );
+      }
     }
   });
 
   const valueMeta = getFieldMeta('value');
   const imageMeta = getFieldMeta('proofImageUrl');
   const nfceMeta = getFieldMeta('nfce');
+
+  const acceptCheckMeta = getFieldMeta('acceptCheck');
+  const acceptCheckField = getFieldProps('acceptCheck');
 
   const invalidConsumptionValue = !!(family && values.value > 0 && values.value > family.balance);
 
@@ -217,10 +226,18 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
                     </Typography.Paragraph>
                   </Modal>
                 </Form.Item>
-                <Form.Item>
-                  {values.proofImageUrl.length > 0 && (
+                {values.proofImageUrl.length > 0 && (
+                  <Form.Item>
                     <img alt="example" style={{ width: '100%', maxWidth: '600px' }} src={values.proofImageUrl} />
-                  )}
+                  </Form.Item>
+                )}
+                <Form.Item
+                  validateStatus={!!acceptCheckMeta.error && !!acceptCheckMeta.touched ? 'error' : ''}
+                  help={!!acceptCheckMeta.error && !!acceptCheckMeta.touched ? acceptCheckMeta.error : undefined}
+                >
+                  <Checkbox checked={values.acceptCheck} {...acceptCheckField}>
+                    Apenas itens contemplados pelo o programa estão incluídos na compra que está sendo inserida
+                  </Checkbox>
                 </Form.Item>
               </>
             )}
@@ -228,7 +245,12 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
           <Flex alignItems="center" justifyContent="flex-end">
             <Button
               htmlType="submit"
-              disabled={!!(errors && Object.keys(errors).length > 0 && touched) || !family || invalidConsumptionValue}
+              disabled={
+                !!(errors && Object.keys(errors).length > 0 && touched) ||
+                !family ||
+                invalidConsumptionValue ||
+                !values.acceptCheck
+              }
               type="primary"
             >
               Confirmar consumo
