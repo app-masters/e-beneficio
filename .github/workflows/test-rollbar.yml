@@ -12,7 +12,6 @@ jobs:
     steps:
       - name: Notify start deploy to Rollbar
         uses: rollbar/github-deploy-action@1.0.0
-        id: rollbar_pre_deploy
         with:
           environment: 'devops'
           version: $GITHUB_SHA
@@ -21,7 +20,6 @@ jobs:
           ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
       - name: Notify start deploy to Rollbar
         uses: rollbar/github-deploy-action@1.0.0
-        id: rollbar_pre_deploy
         with:
           environment: 'devops'
           version: $GITHUB_SHA
@@ -30,14 +28,13 @@ jobs:
           ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
       - name: Notify start deploy to Rollbar
         uses: rollbar/github-deploy-action@1.0.0
-        id: rollbar_pre_deploy
         with:
           environment: 'devops'
           version: $GITHUB_SHA
           status: 'failed'
         env:
           ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
-          
+
       - name: show job status
         if: always()
         run: echo $status
