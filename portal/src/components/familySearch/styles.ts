@@ -47,8 +47,7 @@ export const ActionWrapper = styled.div`
 `;
 
 export const FamilyWrapper = styled.div`
-  margin-bottom: ${(props) => props.theme.spacing.md};
-  text-align: center;
+  /* margin-bottom: ${(props) => props.theme.spacing.md}; */
 `;
 
 export const FamilyActions = styled.div`
@@ -64,7 +63,6 @@ export const FamilyActions = styled.div`
 
 export const HowToHeaderContainer = styled.div`
   display: flex;
-  text-align: center;
   margin-top: ${(props) => props.theme.spacing.sm};
   margin-bottom: ${(props) => props.theme.spacing.sm};
 `;
