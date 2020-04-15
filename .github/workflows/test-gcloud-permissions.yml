@@ -6,8 +6,6 @@ on:
       - devops-tests
       - devops
 
-# https://help.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables
-
 jobs:
   test_permissions:
     runs-on: ubuntu-latest
@@ -22,10 +20,6 @@ jobs:
       - run: gcloud info
       - run: gcloud beta compute ssh "resources-dev-2" --zone "us-central1-a" --command="pwd && ls"
 
-
-#      - run: echo "$GCP_SSH_KEY_PHORMAR_DEV_PRIV" > ./id_rsa
-#      - run: echo "$GCP_SSH_KEY_PHORMAR_DEV_PUB" > ./id_rsa.pub
-# project will vary according to branch
 
 # test-account-3 + compute-admin + updated metadata with "enable-oslogin"
 
