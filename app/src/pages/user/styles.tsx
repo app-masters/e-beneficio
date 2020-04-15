@@ -9,4 +9,10 @@ export const PageContainer = styled.div`
   }
 `;
 
-export const ActionWrapper = styled.div``;
+export const ActionWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  > * {
+    margin-left: ${(props) => props.theme.spacing.sm};
+  }
+`;
