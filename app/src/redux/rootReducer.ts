@@ -6,13 +6,15 @@ import consumptionReducer from './consumption/reducers';
 import familyReducer from './family/reducers';
 import userReducer from './user/reducers';
 import placeStoreReducer from './placeStore/reducers';
+import placeReducer from './place/reducers';
 
 const rootReducer = combineReducers({
   authReducer,
   consumptionReducer,
   familyReducer,
   userReducer,
-  placeStoreReducer
+  placeStoreReducer,
+  placeReducer
 });
 
 export type AppState = ReturnType<typeof rootReducer>;

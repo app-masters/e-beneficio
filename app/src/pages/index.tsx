@@ -9,6 +9,8 @@ import { AdminLayout } from '../components/adminLayout';
 import { LoginPage } from './login';
 import { UserList } from './user/list';
 import { UserForm } from './user/form';
+import { PlaceStoreList } from './placeStore/list';
+import { PlaceStoreForm } from './placeStore/form';
 import { DashboardPage } from './dashboard';
 import { useRefreshToken } from '../utils/auth';
 import { LogoutPage } from './logout';
@@ -29,6 +31,9 @@ const PrivateRouter: React.FC<{}> = (props) => {
         <ManagerRouter>
           <Route path="/usuarios" component={UserList} />
           <Route path="/usuarios/:id" component={UserForm} />
+
+          <Route path="/lojas" component={PlaceStoreList} />
+          <Route path="/lojas/:id" component={PlaceStoreForm} />
         </ManagerRouter>
         {/* Dashboard */}
         <Route path="/" component={DashboardPage} exact />

@@ -5,7 +5,8 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   HomeOutlined,
-  UserOutlined
+  UserOutlined,
+  ShopOutlined
 } from '@ant-design/icons';
 import { Button, Layout, Menu, Popover } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -102,6 +103,12 @@ export const Sidebar: React.FC = () => {
       path: '/usuarios',
       icon: () => <UserOutlined />,
       name: 'Usuários',
+      disabled: currentUser.role !== 'manager'
+    },
+    {
+      path: '/lojas',
+      icon: () => <ShopOutlined />,
+      name: 'Lojas',
       disabled: currentUser.role !== 'manager'
     }
   ];
