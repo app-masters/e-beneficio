@@ -22,6 +22,8 @@ jobs:
           project_id: "covid19jf"
           export_default_credentials: true
       - run: gcloud components install --quiet beta
+      - run: gcloud info
+      - run: gcloud beta compute ssh "resources-dev-2" --zone "us-central1-a" --command="pwd && ls"
 
       - name: Extract branch name
         shell: bash
