@@ -12,7 +12,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from 'styled-components';
 import { localStorageConstraints } from '../../utils/constraints';
 import { Flex } from '../flex';
-import { FixSider, MenuHeight, MenuIcon } from './styles';
+import { FixSider, MenuHeight, MenuIcon, CollapseWrapper } from './styles';
 import { useWindowDimensions } from '../../utils/viewport';
 import { breakpoints } from '../../styles/theme';
 
@@ -90,7 +90,7 @@ const menuItem = (item: RouteItem, parentPath: string, onClick: () => void) => {
 /**
  * The main sidebar component, it contains the main urls
  */
-export const Sidebar: React.FC = () => {
+export const Sidebar: React.FC = (props) => {
   const location = useLocation();
   const theme = useTheme();
   const { width } = useWindowDimensions();
@@ -102,51 +102,54 @@ export const Sidebar: React.FC = () => {
   useEffect(() => localStorage.setItem(localStorageConstraints.SIDEBAR_COLLAPSED, collapsed.toString()), [collapsed]);
 
   return (
-    <FixSider>
-      <Sider
-        collapsible
-        theme="light"
-        trigger={null}
-        collapsed={collapsed}
-        width={300}
-        // make it mobile friendly
-        breakpoint="lg"
-        collapsedWidth={width < breakpoints.medium ? '0' : undefined}
-      >
-        <div>
-          {/* <LogoWrapper collapsed={collapsed}>
+    <>
+      <FixSider>
+        <Sider
+          collapsible
+          theme="light"
+          trigger={null}
+          collapsed={collapsed}
+          width={300}
+          // make it mobile friendly
+          breakpoint="lg"
+          collapsedWidth={width < breakpoints.medium ? '0' : undefined}
+        >
+          <div>
+            {/* <LogoWrapper collapsed={collapsed}>
             <Logo show={!collapsed} src="/logo.png" alt="Admin logo" />
             <Logo show={collapsed} src="/logo-compact.png" alt="Admin logo collapsed" />
           </LogoWrapper> */}
-          <MenuIcon onClick={() => setCollapsed(!collapsed)}>
-            {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-          </MenuIcon>
-        </div>
-        <MenuHeight>
-          <Menu theme="light" mode="inline" defaultSelectedKeys={[location ? location.pathname : '/']}>
-            {/* Render the links based on the nav arrays */}
-            {routes.map((navLink) => menuItem(navLink, '', () => setCollapsed(true)))}
-          </Menu>
-        </MenuHeight>
-        <Flex vertical={collapsed} alignItems="center" gap="sm" justifyContent="space-between">
-          {/* <UserDisplay compact={collapsed} /> */}
-          <div />
-          <Popover content="Sair">
-            <Link to="/logout">
-              <Button
-                type="ghost"
-                style={{
-                  marginRight: collapsed ? 'auto' : theme.spacing.sm,
-                  marginLeft: 'auto',
-                  marginBottom: theme.spacing.sm
-                }}
-              >
-                <LogoutOutlined />
-              </Button>
-            </Link>
-          </Popover>
-        </Flex>
-      </Sider>
-    </FixSider>
+            <MenuIcon onClick={() => setCollapsed(!collapsed)}>
+              {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            </MenuIcon>
+          </div>
+          <MenuHeight>
+            <Menu theme="light" mode="inline" defaultSelectedKeys={[location ? location.pathname : '/']}>
+              {/* Render the links based on the nav arrays */}
+              {routes.map((navLink) => menuItem(navLink, '', () => setCollapsed(true)))}
+            </Menu>
+          </MenuHeight>
+          <Flex vertical={collapsed} alignItems="center" gap="sm" justifyContent="space-between">
+            {/* <UserDisplay compact={collapsed} /> */}
+            <div />
+            <Popover content="Sair">
+              <Link to="/logout">
+                <Button
+                  type="ghost"
+                  style={{
+                    marginRight: collapsed ? 'auto' : theme.spacing.sm,
+                    marginLeft: 'auto',
+                    marginBottom: theme.spacing.sm
+                  }}
+                >
+                  <LogoutOutlined />
+                </Button>
+              </Link>
+            </Popover>
+          </Flex>
+        </Sider>
+      </FixSider>
+      <CollapseWrapper collapsed={collapsed}>{collapsed && props.children}</CollapseWrapper>
+    </>
   );
 };

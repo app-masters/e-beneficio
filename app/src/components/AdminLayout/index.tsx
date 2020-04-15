@@ -19,18 +19,19 @@ type AdminLayoutProps = {
 export const AdminLayout: React.FC<AdminLayoutProps> = (props) => {
   return (
     <Wrapper>
-      <Sidebar />
-      <Layout>
-        <Content>
-          {props.loading ? (
-            <SpinContainer>
-              <Spin />
-            </SpinContainer>
-          ) : (
-            props.children
-          )}
-        </Content>
-      </Layout>
+      <Sidebar>
+        <Layout>
+          <Content>
+            {props.loading ? (
+              <SpinContainer>
+                <Spin />
+              </SpinContainer>
+            ) : (
+              props.children
+            )}
+          </Content>
+        </Layout>
+      </Sidebar>
     </Wrapper>
   );
 };
