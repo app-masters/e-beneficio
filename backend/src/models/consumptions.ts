@@ -6,6 +6,7 @@ import { Family } from '../schemas/families';
 import moment from 'moment';
 import logging from '../utils/logging';
 import { Place } from '../schemas/places';
+import { City } from '../schemas/cities';
 
 /**
  * Get family balace looking for benefits and consumptions
@@ -122,4 +123,90 @@ export const getPlaceConsumptionsReport = async (
   const total = consumptions.reduce((sum, consumption) => sum + (consumption.toJSON() as { total: number }).total, 0);
 
   return { data: consumptions, total };
+};
+
+/**
+ * Count how many unique families have consumptions saved on the period
+ * @param dateStart period start
+ * @param dateEnd period end
+ * @param placeStoreId place store unique ID
+ */
+export const countFamilies = async (
+  dateStart: Date | string,
+  dateEnd: Date | string,
+  placeStoreId?: PlaceStore['id']
+) => {
+  const [data] = await db.consumptions.findAll({
+    where: {
+      [Sequelize.Op.and]: [
+        { createdAt: { [Sequelize.Op.gte]: dateStart } },
+        { createdAt: { [Sequelize.Op.lte]: dateEnd } },
+        placeStoreId ? { placeStoreId } : {}
+      ]
+    },
+    attributes: [[Sequelize.fn('count', Sequelize.fn('distinct', Sequelize.col('familyId'))), 'count']]
+  });
+  if (data) return Number((data.toJSON() as { count: number }).count || 0);
+  return 0;
+};
+
+/**
+ * Sum the total consumption values in the period
+ * @param dateStart period start
+ * @param dateEnd period end
+ * @param placeStoreId place store unique ID
+ */
+export const sumConsumptions = async (
+  dateStart: Date | string,
+  dateEnd: Date | string,
+  placeStoreId?: PlaceStore['id']
+) => {
+  const [data] = await db.consumptions.findAll({
+    where: {
+      [Sequelize.Op.and]: [
+        { createdAt: { [Sequelize.Op.gte]: dateStart } },
+        { createdAt: { [Sequelize.Op.lte]: dateEnd } },
+        placeStoreId ? { placeStoreId } : {}
+      ]
+    },
+    attributes: [[Sequelize.fn('sum', Sequelize.col('value')), 'total']]
+  });
+
+  if (data) return (data.toJSON() as { total: number }).total || 0;
+  return 0;
+};
+
+/**
+ * Get consumption dashboard info
+ * @param cityId logged user city ID
+ * @param placeStoreId logged user place store ID
+ */
+export const getConsumptionDashboardInfo = async (cityId: NonNullable<City['id']>, placeStoreId?: PlaceStore['id']) => {
+  const dashboardReturn = {
+    todayFamilies: 0,
+    monthFamilies: 0,
+    todayConsumption: 0,
+    monthConsumption: 0
+  };
+
+  const today = moment();
+  const startToday = today.startOf('day').toDate();
+  const endToday = today.endOf('day').toDate();
+  const startMonth = today.startOf('month').toDate();
+  const endMonth = today.endOf('month').toDate();
+
+  // Await for all the promises
+  [
+    dashboardReturn.todayConsumption,
+    dashboardReturn.monthConsumption,
+    dashboardReturn.todayFamilies,
+    dashboardReturn.monthFamilies
+  ] = await Promise.all([
+    sumConsumptions(startToday, endToday, placeStoreId),
+    sumConsumptions(startMonth, endMonth, placeStoreId),
+    countFamilies(startToday, endToday, placeStoreId),
+    countFamilies(startMonth, endMonth, placeStoreId)
+  ]);
+
+  return dashboardReturn;
 };
