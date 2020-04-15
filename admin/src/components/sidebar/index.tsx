@@ -37,6 +37,11 @@ const routes: RouteItem[] = [
     name: 'Beneficios'
   },
   {
+    path: '/familias',
+    icon: () => <IdcardOutlined />,
+    name: 'Famílias'
+  },
+  {
     path: '/usuarios',
     icon: () => <UserOutlined />,
     name: 'Usuários'
@@ -55,11 +60,6 @@ const routes: RouteItem[] = [
     path: '/instituicoes',
     icon: () => <BankOutlined />,
     name: 'Instituições'
-  },
-  {
-    path: '/familias',
-    icon: () => <IdcardOutlined />,
-    name: 'Famílias'
   },
   {
     path: '/relatorios',
