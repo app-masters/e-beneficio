@@ -4,6 +4,7 @@ on:
     branches:
       - devops-fixes
       - devops-tests
+      - devops
 
 # https://help.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables
 
