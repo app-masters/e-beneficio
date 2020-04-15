@@ -14,8 +14,8 @@ jobs:
     steps:
       - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
-          service_account_email: ${{ secrets.GCP_SA_EMAIL_TEST_2 }}
-          service_account_key: ${{ secrets.GCP_SA_KEY_TEST_2 }}
+          service_account_email: ${{ secrets.GCP_SA_EMAIL_TEST_3 }}
+          service_account_key: ${{ secrets.GCP_SA_KEY_TEST_3 }}
           project_id: "covid19jf"
           export_default_credentials: true
       - run: gcloud components install --quiet beta
@@ -27,7 +27,11 @@ jobs:
 #      - run: echo "$GCP_SSH_KEY_PHORMAR_DEV_PUB" > ./id_rsa.pub
 # project will vary according to branch
 
+# test-account-4 -  test-account-3@covid19jf.iam.gserviceaccount.com      iam.serviceAccountUser +  roles/compute.osAdminLogin(compute.instances.get)
+
 # test-account-3 + compute-admin
+#ERROR: (gcloud.beta.compute.ssh) Could not fetch resource:
+#         - Required 'compute.instances.get' permission for 'projects/covid19jf/zones/us-central1-a/instances/resources-dev-2'
 
 # test-account-3 -  test-account-3@covid19jf.iam.gserviceaccount.com      iam.serviceAccountUser +  roles/compute.osAdminLogin(compute.instances.get)
 #https://github.com/TiagoGouvea/resources4vulnerable/runs/589027832?check_suite_focus=true
