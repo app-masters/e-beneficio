@@ -35,28 +35,8 @@ jobs:
           cd deployment
           ./deploy-gcp.sh ${{ steps.extract_branch.outputs.branch }}
 
-
-#      - run: echo "$GCP_SSH_KEY_PHORMAR_DEV_PRIV" > ./id_rsa
-#      - run: echo "$GCP_SSH_KEY_PHORMAR_DEV_PUB" > ./id_rsa.pub
-# project will vary according to branch
-
-# test-account-3 + compute-admin + updated metadata with "enable-oslogin"
-
-# test-account-3 -  test-account-3@covid19jf.iam.gserviceaccount.com      iam.serviceAccountUser +  roles/compute.osAdminLogin(compute.instances.get)
-#https://github.com/TiagoGouvea/resources4vulnerable/runs/589027832?check_suite_focus=true
-#ERROR: (gcloud.beta.compute.ssh) Could not fetch resource:
-#         - Required 'compute.instances.get' permission for 'projects/covid19jf/zones/us-central1-a/instances/resources-dev-2'
-
-# test-account-2 -  test-account-2@covid19jf.iam.gserviceaccount.com    iam.serviceAccountUser + iam.serviceAccountAdmin
-# https://github.com/TiagoGouvea/resources4vulnerable/runs/588991144?check_suite_focus=true
-#ERROR: (gcloud.beta.compute.ssh) Could not fetch resource:
-# - Required 'compute.instances.get' permission for 'projects/covid19jf/zones/us-central1-a/instances/resources-dev-2'
-
-# test-account-1 -  test-account-1@covid19jf.iam.gserviceaccount.com  GCP_SA_KEY_TEST_1     instanceadmin + computeadmin
-#  Updating project ssh metadata...
-#  ........................................................................................................failed.
-#  Updating instance ssh metadata...
-#  ..........failed.
-#ERROR: (gcloud.beta.compute.ssh) Could not add SSH key to instance metadata:
-#         - The user does not have access to service account '884116399104-compute@developer.gserviceaccount.com'.  User: '***'.  Ask a project owner to grant you the iam.serviceAccountUser role on the service account
-
+      - name: show job status
+        if: always()
+        run: echo $status
+        env:
+          status: ${{job.status}}
