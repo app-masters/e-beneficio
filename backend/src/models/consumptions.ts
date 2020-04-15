@@ -5,6 +5,7 @@ import { PlaceStore } from '../schemas/placeStores';
 import { Family } from '../schemas/families';
 import moment from 'moment';
 import logging from '../utils/logging';
+import { Place } from '../schemas/places';
 
 /**
  * Get family balace looking for benefits and consumptions
@@ -82,4 +83,43 @@ export const addConsumption = async (
   }
   // Everything is ok, create it
   return db.consumptions.create({ ...values, placeStoreId });
+};
+
+/**
+ * Get report for consumptions on the place on the interval
+ * @param minDate start of interval
+ * @param maxDate end of interval
+ * @param placeId place unique ID
+ * @param placeStoreId place unique ID
+ * @returns Promise<List of items>
+ */
+export const getPlaceConsumptionsReport = async (
+  minDate: Date | string,
+  maxDate: Date | string,
+  placeId?: NonNullable<Place['id']>,
+  placeStoreId?: NonNullable<PlaceStore['id']>
+) => {
+  const start = moment(minDate).startOf('day');
+  const end = moment(maxDate).endOf('day');
+
+  if (!start.isValid() || !end.isValid()) {
+    throw { status: 422, message: 'Invalid date provided to the query' };
+  }
+
+  const consumptions = await db.consumptions.findAll({
+    where: {
+      [Sequelize.Op.and]: [
+        { createdAt: { [Sequelize.Op.gte]: start.toDate() } },
+        { createdAt: { [Sequelize.Op.lte]: end.toDate() } },
+        placeStoreId ? { placeStoreId } : {}
+      ]
+    },
+    include: [{ model: db.placeStores, as: 'placeStore', where: placeId ? { placeId } : {} }],
+    attributes: ['placeStoreId', [Sequelize.fn('sum', Sequelize.col('value')), 'total']],
+    group: ['placeStore.id', 'Consumptions.placeStoreId']
+  });
+
+  const total = consumptions.reduce((sum, consumption) => sum + (consumption.toJSON() as { total: number }).total, 0);
+
+  return { data: consumptions, total };
 };
