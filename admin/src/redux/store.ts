@@ -13,7 +13,7 @@ export type ThunkResult<R> = ThunkAction<R, AppState, undefined, Action>;
 const persistConfig = {
   key: PERSIST_KEY,
   storage,
-  blacklist: ['consumptionReducer']
+  blacklist: ['reportReducer']
 };
 
 // Persist all the reducers

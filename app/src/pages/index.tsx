@@ -15,6 +15,7 @@ import { DashboardPage } from './dashboard';
 import { useRefreshToken } from '../utils/auth';
 import { LogoutPage } from './logout';
 import { ConsumptionForm } from './consumption';
+import { ReportList } from './report';
 
 /**
  * Router available only for logged users
@@ -28,6 +29,7 @@ const PrivateRouter: React.FC<{}> = () => {
       <>
         <Route path="/logout" component={LogoutPage} />
         <Route path="/consumo" component={ConsumptionForm} />
+        <Route path="/relatorios" component={ReportList} />
         <ManagerRouter>
           <Route path="/usuarios" component={UserList} />
           <Route path="/usuarios/:id" component={UserForm} />
