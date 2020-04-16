@@ -1,7 +1,8 @@
 import { createAction } from '@reduxjs/toolkit';
 import { TokenResponse } from '../../interfaces/auth';
 import { ThunkResult } from '../store';
-import { backend, setAuthorization } from '../../utils/networking';
+import { backend } from '../../utils/networking';
+import { getRefresh, setAuthorization, setRefresh } from '../../utils/auth';
 
 // Simple actions and types
 export const doLoginUser = createAction<void>('auth/LOGIN_USER');
@@ -22,14 +23,20 @@ export const requestLoginUser = (email: string, password: string): ThunkResult<v
       const response = await backend.post<TokenResponse>('/auth/login', { email, password });
       if (response && response.data) {
         // Request finished
-        setAuthorization(response.data.token); // Set base authorization
+        setAuthorization(response.data.token);
+        setRefresh(response.data.refreshToken);
+
         dispatch(doLoginUserSuccess(response.data)); // Dispatch result
       } else {
         // Request without response - probably won't happen, but cancel the request
+        setAuthorization();
+        setRefresh();
         dispatch(doLoginUserFailed());
       }
     } catch (error) {
       // Request failed: dispatch error
+      setAuthorization();
+      setRefresh();
       dispatch(doLoginUserFailed(error));
     }
   };
@@ -39,12 +46,12 @@ export const requestLoginUser = (email: string, password: string): ThunkResult<v
  * Token renewal process - call on token expiration and on the return to the app
  */
 export const requestGetToken = (): ThunkResult<void> => {
-  return async (dispatch, getState) => {
+  return async (dispatch) => {
     try {
       // Start request - starting loading state
       dispatch(doGetToken());
       // Getting refresh token from the state
-      const refreshToken = getState().authReducer.refreshToken;
+      const refreshToken = getRefresh();
       if (!refreshToken) {
         // User never logged
         dispatch(doGetTokenFailed());
@@ -53,14 +60,19 @@ export const requestGetToken = (): ThunkResult<void> => {
       const response = await backend.post<TokenResponse>('/auth/token', { refreshToken });
       if (response && response.data) {
         // Request finished
-        setAuthorization(response.data.token); // Set base authorization
+        setAuthorization(response.data.token);
+        setRefresh(response.data.refreshToken);
         dispatch(doGetTokenSuccess(response.data)); // Dispatch result
       } else {
         // Request without response - probably won't happen, but cancel the request
+        setAuthorization();
+        setRefresh();
         dispatch(doGetTokenFailed());
       }
     } catch (error) {
       // Request failed: dispatch error
+      setAuthorization();
+      setRefresh();
       dispatch(doGetTokenFailed(error));
     }
   };

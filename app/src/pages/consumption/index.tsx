@@ -223,6 +223,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
                         <li>Nota fiscal</li>
                         <li>Documento do comprador</li>
                       </ul>
+                      Tente manter a foto o mais nítida possível.
                     </Typography.Paragraph>
                   </Modal>
                 </Form.Item>

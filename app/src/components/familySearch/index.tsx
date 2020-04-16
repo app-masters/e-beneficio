@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Alert, Button, Descriptions, Form, Input, Typography } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
-import { Flex } from '../../components/flex';
+import { Flex } from '../flex';
 import { FamilyActions, FamilyWrapper } from './styles';
 import { AppState } from '../../redux/rootReducer';
 import { requestGetFamily } from '../../redux/family/actions';

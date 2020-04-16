@@ -11,7 +11,7 @@ const router = express.Router({ mergeParams: true });
  */
 router.get('/families', async (req, res) => {
   try {
-    const item = await familyModel.findByNis(req.query.nis, req.query.cityId);
+    const item = await familyModel.findByNis(req.query.nis as string, req.query.cityId as string);
     if (!item) return res.status(404).send('Not found');
     const balance = await consumptionModel.getFamilyBalance(item);
     return res.send({ ...item.toJSON(), balance });
@@ -26,7 +26,7 @@ router.get('/families', async (req, res) => {
  */
 router.get('/place-stores', async (req, res) => {
   try {
-    const list = await placeStoreModel.getAll(req.query.cityId);
+    const list = await placeStoreModel.getAll(req.query.cityId as string);
     res.send(list);
   } catch (error) {
     logging.error(error);
