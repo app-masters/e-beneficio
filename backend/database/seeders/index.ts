@@ -1,3 +1,4 @@
+import { sequelize } from '../../src/schemas';
 import cities from './cities';
 import places from './places';
 import placeStores from './placeStores';
@@ -32,5 +33,11 @@ const seedAll = async () => {
 console.log('[seed] Started ---');
 const startTime = new Date().getTime();
 seedAll()
-  .then(() => console.log(`[seed] Finished: All tables seeded -- Time spent: ${new Date().getTime() - startTime}ms`))
-  .catch(console.error);
+  .then(() => {
+    console.log(`[seed] Finished: All tables seeded -- Time spent: ${new Date().getTime() - startTime}ms`);
+    sequelize.close();
+  })
+  .catch((error) => {
+    console.error(error);
+    process.exit();
+  });

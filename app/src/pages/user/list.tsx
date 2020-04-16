@@ -16,7 +16,7 @@ import { roleList } from './../../utils/constraints';
  * UserList page component
  * @param props component props
  */
-export const UserList: React.FC<{}> = (props) => {
+export const UserList: React.FC<{}> = () => {
   // Redux state
   const currentUser = useSelector<AppState, User>((state) => state.authReducer.user as User);
   const list = useSelector<AppState, User[]>((state) => state.userReducer.list as User[]);

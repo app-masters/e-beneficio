@@ -14,7 +14,7 @@ import { requestGetDashboard } from '../../redux/dashboard/actions';
  * Dashboard page component
  * @param props component props
  */
-export const DashboardPage: React.FC<{}> = (props) => {
+export const DashboardPage: React.FC<{}> = () => {
   // Redux state
   const user = useSelector<AppState, User | undefined>((state) => state.authReducer.user);
   const dashboard = useSelector<AppState, Dashboard | undefined>((state) => state.dashboardReducer.dashboard);

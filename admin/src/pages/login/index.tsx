@@ -11,7 +11,7 @@ import { FormContainer, PageContainer } from './styles';
  * Login page component
  * @param props component props
  */
-export const LoginPage: React.FC<{}> = (props) => {
+export const LoginPage: React.FC<{}> = () => {
   // Local state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

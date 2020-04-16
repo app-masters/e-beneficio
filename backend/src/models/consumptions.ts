@@ -14,10 +14,29 @@ import { City } from '../schemas/cities';
  */
 export const getFamilyBalance = async (family: Family): Promise<number> => {
   // Get all benefits from the family group
+
+  const familyStartMonth = moment(family.createdAt as Date).month() + 1;
+  const familyStartYear = moment(family.createdAt as Date).year();
+  const todayMonth = moment().month() + 1;
+  const todayYear = moment().year();
+
   const [benefit] = await db.benefits.findAll({
     where: {
-      month: { [Sequelize.Op.gte]: moment(family.createdAt as Date).month() + 1 }, // Deal with year
-      groupName: family.groupName
+      [Sequelize.Op.and]: [
+        {
+          [Sequelize.Op.or]: [
+            { year: { [Sequelize.Op.gt]: familyStartYear } },
+            { year: familyStartYear, month: { [Sequelize.Op.gte]: familyStartMonth } }
+          ]
+        },
+        {
+          [Sequelize.Op.or]: [
+            { year: { [Sequelize.Op.lt]: todayYear } },
+            { year: todayYear, month: { [Sequelize.Op.lte]: todayMonth } }
+          ]
+        },
+        { groupName: family.groupName }
+      ]
     },
     attributes: ['groupName', [Sequelize.fn('sum', Sequelize.col('value')), 'total']],
     include: [{ model: db.institutions, as: 'institution', where: { cityId: family.cityId }, attributes: [] }],
