@@ -3,9 +3,9 @@ WORKDIR /var/www
 RUN mkdir -p ./backend/dist
 COPY ./backend/package.json .
 # COPY ./backend/package-lock.json .
-RUN npm install
+RUN yarn install
 COPY ./backend/. .
-RUN npm run build
+RUN yarn build
 
 FROM node:11-alpine
 WORKDIR /var/www
