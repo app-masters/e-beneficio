@@ -4,12 +4,17 @@ import {
   doUploadFamilyFile,
   doUploadFamilyFileFailed,
   doUploadFamilyFileRestart,
-  doUploadFamilyFileSuccess
+  doUploadFamilyFileSuccess,
+  doGetDashboardFamily,
+  doGetDashboardFamilySuccess,
+  doGetDashboardFamilyFailed
 } from './actions';
+import { DashboardFamily } from '../../interfaces/dashboardFamily';
 
 export interface FamilyReducerState {
   loading: boolean;
   error?: string;
+  dashboard?: DashboardFamily;
   uploadReport?: CSVReport;
 }
 
@@ -39,5 +44,18 @@ export default createReducer<FamilyReducerState>(initialState, (builder) =>
       state.loading = false;
       state.error = undefined;
       state.uploadReport = undefined;
+    })
+    // Get actions
+    .addCase(doGetDashboardFamily, (state) => {
+      state.loading = true;
+      state.error = undefined;
+    })
+    .addCase(doGetDashboardFamilySuccess, (state, action) => {
+      state.loading = false;
+      state.dashboard = action.payload;
+    })
+    .addCase(doGetDashboardFamilyFailed, (state, action) => {
+      state.loading = false;
+      // state.error = action.payload;
     })
 );

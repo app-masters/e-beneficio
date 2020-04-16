@@ -3,11 +3,16 @@ import { backend } from '../../utils/networking';
 import { ThunkResult } from '../store';
 import path from 'path';
 import { CSVReport } from '../../interfaces/csvReport';
+import { DashboardFamily } from '../../interfaces/dashboardFamily';
 
 export const doUploadFamilyFile = createAction<void>('families/UPLOAD');
 export const doUploadFamilyFileSuccess = createAction<CSVReport>('families/UPLOAD_SUCCESS');
 export const doUploadFamilyFileFailed = createAction<string | undefined>('families/UPLOAD_FAILED');
 export const doUploadFamilyFileRestart = createAction<void>('families/UPLOAD_RESTART');
+
+export const doGetDashboardFamily = createAction<void>('dashboardFamily/GET');
+export const doGetDashboardFamilySuccess = createAction<DashboardFamily>('dashboardFamily/GET_SUCCESS');
+export const doGetDashboardFamilyFailed = createAction<Error | undefined>('dashboardFamily/GET_FAILED');
 
 /**
  * Save User Thunk action
@@ -61,6 +66,32 @@ export const requestUploadFamilyFile = (
       }
     } catch (error) {
       onError(error.message);
+    }
+  };
+};
+
+/**
+ * Get darshboardFamily Thunk action
+ */
+export const requestGetDashboardFamily = (): ThunkResult<void> => {
+  return async (dispatch) => {
+    try {
+      // Start request - starting loading state
+      dispatch(doGetDashboardFamily());
+      // Request
+      const response = await backend.get<DashboardFamily>(`/families/dashboard`);
+      if (response && response.data) {
+        // Request finished
+        alert(JSON.stringify(response));
+        dispatch(doGetDashboardFamilySuccess(response.data)); // Dispatch result
+      } else {
+        // Request without response - probably won't happen, but cancel the request
+        dispatch(doGetDashboardFamilyFailed());
+      }
+    } catch (error) {
+      alert(JSON.stringify(error));
+      // Request failed: dispatch error
+      dispatch(doGetDashboardFamilyFailed(error));
     }
   };
 };
