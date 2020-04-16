@@ -36,6 +36,7 @@ const init = (listeningCallback: () => void, errorCallback: (error: Error) => vo
     );
     app.use(bodyParser.urlencoded({ extended: true, limit: '20mb' }));
     app.use(bodyParser.json({ limit: '20mb' }));
+
     app.use(
       fileUpload({
         limits: { fileSize: 10 * 1024 * 1024 },
@@ -46,6 +47,7 @@ const init = (listeningCallback: () => void, errorCallback: (error: Error) => vo
     );
     // Initializing routes
     app.use(routes);
+
     // Server start
     const server = http.createServer(app);
     server.setTimeout(6 * 60 * 60 * 1000);
