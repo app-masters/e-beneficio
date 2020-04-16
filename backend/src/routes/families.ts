@@ -11,9 +11,23 @@ const router = express.Router({ mergeParams: true });
 router.get('/', async (req, res) => {
   try {
     if (!req.user?.cityId) throw Error('User without selected city');
-    const item = await familyModel.findByNis(req.query.nis, req.user.cityId);
+    const item = await familyModel.findByNis(req.query.nis as string, req.user.cityId);
     const balance = await consumptionModel.getFamilyBalance(item);
     res.send({ ...item.toJSON(), balance });
+  } catch (error) {
+    logging.error(error);
+    res.status(500).send(error.message);
+  }
+});
+
+/**
+ * Family dashboard
+ */
+router.get('/dashboard', async (req, res) => {
+  try {
+    if (!req.user?.cityId) throw Error('User without selected city');
+    const data = await familyModel.getDashboardInfo(req.user.cityId);
+    res.send(data);
   } catch (error) {
     logging.error(error);
     res.status(500).send(error.message);

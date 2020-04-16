@@ -1,7 +1,11 @@
-export const PERSIST_KEY = 'root';
+export const APP_PREFIX = 'app';
+
+export const PERSIST_KEY = `${APP_PREFIX}/root`;
 
 export const localStorageConstraints = {
-  SIDEBAR_COLLAPSED: 'sidebar:collapsed'
+  SIDEBAR_COLLAPSED: `${APP_PREFIX}/sidebar:collapsed`,
+  AUTH_TOKEN: `${APP_PREFIX}/authToken`,
+  REFRESH_TOKEN: `${APP_PREFIX}/refreshToken`
 };
 
 export const familyGroupList = {

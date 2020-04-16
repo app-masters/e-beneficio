@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Typography, Spin, Layout, Collapse, List, Button, Col, Row, Card } from 'antd';
+import { Typography, Spin, Layout, Collapse, Button, Col, Row, Card } from 'antd';
 import {
   PageContainer,
   HeaderContainer,
@@ -22,17 +22,11 @@ const { Panel } = Collapse;
 const { Title, Text, Paragraph } = Typography;
 const { Footer } = Layout;
 
-const text = `
-  A dog is a type of domesticated animal.
-  Known for its loyalty and faithfulness,
-  it can be found as a welcome guest in many households across the world.
-`;
-
 /**
  * Dashboard page component
  * @param props component props
  */
-export const DashboardPage: React.FC<{}> = (props) => {
+export const DashboardPage: React.FC<{}> = () => {
   const dispatch = useDispatch();
 
   const cityId = process.env.REACT_APP_ENV_CITY_ID as string;
@@ -50,7 +44,7 @@ export const DashboardPage: React.FC<{}> = (props) => {
         <HeaderContainer>
           <HeaderContent>
             <LogoContainer>
-              <img src={require('../../assets/logo.png')} />
+              <img src={require('../../assets/logo.png')} alt="" />
             </LogoContainer>
             <Title level={2} style={{ color: '#FFFFFF', marginBottom: 0 }}>
               Mercado Popular
@@ -124,7 +118,7 @@ export const DashboardPage: React.FC<{}> = (props) => {
         </Container>
         {/* </Flex> */}
         <Container>
-          <BodyContainer id="establishment">
+          <BodyContainer id="estabelecimentos">
             <Title level={4}>Estabelecimentos parceiros</Title>
             <Paragraph>Esses são os locais onde você pode usar seus créditos no programa</Paragraph>
             <Spin spinning={placeStoreLoading}>

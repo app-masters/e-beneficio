@@ -10,8 +10,6 @@ import {
 import { User } from '../../interfaces/user';
 
 export interface AuthReducerState {
-  token?: string;
-  refreshToken?: string;
   user?: User;
   loading: boolean;
   error?: Error;
@@ -28,8 +26,6 @@ export default createReducer<AuthReducerState>(initialState, {
   },
   [doLoginUserSuccess.toString()]: (state: AuthReducerState, action) => {
     state.loading = false;
-    state.token = action.payload.token;
-    state.refreshToken = action.payload.refreshToken;
     state.user = action.payload.user;
   },
   [doLoginUserFailed.toString()]: (state: AuthReducerState, action) => {
@@ -41,15 +37,11 @@ export default createReducer<AuthReducerState>(initialState, {
   },
   [doGetTokenSuccess.toString()]: (state: AuthReducerState, action) => {
     state.loading = false;
-    state.token = action.payload.token;
-    state.refreshToken = action.payload.refreshToken;
     state.user = action.payload.user;
   },
   [doGetTokenFailed.toString()]: (state: AuthReducerState) => {
     state.loading = false;
     // Token failed, log out the user
-    state.token = undefined;
-    state.refreshToken = undefined;
     state.user = undefined;
   }
 });

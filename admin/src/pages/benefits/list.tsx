@@ -14,7 +14,7 @@ import { ActionWrapper, PageContainer } from './styles';
  * List component
  * @param props component props
  */
-export const BenefitList: React.FC<{}> = (props) => {
+export const BenefitList: React.FC<{}> = () => {
   // Redux state
   const list = useSelector<AppState, Benefit[]>((state) => state.benefitReducer.list as Benefit[]);
   // Redux actions
