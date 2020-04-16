@@ -12,7 +12,8 @@ export type ThunkResult<R> = ThunkAction<R, AppState, undefined, Action>;
 // Redux-persist config
 const persistConfig = {
   key: PERSIST_KEY,
-  storage
+  storage,
+  blacklist: ['consumptionReducer']
 };
 
 // Persist all the reducers

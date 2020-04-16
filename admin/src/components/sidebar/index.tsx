@@ -64,8 +64,7 @@ const routes: RouteItem[] = [
   {
     path: '/relatorios',
     icon: () => <BarChartOutlined />,
-    name: 'Relatórios',
-    disabled: true
+    name: 'Relatórios'
   }
 ];
 
