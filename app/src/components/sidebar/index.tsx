@@ -92,12 +92,14 @@ export const Sidebar: React.FC = (props) => {
       path: '/consumo',
       icon: () => <CarryOutOutlined />,
       name: 'Informar consumo'
-    },
+    }
+  ];
+
+  const privateRoutes: RouteItem[] = [
     {
       path: '/relatorios',
       icon: () => <BarChartOutlined />,
-      name: 'Relatórios',
-      disabled: true
+      name: 'Relatórios'
     }
   ];
 
@@ -150,6 +152,9 @@ export const Sidebar: React.FC = (props) => {
               {routes.map((navLink) => menuItem(navLink, '', () => setCollapsed(true)))}
               {currentUser.role === 'manager'
                 ? adminRoutes.map((navLink) => menuItem(navLink, '', () => setCollapsed(true)))
+                : null}
+              {currentUser.role !== 'operator'
+                ? privateRoutes.map((navLink) => menuItem(navLink, '', () => setCollapsed(true)))
                 : null}
             </Menu>
           </MenuHeight>
