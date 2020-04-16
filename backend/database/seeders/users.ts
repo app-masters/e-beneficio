@@ -7,7 +7,7 @@ const list = [
     role: 'admin',
     cpf: '00000000000',
     email: 'admin@login.com',
-    password: 'admin@login',
+    password: 'admin',
     active: true
   },
   {
@@ -15,7 +15,7 @@ const list = [
     role: 'manager',
     cpf: '00000000001',
     email: 'manager@login.com',
-    password: 'manager@login',
+    password: 'manager',
     active: true
   },
   {
@@ -23,7 +23,7 @@ const list = [
     role: 'financial',
     cpf: '00000000002',
     email: 'financial@login.com',
-    password: 'financial@login',
+    password: 'financial',
     active: true
   },
   {
@@ -31,7 +31,7 @@ const list = [
     role: 'operator',
     cpf: '00000000003',
     email: 'operator@login.com',
-    password: 'operator@login',
+    password: 'operator',
     active: true
   }
 ] as User[];
