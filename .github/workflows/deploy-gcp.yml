@@ -26,7 +26,7 @@ jobs:
         uses: rollbar/github-deploy-action@v1.0.0
         with:
           environment: 'devops'
-          version:  ${{ GITHUB_SHA }}
+          version:  ${GITHUB_SHA}
           status: 'started'
         env:
           ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
@@ -62,7 +62,7 @@ jobs:
           ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
         with:
           environment: 'devops'
-          version: ${{ GITHUB_SHA }}
+          version: ${GITHUB_SHA}
           status: 'failed'
 
       - name: Notify sucess status to Rollbar
@@ -71,7 +71,7 @@ jobs:
           ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
         with:
           environment: 'devops'
-          version:  ${{ GITHUB_SHA }}
+          version:  ${GITHUB_SHA}
           status: 'succeeded'
 
 #        - name: Notify fail status to Rollbar
