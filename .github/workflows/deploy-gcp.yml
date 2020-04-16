@@ -46,14 +46,33 @@ jobs:
           ./deploy-gcp.sh ${{ steps.extract_branch.outputs.branch }}
 
       - name: Notify fail status to Rollbar
-        if: always()
+        if: failure()
         uses: rollbar/github-deploy-action@v1.0.0
         env:
           ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
         with:
           environment: 'devops'
-          version: ${{ $GITHUB_SHA=="success" ? "succeeded" : "failed" }}
+          version: $GITHUB_SHA
           status: 'failed'
+
+      - name: Notify sucess status to Rollbar
+        uses: rollbar/github-deploy-action@v1.0.0
+        env:
+          ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
+        with:
+          environment: 'devops'
+          version: $GITHUB_SHA
+          status: 'succeeded'
+
+#        - name: Notify fail status to Rollbar
+#        if: always()
+#        uses: rollbar/github-deploy-action@v1.0.0
+#        env:
+#          ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
+#        with:
+#          environment: 'devops'
+#          version: ${{ $GITHUB_SHA=="success" ? "succeeded" : "failed" }}
+#          status: 'failed'
 
 #      - name: show job status
 #        if: always()
