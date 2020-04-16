@@ -20,7 +20,7 @@ export const doDeleteUserFailed = createAction<Error | undefined>('user/DELETE_F
  * Get user Thunk action
  */
 export const requestGetUser = (id?: number): ThunkResult<void> => {
-  return async (dispatch, getState) => {
+  return async (dispatch) => {
     try {
       // Start request - starting loading state
       dispatch(doGetUser());
@@ -83,7 +83,7 @@ export const requestSaveUser = (
  * Delete user Thunk action
  */
 export const requestDeleteUser = (id: number): ThunkResult<void> => {
-  return async (dispatch, getState) => {
+  return async (dispatch) => {
     try {
       // Start request - starting loading state
       dispatch(doGetUser());
