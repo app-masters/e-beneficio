@@ -8,6 +8,7 @@ import userReducer from './user/reducers';
 import placeStoreReducer from './placeStore/reducers';
 import placeReducer from './place/reducers';
 import dashboardReducer from './dashboard/reducers';
+import reportReducer from './report/reducers';
 
 const rootReducer = combineReducers({
   authReducer,
@@ -16,7 +17,8 @@ const rootReducer = combineReducers({
   userReducer,
   placeStoreReducer,
   placeReducer,
-  dashboardReducer
+  dashboardReducer,
+  reportReducer
 });
 
 export type AppState = ReturnType<typeof rootReducer>;
