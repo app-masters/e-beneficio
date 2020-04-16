@@ -52,7 +52,7 @@ jobs:
           ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
         with:
           environment: 'devops'
-          version: ( ${{ $GITHUB_SHA=="success" ? "succeeded" : "failed" }} )
+          version: ${{ $GITHUB_SHA=="success" ? "succeeded" : "failed" }}
           status: 'failed'
 
 #      - name: show job status
