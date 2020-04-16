@@ -1,4 +1,4 @@
-# Resources 4 Vulnerables
+# Resources 4 Vulnerable
 
 ## Getting started
 
