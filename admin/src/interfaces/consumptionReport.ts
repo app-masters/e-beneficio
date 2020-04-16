@@ -1,6 +1,6 @@
 import { PlaceStore } from './placeStore';
 
-export interface Consumption {
+export interface ConsumptionReport {
   readonly id?: number | string;
   createdAt?: number | Date | null;
   data: ConsumptionPlace[];
@@ -14,9 +14,3 @@ export interface ConsumptionPlace {
   total: number;
   placeStore: PlaceStore;
 }
-
-// {
-//   placeStoreId: string;
-//   total: number;
-//   placeStore: PlaceStore;
-// }
