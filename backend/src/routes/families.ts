@@ -21,6 +21,20 @@ router.get('/', async (req, res) => {
 });
 
 /**
+ * Family dashboard
+ */
+router.get('/dashboard', async (req, res) => {
+  try {
+    if (!req.user?.cityId) throw Error('User without selected city');
+    const data = await familyModel.getDashboardInfo(req.user.cityId);
+    res.send(data);
+  } catch (error) {
+    logging.error(error);
+    res.status(500).send(error.message);
+  }
+});
+
+/**
  * Upload CSV file with family list
  */
 router.post('/file', async (req, res) => {
