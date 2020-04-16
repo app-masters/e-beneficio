@@ -26,7 +26,7 @@ import { FamiliesList } from './families/list';
  * Router available only for logged users
  * @param props component props
  */
-const PrivateRouter: React.FC<{}> = (props) => {
+const PrivateRouter: React.FC<{}> = () => {
   const loading = useRefreshToken();
 
   return (
@@ -61,7 +61,7 @@ const PrivateRouter: React.FC<{}> = (props) => {
  * Router available when the user is not logged
  * @param props component props
  */
-const PublicRouter: React.FC<{}> = (props) => {
+const PublicRouter: React.FC<{}> = () => {
   return (
     <Switch>
       <Route path="*">

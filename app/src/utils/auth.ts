@@ -78,7 +78,7 @@ export const useRefreshToken = () => {
     // If the token exists
     if (token) {
       // Read its payload
-      const payload = jwt.decode(token) as { [key: string]: any };
+      const payload = jwt.decode(token) as { [key: string]: string | number };
 
       // If the paylod expiration timestamp has expired and we have an url
       if (payload && payload.exp < Date.now() / 1000 && location.pathname) {

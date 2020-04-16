@@ -21,7 +21,7 @@ export const doDeletePlaceFailed = createAction<Error | undefined>('place/DELETE
  * Get place Thunk action
  */
 export const requestGetPlace = (id?: number): ThunkResult<void> => {
-  return async (dispatch, getState) => {
+  return async (dispatch) => {
     try {
       // Start request - starting loading state
       dispatch(doGetPlace());
@@ -84,7 +84,7 @@ export const requestSavePlace = (
  * Delete place Thunk action
  */
 export const requestDeletePlace = (id: number): ThunkResult<void> => {
-  return async (dispatch, getState) => {
+  return async (dispatch) => {
     try {
       // Start request - starting loading state
       dispatch(doGetPlace());

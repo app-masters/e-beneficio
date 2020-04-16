@@ -3,7 +3,7 @@ import csv from 'csvtojson';
 import db from '../schemas';
 import { Family, SequelizeFamily } from '../schemas/families';
 import { City } from '../schemas/cities';
-import { getFamilyGroupByCode, familyGroupList } from '../utils/constraints';
+import { getFamilyGroupByCode } from '../utils/constraints';
 import moment from 'moment';
 import logging from '../utils/logging';
 
