@@ -4,8 +4,8 @@ RUN mkdir -p ./backend/dist
 COPY ./backend/package.json .
 RUN rm -f package-lock.json rm yarn.lock
 RUN yarn --version
-RUN curl --compressed -o- -L https://yarnpkg.com/install.sh | bash
-RUN yarn --version
+RUN npm install --global yarn
+RUN npm upgrade --global yarn
 RUN yarn install
 COPY ./backend/. .
 RUN yarn build
