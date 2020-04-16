@@ -13,6 +13,7 @@ import { requestGetConsumption } from '../../redux/consumptions/actions';
 import { Consumption, ConsumptionPlace } from '../../interfaces/consumption';
 import moment from 'moment';
 import Text from 'antd/lib/typography/Text';
+import locale from 'antd/es/date-picker/locale/pt_BR';
 
 const schema = yup.object().shape({
   rangeDate: yup.string().label('Data').required(),
@@ -148,6 +149,7 @@ export const Report: React.FC<{}> = () => {
                     help={!!rangeDateMeta.error && !!rangeDateMeta.touched ? rangeDateMeta.error : undefined}
                   >
                     <RangePicker
+                      locale={locale}
                       format={'DD/MM/YYYY'}
                       onCalendarChange={(value) => {
                         setFieldValue('rangeDate', value);
