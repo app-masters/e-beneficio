@@ -9,8 +9,8 @@ import { AppState } from '../../redux/rootReducer';
 import { Place } from '../../interfaces/place';
 import { requestGetPlaceStore } from '../../redux/placeStore/actions';
 import { PlaceStore } from '../../interfaces/placeStore';
-import { requestGetConsumption } from '../../redux/consumptions/actions';
-import { ConsumptionReport, ConsumptionPlace } from '../../interfaces/consumptionReport';
+import { requestGetConsumption } from '../../redux/report/actions';
+import { Report, ConsumptionPlace } from '../../interfaces/report';
 import moment from 'moment';
 import Text from 'antd/lib/typography/Text';
 import locale from 'antd/es/date-picker/locale/pt_BR';
@@ -28,16 +28,14 @@ const { RangePicker } = DatePicker;
  * List component
  * @param props component props
  */
-export const Report: React.FC<{}> = () => {
+export const ReportList: React.FC<{}> = () => {
   // Redux state
   const placeLoading = useSelector<AppState, boolean>(({ placeReducer }) => placeReducer.loading);
   const placeList = useSelector<AppState, Place[]>(({ placeReducer }) => placeReducer.list);
   const placeStoreLoading = useSelector<AppState, boolean>(({ placeStoreReducer }) => placeStoreReducer.loading);
   const placeStoreList = useSelector<AppState, PlaceStore[]>(({ placeStoreReducer }) => placeStoreReducer.list);
-  const consumptionLoading = useSelector<AppState, boolean>(({ consumptionReducer }) => consumptionReducer.loading);
-  const consumptionData = useSelector<AppState, ConsumptionReport | undefined>(
-    ({ consumptionReducer }) => consumptionReducer.item
-  );
+  const reportLoading = useSelector<AppState, boolean>(({ reportReducer }) => reportReducer.loading);
+  const reportData = useSelector<AppState, Report | undefined>(({ reportReducer }) => reportReducer.item);
 
   // Redux actions
   const dispatch = useDispatch();
@@ -172,8 +170,8 @@ export const Report: React.FC<{}> = () => {
             </Form>
           </form>
           <Table
-            dataSource={consumptionData?.data}
-            loading={consumptionLoading}
+            dataSource={reportData?.data}
+            loading={reportLoading}
             pagination={false}
             summary={(pageData) => {
               let totalPrice = 0;
