@@ -1,8 +1,9 @@
+import Sequelize from 'sequelize';
 import csv from 'csvtojson';
 import db from '../schemas';
 import { Family, SequelizeFamily } from '../schemas/families';
 import { City } from '../schemas/cities';
-import { getFamilyGroupByCode } from '../utils/constraints';
+import { getFamilyGroupByCode, familyGroupList } from '../utils/constraints';
 import moment from 'moment';
 import logging from '../utils/logging';
 
@@ -113,4 +114,31 @@ export const importFamilyFromCSVFile = async (
   }
 
   return conversion;
+};
+
+/**
+ * Get family dashboard object
+ * @param cityId logged user city ID
+ */
+export const getDashboardInfo = async (cityId: NonNullable<City['id']>) => {
+  const dashboard: { [key: string]: number | Date } = { total: 0 };
+
+  const data = await db.families.findAll({
+    where: { cityId },
+    attributes: ['groupName', [Sequelize.fn('count', Sequelize.fn('distinct', Sequelize.col('id'))), 'count']],
+    group: ['groupName']
+  });
+
+  for (const item of data) {
+    const { count } = item.toJSON() as { count: number };
+    dashboard[item.groupName] = Number(count);
+    (dashboard.total as number) += Number(count);
+  }
+
+  const last = await db.families.max<SequelizeFamily, SequelizeFamily['createdAt']>('createdAt');
+  if (last) {
+    dashboard.lastCreatedDate = moment(last).toDate();
+  }
+
+  return dashboard;
 };

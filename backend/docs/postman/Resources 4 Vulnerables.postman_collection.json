@@ -1732,6 +1732,37 @@
 						"description": "Send the CSV file with the family list that will be used to populate the database"
 					},
 					"response": []
+				},
+				{
+					"name": "/families/dashboard",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "d3af934c-b820-4347-b87a-2010f3b329d2",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/families/dashboard",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"families",
+								"dashboard"
+							]
+						},
+						"description": "Dashboard info for the families"
+					},
+					"response": []
 				}
 			],
 			"description": "Families that will receive the benefits",
@@ -1939,6 +1970,31 @@
 				}
 			],
 			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "/dashboard",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"dashboard"
+							]
+						},
+						"description": "Basic dashboard endpoints, returning data about consumptions"
+					},
+					"response": []
+				}
+			],
+			"description": "General dashboard info endpoints",
+			"protocolProfileBehavior": {}
 		}
 	],
 	"auth": {
@@ -1975,79 +2031,79 @@
 	],
 	"variable": [
 		{
-			"id": "2af6650f-3dfa-4f1f-b114-02611287b93c",
+			"id": "3fc9e218-53b3-4a50-b791-3c7bba6a2018",
 			"key": "baseUrl",
 			"value": "http://localhost:3001",
 			"type": "string"
 		},
 		{
-			"id": "74e0c9eb-3be9-421c-b8dc-f5fb6f0a5c5b",
+			"id": "fbb208a8-fd7b-4188-9e67-b18f3e03f33a",
 			"key": "authTokenAdmin",
 			"value": "_token_",
 			"type": "string"
 		},
 		{
-			"id": "77c4144f-6a9e-4c50-b61c-687946d16ead",
+			"id": "4e21da21-0c4f-4905-a4c3-2edbbbfa9b88",
 			"key": "refreshTokenAdmin",
 			"value": "_token_",
 			"type": "string"
 		},
 		{
-			"id": "1e259092-7ad8-4402-b4ad-663fa846521d",
+			"id": "797fb4d7-4129-44f7-b013-7a638158939c",
 			"key": "authTokenOperator",
 			"value": "_token_",
 			"type": "string"
 		},
 		{
-			"id": "02ba6842-96b8-469e-916b-44a1d9727af7",
+			"id": "5f1bc9f9-cc89-4650-b249-b52263b94b30",
 			"key": "refreshTokenOperator",
 			"value": "_token_",
 			"type": "string"
 		},
 		{
-			"id": "1537c02b-f565-49b2-ac44-e8e11afb5390",
+			"id": "7c03b2bd-ea65-4976-b207-2554317a7232",
 			"key": "cityId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "877065b5-4c66-4091-8717-72b6f05e5c5b",
+			"id": "2de7606c-1218-468f-9141-0b153345eb6a",
 			"key": "placeId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "c3e5765f-eeb9-4715-96ff-ec8e425921be",
+			"id": "c9081b92-e429-4b54-a36d-b12f0e459199",
 			"key": "placeStoreId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "253be4cc-aa56-459d-bf52-20ebe10c22f9",
+			"id": "38445c67-1233-4ff1-9dd3-3eceffc2de28",
 			"key": "userId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "b41c84af-d9e2-423f-bd4f-96746087ce6c",
+			"id": "fe712a68-f884-46e7-bc3a-1a798310e661",
 			"key": "institutionId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "2e11e0c8-8466-4a14-b9c4-db7d410007a0",
+			"id": "f596127a-ed33-45b9-9eb5-b0632fdf9263",
 			"key": "benefitId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "09e3c99c-7a4d-455d-9d63-9fdf5cbb1053",
+			"id": "b95e4bf9-cfaf-4880-95ea-0c543f9726f4",
 			"key": "familyId",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "2b4b0e48-f051-43c7-bc6d-cd912fb70083",
+			"id": "24bb8e55-1486-4181-9d0d-6db4bf080b5a",
 			"key": "consumptionId",
 			"value": "1",
 			"type": "string"
