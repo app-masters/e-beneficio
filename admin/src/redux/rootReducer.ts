@@ -8,6 +8,7 @@ import institutionReducer from './institution/reducers';
 import placeStoreReducer from './placeStore/reducers';
 import userReducer from './user/reducers';
 import familiesReducer from './families/reducers';
+import consumptionReducer from './consumptions/reducers';
 
 const rootReducer = combineReducers({
   authReducer,
@@ -16,7 +17,8 @@ const rootReducer = combineReducers({
   institutionReducer,
   placeStoreReducer,
   userReducer,
-  familiesReducer
+  familiesReducer,
+  consumptionReducer
 });
 
 export type AppState = ReturnType<typeof rootReducer>;

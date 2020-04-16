@@ -21,6 +21,7 @@ import { UserForm } from './user/form';
 import { InstitutionForm } from './institutions/form';
 import { InstitutionList } from './institutions/list';
 import { FamiliesList } from './families/list';
+import { Report } from './report';
 
 /**
  * Router available only for logged users
@@ -33,8 +34,10 @@ const PrivateRouter: React.FC<{}> = (props) => {
     <AdminLayout loading={loading}>
       <>
         <Route path="/logout" component={LogoutPage} />
-        {/* Place routes */}
+        {/* Report routes */}
         <Route path="/estabelecimentos" component={PlaceList} />
+        {/* Place routes */}
+        <Route path="/relatorios" component={Report} />
         <Route path="/estabelecimentos/:id" component={PlaceForm} />
         {/* Benefit routes */}
         <Route path="/beneficios" component={BenefitList} />
