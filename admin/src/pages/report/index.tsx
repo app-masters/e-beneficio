@@ -10,7 +10,7 @@ import { Place } from '../../interfaces/place';
 import { requestGetPlaceStore } from '../../redux/placeStore/actions';
 import { PlaceStore } from '../../interfaces/placeStore';
 import { requestGetConsumption } from '../../redux/consumptions/actions';
-import { Consumption, ConsumptionPlace } from '../../interfaces/consumption';
+import { ConsumptionReport, ConsumptionPlace } from '../../interfaces/consumptionReport';
 import moment from 'moment';
 import Text from 'antd/lib/typography/Text';
 import locale from 'antd/es/date-picker/locale/pt_BR';
@@ -35,7 +35,7 @@ export const Report: React.FC<{}> = () => {
   const placeStoreLoading = useSelector<AppState, boolean>(({ placeStoreReducer }) => placeStoreReducer.loading);
   const placeStoreList = useSelector<AppState, PlaceStore[]>(({ placeStoreReducer }) => placeStoreReducer.list);
   const consumptionLoading = useSelector<AppState, boolean>(({ consumptionReducer }) => consumptionReducer.loading);
-  const consumptionData = useSelector<AppState, Consumption | undefined>(
+  const consumptionData = useSelector<AppState, ConsumptionReport | undefined>(
     ({ consumptionReducer }) => consumptionReducer.item
   );
 

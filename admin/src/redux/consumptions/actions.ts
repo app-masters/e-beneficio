@@ -1,11 +1,11 @@
 import { createAction } from '@reduxjs/toolkit';
 import { ThunkResult } from '../store';
 import { backend } from '../../utils/networking';
-import { Consumption } from '../../interfaces/consumption';
+import { ConsumptionReport } from '../../interfaces/consumptionReport';
 
 // Simple actions and types
 export const doGetConsumption = createAction<void>('consumption/GET');
-export const doGetConsumptionSuccess = createAction<Consumption | undefined>('consumption/GET_SUCCESS');
+export const doGetConsumptionSuccess = createAction<ConsumptionReport | undefined>('consumption/GET_SUCCESS');
 export const doGetConsumptionFailed = createAction<Error | undefined>('consumption/GET_FAILED');
 
 /**
@@ -24,7 +24,7 @@ export const requestGetConsumption = (
       // Request
       let url = `/consumptions/report?minDate=${minDate}&maxDate=${maxDate}&placeId=${placeId}`;
       if (placeStoreId) url += `&placeStoreId=${placeStoreId}`;
-      const response = await backend.get<Consumption | undefined>(url);
+      const response = await backend.get<ConsumptionReport | undefined>(url);
 
       if (response && response.data) {
         // Request finished
