@@ -40,8 +40,5 @@ pids
 # Yarn Integrity file
 .yarn-integrity
 
-# Docker
-docker-compose.yml
-
 # Google cloud credential
 storage-**-service-account.json

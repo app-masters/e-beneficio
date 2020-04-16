@@ -21,20 +21,23 @@ import { UserForm } from './user/form';
 import { InstitutionForm } from './institutions/form';
 import { InstitutionList } from './institutions/list';
 import { FamiliesList } from './families/list';
+import { ReportList } from './report';
 
 /**
  * Router available only for logged users
  * @param props component props
  */
-const PrivateRouter: React.FC<{}> = (props) => {
+const PrivateRouter: React.FC<{}> = () => {
   const loading = useRefreshToken();
 
   return (
     <AdminLayout loading={loading}>
       <>
         <Route path="/logout" component={LogoutPage} />
-        {/* Place routes */}
+        {/* Report routes */}
         <Route path="/estabelecimentos" component={PlaceList} />
+        {/* Place routes */}
+        <Route path="/relatorios" component={ReportList} />
         <Route path="/estabelecimentos/:id" component={PlaceForm} />
         {/* Benefit routes */}
         <Route path="/beneficios" component={BenefitList} />
@@ -61,7 +64,7 @@ const PrivateRouter: React.FC<{}> = (props) => {
  * Router available when the user is not logged
  * @param props component props
  */
-const PublicRouter: React.FC<{}> = (props) => {
+const PublicRouter: React.FC<{}> = () => {
   return (
     <Switch>
       <Route path="*">

@@ -21,24 +21,9 @@ npm install
 npm start
 ```
 
-### Frontend
-Inside the folder `/frontend`, create the `.env` file using the keys on the `.env.example` and filling with your local data.
-
-With the node and npm installed: 
-
-```
-cd frontend
-npm install
-npm start
-```
-
-
-## Documentation
-
-### Endpoints
-The list of available endpoints can be easily accessed on the folder `/backend/docs/postman` or using [this link](https://documenter.getpostman.com/view/3342022/SzYaVdaV).
-
 ### Database
+This step is only necessary if you are planning to run the backend locally.
+
 You can easily run a local postgres database using the docker and the docker-compose with the file on the `backend/docs`.
 
 ```
@@ -58,5 +43,31 @@ npm run seed
 ```
 Role: admin or manager or financial or operator
 Email: {role}@login.com
-Password: {role}@login
+Password: {role}
 ```
+
+### Frontend
+The project is separated in 3 frontend projects:
+ - admin: an admin panel with CRUD pages and reports about the consumptions;
+ - app: application used on the store to validate the consumption. Also have some reports for the manager and finantial user;
+ - portal: simple landpage to allow the family responsible see the balance on the app and know the places he can use it;
+
+Inside the folder any of the frontend folders, create the `.env` file using the keys on the `.env.example` and filling with your local data.
+
+With the node and npm installed: 
+
+```
+cd admin  // or portal or app
+npm install
+npm start
+```
+
+You can login with the admin user in the admin project or the financial or manager users on the app project;
+
+
+## Documentation
+
+### Endpoints
+The list of available endpoints can be easily accessed on the folder `/backend/docs/postman` or using [this link](https://documenter.getpostman.com/view/3342022/SzYaVdaV).
+
+

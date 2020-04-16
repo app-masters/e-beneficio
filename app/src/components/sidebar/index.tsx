@@ -92,12 +92,14 @@ export const Sidebar: React.FC = (props) => {
       path: '/consumo',
       icon: () => <CarryOutOutlined />,
       name: 'Informar consumo'
-    },
+    }
+  ];
+
+  const privateRoutes: RouteItem[] = [
     {
       path: '/relatorios',
       icon: () => <BarChartOutlined />,
-      name: 'Relatórios',
-      disabled: true
+      name: 'Relatórios'
     }
   ];
 
@@ -148,6 +150,12 @@ export const Sidebar: React.FC = (props) => {
             <Menu theme="light" mode="inline" defaultSelectedKeys={[location ? location.pathname : '/']}>
               {/* Render the links based on the nav arrays */}
               {routes.map((navLink) => menuItem(navLink, '', () => setCollapsed(true)))}
+              {currentUser.role === 'manager'
+                ? adminRoutes.map((navLink) => menuItem(navLink, '', () => setCollapsed(true)))
+                : null}
+              {currentUser.role !== 'operator'
+                ? privateRoutes.map((navLink) => menuItem(navLink, '', () => setCollapsed(true)))
+                : null}
             </Menu>
           </MenuHeight>
           <Flex vertical={collapsed} alignItems="center" gap="sm" justifyContent="space-between">

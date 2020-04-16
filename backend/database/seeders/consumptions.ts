@@ -21,6 +21,26 @@ const list = [
     value: 60.25,
     nfce: '00004',
     proofImageUrl: 'https://nstecnologia.com.br/blog/wp-content/uploads/2017/08/image2017-8-7-11-8-37.png'
+  },
+  {
+    value: 60.25,
+    nfce: '00005',
+    proofImageUrl: 'https://nstecnologia.com.br/blog/wp-content/uploads/2017/08/image2017-8-7-11-8-37.png'
+  },
+  {
+    value: 60.25,
+    nfce: '00006',
+    proofImageUrl: 'https://nstecnologia.com.br/blog/wp-content/uploads/2017/08/image2017-8-7-11-8-37.png'
+  },
+  {
+    value: 60.25,
+    nfce: '00007',
+    proofImageUrl: 'https://nstecnologia.com.br/blog/wp-content/uploads/2017/08/image2017-8-7-11-8-37.png'
+  },
+  {
+    value: 60.25,
+    nfce: '00008',
+    proofImageUrl: 'https://nstecnologia.com.br/blog/wp-content/uploads/2017/08/image2017-8-7-11-8-37.png'
   }
 ] as Consumption[];
 
@@ -33,10 +53,14 @@ const seed = async () => {
     const families = await db.families.findAll();
     const placeStores = await db.placeStores.findAll();
     const itemsToCreate = list
-      .map((item) => {
+      .map((item, index) => {
         const created = alreadyCreated.find((dbItem) => dbItem.nfce === item.nfce);
         if (created) return null; // Item is already created, don't create it again
-        return { ...item, familyId: families[0].id, placeStoreId: placeStores[0].id };
+        return {
+          ...item,
+          familyId: families[index % families.length].id,
+          placeStoreId: placeStores[index % placeStores.length].id
+        };
       })
       .filter(Boolean) as Consumption[];
     if (itemsToCreate.length > 0) {

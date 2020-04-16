@@ -1,0 +1,16 @@
+version: '3.7'
+services:
+  db:
+    image: postgres:11
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ./postgresql/conf:/etc/postgresql/
+    environment:
+      POSTGRES_DB: backend
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+
+volumes:
+  postgres:
