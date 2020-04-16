@@ -1,14 +1,10 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { PageContainer, PrintableBodyWrapper } from './styles';
-import { Card, Spin, Typography, Form, Button, DatePicker, Select, Row, Col, Table } from 'antd';
+import { Card, Typography, Form, Button, DatePicker, Row, Col, Table } from 'antd';
 import { useFormik } from 'formik';
 import yup from '../../utils/yup';
 import { useDispatch, useSelector } from 'react-redux';
-import { requestGetPlace } from '../../redux/place/actions';
 import { AppState } from '../../redux/rootReducer';
-import { Place } from '../../interfaces/place';
-import { requestGetPlaceStore } from '../../redux/placeStore/actions';
-import { PlaceStore } from '../../interfaces/placeStore';
 import { requestGetConsumption } from '../../redux/report/actions';
 import { Report, ConsumptionPlace } from '../../interfaces/report';
 import moment from 'moment';
@@ -19,7 +15,6 @@ const schema = yup.object().shape({
   rangeDate: yup.string().label('Data').required()
 });
 
-const { Option } = Select;
 const { RangePicker } = DatePicker;
 
 /**
@@ -33,7 +28,7 @@ export const ReportList: React.FC<{}> = () => {
 
   const dispatch = useDispatch();
 
-  const { handleSubmit, values, getFieldMeta, submitForm, setFieldValue, setFieldTouched } = useFormik({
+  const { handleSubmit, getFieldMeta, submitForm, setFieldValue } = useFormik({
     initialValues: {
       rangeDate: ''
     },
