@@ -38,7 +38,7 @@ const handleQRCode = (value: string | null) => {
  * Dashboard page component
  * @param props component props
  */
-export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = (props) => {
+export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = () => {
   const dispatch = useDispatch();
   const history = useHistory();
   const cameraRef = useRef(null);
