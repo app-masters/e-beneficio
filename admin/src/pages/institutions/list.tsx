@@ -13,7 +13,7 @@ import { ActionWrapper, PageContainer } from './styles';
  * List component
  * @param props component props
  */
-export const InstitutionList: React.FC<{}> = (props) => {
+export const InstitutionList: React.FC<{}> = () => {
   // Redux state
   const list = useSelector<AppState, Institution[]>((state) => state.institutionReducer.list as Institution[]);
   // Redux actions

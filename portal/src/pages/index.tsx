@@ -8,7 +8,7 @@ import { DashboardPage } from './dashboard';
  * Router component
  * @param props router props
  */
-export const Router: React.FC<{}> = (props) => {
+export const Router: React.FC<{}> = () => {
   return (
     <BrowserRouter>
       <Route component={DashboardPage} />

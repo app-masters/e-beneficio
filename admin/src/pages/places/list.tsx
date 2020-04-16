@@ -13,7 +13,7 @@ import { ActionWrapper, PageContainer } from './styles';
  * List component
  * @param props component props
  */
-export const PlaceList: React.FC<{}> = (props) => {
+export const PlaceList: React.FC<{}> = () => {
   // Redux state
   const list = useSelector<AppState, Place[]>((state) => state.placeReducer.list as Place[]);
   // Redux actions

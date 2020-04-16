@@ -5,6 +5,7 @@ import storage from 'redux-persist/lib/storage'; // defaults to localStorage for
 import rootReducer, { AppState } from './rootReducer';
 import { PERSIST_KEY } from '../utils/constraints';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Action = { type: string; [key: string]: any };
 export type ThunkResult<R> = ThunkAction<R, AppState, undefined, Action>;
 
