@@ -20,8 +20,10 @@ elif [[ ${ENV} == "dev" || ${ENV} == "devops" ]]; then
 fi
 
 ## Check current user
-echo "Versão docker: "
-docker --version
+echo "Uname: "
+uname -a
+echo "Docker info: "
+docker info
 
 ## Include config
 source ${ENV}/config.sh

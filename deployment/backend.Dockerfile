@@ -2,7 +2,7 @@ FROM node:11-alpine AS build
 WORKDIR /var/www
 RUN mkdir -p ./backend/dist
 COPY ./backend/package.json .
-RUN rm package-lock.json rm yarn.lock 2> /dev/null
+RUN rm -f package-lock.json rm yarn.lock
 RUN yarn install
 COPY ./backend/. .
 RUN yarn build
