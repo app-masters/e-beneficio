@@ -53,7 +53,6 @@ export const DashboardPage: React.FC<{}> = (props) => {
           </Card>
         </Col>
       </Row>
-      ,
     </PageContainer>
   );
 };

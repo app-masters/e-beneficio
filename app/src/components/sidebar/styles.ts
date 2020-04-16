@@ -74,14 +74,16 @@ export const fadeOut = keyframes`
 export const CollapseWrapper = styled.div<{ collapsed?: boolean }>`
   width: 100%;
   height: 100%;
-  ${(props) =>
-    props.collapsed
-      ? css`
-          animation: ${fadeIn} 0.5s ease-out 0s both;
-          opacity: 0;
-        `
-      : css`
-          animation: ${fadeOut} 0.5s ease-out 0s both;
-          opacity: 1;
-        `}
+  ${media('sm', true)} {
+    ${(props) =>
+      props.collapsed
+        ? css`
+            animation: ${fadeIn} 0.5s ease-out 0s both;
+            opacity: 0;
+          `
+        : css`
+            animation: ${fadeOut} 0.5s ease-out 0s both;
+            opacity: 1;
+          `}
+  }
 `;
