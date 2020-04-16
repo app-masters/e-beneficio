@@ -21,6 +21,16 @@ jobs:
           service_account_key: ${{ secrets.GCP_SA_KEY_TEST_3 }}
           project_id: "covid19jf"
           export_default_credentials: true
+
+      - name: Notify start deploy to Rollbar
+        uses: rollbar/github-deploy-action@v1.0.0
+        with:
+          environment: 'devops'
+          version: $GITHUB_SHA
+          status: 'started'
+        env:
+          ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
+
       - run: gcloud components install --quiet beta
       - run: gcloud info
       - run: gcloud beta compute ssh "resources-dev-2" --zone "us-central1-a" --command="pwd && ls"
@@ -35,8 +45,19 @@ jobs:
           cd deployment
           ./deploy-gcp.sh ${{ steps.extract_branch.outputs.branch }}
 
-      - name: show job status
+      - name: Notify final status to Rollbar
         if: always()
-        run: echo $status
+        uses: rollbar/github-deploy-action@v1.0.0
         env:
+          ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
           status: ${{job.status}}
+        with:
+          environment: 'devops'
+          version: $GITHUB_SHA
+          status: ${{job.status}}
+
+#      - name: show job status
+#        if: always()
+#        run: echo $status
+#        env:
+#          status: ${{job.status}}

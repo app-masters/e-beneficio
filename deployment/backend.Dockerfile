@@ -6,6 +6,7 @@ RUN rm -f package-lock.json rm yarn.lock
 RUN yarn --version
 RUN npm install --global yarn
 RUN npm upgrade --global yarn
+RUN yarn --version
 RUN yarn install
 COPY ./backend/. .
 RUN yarn build
