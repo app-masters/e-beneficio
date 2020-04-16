@@ -170,7 +170,7 @@ export const Sidebar: React.FC = (props) => {
           </Flex>
         </Sider>
       </FixSider>
-      <CollapseWrapper collapsed={collapsed}>{collapsed && props.children}</CollapseWrapper>
+      <CollapseWrapper collapsed={collapsed}>{props.children}</CollapseWrapper>
     </>
   );
 };
