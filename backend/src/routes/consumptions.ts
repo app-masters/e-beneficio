@@ -66,17 +66,17 @@ router.get('/report', async (req, res) => {
     let data;
     if (req.user.placeStoreId) {
       data = await consumptionModel.getPlaceConsumptionsReport(
-        req.query.minDate,
-        req.query.maxDate,
+        req.query.minDate as string,
+        req.query.maxDate as string,
         undefined,
-        req.user.placeStoreId
+        req.user.placeStoreId as string
       );
     } else {
       data = await consumptionModel.getPlaceConsumptionsReport(
-        req.query.minDate,
-        req.query.maxDate,
-        req.query.placeId,
-        req.query.placeStoreId
+        req.query.minDate as string,
+        req.query.maxDate as string,
+        req.query.placeId as string,
+        req.query.placeStoreId as string
       );
     }
 

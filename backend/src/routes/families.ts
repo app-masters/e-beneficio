@@ -11,7 +11,7 @@ const router = express.Router({ mergeParams: true });
 router.get('/', async (req, res) => {
   try {
     if (!req.user?.cityId) throw Error('User without selected city');
-    const item = await familyModel.findByNis(req.query.nis, req.user.cityId);
+    const item = await familyModel.findByNis(req.query.nis as string, req.user.cityId);
     const balance = await consumptionModel.getFamilyBalance(item);
     res.send({ ...item.toJSON(), balance });
   } catch (error) {
