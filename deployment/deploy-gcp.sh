@@ -19,12 +19,6 @@ elif [[ ${ENV} == "dev" || ${ENV} == "devops" ]]; then
    ENV="dev-online";
 fi
 
-## Check current user
-echo "Uname: "
-uname -a
-echo "Docker info: "
-docker info
-
 ## Include config
 source ${ENV}/config.sh
 
