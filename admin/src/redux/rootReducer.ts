@@ -8,7 +8,7 @@ import institutionReducer from './institution/reducers';
 import placeStoreReducer from './placeStore/reducers';
 import userReducer from './user/reducers';
 import familiesReducer from './families/reducers';
-import consumptionReducer from './consumptions/reducers';
+import reportReducer from './report/reducers';
 import dashboardReducer from './dashboard/reducers';
 
 const rootReducer = combineReducers({
@@ -19,7 +19,7 @@ const rootReducer = combineReducers({
   placeStoreReducer,
   userReducer,
   familiesReducer,
-  consumptionReducer,
+  reportReducer,
   dashboardReducer
 });
 

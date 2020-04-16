@@ -1,9 +1,9 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { doGetConsumption, doGetConsumptionSuccess, doGetConsumptionFailed } from './actions';
-import { ConsumptionReport } from '../../interfaces/consumptionReport';
+import { Report } from '../../interfaces/report';
 
-export interface ConsumptionReportReducerState {
-  item?: ConsumptionReport;
+export interface ReportReducerState {
+  item?: Report;
   loading: boolean;
   error?: Error;
 }
@@ -12,7 +12,7 @@ const initialState = {
   loading: false
 };
 
-export default createReducer<ConsumptionReportReducerState>(initialState, (builder) =>
+export default createReducer<ReportReducerState>(initialState, (builder) =>
   builder
     // Get actions
     .addCase(doGetConsumption, (state) => {
