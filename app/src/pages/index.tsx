@@ -20,7 +20,7 @@ import { ConsumptionForm } from './consumption';
  * Router available only for logged users
  * @param props component props
  */
-const PrivateRouter: React.FC<{}> = (props) => {
+const PrivateRouter: React.FC<{}> = () => {
   const loading = useRefreshToken();
 
   return (
@@ -46,6 +46,7 @@ const PrivateRouter: React.FC<{}> = (props) => {
  * Router available when the user is manager
  * @param props component props
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ManagerRouter: React.FC<any> = ({ children }) => {
   const currentUser = useSelector<AppState, User>((state) => state.authReducer.user as User);
   return currentUser.role === 'manager' ? (
@@ -63,7 +64,7 @@ const ManagerRouter: React.FC<any> = ({ children }) => {
  * Router available when the user is not logged
  * @param props component props
  */
-const PublicRouter: React.FC<{}> = (props) => {
+const PublicRouter: React.FC<{}> = () => {
   return (
     <Switch>
       <Route path="*">

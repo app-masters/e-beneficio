@@ -17,6 +17,7 @@ import institutionRoutes from './institutions';
 import benefitRoutes from './benefits';
 import familyRoutes from './families';
 import consumptionRoutes from './consumptions';
+import dashboardRoutes from './dashboard';
 
 const router = express.Router();
 
@@ -54,5 +55,6 @@ router.use('/institutions', jwtMiddleware, institutionRoutes);
 router.use('/benefits', jwtMiddleware, benefitRoutes);
 router.use('/families', jwtMiddleware, familyRoutes);
 router.use('/consumptions', jwtMiddleware, consumptionRoutes);
+router.use('/dashboard', jwtMiddleware, dashboardRoutes);
 
 export default router;

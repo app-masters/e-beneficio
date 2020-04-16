@@ -7,6 +7,7 @@ import familyReducer from './family/reducers';
 import userReducer from './user/reducers';
 import placeStoreReducer from './placeStore/reducers';
 import placeReducer from './place/reducers';
+import dashboardReducer from './dashboard/reducers';
 
 const rootReducer = combineReducers({
   authReducer,
@@ -14,7 +15,8 @@ const rootReducer = combineReducers({
   familyReducer,
   userReducer,
   placeStoreReducer,
-  placeReducer
+  placeReducer,
+  dashboardReducer
 });
 
 export type AppState = ReturnType<typeof rootReducer>;
