@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { AppState } from '../redux/rootReducer';
 import { User } from '../interfaces/user';
@@ -7,6 +7,10 @@ import { AdminLayout } from '../components/adminLayout';
 
 // Pages
 import { LoginPage } from './login';
+import { UserList } from './user/list';
+import { UserForm } from './user/form';
+import { PlaceStoreList } from './placeStore/list';
+import { PlaceStoreForm } from './placeStore/form';
 import { DashboardPage } from './dashboard';
 import { useRefreshToken } from '../utils/auth';
 import { LogoutPage } from './logout';
@@ -24,10 +28,34 @@ const PrivateRouter: React.FC<{}> = (props) => {
       <>
         <Route path="/logout" component={LogoutPage} />
         <Route path="/consumo" component={ConsumptionForm} />
+        <ManagerRouter>
+          <Route path="/usuarios" component={UserList} />
+          <Route path="/usuarios/:id" component={UserForm} />
+
+          <Route path="/lojas" component={PlaceStoreList} />
+          <Route path="/lojas/:id" component={PlaceStoreForm} />
+        </ManagerRouter>
         {/* Dashboard */}
         <Route path="/" component={DashboardPage} exact />
       </>
     </AdminLayout>
+  );
+};
+
+/**
+ * Router available when the user is manager
+ * @param props component props
+ */
+const ManagerRouter: React.FC<any> = ({ children }) => {
+  const currentUser = useSelector<AppState, User>((state) => state.authReducer.user as User);
+  return currentUser.role === 'manager' ? (
+    children
+  ) : (
+    <Redirect
+      to={{
+        pathname: '/'
+      }}
+    />
   );
 };
 
