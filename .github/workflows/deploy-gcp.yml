@@ -45,16 +45,15 @@ jobs:
           cd deployment
           ./deploy-gcp.sh ${{ steps.extract_branch.outputs.branch }}
 
-      - name: Notify final status to Rollbar
+      - name: Notify fail status to Rollbar
         if: always()
         uses: rollbar/github-deploy-action@v1.0.0
         env:
           ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
-          status: ${{job.status}}
         with:
           environment: 'devops'
-          version: $GITHUB_SHA
-          status: ${{job.status}}
+          version: ( ${{ $GITHUB_SHA=="success" ? "succeeded" : "failed" }} )
+          status: 'failed'
 
 #      - name: show job status
 #        if: always()
