@@ -73,14 +73,14 @@ export const Report: React.FC<{}> = () => {
           title={<Typography.Title>{`Relatório de consumo`}</Typography.Title>}
           extra={
             <Button className="no-print" onClick={() => window.print()}>
-              Print
+              Imprimir
             </Button>
           }
         >
           <form onSubmit={handleSubmit}>
-            <Form>
+            <Form layout="vertical">
               <Row gutter={[8, 8]}>
-                <Col span={8}>
+                <Col span={12}>
                   <Form.Item
                     label="Estabelecimento"
                     validateStatus={!!placeIdMeta.error && !!placeIdMeta.touched ? 'error' : ''}
@@ -111,7 +111,7 @@ export const Report: React.FC<{}> = () => {
                     </Select>
                   </Form.Item>
                 </Col>
-                <Col span={5}>
+                <Col span={12}>
                   <Form.Item
                     label="Loja"
                     validateStatus={!!placeStoreIdMeta.error && !!placeStoreIdMeta.touched ? 'error' : ''}
@@ -142,26 +142,30 @@ export const Report: React.FC<{}> = () => {
                     </Select>
                   </Form.Item>
                 </Col>
-                <Col span={7}>
+              </Row>
+              <Row gutter={[8, 8]}>
+                <Col span={24}>
                   <Form.Item
                     label="Data"
                     validateStatus={!!rangeDateMeta.error && !!rangeDateMeta.touched ? 'error' : ''}
                     help={!!rangeDateMeta.error && !!rangeDateMeta.touched ? rangeDateMeta.error : undefined}
                   >
-                    <RangePicker
-                      locale={locale}
-                      format={'DD/MM/YYYY'}
-                      onCalendarChange={(value) => {
-                        setFieldValue('rangeDate', value);
-                      }}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={2}>
-                  <Form.Item>
-                    <Button className="no-print" type="primary" onClick={submitForm}>
-                      Filtrar
-                    </Button>
+                    <Row gutter={[8, 8]}>
+                      <Col>
+                        <RangePicker
+                          locale={locale}
+                          format={'DD/MM/YYYY'}
+                          onCalendarChange={(value) => {
+                            setFieldValue('rangeDate', value);
+                          }}
+                        />
+                      </Col>
+                      <Col>
+                        <Button className="no-print" type="primary" onClick={submitForm}>
+                          Filtrar
+                        </Button>
+                      </Col>
+                    </Row>
                   </Form.Item>
                 </Col>
               </Row>
