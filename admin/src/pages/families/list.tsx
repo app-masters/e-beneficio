@@ -14,6 +14,8 @@ import { Flex } from '../../components/flex';
 import { DashboardFamily } from '../../interfaces/dashboardFamily';
 import { familyGroupList } from '../../utils/constraints';
 import moment from 'moment';
+import { FamilySearch } from '../../components/familySearch';
+import { Link } from 'react-router-dom';
 
 const { Dragger } = Upload;
 
@@ -42,9 +44,7 @@ export const FamiliesList: React.FC<{}> = () => {
     <PageContainer>
       <Row gutter={[16, 16]}>
         <Col span={24}>
-          {/* <Card> */}
           <Typography.Title>{`Famílias`}</Typography.Title>
-          {/* </Card> */}
         </Col>
       </Row>
       <Row gutter={[16, 16]}>
@@ -75,6 +75,22 @@ export const FamiliesList: React.FC<{}> = () => {
               <Col span={12} style={ColAlignRight}>
                 <Typography.Text>Última atualização: </Typography.Text>
                 <Typography.Text>{moment(dashboardData?.lastCreatedDate).fromNow()}</Typography.Text>
+              </Col>
+            </Row>
+          </Card>
+        </Col>
+      </Row>
+      <Row gutter={[16, 16]}>
+        <Col span={24}>
+          <Card title={'Busca pelo NIS'}>
+            <Row gutter={[16, 16]}>
+              <Col flex={1}>
+                <FamilySearch />
+              </Col>
+              <Col>
+                <Link to={`/familias/criar`}>
+                  <Button type="primary">Adicionar</Button>
+                </Link>
               </Col>
             </Row>
           </Card>
