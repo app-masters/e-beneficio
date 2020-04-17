@@ -19,3 +19,11 @@ export const PrintableBodyWrapper = styled.div`
     }
   }
 `;
+
+export const Th = styled.th`
+  text-align: right !important;
+`;
+
+export const RangePickerStyle = {
+  width: '100%'
+};

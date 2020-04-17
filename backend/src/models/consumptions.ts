@@ -203,28 +203,33 @@ export const sumConsumptions = async (
 export const getConsumptionDashboardInfo = async (cityId: NonNullable<City['id']>, placeStoreId?: PlaceStore['id']) => {
   const dashboardReturn = {
     todayFamilies: 0,
+    weekFamilies: 0,
     monthFamilies: 0,
     todayConsumption: 0,
+    weekConsumption: 0,
     monthConsumption: 0
   };
 
-  const today = moment();
-  const startToday = today.startOf('day').toDate();
-  const endToday = today.endOf('day').toDate();
-  const startMonth = today.startOf('month').toDate();
-  const endMonth = today.endOf('month').toDate();
+  const today = moment().toDate();
+  const startToday = moment().startOf('day').toDate();
+  const startWeek = moment().subtract(7, 'days').toDate();
+  const startMonth = moment().subtract(30, 'days').toDate();
 
   // Await for all the promises
   [
     dashboardReturn.todayConsumption,
+    dashboardReturn.weekConsumption,
     dashboardReturn.monthConsumption,
     dashboardReturn.todayFamilies,
+    dashboardReturn.weekFamilies,
     dashboardReturn.monthFamilies
   ] = await Promise.all([
-    sumConsumptions(startToday, endToday, placeStoreId),
-    sumConsumptions(startMonth, endMonth, placeStoreId),
-    countFamilies(startToday, endToday, placeStoreId),
-    countFamilies(startMonth, endMonth, placeStoreId)
+    sumConsumptions(startToday, today, placeStoreId),
+    sumConsumptions(startWeek, today, placeStoreId),
+    sumConsumptions(startMonth, today, placeStoreId),
+    countFamilies(startToday, today, placeStoreId),
+    countFamilies(startWeek, today, placeStoreId),
+    countFamilies(startMonth, today, placeStoreId)
   ]);
 
   return dashboardReturn;

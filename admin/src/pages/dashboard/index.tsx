@@ -27,28 +27,42 @@ export const DashboardPage: React.FC<{}> = () => {
         <Typography.Text>{`Bem vindo ${user.name}`}</Typography.Text>
       </Card>
       <Row gutter={16}>
-        <Col span={12}>
+        <Col span={24} md={8}>
           <Card>
-            <Statistic title="Famílias auxiliadas no mês" value={dashboard?.monthFamilies} />
+            <Statistic
+              title="Hoje"
+              value={dashboard?.todayFamilies}
+              suffix={dashboard?.todayFamilies === 1 ? 'família auxiliada' : 'famílias auxiliadas'}
+            />
             <Divider />
-            <Typography.Text type="secondary">Hoje: </Typography.Text>
             <Typography.Text type="secondary">
-              {dashboard?.todayFamilies} {dashboard?.todayFamilies === 1 ? 'família' : 'famílias'}
+              R$ {dashboard?.todayConsumption.toFixed(2).replace('.', ',')} em consumo
             </Typography.Text>
           </Card>
         </Col>
-        <Col span={12}>
+        <Col span={24} md={8}>
           <Card>
             <Statistic
-              title="Consumo total no mês"
-              value={dashboard?.monthConsumption}
-              prefix="R$"
-              decimalSeparator=","
+              title="Últimos 7 dias"
+              value={dashboard?.weekFamilies}
+              suffix={dashboard?.weekFamilies === 1 ? 'família auxiliada' : 'famílias auxiliadas'}
             />
             <Divider />
-            <Typography.Text type="secondary">Hoje: </Typography.Text>
             <Typography.Text type="secondary">
-              R$ {dashboard?.todayConsumption.toFixed(2).replace('.', ',')}
+              R$ {dashboard?.weekConsumption.toFixed(2).replace('.', ',')} em consumo
+            </Typography.Text>
+          </Card>
+        </Col>
+        <Col span={24} md={8}>
+          <Card>
+            <Statistic
+              title="Últimos 30 dias"
+              value={dashboard?.monthFamilies}
+              suffix={dashboard?.monthFamilies === 1 ? 'família auxiliada' : 'famílias auxiliadas'}
+            />
+            <Divider />
+            <Typography.Text type="secondary">
+              R$ {dashboard?.monthConsumption.toFixed(2).replace('.', ',')} em consumo
             </Typography.Text>
           </Card>
         </Col>
