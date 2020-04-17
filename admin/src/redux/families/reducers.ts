@@ -56,7 +56,7 @@ export default createReducer<FamilyReducerState>(initialState, (builder) =>
       state.dashboardLoading = false;
       state.dashboard = action.payload;
     })
-    .addCase(doGetDashboardFamilyFailed, (state, action) => {
+    .addCase(doGetDashboardFamilyFailed, (state) => {
       state.dashboardLoading = false;
       // state.error = action.payload;
     })
