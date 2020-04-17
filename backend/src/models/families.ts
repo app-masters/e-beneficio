@@ -31,6 +31,21 @@ type CSVReport = {
 };
 
 /**
+ * Create or update family
+ * @param family Family Object
+ */
+export const certifyFamilyByNIS = async (family: Family) => {
+  const [createdFamily, created] = await db.families.findCreateFind({ where: { code: family.code }, defaults: family });
+  if (!created) {
+    // Just update the family with the new data
+    return db.families.update(family, { where: { id: createdFamily.id as number } });
+  } else {
+    // Family was created
+    return createdFamily;
+  }
+};
+
+/**
  * Import CSV file to create/update/delete families using the file values
  * @param path CSV file path
  * @param cityId logged user city ID
@@ -42,7 +57,8 @@ export const importFamilyFromCSVFile = async (
   deleteOthers?: boolean
 ): Promise<CSVReport> => {
   const reportResult: CSVReport = { created: 0, updated: 0, deleted: 0, wrong: 0, report: [], finished: false };
-  const handledIds = [] as Family['id'][];
+  const timeStart = new Date().getTime();
+  let promises: Promise<any>[] = [];
   const conversion: Promise<CSVReport> = new Promise((resolve, reject) => {
     csv({ delimiter: ';' })
       .fromFile(path)
@@ -53,41 +69,48 @@ export const importFamilyFromCSVFile = async (
            */
           const lineHandler = async () => {
             try {
+              const timeStartLine = new Date().getTime();
               if (json['cod_parentesco_rf_pessoa'] !== '1') {
                 // We're only saving people that are the responsible for the family (RF)
                 reportResult.wrong++;
                 reportResult.report.push(`[linha: ${lineNumber}] Pessoa ${json['nom_pessoa']} não é um RF`);
                 return;
               }
-              if (!getFamilyGroupByCode(json.d['fx_rfpc'])) {
+              const group = getFamilyGroupByCode(json.d['fx_rfpc']);
+              if (!group) {
                 reportResult.wrong++;
                 reportResult.report.push(
                   `[linha: ${lineNumber}] Família ${json['cod_familiar_fam']} está com um valor inválido de fx_rfpc`
                 );
+                return;
               }
               // Converting CSV format to DB format
               const family = {
                 code: json.d['cod_familiar_fam'],
-                groupName: getFamilyGroupByCode(json.d['fx_rfpc'])?.key,
+                groupName: group.key,
                 responsibleName: json['nom_pessoa'],
                 responsibleBirthday: moment(json['dta_nasc_pessoa'], 'DD/MM/YYYY').toDate(),
                 responsibleNis: json['num_nis_pessoa_atual'],
                 responsibleMotherName: json['nom_completo_mae_pessoa'],
                 cityId
               };
-              // Checking if a family is already created using the same family code
-              const [alreadyCreated] = await db.families.findAll({ where: { code: family.code } });
-              if (alreadyCreated) {
-                // Just update the family with the new data
-                await db.families.update(family, { where: { id: alreadyCreated.id as number } });
-                handledIds.push(alreadyCreated.id);
-                reportResult.updated++;
-              } else {
-                // Create new family
-                const newFamily = await db.families.create(family);
-                handledIds.push(newFamily.id);
-                reportResult.created++;
+              // Checking if a family is already created using the same family code and create if don't
+              promises.push(certifyFamilyByNIS(family));
+              reportResult.updated++;
+
+              // Executing promises
+              if (promises.length >= 100) {
+                await Promise.all(promises);
+                promises = [];
               }
+              const timeEnd = new Date().getTime();
+              process.stdout.write(
+                `[line: ${lineNumber}] ------------------------------------ time spent: ${
+                  timeEnd - timeStartLine
+                }ms - mean: ${((timeEnd - timeStart) / (lineNumber + 1)).toFixed(2)}ms - total: ${
+                  timeEnd - timeStart
+                }ms         ` + '\r'
+              );
             } catch (error) {
               reportResult.wrong++;
               reportResult.report.push(`[linha: ${lineNumber}] Erro inesperado: ${error.message}`);
@@ -101,7 +124,12 @@ export const importFamilyFromCSVFile = async (
           reject(error);
           logging.error(error);
         },
-        () => {
+        async () => {
+          if (promises.length > 0) {
+            await Promise.all(promises);
+          }
+          console.log(``);
+          console.log(`FINAL TIME: ${new Date().getTime() - timeStart}ms`);
           reportResult.finished = true;
           resolve(reportResult);
         }
