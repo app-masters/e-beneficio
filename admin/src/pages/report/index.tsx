@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { PageContainer, PrintableBodyWrapper } from './styles';
+import { PageContainer, PrintableBodyWrapper, Th, RangePickerStyle } from './styles';
 import { Card, Spin, Typography, Form, Button, DatePicker, Select, Row, Col, Table } from 'antd';
 import { useFormik } from 'formik';
 import yup from '../../utils/yup';
@@ -129,6 +129,7 @@ export const ReportList: React.FC<{}> = () => {
                         setFieldTouched('placeStoreId', true);
                       }}
                     >
+                      <Option value={'-1'}>{'  '}</Option>
                       {!placeStoreLoading &&
                         placeStoreList &&
                         placeStoreList.length > 0 &&
@@ -142,24 +143,26 @@ export const ReportList: React.FC<{}> = () => {
                 </Col>
               </Row>
               <Row gutter={[8, 8]}>
-                <Col span={24}>
+                <Col span={12} />
+                <Col span={12}>
                   <Form.Item
                     label="Data"
                     validateStatus={!!rangeDateMeta.error && !!rangeDateMeta.touched ? 'error' : ''}
                     help={!!rangeDateMeta.error && !!rangeDateMeta.touched ? rangeDateMeta.error : undefined}
                   >
                     <Row gutter={[8, 8]}>
-                      <Col>
+                      <Col flex={1}>
                         <RangePicker
                           locale={locale}
                           format={'DD/MM/YYYY'}
+                          style={RangePickerStyle}
                           onCalendarChange={(value) => {
                             setFieldValue('rangeDate', value);
                           }}
                         />
                       </Col>
-                      <Col>
-                        <Button className="no-print" type="primary" onClick={submitForm}>
+                      <Col className="no-print">
+                        <Button type="primary" onClick={submitForm}>
                           Filtrar
                         </Button>
                       </Col>
@@ -184,9 +187,9 @@ export const ReportList: React.FC<{}> = () => {
                     <td />
                     <td />
                     <td />
-                    <th>
+                    <Th>
                       <Text>{`Total: R$ ${totalPrice.toFixed(2).replace('.', ',')}`}</Text>
-                    </th>
+                    </Th>
                   </tr>
                 </>
               );
@@ -210,6 +213,7 @@ export const ReportList: React.FC<{}> = () => {
             <Table.Column
               title="Total consumo"
               dataIndex="total"
+              align="right"
               render={(data: ConsumptionPlace['total']) => `R$ ${data.toFixed(2).replace('.', ',')}`}
             />
           </Table>

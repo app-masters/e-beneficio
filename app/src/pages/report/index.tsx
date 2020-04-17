@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { PageContainer, PrintableBodyWrapper } from './styles';
+import { PageContainer, PrintableBodyWrapper, Th } from './styles';
 import { Card, Spin, Typography, Form, Button, DatePicker, Select, Row, Col, Table } from 'antd';
 import { useFormik } from 'formik';
 import yup from '../../utils/yup';
@@ -104,9 +104,9 @@ export const ReportList: React.FC<{}> = () => {
                     <td />
                     <td />
                     <td />
-                    <th>
+                    <Th>
                       <Text>{`Total: R$ ${totalPrice.toFixed(2).replace('.', ',')}`}</Text>
-                    </th>
+                    </Th>
                   </tr>
                 </>
               );
@@ -130,6 +130,7 @@ export const ReportList: React.FC<{}> = () => {
             <Table.Column
               title="Total consumo"
               dataIndex="total"
+              align="right"
               render={(data: ConsumptionPlace['total']) => `R$ ${data.toFixed(2).replace('.', ',')}`}
             />
           </Table>
