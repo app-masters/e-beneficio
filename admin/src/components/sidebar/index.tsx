@@ -8,7 +8,8 @@ import {
   MenuUnfoldOutlined,
   ShopOutlined,
   SolutionOutlined,
-  UserOutlined
+  UserOutlined,
+  HomeOutlined
 } from '@ant-design/icons';
 import { Button, Layout, Menu, Popover } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -31,6 +32,16 @@ interface RouteItem {
 }
 
 const routes: RouteItem[] = [
+  {
+    path: '/',
+    icon: () => <HomeOutlined />,
+    name: 'Início'
+  },
+  {
+    path: '/relatorios',
+    icon: () => <BarChartOutlined />,
+    name: 'Relatórios'
+  },
   {
     path: '/beneficios',
     icon: () => <CarryOutOutlined />,
@@ -60,11 +71,6 @@ const routes: RouteItem[] = [
     path: '/instituicoes',
     icon: () => <BankOutlined />,
     name: 'Instituições'
-  },
-  {
-    path: '/relatorios',
-    icon: () => <BarChartOutlined />,
-    name: 'Relatórios'
   }
 ];
 
