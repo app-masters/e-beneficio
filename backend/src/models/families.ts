@@ -170,3 +170,32 @@ export const getDashboardInfo = async (cityId: NonNullable<City['id']>) => {
 
   return dashboard;
 };
+
+/**
+ * Function to create a new row on the table
+ * @param values object with the new item data
+ * @returns Promise<Item>
+ */
+export const create = (values: Family | SequelizeFamily): Promise<SequelizeFamily> => {
+  return db.families.create(values);
+};
+
+/**
+ * Function to update a row on the table by the unique ID
+ * @param id unique ID of the desired item
+ * @param values object with the new data
+ * @returns Promise<Item>
+ */
+export const updateById = async (
+  id: NonNullable<Family['id']>,
+  values: Family | SequelizeFamily
+): Promise<SequelizeFamily | null> => {
+  // Trying to get item on the city
+  const cityItem = await db.families.findByPk(id);
+  if (cityItem) {
+    // The update return an array [count, item[]], so I'm destructuring to get the updated benefit
+    const [, [item]] = await db.families.update(values, { where: { id }, returning: true });
+    return item;
+  }
+  return null;
+};
