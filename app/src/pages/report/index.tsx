@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { PageContainer, PrintableBodyWrapper, Th } from './styles';
-import { Card, Spin, Typography, Form, Button, DatePicker, Select, Row, Col, Table } from 'antd';
+import { Card, Typography, Form, Button, DatePicker, Row, Col, Table } from 'antd';
 import { useFormik } from 'formik';
 import yup from '../../utils/yup';
 import { useDispatch, useSelector } from 'react-redux';
