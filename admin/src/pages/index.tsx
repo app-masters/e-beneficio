@@ -21,6 +21,7 @@ import { UserForm } from './user/form';
 import { InstitutionForm } from './institutions/form';
 import { InstitutionList } from './institutions/list';
 import { FamiliesList } from './families/list';
+import { FamilyForm } from './families/form';
 import { ReportList } from './report';
 
 /**
@@ -53,6 +54,7 @@ const PrivateRouter: React.FC<{}> = () => {
         <Route path="/instituicoes/:id" component={InstitutionForm} />
         {/* Institution routes */}
         <Route path="/familias" component={FamiliesList} />
+        <Route path="/familias/:id" component={FamilyForm} />
         {/* Dashboard */}
         <Route path="/" component={DashboardPage} exact />
       </>
