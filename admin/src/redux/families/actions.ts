@@ -82,14 +82,13 @@ export const requestGetDashboardFamily = (): ThunkResult<void> => {
       const response = await backend.get<DashboardFamily>(`/families/dashboard`);
       if (response && response.data) {
         // Request finished
-        alert(JSON.stringify(response));
         dispatch(doGetDashboardFamilySuccess(response.data)); // Dispatch result
       } else {
         // Request without response - probably won't happen, but cancel the request
         dispatch(doGetDashboardFamilyFailed());
       }
     } catch (error) {
-      alert(JSON.stringify(error));
+      // alert(JSON.stringify(error));
       // Request failed: dispatch error
       dispatch(doGetDashboardFamilyFailed(error));
     }

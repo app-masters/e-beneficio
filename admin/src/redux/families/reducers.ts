@@ -13,13 +13,15 @@ import { DashboardFamily } from '../../interfaces/dashboardFamily';
 
 export interface FamilyReducerState {
   loading: boolean;
+  dashboardLoading: boolean;
   error?: string;
   dashboard?: DashboardFamily;
   uploadReport?: CSVReport;
 }
 
 const initialState = {
-  loading: false
+  loading: false,
+  dashboardLoading: false
 };
 
 export default createReducer<FamilyReducerState>(initialState, (builder) =>
@@ -47,15 +49,15 @@ export default createReducer<FamilyReducerState>(initialState, (builder) =>
     })
     // Get actions
     .addCase(doGetDashboardFamily, (state) => {
-      state.loading = true;
+      state.dashboardLoading = true;
       state.error = undefined;
     })
     .addCase(doGetDashboardFamilySuccess, (state, action) => {
-      state.loading = false;
+      state.dashboardLoading = false;
       state.dashboard = action.payload;
     })
     .addCase(doGetDashboardFamilyFailed, (state, action) => {
-      state.loading = false;
+      state.dashboardLoading = false;
       // state.error = action.payload;
     })
 );
