@@ -55,4 +55,32 @@ router.post('/file', async (req, res) => {
   }
 });
 
+/**
+ * Sub-route to POST a new item
+ */
+router.post('/', async (req, res) => {
+  try {
+    if (!req.user?.cityId) throw Error('User without selected city');
+    const item = await familyModel.create(req.body);
+    res.send(item);
+  } catch (error) {
+    logging.error(error);
+    res.status(500).send(error.message);
+  }
+});
+
+/**
+ * Sub-route to PUT an existing item
+ */
+router.put('/:id', async (req, res) => {
+  try {
+    if (!req.user?.cityId) throw Error('User without selected city');
+    const item = await familyModel.updateById(req.params.id, req.body);
+    res.send(item);
+  } catch (error) {
+    logging.error(error);
+    res.status(500).send(error.message);
+  }
+});
+
 export default router;
