@@ -58,9 +58,9 @@ mkdir -p ../frontend/place/
 cp -R build/ ../frontend/place/
 cd ..
 
-## build and copy public
-echo -e "\n# 5/9 - Building public...\n"
-cd public
+## build and copy portal
+echo -e "\n# 5/9 - Building portal...\n"
+cd portal
 yarn install
 yarn build
 mkdir -p ../frontend/portal/
@@ -68,7 +68,7 @@ cp -R build/ ../frontend/portal/
 cd ..
 
 # Build docker and so on
-echo -e "\n# 6/9 - Building and tagging full frontend (admin + app + public) dockerfile...\n"
+echo -e "\n# 6/9 - Building and tagging full frontend (admin + app + portal) dockerfile...\n"
 docker build -f deployment/frontend.Dockerfile -t ${FRONTEND_IMAGE_TAG} .
 docker tag ${FRONTEND_IMAGE_TAG} ${FRONTEND_CONTAINER_IMAGE}
 
