@@ -1,3 +1,4 @@
+import { sequelize } from '../../src/schemas';
 import cities from './cities';
 import places from './places';
 import placeStores from './placeStores';
@@ -11,8 +12,8 @@ import consumptions from './consumptions';
  * Seed all tables
  */
 const seedAll = async () => {
-  // Development seed
   if (process.env.NODE_ENV === 'development') {
+    // Development seed
     await cities.seed();
     await places.seed();
     await placeStores.seed();
@@ -22,13 +23,21 @@ const seedAll = async () => {
     await families.seed();
     await consumptions.seed();
     await families.csv(); // CSV example seed
+  } else {
+    // Production seed - one city and admin user
+    await cities.seed();
+    await users.seedAdmin();
   }
-  // Production seed
-  // ...
 };
 
 console.log('[seed] Started ---');
 const startTime = new Date().getTime();
 seedAll()
-  .then(() => console.log(`[seed] Finished: All tables seeded -- Time spent: ${new Date().getTime() - startTime}ms`))
-  .catch(console.error);
+  .then(() => {
+    console.log(`[seed] Finished: All tables seeded -- Time spent: ${new Date().getTime() - startTime}ms`);
+    sequelize.close();
+  })
+  .catch((error) => {
+    console.error(error);
+    process.exit();
+  });

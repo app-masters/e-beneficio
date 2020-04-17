@@ -7,7 +7,7 @@ const list = [
     role: 'admin',
     cpf: '00000000000',
     email: 'admin@login.com',
-    password: 'admin@login',
+    password: 'admin',
     active: true
   },
   {
@@ -15,7 +15,7 @@ const list = [
     role: 'manager',
     cpf: '00000000001',
     email: 'manager@login.com',
-    password: 'manager@login',
+    password: 'manager',
     active: true
   },
   {
@@ -23,7 +23,7 @@ const list = [
     role: 'financial',
     cpf: '00000000002',
     email: 'financial@login.com',
-    password: 'financial@login',
+    password: 'financial',
     active: true
   },
   {
@@ -31,7 +31,7 @@ const list = [
     role: 'operator',
     cpf: '00000000003',
     email: 'operator@login.com',
-    password: 'operator@login',
+    password: 'operator',
     active: true
   }
 ] as User[];
@@ -68,4 +68,30 @@ const seed = async () => {
   }
 };
 
-export default { seed };
+/**
+ * Seed admin user
+ */
+const seedAdmin = async () => {
+  const alreadyCreated = await db.users.findAll();
+  if (alreadyCreated.length == 0) {
+    const [city] = await db.cities.findAll();
+    const itemsToCreate = list
+      .filter((item) => item.role === 'admin')
+      .map((item) => {
+        const password = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        const user = { ...item, cityId: city.id, password };
+        console.log(`[seed] Admin User will be created with data:`);
+        console.log(`       Role -      ${user.role}`);
+        console.log(`       Email -     ${user.email}`);
+        console.log(`       Password -  ${user.password}`);
+        return user;
+      })
+      .filter(Boolean) as User[];
+    await db.users.bulkCreate(itemsToCreate, { individualHooks: true });
+    console.log(`[seed] Users: Seeded successfully - ${itemsToCreate.length} new created`);
+  } else {
+    console.log(`[seed] Users: Nothing to seed`);
+  }
+};
+
+export default { seed, seedAdmin };
