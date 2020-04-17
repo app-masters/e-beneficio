@@ -1,0 +1,19 @@
+{
+  "private": true,
+  "scripts": {
+    "install": "lerna bootstrap",
+    "lerna-bootstrap": "lerna bootstrap",
+    "checks": "lerna run checks",
+    "pre-push2": "lerna bootstrap && lerna run pre-push"
+  },
+  "devDependencies": {
+    "husky": "^3.1.0",
+    "lerna": "^3.20.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "lerna run checks"
+    }
+  },
+  "name": "phormar"
+}

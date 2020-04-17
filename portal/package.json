@@ -1,6 +1,7 @@
 {
   "name": "portal",
   "version": "0.0.1",
+  "homepage": ".",
   "private": true,
   "dependencies": {
     "@ant-design/icons": "^4.0.5",
