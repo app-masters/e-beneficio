@@ -9,8 +9,11 @@ import {
   requestGetDashboardFamily
 } from '../../redux/families/actions';
 import { AppState } from '../../redux/rootReducer';
-import { PageContainer } from './styles';
+import { PageContainer, ColAlignRight } from './styles';
 import { Flex } from '../../components/flex';
+import { DashboardFamily } from '../../interfaces/dashboardFamily';
+import { familyGroupList } from '../../utils/constraints';
+import moment from 'moment';
 
 const { Dragger } = Upload;
 
@@ -24,6 +27,11 @@ export const FamiliesList: React.FC<{}> = () => {
   const error = useSelector<AppState, string | undefined>(({ familiesReducer }) => familiesReducer.error);
   const uploadReport = useSelector<AppState, CSVReport | undefined>(
     ({ familiesReducer }) => familiesReducer.uploadReport
+  );
+
+  const dashboardLoading = useSelector<AppState, boolean>(({ familiesReducer }) => familiesReducer.dashboardLoading);
+  const dashboardData = useSelector<AppState, DashboardFamily | undefined>(
+    ({ familiesReducer }) => familiesReducer.dashboard
   );
 
   useEffect(() => {
@@ -40,32 +48,35 @@ export const FamiliesList: React.FC<{}> = () => {
         </Col>
       </Row>
       <Row gutter={[16, 16]}>
-        <Col span={12}>
-          <Card>
-            <Statistic
-              title="Famílias por grupo"
-              // value={dashboard?.monthFamilies}
-            />
+        <Col span={24}>
+          <Card loading={dashboardLoading}>
+            <Row gutter={[16, 16]}>
+              <Col span={8}>
+                <Statistic
+                  title={familyGroupList['extreme-poverty'].title}
+                  value={dashboardData?.['extreme-poverty']}
+                />
+              </Col>
+              <Col span={8}>
+                <Statistic title={familyGroupList['poverty-line'].title} value={dashboardData?.['poverty-line']} />
+              </Col>
+              <Col span={8}>
+                <Statistic title={familyGroupList['cad'].title} value={dashboardData?.['cad']} />
+              </Col>
+            </Row>
             <Divider />
-            <Typography.Text type="secondary">Hoje: </Typography.Text>
-            <Typography.Text type="secondary">
-              {/* {dashboard?.todayFamilies} {dashboard?.todayFamilies === 1 ? 'família' : 'famílias'} */}
-            </Typography.Text>
-          </Card>
-        </Col>
-        <Col span={12}>
-          <Card>
-            <Statistic
-              title="Consumo total no mês"
-              // value={dashboard?.monthConsumption}
-              prefix="R$"
-              decimalSeparator=","
-            />
-            <Divider />
-            <Typography.Text type="secondary">Hoje: </Typography.Text>
-            <Typography.Text type="secondary">
-              {/* R$ {dashboard?.todayConsumption.toFixed(2).replace('.', ',')} */}
-            </Typography.Text>
+            <Row gutter={[16, 16]}>
+              <Col span={12}>
+                <Typography.Text>Total: </Typography.Text>
+                <Typography.Text>
+                  {dashboardData?.total} {dashboardData?.total === 1 ? 'família' : 'famílias'}
+                </Typography.Text>
+              </Col>
+              <Col span={12} style={ColAlignRight}>
+                <Typography.Text>Última atualização: </Typography.Text>
+                <Typography.Text>{moment(dashboardData?.lastCreatedDate).fromNow()}</Typography.Text>
+              </Col>
+            </Row>
           </Card>
         </Col>
       </Row>
