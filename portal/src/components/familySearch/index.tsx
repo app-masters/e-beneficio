@@ -7,6 +7,7 @@ import { requestGetFamily } from '../../redux/family/actions';
 import { Family } from '../../interfaces/family';
 import { Flex } from '../flex';
 import moment from 'moment';
+import { env } from '../../env';
 
 const { Text } = Typography;
 
@@ -31,7 +32,7 @@ export const FamilySearch: React.FC<ComponentProps> = () => {
   const family = useSelector<AppState, Family | null | undefined>((state) => state.familyReducer.item);
 
   // .env
-  const cityId = process.env.REACT_APP_ENV_CITY_ID as string;
+  const cityId = env.REACT_APP_ENV_CITY_ID as string;
 
   const sameBirthday = moment(family?.responsibleBirthday).diff(moment(birthday, 'DD/MM/YYYY'), 'days') === 0;
 
