@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppState } from '../../redux/rootReducer';
 import { FamilySearch } from '../../components/familySearch';
 import { Flex } from '../../components/flex';
+import { env } from '../../env';
 
 const { Panel } = Collapse;
 const { Title, Text, Paragraph } = Typography;
@@ -29,7 +30,7 @@ const { Footer } = Layout;
 export const DashboardPage: React.FC<{}> = () => {
   const dispatch = useDispatch();
 
-  const cityId = process.env.REACT_APP_ENV_CITY_ID as string;
+  const cityId = env.REACT_APP_ENV_CITY_ID as string;
 
   const placeStoreLoading = useSelector<AppState, boolean>((state) => state.placeStoreReducer.loading);
   const placeStore = useSelector<AppState, [PlaceStore] | null | undefined>((state) => state.placeStoreReducer.item);
@@ -96,18 +97,18 @@ export const DashboardPage: React.FC<{}> = () => {
                   </Text>
                   <Typography>
                     <ul>
-                      <li>Residentes de {process.env.REACT_APP_ENV_CITY_NAME}</li>
+                      <li>Residentes de {env.REACT_APP_ENV_CITY_NAME}</li>
                       <li>No perfil de extrema pobreza, linha da pobreza ou cadastradas no CAD único</li>
                     </ul>
                   </Typography>
                 </Panel>
                 <Panel header="Obter mais informações" key="info">
                   <Text>
-                    Para obter mais informações, ligue para {process.env.REACT_APP_ENV_INFO_PHONE} ou entre no seguinte
-                    link e estaremos prontos para te ajudar
+                    Para obter mais informações, ligue para {env.REACT_APP_ENV_INFO_PHONE} ou entre no seguinte link e
+                    estaremos prontos para te ajudar
                   </Text>
                   <PanelActionContainer>
-                    <Button href={process.env.REACT_APP_ENV_INFO_LINK} target="_blank">
+                    <Button href={env.REACT_APP_ENV_INFO_LINK} target="_blank">
                       Saiba mais
                     </Button>
                   </PanelActionContainer>
