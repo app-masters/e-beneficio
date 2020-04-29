@@ -14,6 +14,7 @@ import { Flex } from '../../components/flex';
 import { DashboardFamily } from '../../interfaces/dashboardFamily';
 import { familyGroupList } from '../../utils/constraints';
 import moment from 'moment';
+import { FamilySearch } from '../../components/familySearch';
 
 const { Dragger } = Upload;
 
@@ -77,6 +78,13 @@ export const FamiliesList: React.FC<{}> = () => {
                 <Typography.Text>{moment(dashboardData?.lastCreatedDate).fromNow()}</Typography.Text>
               </Col>
             </Row>
+          </Card>
+        </Col>
+      </Row>
+      <Row gutter={[16, 16]}>
+        <Col span={24}>
+          <Card title={'Busca pelo NIS'}>
+            <FamilySearch />
           </Card>
         </Col>
       </Row>
