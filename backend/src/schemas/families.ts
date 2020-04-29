@@ -1,4 +1,5 @@
 import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize';
+import { Dependent } from './depedents';
 
 // Simple item type
 export interface Family {
@@ -13,6 +14,8 @@ export interface Family {
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
+  // Join
+  dependents?: Dependent[];
 }
 // Sequelize returns type
 export type SequelizeFamily = Family & Model;
@@ -84,6 +87,10 @@ export const initFamilySchema = (sequelize: Sequelize): SequelizeFamilyModel => 
     Schema.hasMany(models.consumptions, {
       foreignKey: 'familyId',
       as: 'consumptions'
+    });
+    Schema.hasMany(models.dependents, {
+      foreignKey: 'familyId',
+      as: 'dependents'
     });
   };
 

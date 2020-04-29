@@ -56,6 +56,60 @@ router.post('/file', async (req, res) => {
 });
 
 /**
+ * Upload CSV file with sislame list and family list
+ */
+router.post('/file-sislame', async (req, res) => {
+  try {
+    if (!req.user?.cityId) throw Error('User without selected city');
+
+    // Check if another import is in progress
+    const status = familyModel.getImportReport(req.user.cityId);
+    if (status.inProgress) {
+      return res.status(403).send('Another import already running.');
+    }
+    // Check files
+    if (!req.files || !req.files.sislame || !req.files.families) {
+      return res.status(400).send('No files were uploaded.');
+    }
+    let sislameFile = req.files.sislame;
+    if (Array.isArray(sislameFile)) {
+      sislameFile = sislameFile[0];
+    }
+    let familiyFile = req.files.families;
+    if (Array.isArray(familiyFile)) {
+      familiyFile = familiyFile[0];
+    }
+    // Files ok, send uploaded
+    res.send({ uploaded: true });
+
+    // Run the import function, the status will be monitored using the report function/route
+    await familyModel.importFamilyFromCadAndSislameCSV(
+      familiyFile.tempFilePath,
+      sislameFile.tempFilePath,
+      req.user.cityId
+    );
+    return;
+  } catch (error) {
+    logging.error(error);
+    return res.status(error.status || 500).send(error.message);
+  }
+});
+
+/**
+ * Get CSV import status
+ */
+router.get('/import-status', async (req, res) => {
+  try {
+    if (!req.user?.cityId) throw Error('User without selected city');
+    const data = familyModel.getImportReport(req.user.cityId);
+    return res.send(data);
+  } catch (error) {
+    logging.error(error);
+    return res.status(error.status || 500).send(error.message);
+  }
+});
+
+/**
  * Sub-route to POST a new item
  */
 router.post('/', async (req, res) => {
