@@ -10,7 +10,13 @@ import {
   doGetDashboardFamilyFailed,
   doGetFamily,
   doGetFamilySuccess,
-  doGetFamilyFailed
+  doGetFamilyFailed,
+  doSaveFamily,
+  doSaveFamilySuccess,
+  doSaveFamilyFailed,
+  doDeleteFamily,
+  doDeleteFamilySuccess,
+  doDeleteFamilyFailed
 } from './actions';
 import { DashboardFamily } from '../../interfaces/dashboardFamily';
 import { Family } from '../../interfaces/family';
@@ -26,12 +32,17 @@ export interface FamilyReducerState {
   familyLoading: boolean;
   familyItem?: Family | null;
   familyError?: Error;
+
+  familySaveLoading: boolean;
+  familySaveItem?: Family | null;
+  familySaveError?: Error;
 }
 
 const initialState = {
   loading: false,
   dashboardLoading: false,
-  familyLoading: false
+  familyLoading: false,
+  familySaveLoading: false
 };
 
 export default createReducer<FamilyReducerState>(initialState, (builder) =>
@@ -84,5 +95,33 @@ export default createReducer<FamilyReducerState>(initialState, (builder) =>
       state.familyLoading = false;
       state.familyError = action.payload;
       state.familyItem = undefined;
+    })
+    // Get actions
+    .addCase(doSaveFamily, (state) => {
+      state.familySaveLoading = true;
+      state.familySaveError = undefined;
+      state.familySaveItem = undefined;
+    })
+    .addCase(doSaveFamilySuccess, (state, action) => {
+      state.familySaveLoading = false;
+      state.familySaveItem = action.payload;
+    })
+    .addCase(doSaveFamilyFailed, (state, action) => {
+      state.familySaveLoading = false;
+      state.familySaveError = action.payload;
+      state.familySaveItem = undefined;
+    })
+    // Delete actions
+    .addCase(doDeleteFamily, (state) => {
+      state.familySaveLoading = true;
+      state.familySaveError = undefined;
+    })
+    .addCase(doDeleteFamilySuccess, (state, action) => {
+      state.familySaveLoading = false;
+      state.familySaveItem = null;
+    })
+    .addCase(doDeleteFamilyFailed, (state, action) => {
+      state.familySaveLoading = false;
+      state.familySaveError = action.payload;
     })
 );

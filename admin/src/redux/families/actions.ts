@@ -5,6 +5,7 @@ import path from 'path';
 import { CSVReport } from '../../interfaces/csvReport';
 import { DashboardFamily } from '../../interfaces/dashboardFamily';
 import { Family } from '../../interfaces/family';
+import { User } from '../../interfaces/user';
 
 export const doUploadFamilyFile = createAction<void>('families/UPLOAD');
 export const doUploadFamilyFileSuccess = createAction<CSVReport>('families/UPLOAD_SUCCESS');
@@ -18,6 +19,14 @@ export const doGetDashboardFamilyFailed = createAction<Error | undefined>('dashb
 export const doGetFamily = createAction<void>('family/GET');
 export const doGetFamilySuccess = createAction<Family>('family/GET_SUCCESS');
 export const doGetFamilyFailed = createAction<Error | undefined>('family/GET_FAILED');
+
+export const doSaveFamily = createAction<void>('family/SAVE');
+export const doSaveFamilySuccess = createAction<Family>('family/SAVE_SUCCESS');
+export const doSaveFamilyFailed = createAction<Error | undefined>('family/SAVE_FAILED');
+
+export const doDeleteFamily = createAction<void>('family/DELETE');
+export const doDeleteFamilySuccess = createAction<{ id: number }>('family/DELETE_SUCCESS');
+export const doDeleteFamilyFailed = createAction<Error | undefined>('family/DELETE_FAILED');
 
 /**
  * Save User Thunk action
@@ -120,6 +129,46 @@ export const requestGetFamily = (nis: string, cityId: string): ThunkResult<void>
     } catch (error) {
       // Request failed: dispatch error
       dispatch(doGetFamilyFailed(error));
+    }
+  };
+};
+
+/**
+ * Save family Thunk action
+ */
+export const requestSaveFamily = (
+  item: Pick<Family, 'code' | 'id'>,
+  onSuccess?: () => void,
+  onFailure?: (error?: Error) => void
+): ThunkResult<void> => {
+  return async (dispatch, getState) => {
+    try {
+      // Start request - starting loading state
+      dispatch(doDeleteFamily());
+      // Get logged user cityId
+      const user = getState().authReducer.user as User;
+
+      //Request
+      let response;
+      if (item.id) {
+        response = await backend.put<Family>(`/families/${item.id}`, { ...item, cityId: user.cityId });
+      } else {
+        response = await backend.post<Family>(`/families`, { ...item, cityId: user.cityId });
+      }
+      if (response && response.data) {
+        // Request finished
+        dispatch(doSaveFamilySuccess(response.data)); // Dispatch result
+        if (onSuccess) onSuccess();
+      } else {
+        // Request without response - probably won't happen, but cancel the request
+        dispatch(doSaveFamilyFailed());
+        if (onFailure) onFailure();
+      }
+    } catch (error) {
+      // Request failed: dispatch error
+      alert(JSON.stringify(error));
+      dispatch(doSaveFamilyFailed(error));
+      if (onFailure) onFailure(error);
     }
   };
 };

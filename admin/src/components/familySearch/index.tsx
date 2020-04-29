@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Form, Button, Input, Typography, Card, Descriptions } from 'antd';
+import { Form, Input, Button, Typography, Card, Descriptions, Row, Col } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
-import { FamilyWrapper, InfoContainer, PriceStyle, PriceLabelStyle, HowToHeaderContainer, HowToLabel } from './styles';
+import { FamilyWrapper, InfoContainer } from './styles';
 import { AppState } from '../../redux/rootReducer';
 import { requestGetFamily } from '../../redux/families/actions';
 import { Family } from '../../interfaces/family';
-import { Flex } from '../flex';
 import moment from 'moment';
+import { Link } from 'react-router-dom';
 
 const { Text } = Typography;
 
@@ -65,18 +65,30 @@ export const FamilySearch: React.FC<ComponentProps> = () => {
 
       {!familyLoading && family && (
         <FamilyWrapper>
-          <Descriptions bordered size="small" layout="vertical">
-            <Descriptions.Item label="Nome do responsável">{family.responsibleName}</Descriptions.Item>
-            <Descriptions.Item label="Data de nascimento">
-              {moment(family.responsibleBirthday).format('DD/MM/YYYY')}
-            </Descriptions.Item>
-            <Descriptions.Item label="Nome da mãe">{family.responsibleMotherName}</Descriptions.Item>
-            <Descriptions.Item label="Saldo disponível">
-              <Typography.Paragraph strong>{`R$${(family.balance || 0)
-                .toFixed(2)
-                .replace('.', ',')}`}</Typography.Paragraph>
-            </Descriptions.Item>
-          </Descriptions>
+          <Row gutter={[16, 16]}>
+            <Col span={24}>
+              <Descriptions bordered size="small" layout="vertical">
+                <Descriptions.Item label="Nome do responsável">{family.responsibleName}</Descriptions.Item>
+                <Descriptions.Item label="Data de nascimento">
+                  {moment(family.responsibleBirthday).format('DD/MM/YYYY')}
+                </Descriptions.Item>
+                <Descriptions.Item label="Nome da mãe">{family.responsibleMotherName}</Descriptions.Item>
+                <Descriptions.Item label="Saldo disponível">
+                  <Typography.Paragraph strong>{`R$${(family.balance || 0)
+                    .toFixed(2)
+                    .replace('.', ',')}`}</Typography.Paragraph>
+                </Descriptions.Item>
+              </Descriptions>
+            </Col>
+          </Row>
+          <Row gutter={[16, 16]}>
+            <Col flex={1} />
+            <Col>
+              <Link to={`/familias/${family.id}/editar`}>
+                <Button>Editar</Button>
+              </Link>
+            </Col>
+          </Row>
         </FamilyWrapper>
       )}
     </>
