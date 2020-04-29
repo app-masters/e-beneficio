@@ -32,7 +32,7 @@ module.exports = {
       }
     ],
     'jsdoc/require-description': [2],
-    complexity: ['error', { max: 10 }]
+    // complexity: ['error', { max: 10 }]
   },
   settings: {
     jsdoc: {
