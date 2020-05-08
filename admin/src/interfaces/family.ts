@@ -24,6 +24,7 @@ export type ImportReport = {
   inProgress?: boolean;
   originalFamilyCount?: number;
   originalSislameCount?: number;
+  originalNurseryCount?: number;
   filteredFamilyCount?: number;
   grantedFamilyCount?: number;
   aboveAgeFamilyCount?: number;
@@ -33,4 +34,7 @@ export type ImportReport = {
   notFoundFamilyCount?: number;
   dependentsCount?: number;
   duplicatedCount?: number;
+  sislameWithoutParentCount?: number;
+  fourteenOrLessGrantedCount?: number;
+  fourteenOrLessFilteredCount?: number;
 };

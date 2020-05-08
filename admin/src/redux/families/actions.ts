@@ -126,6 +126,7 @@ export const requestGetImportReport = (): ThunkResult<void> => {
     } catch (error) {
       // Request failed: dispatch error
       dispatch(doGetImportReportFailed(error));
+      dispatch(requestStopImportReportSync());
     }
   };
 };
@@ -153,6 +154,7 @@ export const requestStartImportReportSync = (): ThunkResult<void> => {
 export const requestUploadSislameFile = (
   familyFile: File,
   sislameFile: File,
+  nurseryFile: File,
   onSuccess?: () => void,
   onFailure?: (error?: string) => void
 ): ThunkResult<void> => {
@@ -167,15 +169,20 @@ export const requestUploadSislameFile = (
     };
 
     try {
-      if (familyFile && sislameFile) {
+      if (familyFile && sislameFile && nurseryFile) {
         // If the extension is correct
-        if (path.extname(familyFile.name) === '.csv' && path.extname(sislameFile.name) === '.csv') {
+        if (
+          path.extname(familyFile.name) === '.csv' &&
+          path.extname(sislameFile.name) === '.csv' &&
+          path.extname(nurseryFile.name) === '.csv'
+        ) {
           // Start request - starting loading state
           dispatch(doUploadSislameFiles());
 
           const data = new FormData();
           data.append('families', familyFile);
           data.append('sislame', sislameFile);
+          data.append('nursery', nurseryFile);
 
           // Request
           const response = await backend.post<{ uploaded: boolean }>(`/families/file-sislame`, data);

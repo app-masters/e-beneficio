@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 import db from '../schemas';
 import { Dependent, SequelizeDependent } from '../schemas/depedents';
-import { FamilyItem, SislameItem } from '../typings/filesItems';
+import { FamilyItem, OriginalSislameItem } from '../typings/filesItems';
 import moment from 'moment';
 import { Family } from '../schemas/families';
 
@@ -11,13 +11,13 @@ import { Family } from '../schemas/families';
  * @param sislameItem Sislame CSV item
  * @returns Dependent object
  */
-export const parseFamilyAndSislameItems = (familyItem: FamilyItem, sislameItem: SislameItem): Dependent => {
+export const parseFamilyAndSislameItems = (familyItem: FamilyItem, sislameItem: OriginalSislameItem): Dependent => {
   return {
     familyId: 0,
     name: familyItem['DEPENDENTE'].toUpperCase(),
     nis: familyItem['NISDEPENDEN'],
     birthday: moment(familyItem['DTNASCDEP'], 'DD/MM/YYYY').toISOString(),
-    schoolName: sislameItem['Escola']
+    schoolName: sislameItem['NOME ESCOLA']
   };
 };
 

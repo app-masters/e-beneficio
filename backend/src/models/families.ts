@@ -12,7 +12,7 @@ import logging from '../utils/logging';
 import { compareNames } from '../utils/string';
 import { parseFamilyAndSislameItems, certifyDependentsByFamilyList } from './dependents';
 
-import { FamilyItem, SislameItem, OriginalSislameItem } from '../typings/filesItems';
+import { FamilyItem, SislameItem, OriginalSislameItem, OriginalNurseryItem } from '../typings/filesItems';
 import { Family, SequelizeFamily } from '../schemas/families';
 import { City } from '../schemas/cities';
 
@@ -24,6 +24,7 @@ type ImportReport = {
   inProgress?: boolean;
   originalFamilyCount?: number;
   originalSislameCount?: number;
+  originalNurseryCount?: number;
   filteredFamilyCount?: number;
   grantedFamilyCount?: number;
   aboveAgeFamilyCount?: number;
@@ -33,6 +34,9 @@ type ImportReport = {
   notFoundFamilyCount?: number;
   dependentsCount?: number;
   duplicatedCount?: number;
+  sislameWithoutParentCount?: number;
+  fourteenOrLessGrantedCount?: number;
+  fourteenOrLessFilteredCount?: number;
 };
 
 // Global report
@@ -96,6 +100,7 @@ export const resetImportReport = (cityId: NonNullable<City['id']>) => {
     cityId: cityId,
     originalFamilyCount: 0,
     originalSislameCount: 0,
+    originalNurseryCount: 0,
     filteredFamilyCount: 0,
     grantedFamilyCount: 0,
     aboveAgeFamilyCount: 0,
@@ -104,7 +109,10 @@ export const resetImportReport = (cityId: NonNullable<City['id']>) => {
     grantedAnotherParentCount: 0,
     notFoundFamilyCount: 0,
     dependentsCount: 0,
-    duplicatedCount: 0
+    duplicatedCount: 0,
+    sislameWithoutParentCount: 0,
+    fourteenOrLessGrantedCount: 0,
+    fourteenOrLessFilteredCount: 0
   });
 };
 
@@ -404,15 +412,40 @@ export const parseFamilyItem = (family: FamilyItem, cityId: NonNullable<City['id
   };
 };
 
+// Official Sislame file
+const keys = {
+  dependentName: 'NOME DO ALUNO',
+  birthday: 'Data Nascimento',
+  motherName: 'Nome Mae',
+  originalMotherName: 'Nome Mãe',
+  fatherName: 'Nome Pai',
+  originalFatherName: 'Nome Pai',
+  responsibleName: 'Nome Responsavel',
+  originalResponsibleName: 'Nome Responsável',
+  schoolName: 'NOME ESCOLA',
+  uniqueNumber: 'ID_ALUNO_MATRICULA'
+};
+
+// First Sislame file
+// const keys = {
+//   dependentName: 'Aluno',
+//   birthday: 'Data Nascimento',
+//   motherName: 'Mae',
+//   fatherName: 'Pai',
+//   responsibleName: 'Nome Responsavel',
+//   schoolName: 'Escola',
+//   uniqueNumber: 'Matricula'
+// };
+
 /**
  * Check item and throw error if required key is not found
  * @param item single sislame item
  * @param cityId logged user city unique ID
  */
-export const checkRequiredSislameData = (item: SislameItem, cityId: NonNullable<City['id']>): void => {
+export const checkRequiredSislameData = (item: OriginalSislameItem, cityId: NonNullable<City['id']>): void => {
   if (!item) throw { status: 412, message: 'Nenhum dado na tabela do Sislame' };
-  const requiredKeys = ['Aluno', 'Nome Responsável'] as (keyof OriginalSislameItem)[]; // Checking before removing the special characters
-  const availableKeys = Object.keys(item) as (keyof OriginalSislameItem)[];
+  const requiredKeys = [keys.dependentName, keys.responsibleName] as (keyof OriginalSislameItem)[]; // Checking before removing the special characters
+  const availableKeys = Object.keys(item).map(deburr) as (keyof OriginalSislameItem)[];
   const notFoundKeys = requiredKeys.filter((key) => availableKeys.indexOf(key) < 0);
   if (notFoundKeys && notFoundKeys.length > 0) {
     const message = `Na tabela do Sislame, as seguintes colunas não foram encontradas: ${notFoundKeys.join(', ')}`;
@@ -448,14 +481,35 @@ export const checkRequiredFamilyData = (item: FamilyItem, cityId: NonNullable<Ci
 };
 
 /**
+ * Check item and throw error if required key is not found
+ * @param item single nursery item
+ * @param cityId logged user city unique ID
+ */
+export const checkRequiredNurseryData = (item: OriginalNurseryItem, cityId: NonNullable<City['id']>): void => {
+  if (!item) throw { status: 412, message: 'Nenhum dado na tabela do Bolsa Família' };
+  const requiredKeys = ['Criança', 'Creche', 'RESPONSAVEL'] as (keyof OriginalNurseryItem)[]; // Checking before removing the special characters
+  const availableKeys = Object.keys(item) as (keyof OriginalNurseryItem)[];
+  const notFoundKeys = requiredKeys.filter((key) => availableKeys.indexOf(key) < 0);
+  if (notFoundKeys && notFoundKeys.length > 0) {
+    const message = `Na tabela das Creches, as seguintes colunas não foram encontradas: ${notFoundKeys.join(
+      ', '
+    )} --- Disponíveis: ${availableKeys.join(', ')}`;
+    updateImportReport({ status: 'Falhou', message, inProgress: false }, cityId);
+    throw { status: 412, message };
+  }
+};
+
+/**
  * Find the interception between CAD and Sislame data to create the families
  * @param familyFilePath file absolute path
  * @param sislameFilePath file absolute path
+ * @param nurseryFilePath file absolute path
  * @param cityId logged user city ID
  */
 export const importFamilyFromCadAndSislameCSV = async (
   familyFilePath: string,
   sislameFilePath: string,
+  nurseryFilePath: string,
   cityId: NonNullable<City['id']>
 ) => {
   resetImportReport(cityId);
@@ -465,10 +519,12 @@ export const importFamilyFromCadAndSislameCSV = async (
   updateImportReport({ status: 'Lendo arquivos' }, cityId);
   // Lendo arquivos to get the data
   let originalFamilyData: FamilyItem[] = await csv({ delimiter: ';', flatKeys: true }).fromFile(familyFilePath);
-  let originalSislameData: SislameItem[] = await csv({ flatKeys: true }).fromFile(sislameFilePath);
+  let originalSislameData: OriginalSislameItem[] = await csv({ flatKeys: true }).fromFile(sislameFilePath);
+  const originalNurseryData: OriginalNurseryItem[] = await csv({ flatKeys: true }).fromFile(nurseryFilePath);
 
   addOnReportCount(cityId, 'originalFamilyCount', originalFamilyData.length);
   addOnReportCount(cityId, 'originalSislameCount', originalSislameData.length);
+  addOnReportCount(cityId, 'originalNurseryCount', originalNurseryData.length);
 
   console.log(`[import] Base bolsa família: ${originalFamilyData.length} items`);
   console.log(`[import] Base sislame:       ${originalSislameData.length} items`);
@@ -481,11 +537,29 @@ export const importFamilyFromCadAndSislameCSV = async (
   // Check all important fields
   checkRequiredSislameData(originalSislameData[0], cityId);
   checkRequiredFamilyData(originalFamilyData[0], cityId);
+  checkRequiredNurseryData(originalNurseryData[0], cityId);
+
+  // Mergeing Sislame with Nursery files
+  originalSislameData = [
+    ...originalSislameData,
+    ...originalNurseryData.map(
+      (item, index) =>
+        ({
+          [keys.dependentName]: item['Criança'],
+          [keys.originalResponsibleName]: item['RESPONSAVEL'],
+          [keys.schoolName]: item['Creche'],
+          [keys.uniqueNumber]: `nursery-${index}`
+        } as OriginalSislameItem)
+    )
+  ];
 
   // Removing duplicated lines in each list
   const countFamilyBefore = originalFamilyData.length;
   originalFamilyData = uniqBy(originalFamilyData, (item) => `${item.NISTITULAR}-${item.NISDEPENDEN}`);
-  originalSislameData = uniqBy(originalSislameData, (item) => `${item['Aluno']}-${item['Matricula']}`);
+  originalSislameData = uniqBy(
+    originalSislameData,
+    (item) => `${item[keys.dependentName]}-${item[keys.uniqueNumber] || Math.random()}`
+  );
 
   addOnReportCount(cityId, 'duplicatedCount', countFamilyBefore - originalFamilyData.length);
 
@@ -494,7 +568,6 @@ export const importFamilyFromCadAndSislameCSV = async (
   [originalFamilyData, removedFamilies] = originalFamilyData.reduce(
     ([valid, invalid], item) => {
       // Checking the birthday, the dependent can't have more than 17 years
-
       const validAge = moment().startOf('month').diff(moment(item['DTNASCDEP'], 'DD/MM/YYYY'), 'years') < 18;
       if (!validAge) {
         // Add to invalid data
@@ -505,9 +578,25 @@ export const importFamilyFromCadAndSislameCSV = async (
     },
     [[], []] as FamilyItem[][]
   );
+  let removedSislame: OriginalSislameItem[] = [];
+  [originalSislameData, removedSislame] = originalSislameData.reduce(
+    ([valid, invalid], item) => {
+      const hasParents =
+        (item[keys.originalResponsibleName] && item[keys.originalResponsibleName].length > 1) ||
+        (item[keys.originalFatherName] && item[keys.originalFatherName].length > 1) ||
+        (item[keys.originalMotherName] && item[keys.originalMotherName].length > 1);
+      if (!hasParents) {
+        return [valid, [...invalid, item]];
+      }
+
+      return [[...valid, item], invalid];
+    },
+    [[], []] as OriginalSislameItem[][]
+  );
   // Loging invalid data
   await CSVWriter.writeRecords(removedFamilies);
   addOnReportCount(cityId, 'aboveAgeFamilyCount', removedFamilies.length);
+  addOnReportCount(cityId, 'sislameWithoutParentCount', removedSislame.length);
 
   // Removing special characters
   let familyData: FamilyItem[] = JSON.parse(deburr(JSON.stringify(originalFamilyData)));
@@ -533,6 +622,8 @@ export const importFamilyFromCadAndSislameCSV = async (
 
   const grantedFamilies: Family[] = [];
 
+  console.log(sislameData[sislameData.length - 1]);
+
   // Going through each family in the list
   for (const familyIndex in familyData) {
     updateImportReport({ status: 'Cruzando dados', percentage: (Number(familyIndex) + 1) / familyData.length }, cityId);
@@ -545,28 +636,33 @@ export const importFamilyFromCadAndSislameCSV = async (
     const familyItem = familyData[familyIndex];
     // Finding family child on sislame
     const sislameIndex = sislameData.findIndex((sislameItem) => {
-      const sameName = compareNames(sislameItem['Aluno'], familyItem['DEPENDENTE']);
-      const parentKeys = ['Mae', 'Nome Mae', 'Pai', 'Nome Pai', 'Nome Responsavel'];
-
-      const sameResponsible = parentKeys
-        .map((key) => (sislameItem[key] ? compareNames(sislameItem[key], familyItem['TITULAR']) : false))
-        .some(Boolean);
-      // const sameResponsible =
-      //   compareNames(sislameItem['Mae'], familyItem['TITULAR']) ||
-      //   compareNames(sislameItem['Pai'], familyItem['TITULAR']) ||
-      //   compareNames(sislameItem['Nome Responsavel'], familyItem['TITULAR']);
-      return sameName && sameResponsible;
+      if (sislameItem[keys.dependentName][0].toLowerCase() !== familyItem['DEPENDENTE'][0].toLocaleLowerCase()) {
+        // Not even the first letter is the same
+        return false;
+      }
+      const sameName = compareNames(sislameItem[keys.dependentName], familyItem['DEPENDENTE']);
+      if (sameName) {
+        // Same name, check the parent
+        const sameResponsible =
+          compareNames(sislameItem[keys.motherName], familyItem['TITULAR']) ||
+          compareNames(sislameItem[keys.fatherName], familyItem['TITULAR']) ||
+          compareNames(sislameItem[keys.dependentName], familyItem['TITULAR']);
+        return sameResponsible;
+      }
+      return false;
     });
+    // Counting if the age is bellow 14
+    const fourteenOrLess = moment().startOf('month').diff(moment(familyItem.DTNASCDEP, 'DD/MM/YYYY'), 'years') < 15;
     if (sislameIndex > -1) {
       const sislameItem = sislameData[sislameIndex];
       // Check Sislame birthday - seems weird to check just here, but all the reasons need a familyItem
-      if (sislameItem['Data Nascimento']) {
+      if (sislameItem[keys.birthday]) {
         const validSislameAge =
-          moment().startOf('month').diff(moment(sislameItem['Data Nascimento'], 'DD/MM/YYYY'), 'years') < 18;
+          moment().startOf('month').diff(moment(sislameItem[keys.birthday], 'DD/MM/YYYY'), 'years') < 18;
         if (!validSislameAge) {
-          await CSVWriter.writeRecords([{ ...familyItem, reason: 'Dependente não é menor de idade no Sislame' }]);
           addOnReportCount(cityId, 'aboveAgeSislameCount');
-          continue;
+          // await CSVWriter.writeRecords([{ ...familyItem, reason: 'Dependente não é menor de idade no Sislame' }]);
+          // continue;
         }
       }
 
@@ -579,17 +675,24 @@ export const importFamilyFromCadAndSislameCSV = async (
         // Not on the list yet, add it
         grantedFamilies.push({ ...parseFamilyItem(originalFamilyData[familyIndex], cityId), dependents: [dependent] });
         addOnReportCount(cityId, 'grantedFamilyCount');
-        addOnReportCount(cityId, 'dependentsCount');
       } else {
         // Already on the list, just update the number of children
         const family = grantedFamilies[alreadyOnListIndex];
         grantedFamilies[alreadyOnListIndex] = { ...family, dependents: [...(family.dependents || []), dependent] };
-        addOnReportCount(cityId, 'dependentsCount');
+      }
+      addOnReportCount(cityId, 'dependentsCount');
+      if (fourteenOrLess) {
+        addOnReportCount(cityId, 'fourteenOrLessGrantedCount');
       }
       continue;
     }
     // Item not found in sislame database, trying to find a better reason
-    const sislameItem = sislameData.find((sislameItem) => compareNames(sislameItem['Aluno'], familyItem['DEPENDENTE']));
+    const sislameItem = sislameData.find((sislameItem) => {
+      if (sislameItem[keys.dependentName][0].toLowerCase() !== familyItem['DEPENDENTE'][0].toLocaleLowerCase()) {
+        return compareNames(sislameItem[keys.dependentName], familyItem['DEPENDENTE']);
+      }
+      return false;
+    });
     if (sislameItem) {
       await CSVWriter.writeRecords([
         {
@@ -603,6 +706,9 @@ export const importFamilyFromCadAndSislameCSV = async (
       await CSVWriter.writeRecords([{ ...familyItem, reason: 'Dependente não está no Sislame' }]);
       addOnReportCount(cityId, 'notFoundFamilyCount');
     }
+    if (fourteenOrLess) {
+      addOnReportCount(cityId, 'fourteenOrLessFilteredCount');
+    }
   }
 
   // Dealing with duplicated families
@@ -611,13 +717,12 @@ export const importFamilyFromCadAndSislameCSV = async (
       (item) => item.NISDEPENDEN === duplicatedDependent[0].NISDEPENDEN
     );
     // For duplicated families, the mother have the priority, then the responsible and finally the father
-    type PossibleParents = 'Mae' | 'Nome Mae' | 'Pai' | 'Nome Pai' | 'Nome Responsavel';
-    let foundSislameKey: PossibleParents = 'Mae';
-    const sislamePossibleKeys: PossibleParents[] = ['Mae', 'Nome Mae', 'Pai', 'Nome Pai', 'Nome Responsavel'];
+    let foundSislameKey = keys.motherName;
+    const sislamePossibleKeys = [keys.motherName, keys.fatherName, keys.responsibleName];
     let sislameIndex = -1;
     for (const key of sislamePossibleKeys) {
       sislameIndex = sislameData.findIndex((sislameItem) => {
-        const sameName = compareNames(sislameItem['Aluno'], duplicatedItens[0]['DEPENDENTE']);
+        const sameName = compareNames(sislameItem[keys.dependentName], duplicatedItens[0]['DEPENDENTE']);
         const sameParent = duplicatedItens.some((familyItem) => compareNames(sislameItem[key], familyItem['TITULAR']));
         return sameName && sameParent;
       });
@@ -639,12 +744,13 @@ export const importFamilyFromCadAndSislameCSV = async (
         if (compareNames(sislameItem[foundSislameKey], familyItem['TITULAR'])) {
           const sislameItem = sislameData[sislameIndex];
           // Check Sislame birthday - seems weird to check just here, but all the reasons need a familyItem
-          if (sislameItem['Data Nascimento']) {
+          if (sislameItem[keys.birthday]) {
             const validSislameAge =
-              moment().startOf('month').diff(moment(sislameItem['Data Nascimento'], 'DD/MM/YYYY'), 'years') < 18;
+              moment().startOf('month').diff(moment(sislameItem[keys.birthday], 'DD/MM/YYYY'), 'years') < 18;
             if (!validSislameAge) {
-              await CSVWriter.writeRecords([{ ...familyItem, reason: 'Dependente não é menor de idade no Sislame' }]);
-              continue;
+              addOnReportCount(cityId, 'aboveAgeSislameCount');
+              // await CSVWriter.writeRecords([{ ...familyItem, reason: 'Dependente não é menor de idade no Sislame' }]);
+              // continue;
             }
           }
           const alreadyOnListIndex = grantedFamilies.findIndex(

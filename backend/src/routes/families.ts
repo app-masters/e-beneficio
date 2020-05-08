@@ -68,24 +68,29 @@ router.post('/file-sislame', async (req, res) => {
       return res.status(403).send('Another import already running.');
     }
     // Check files
-    if (!req.files || !req.files.sislame || !req.files.families) {
+    if (!req.files || !req.files.sislame || !req.files.families || !req.files.nursery) {
       return res.status(400).send('No files were uploaded.');
     }
     let sislameFile = req.files.sislame;
     if (Array.isArray(sislameFile)) {
       sislameFile = sislameFile[0];
     }
-    let familiyFile = req.files.families;
-    if (Array.isArray(familiyFile)) {
-      familiyFile = familiyFile[0];
+    let familyFile = req.files.families;
+    if (Array.isArray(familyFile)) {
+      familyFile = familyFile[0];
+    }
+    let nurseryFile = req.files.nursery;
+    if (Array.isArray(nurseryFile)) {
+      nurseryFile = nurseryFile[0];
     }
     // Files ok, send uploaded
     res.send({ uploaded: true });
 
     // Run the import function, the status will be monitored using the report function/route
     await familyModel.importFamilyFromCadAndSislameCSV(
-      familiyFile.tempFilePath,
+      familyFile.tempFilePath,
       sislameFile.tempFilePath,
+      nurseryFile.tempFilePath,
       req.user.cityId
     );
     return;
