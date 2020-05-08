@@ -66,30 +66,19 @@ export const FamiliesList: React.FC<{}> = () => {
   const [importType, setImportType] = useState<'sislame' | 'cad'>('sislame');
   const [familyFile, setFamilyFile] = useState<File | null>(null);
   const [sislameFile, setSislameFile] = useState<File | null>(null);
+  const [nurseryFile, setNurseryFile] = useState<File | null>(null);
 
   /**
-   * Save files and upload if both are defined
-   * @param familyChosenFile Family file
-   * @param sislameChosenFile Sislame file
+   * Save files and upload if all are defined
    */
-  const uploadFile = (familyChosenFile?: File, sislameChosenFile?: File) => {
-    if (familyChosenFile) {
-      if (sislameFile) {
-        dispatch(requestUploadSislameFile(familyChosenFile, sislameFile));
-        setSislameFile(null);
-      } else {
-        setFamilyFile(familyChosenFile);
-      }
+  useEffect(() => {
+    if (familyFile && sislameFile && nurseryFile) {
+      dispatch(requestUploadSislameFile(familyFile, sislameFile, nurseryFile));
+      setFamilyFile(null);
+      setSislameFile(null);
+      setNurseryFile(null);
     }
-    if (sislameChosenFile) {
-      if (familyFile) {
-        dispatch(requestUploadSislameFile(familyFile, sislameChosenFile));
-        setFamilyFile(null);
-      } else {
-        setSislameFile(sislameChosenFile);
-      }
-    }
-  };
+  }, [dispatch, familyFile, sislameFile, nurseryFile]);
 
   useEffect(() => {
     dispatch(requestGetDashboardFamily());
@@ -178,6 +167,9 @@ export const FamiliesList: React.FC<{}> = () => {
                 <Descriptions.Item label="Alunos na base do Sislame">
                   <CounterItem>{importReport.originalSislameCount}</CounterItem>
                 </Descriptions.Item>
+                <Descriptions.Item label="Crianças na base das Creches">
+                  <CounterItem>{importReport.originalNurseryCount}</CounterItem>
+                </Descriptions.Item>
               </Descriptions>
               <Descriptions bordered size="small" column={1} style={{ marginBottom: spacing.default }}>
                 <Descriptions.Item label="Dependentes no Bolsa Família duplicados (mesmo NIS para responsável e dependente)">
@@ -195,8 +187,8 @@ export const FamiliesList: React.FC<{}> = () => {
                 <Descriptions.Item label="Dependentes no Bolsa Família maiores de idade">
                   <CounterItem>{importReport.aboveAgeFamilyCount}</CounterItem>
                 </Descriptions.Item>
-                <Descriptions.Item label="Alunos maiores de idade apenas no Sislame">
-                  <CounterItem>{importReport.aboveAgeSislameCount}</CounterItem>
+                <Descriptions.Item label="Alunos sem nenhum responsável no Sislame">
+                  <CounterItem>{importReport.sislameWithoutParentCount}</CounterItem>
                 </Descriptions.Item>
                 <Descriptions.Item label="Dependentes após filtros de idade e duplicidade">
                   <CounterItem bold>
@@ -226,6 +218,19 @@ export const FamiliesList: React.FC<{}> = () => {
                     {importReport.notFoundFamilyCount}
                   </CounterItem>
                 </Descriptions.Item>
+                <Descriptions.Item label="Alunos maiores de idade apenas no Sislame">
+                  <CounterItem>
+                    {importReport.filteredFamilyCount && importReport.filteredFamilyCount > 0 && (
+                      <Typography.Text type="secondary" style={{ marginRight: spacing.default }}>
+                        {`(${(
+                          (100 * (importReport.aboveAgeSislameCount || 0)) /
+                          importReport.filteredFamilyCount
+                        ).toFixed(1)}%)`}
+                      </Typography.Text>
+                    )}
+                    {importReport.aboveAgeSislameCount}
+                  </CounterItem>
+                </Descriptions.Item>
                 <Descriptions.Item label="Dependentes com nome encontrado, mas responsável não">
                   <CounterItem>
                     {importReport.filteredFamilyCount && importReport.filteredFamilyCount > 0 && (
@@ -238,6 +243,9 @@ export const FamiliesList: React.FC<{}> = () => {
                     )}
                     {importReport.foundOnlyNameFamilyCount}
                   </CounterItem>
+                </Descriptions.Item>
+                <Descriptions.Item label="Dependentes com 14 anos ou menos removidos">
+                  <CounterItem>{importReport.fourteenOrLessFilteredCount}</CounterItem>
                 </Descriptions.Item>
               </Descriptions>
               <Descriptions bordered size="small" column={1} style={{ marginBottom: spacing.default }}>
@@ -258,6 +266,19 @@ export const FamiliesList: React.FC<{}> = () => {
                 </Descriptions.Item>
                 <Descriptions.Item label="Depedentes já beneficiados por outro responsável">
                   <CounterItem>{importReport.grantedAnotherParentCount}</CounterItem>
+                </Descriptions.Item>
+                <Descriptions.Item label="Dependentes com 14 anos ou menos beneficiados">
+                  <CounterItem>
+                    {importReport.dependentsCount && importReport.dependentsCount > 0 && (
+                      <Typography.Text type="secondary" style={{ marginRight: spacing.sm }}>
+                        {`(${(
+                          (100 * (importReport.fourteenOrLessGrantedCount || 0)) /
+                          importReport.dependentsCount
+                        ).toFixed(1)}%)`}
+                      </Typography.Text>
+                    )}
+                    {importReport.fourteenOrLessGrantedCount}
+                  </CounterItem>
                 </Descriptions.Item>
               </Descriptions>
               <Flex gap>
@@ -369,7 +390,7 @@ export const FamiliesList: React.FC<{}> = () => {
                           accept=".csv"
                           action={undefined}
                           showUploadList={false}
-                          customRequest={({ file }) => uploadFile(file, undefined)}
+                          customRequest={({ file }) => setFamilyFile(file)}
                         >
                           <p className="ant-upload-drag-icon">
                             <IdcardOutlined />
@@ -391,7 +412,7 @@ export const FamiliesList: React.FC<{}> = () => {
                           accept=".csv"
                           action={undefined}
                           showUploadList={false}
-                          customRequest={({ file }) => uploadFile(undefined, file)}
+                          customRequest={({ file }) => setSislameFile(file)}
                         >
                           <p className="ant-upload-drag-icon">
                             <TeamOutlined />
@@ -403,6 +424,28 @@ export const FamiliesList: React.FC<{}> = () => {
                               color="processing"
                               style={{ marginTop: spacing.default }}
                             >{`Arquivo selectionado: ${sislameFile.name}`}</Tag>
+                          )}
+                        </Dragger>
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <Dragger
+                          id="file"
+                          name="file"
+                          accept=".csv"
+                          action={undefined}
+                          showUploadList={false}
+                          customRequest={({ file }) => setNurseryFile(file)}
+                        >
+                          <p className="ant-upload-drag-icon">
+                            <TeamOutlined />
+                          </p>
+                          <p className="ant-upload-text">Clique ou arraste um arquivo da base das Creches</p>
+                          <p className="ant-upload-hint">O arquivo precisa ser do tipo CSV</p>
+                          {nurseryFile && (
+                            <Tag
+                              color="processing"
+                              style={{ marginTop: spacing.default }}
+                            >{`Arquivo selectionado: ${nurseryFile.name}`}</Tag>
                           )}
                         </Dragger>
                       </div>

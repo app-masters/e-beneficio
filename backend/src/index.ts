@@ -34,12 +34,12 @@ const init = (listeningCallback: () => void, errorCallback: (error: Error) => vo
         credentials: true
       })
     );
-    app.use(bodyParser.urlencoded({ extended: true, limit: '20mb' }));
-    app.use(bodyParser.json({ limit: '20mb' }));
+    app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
+    app.use(bodyParser.json({ limit: '50mb' }));
 
     app.use(
       fileUpload({
-        limits: { fileSize: 10 * 1024 * 1024 },
+        limits: { fileSize: 50 * 1024 * 1024 },
         useTempFiles: true,
         tempFileDir: `${path.dirname(__dirname)}/database/storage/`,
         preserveExtension: true
