@@ -23,11 +23,18 @@ export const LoginPage: React.FC<{}> = () => {
     <PageContainer>
       <Card>
         <FormContainer>
-          <Form style={{ width: '300px' }}>
+          <Form
+            name="login"
+            style={{ width: '300px' }}
+            onFinish={() => {
+              dispatch(requestLoginUser(email, password));
+            }}
+          >
             <Form.Item>
               <Input
                 size="large"
                 value={email}
+                required
                 placeholder={'Email'}
                 onChange={(event) => setEmail(event.target.value)}
               />
@@ -35,6 +42,7 @@ export const LoginPage: React.FC<{}> = () => {
             <Form.Item>
               <Input.Password
                 size="large"
+                required
                 value={password}
                 placeholder={'Password'}
                 onChange={(event) => setPassword(event.target.value)}
@@ -45,15 +53,11 @@ export const LoginPage: React.FC<{}> = () => {
                 <Typography.Text type="danger">{error.message || 'Ocorreu um erro inesperado'}</Typography.Text>
               </Form.Item>
             )}
-            <Button
-              size="large"
-              loading={loading}
-              type="primary"
-              onClick={() => dispatch(requestLoginUser(email, password))}
-              style={{ width: '100%' }}
-            >
-              Entrar
-            </Button>
+            <Form.Item>
+              <Button size="large" loading={loading} htmlType="submit" type="primary" style={{ width: '100%' }}>
+                Entrar
+              </Button>
+            </Form.Item>
           </Form>
         </FormContainer>
       </Card>
