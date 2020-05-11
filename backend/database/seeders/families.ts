@@ -61,27 +61,4 @@ const seed = async () => {
   }
 };
 
-/**
- * Seed from CSV example
- */
-const csv = async () => {
-  const cities = await db.cities.findAll();
-  // const report = await importFamilyFromCSVFile(`${__dirname}/../files/families_example.csv`, cities[0].id as number);
-  const report = await importFamilyFromCadAndSislameCSV(
-    `${__dirname}/../files/Base Abril Corona Voucher.csv`,
-    `${__dirname}/../files/Relação de alunos - Sislame 2020.csv`,
-    cities[0].id as number
-  );
-  // if (report) {
-  //   if (report.report.length > 0) {
-  //     report.report.map((message) => console.log(`     - ${message}`));
-  //   }
-  //   console.log(`[seed] Families: CSV import finished`);
-  //   console.log(`     - ${report.created} created`);
-  //   console.log(`     - ${report.updated} updated`);
-  //   console.log(`     - ${report.deleted} deleted`);
-  //   console.log(`     - ${report.wrong} wrong`);
-  // }
-};
-
-export default { seed, csv };
+export default { seed };
