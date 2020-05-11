@@ -1,7 +1,6 @@
 import db from '../../src/schemas';
 import { Family } from '../../src/schemas/families';
 import moment from 'moment';
-import { importFamilyFromCadAndSislameCSV } from '../../src/models/families';
 
 const list = [
   {
