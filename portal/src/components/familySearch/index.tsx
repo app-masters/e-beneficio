@@ -76,7 +76,7 @@ export const FamilySearch: React.FC<ComponentProps> = () => {
       {!familyLoading && family && (
         <FamilyWrapper>
           <Card>
-            {sameBirthday ? (
+            {!sameBirthday ? (
               <>
                 <Text style={PriceLabelStyle}>{'Saldo disponível: '}</Text>
                 <Text style={PriceStyle}>{`R$${(family.balance || 0).toFixed(2).replace('.', ',')}`}</Text>
@@ -86,10 +86,10 @@ export const FamilySearch: React.FC<ComponentProps> = () => {
                     Para utilizar os seus créditos, vá até um dos estabelecimentos parceiros e informe que faz parte do
                     programa
                   </HowToLabel>
+                  {family.school && (
+                    <HowToLabel>{`Caso não tenha pego seu cartão, entre em contato com a escola ${family.school}`}</HowToLabel>
+                  )}
                 </HowToHeaderContainer>
-                <Flex justifyContent="center">
-                  <Button href={'#estabelecimentos'}>Ver Estabelecimentos</Button>
-                </Flex>
               </>
             ) : (
               <Form.Item

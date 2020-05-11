@@ -3,12 +3,10 @@ import { combineReducers } from 'redux';
 // Reducers
 import authReducer from './auth/reducers';
 import familyReducer from './family/reducers';
-import placeStoreReducer from './placeStore/reducers';
 
 const rootReducer = combineReducers({
   authReducer,
-  familyReducer,
-  placeStoreReducer
+  familyReducer
 });
 
 export type AppState = ReturnType<typeof rootReducer>;
