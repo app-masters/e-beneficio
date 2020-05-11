@@ -142,4 +142,18 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+/**
+ * Sub-rote to GET the file with all the families and balances
+ */
+router.get('/list-file', async (req, res) => {
+  try {
+    if (!req.user?.cityId) throw Error('User without selected city');
+    const filePath = await familyModel.generateListFile(req.user.cityId);
+    res.sendFile(filePath);
+  } catch (error) {
+    logging.error(error);
+    res.status(500).send(error.message);
+  }
+});
+
 export default router;
