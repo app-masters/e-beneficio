@@ -87,7 +87,6 @@ export const FamilyForm: React.FC<RouteComponentProps<{ id: string }>> = (props)
     >
       {status && <Alert message="Erro no formulário" description={status} type="error" />}
       <form onSubmit={handleSubmit}>
-        <label>{JSON.stringify(errors)}</label>
         <Form layout="vertical">
           <Form.Item
             label={'Código'}
