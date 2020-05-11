@@ -11,10 +11,12 @@ import moment from 'moment';
 import logging from '../utils/logging';
 import { compareNames } from '../utils/string';
 import { parseFamilyAndSislameItems, certifyDependentsByFamilyList } from './dependents';
+import { getFamilyDependentBalance } from './consumptions';
 
 import { FamilyItem, SislameItem, OriginalSislameItem, OriginalNurseryItem } from '../typings/filesItems';
 import { Family, SequelizeFamily } from '../schemas/families';
 import { City } from '../schemas/cities';
+import { File } from '@google-cloud/storage';
 
 type ImportReport = {
   status: 'Em espera' | 'Finalizado' | 'Falhou' | 'Lendo arquivos' | 'Filtrando dados' | 'Salvando' | 'Cruzando dados';
@@ -822,4 +824,60 @@ export const importFamilyFromCadAndSislameCSV = async (
   }
   console.log('');
   console.log('[import] Finalizado');
+};
+
+/**
+ * Generate CSV file with all registered families
+ * @param cityId logged user unique ID
+ */
+export const generateListFile = async (cityId: NonNullable<City['id']>) => {
+  const families = await db.families.findAll({
+    where: { cityId },
+    include: [{ model: db.dependents, as: 'dependents', required: true }]
+  });
+
+  const filePath = `${path.dirname(__dirname)}/../database/storage/list_${cityId}.csv`;
+  // Create file
+  fs.writeFileSync(filePath, undefined);
+  const csvFileWriter = createObjectCsvWriter({
+    path: filePath,
+    header: [
+      { id: 'school', title: 'ESCOLA' },
+      { id: 'responsibleName', title: 'TITULAR' },
+      { id: 'responsibleNis', title: 'NISTITULAR' },
+      { id: 'address', title: 'ENDEREÇO' },
+      { id: 'phone', title: 'TELEFONE' },
+      { id: 'dependents', title: 'DEPENDENTES' },
+      { id: 'balance', title: 'SALDO' }
+    ]
+  });
+  const benefits = await db.benefits.findAll({
+    include: [{ model: db.institutions, as: 'institution', where: { cityId } }]
+  });
+  // Getting each family balance and adding it to the file
+  let fileFamilies = [];
+  for (const family of families) {
+    if (!family.dependents || family.dependents.length < 1) continue;
+    const balance = await getFamilyDependentBalance(family, benefits);
+    const yongerDepedent = family.dependents.sort((a, b) => moment(b.birthday).diff(moment(a.birthday)))[0];
+    fileFamilies.push({
+      responsibleName: family.responsibleName,
+      responsibleNis: family.responsibleNis,
+      phone: family.phone,
+      address: family.address,
+      balance,
+      dependents: family.dependents.length,
+      school: yongerDepedent.schoolName
+    });
+  }
+  // Sort File
+  fileFamilies = fileFamilies.sort((a, b) => {
+    const schoolCompare = a.school?.localeCompare(b.school || '') || 0;
+    if (schoolCompare === 0) {
+      return a.responsibleName?.localeCompare(b.responsibleName || '') || 0;
+    }
+    return schoolCompare;
+  });
+  await csvFileWriter.writeRecords(fileFamilies);
+  return path.resolve(filePath);
 };
