@@ -166,7 +166,7 @@ export default createReducer<FamilyReducerState>(initialState, (builder) =>
       state.familySaveLoading = true;
       state.familySaveError = undefined;
     })
-    .addCase(doDeleteFamilySuccess, (state, action) => {
+    .addCase(doDeleteFamilySuccess, (state) => {
       state.familySaveLoading = false;
       state.familySaveItem = null;
     })

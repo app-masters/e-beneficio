@@ -16,7 +16,6 @@ import { getFamilyDependentBalance } from './consumptions';
 import { FamilyItem, SislameItem, OriginalSislameItem, OriginalNurseryItem } from '../typings/filesItems';
 import { Family, SequelizeFamily } from '../schemas/families';
 import { City } from '../schemas/cities';
-import { File } from '@google-cloud/storage';
 
 type ImportReport = {
   status: 'Em espera' | 'Finalizado' | 'Falhou' | 'Lendo arquivos' | 'Filtrando dados' | 'Salvando' | 'Cruzando dados';
