@@ -3,6 +3,7 @@ import { BrowserRouter, Route } from 'react-router-dom';
 
 // Pages
 import { DashboardPage } from './dashboard';
+import { ConsumptionForm } from './dashboard/form';
 
 /**
  * Router component
@@ -12,6 +13,7 @@ export const Router: React.FC<{}> = () => {
   return (
     <BrowserRouter>
       <Route component={DashboardPage} />
+      <Route path="/novo" component={ConsumptionForm} />
     </BrowserRouter>
   );
 };

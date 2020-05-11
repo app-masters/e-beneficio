@@ -76,7 +76,7 @@ export const FamilySearch: React.FC<ComponentProps> = () => {
       {!familyLoading && family && (
         <FamilyWrapper>
           <Card>
-            {!sameBirthday ? (
+            {sameBirthday ? (
               <>
                 <Text style={PriceLabelStyle}>{'Saldo disponível: '}</Text>
                 <Text style={PriceStyle}>{`R$${(family.balance || 0).toFixed(2).replace('.', ',')}`}</Text>
