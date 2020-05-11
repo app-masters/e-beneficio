@@ -2,6 +2,7 @@ export interface Family {
   readonly id?: number | string;
   cityId: number | string;
   code: string;
+  school: string;
   groupName: string;
   responsibleName: string;
   responsibleNis: string;
