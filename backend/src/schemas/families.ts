@@ -1,4 +1,6 @@
 import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize';
+import { Dependent } from './depedents';
+import { Consumption } from './consumptions';
 
 // Simple item type
 export interface Family {
@@ -10,9 +12,14 @@ export interface Family {
   responsibleNis: string;
   responsibleBirthday: Date;
   responsibleMotherName: string;
+  address?: string;
+  phone?: string;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
+  // Join
+  dependents?: Dependent[];
+  consumptions?: Consumption[];
 }
 // Sequelize returns type
 export type SequelizeFamily = Family & Model;
@@ -62,6 +69,14 @@ export const attributes = {
   responsibleMotherName: {
     type: DataTypes.STRING,
     allowNull: false
+  },
+  phone: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  address: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 };
 
@@ -84,6 +99,13 @@ export const initFamilySchema = (sequelize: Sequelize): SequelizeFamilyModel => 
     Schema.hasMany(models.consumptions, {
       foreignKey: 'familyId',
       as: 'consumptions'
+    });
+    Schema.hasMany(models.dependents, {
+      foreignKey: 'familyId',
+      as: 'dependents'
+    });
+    Schema.hasMany(models.benefits, {
+      foreignKey: 'groupName'
     });
   };
 
