@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { doGetTokenFailed } from '../../redux/auth/actions';
+import { doLogoutUser } from '../../redux/auth/actions';
 import { useHistory } from 'react-router-dom';
 
 /**
@@ -11,7 +11,7 @@ export const LogoutPage: React.FC = () => {
   const history = useHistory();
 
   useEffect(() => {
-    dispatch(doGetTokenFailed());
+    dispatch(doLogoutUser());
     history.push('/');
   }, [dispatch, history]);
 

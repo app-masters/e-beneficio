@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux';
+import { combineReducers, AnyAction, CombinedState } from 'redux';
 
 // Reducers
 import authReducer from './auth/reducers';
@@ -11,7 +11,7 @@ import familiesReducer from './families/reducers';
 import reportReducer from './report/reducers';
 import dashboardReducer from './dashboard/reducers';
 
-const rootReducer = combineReducers({
+const appReducer = combineReducers({
   authReducer,
   placeReducer,
   benefitReducer,
@@ -22,6 +22,16 @@ const rootReducer = combineReducers({
   reportReducer,
   dashboardReducer
 });
+
+/**
+ * Base Redux application component
+ */
+const rootReducer = (state: CombinedState<any>, action: AnyAction) => {
+  if (action.type === 'auth/USER_LOGOUT') {
+    state = undefined;
+  }
+  return appReducer(state, action);
+};
 
 export type AppState = ReturnType<typeof rootReducer>;
 
