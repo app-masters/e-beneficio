@@ -6,11 +6,10 @@ import QrReader from 'react-qr-reader';
 import { useSelector } from 'react-redux';
 import Webcam from 'react-webcam';
 import { FamilySearch } from '../../components/familySearch';
-import { Flex } from '../../components/flex';
 import { Family } from '../../interfaces/family';
-// import { requestSaveConsumption } from '../../redux/consumption/actions';
 import { AppState } from '../../redux/rootReducer';
 import yup from '../../utils/yup';
+import { requestSaveConsumption } from '../../redux/consumption/actions';
 
 const schema = yup.object().shape({
   nfce: yup.string().label('Nota fiscal eletrônica').required(),
@@ -79,7 +78,18 @@ export const ConsumptionForm: React.FC<{ open: boolean; closeModal: Function }> 
       setStatus();
       const invalidConsumptionValue = !!(family && values.value > 0 && values.value > family.balance);
       if (!(!family || invalidConsumptionValue || !values.acceptCheck)) {
-        alert('A');
+        requestSaveConsumption(
+          {
+            nfce: values.nfce,
+            value: Number(values.value),
+            proofImageUrl: values.proofImageUrl,
+            familyId: values.familyId
+          },
+          () => {
+            Modal.success({ title: 'Consumo salvo com sucesso', onOk: () => closeModal() });
+          },
+          () => setStatus('Ocorreu um erro ao confirmar consumo.')
+        );
       }
     }
   });
@@ -99,6 +109,14 @@ export const ConsumptionForm: React.FC<{ open: boolean; closeModal: Function }> 
       onCancel={() => closeModal()}
       onOk={submitForm}
       confirmLoading={loading}
+      okText="Confirmar consumo"
+      okButtonProps={{
+        disabled:
+          !!(errors && Object.keys(errors).length > 0 && touched) ||
+          !family ||
+          invalidConsumptionValue ||
+          !values.acceptCheck
+      }}
       okType={errors && Object.keys(errors).length > 0 && touched ? 'danger' : 'primary'}
     >
       {status && <Alert message="Erro no formulário" description={status} type="error" />}
@@ -230,20 +248,6 @@ export const ConsumptionForm: React.FC<{ open: boolean; closeModal: Function }> 
             </>
           )}
         </Form>
-        <Flex alignItems="center" justifyContent="flex-end">
-          <Button
-            htmlType="submit"
-            disabled={
-              !!(errors && Object.keys(errors).length > 0 && touched) ||
-              !family ||
-              invalidConsumptionValue ||
-              !values.acceptCheck
-            }
-            type="primary"
-          >
-            Confirmar consumo
-          </Button>
-        </Flex>
       </form>
     </Modal>
   );
