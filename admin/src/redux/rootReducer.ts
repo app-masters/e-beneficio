@@ -1,15 +1,27 @@
 import { combineReducers, AnyAction, CombinedState } from 'redux';
 
 // Reducers
-import authReducer from './auth/reducers';
-import placeReducer from './place/reducers';
-import benefitReducer from './benefit/reducers';
-import institutionReducer from './institution/reducers';
-import placeStoreReducer from './placeStore/reducers';
-import userReducer from './user/reducers';
-import familiesReducer from './families/reducers';
-import reportReducer from './report/reducers';
-import dashboardReducer from './dashboard/reducers';
+import authReducer, { AuthReducerState } from './auth/reducers';
+import placeReducer, { PlaceReducerState } from './place/reducers';
+import benefitReducer, { BenefitReducerState } from './benefit/reducers';
+import institutionReducer, { InstitutionReducerState } from './institution/reducers';
+import placeStoreReducer, { PlaceStoreReducerState } from './placeStore/reducers';
+import userReducer, { UserReducerState } from './user/reducers';
+import familiesReducer, { FamilyReducerState } from './families/reducers';
+import reportReducer, { ReportReducerState } from './report/reducers';
+import dashboardReducer, { DashboardReducerState } from './dashboard/reducers';
+
+type TypeReducers = {
+  authReducer: AuthReducerState;
+  placeReducer: PlaceReducerState;
+  benefitReducer: BenefitReducerState;
+  institutionReducer: InstitutionReducerState;
+  placeStoreReducer: PlaceStoreReducerState;
+  userReducer: UserReducerState;
+  familiesReducer: FamilyReducerState;
+  reportReducer: ReportReducerState;
+  dashboardReducer: DashboardReducerState;
+};
 
 const appReducer = combineReducers({
   authReducer,
@@ -26,7 +38,7 @@ const appReducer = combineReducers({
 /**
  * Base Redux application component
  */
-const rootReducer = (state: CombinedState<any>, action: AnyAction) => {
+const rootReducer = (state: CombinedState<TypeReducers> | undefined, action: AnyAction) => {
   if (action.type === 'auth/USER_LOGOUT') {
     state = undefined;
   }
