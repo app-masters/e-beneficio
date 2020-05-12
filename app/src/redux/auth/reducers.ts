@@ -1,5 +1,6 @@
 import { createReducer } from '@reduxjs/toolkit';
 import {
+  doLogoutUser,
   doLoginUser,
   doLoginUserSuccess,
   doLoginUserFailed,
@@ -20,6 +21,11 @@ const initialState = {
 };
 
 export default createReducer<AuthReducerState>(initialState, {
+  [doLogoutUser.toString()]: (state: AuthReducerState) => {
+    state.loading = false;
+    state.user = undefined;
+    state.error = undefined;
+  },
   [doLoginUser.toString()]: (state: AuthReducerState) => {
     state.loading = true;
     state.error = undefined;

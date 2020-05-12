@@ -3,8 +3,7 @@ import { Alert, Button, Checkbox, Form, Input, InputNumber, Modal, Typography } 
 import { useFormik } from 'formik';
 import React, { useEffect, useRef, useState } from 'react';
 import QrReader from 'react-qr-reader';
-import { useDispatch, useSelector } from 'react-redux';
-import { RouteComponentProps, useHistory } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import Webcam from 'react-webcam';
 import { FamilySearch } from '../../components/familySearch';
 import { Flex } from '../../components/flex';
@@ -37,9 +36,7 @@ const handleQRCode = (value: string | null) => {
  * Dashboard page component
  * @param props component props
  */
-export const ConsumptionForm: React.FC<{ open: boolean; closeModal: any }> = ({ open, closeModal }) => {
-  const dispatch = useDispatch();
-  const history = useHistory();
+export const ConsumptionForm: React.FC<{ open: boolean; closeModal: Function }> = ({ open, closeModal }) => {
   const cameraRef = useRef(null);
 
   // Local state
@@ -99,7 +96,7 @@ export const ConsumptionForm: React.FC<{ open: boolean; closeModal: any }> = ({ 
     <Modal
       title={'Registrar consumo'}
       visible={open}
-      onCancel={closeModal}
+      onCancel={() => closeModal()}
       onOk={submitForm}
       confirmLoading={loading}
       okType={errors && Object.keys(errors).length > 0 && touched ? 'danger' : 'primary'}
