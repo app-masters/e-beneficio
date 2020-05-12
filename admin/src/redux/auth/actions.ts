@@ -49,6 +49,20 @@ export const requestLoginUser = (email: string, password: string): ThunkResult<v
       // Request failed: dispatch error
       setAuthorization();
       setRefresh();
+
+      if (error.response) {
+        switch (error.response.status) {
+          case 401:
+            error.message = 'Usuário ou senha inválidos.';
+            break;
+          case 404:
+            error.message = 'Usuário não econtrado.';
+            break;
+        }
+      } else {
+        error.message = 'Ocorreu um erro inesperado.';
+      }
+
       dispatch(doLoginUserFailed(error));
     }
   };
