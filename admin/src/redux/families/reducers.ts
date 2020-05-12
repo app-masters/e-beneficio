@@ -16,10 +16,18 @@ import {
   doSaveFamilyFailed,
   doDeleteFamily,
   doDeleteFamilySuccess,
-  doDeleteFamilyFailed
+  doDeleteFamilyFailed,
+  doStartImportReportSync,
+  doStopImportReportSync,
+  doGetImportReport,
+  doGetImportReportSuccess,
+  doGetImportReportFailed,
+  doUploadSislameFiles,
+  doUploadSislameFilesSuccess,
+  doUploadSislameFilesFailed
 } from './actions';
 import { DashboardFamily } from '../../interfaces/dashboardFamily';
-import { Family } from '../../interfaces/family';
+import { Family, ImportReport } from '../../interfaces/family';
 
 export interface FamilyReducerState {
   loading: boolean;
@@ -36,17 +44,59 @@ export interface FamilyReducerState {
   familySaveLoading: boolean;
   familySaveItem?: Family | null;
   familySaveError?: Error;
+
+  importReportLoading: boolean;
+  importReport?: ImportReport;
+
+  importSyncInterval?: ReturnType<typeof setInterval>;
 }
 
 const initialState = {
   loading: false,
   dashboardLoading: false,
   familyLoading: false,
-  familySaveLoading: false
+  familySaveLoading: false,
+  importReportLoading: false
 };
 
 export default createReducer<FamilyReducerState>(initialState, (builder) =>
   builder
+    // Start / Stop report sync
+    .addCase(doStartImportReportSync, (state, action) => {
+      state.importSyncInterval = action.payload;
+    })
+    .addCase(doStopImportReportSync, (state) => {
+      state.importSyncInterval = undefined;
+    })
+    // Get report sync
+    .addCase(doGetImportReport, (state) => {
+      state.importReportLoading = true;
+      state.error = undefined;
+    })
+    .addCase(doGetImportReportSuccess, (state, action) => {
+      state.importReport = action.payload;
+      state.importReportLoading = false;
+      state.error = undefined;
+    })
+    .addCase(doGetImportReportFailed, (state, action) => {
+      state.importReportLoading = false;
+      state.error = action.payload;
+    })
+    // File upload
+    .addCase(doUploadSislameFiles, (state) => {
+      state.loading = true;
+      state.error = undefined;
+      state.uploadReport = undefined;
+    })
+    .addCase(doUploadSislameFilesSuccess, (state) => {
+      state.loading = false;
+      state.error = undefined;
+    })
+    .addCase(doUploadSislameFilesFailed, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+      state.uploadReport = undefined;
+    })
     // Get actions
     .addCase(doUploadFamilyFile, (state) => {
       state.loading = true;

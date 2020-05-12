@@ -1,4 +1,5 @@
 export const familyGroupList = [
+  { code: 0, title: 'Bolsa família com filho na escola pública', key: 'children' },
   { code: 1, title: 'Extrema pobreza', key: 'extreme-poverty' },
   { code: 2, title: 'Linha da pobreza', key: 'poverty-line' },
   { code: 3, title: 'Perfil CAD único', key: 'cad' },
@@ -11,7 +12,7 @@ export const familyGroupList = [
  * @returns family code item or undefined
  */
 export const getFamilyGroupByCode = (code: number | string) => {
-  return familyGroupList.find((group) => group.code.toString() === code.toString());
+  return familyGroupList.find((group) => group.code.toString() === code.toString()) || familyGroupList[0];
 };
 
 /**

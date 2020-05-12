@@ -1,4 +1,5 @@
 import express from 'express';
+import path from 'path';
 import moment from 'moment';
 import Sequelize from 'sequelize';
 import logging from '../utils/logging';
@@ -56,5 +57,6 @@ router.use('/benefits', jwtMiddleware, benefitRoutes);
 router.use('/families', jwtMiddleware, familyRoutes);
 router.use('/consumptions', jwtMiddleware, consumptionRoutes);
 router.use('/dashboard', jwtMiddleware, dashboardRoutes);
+router.use('/static', jwtMiddleware, express.static(`${path.dirname(__dirname)}/../database/storage`));
 
 export default router;

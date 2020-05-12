@@ -1,5 +1,5 @@
 interface Window {
-  _env_: any;
+  _env_: { [key: string]: string };
 }
 
 declare const window: Window;
