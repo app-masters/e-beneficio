@@ -1,3 +1,5 @@
+import { City } from '../../../backend/src/schemas/cities';
+
 export interface Family {
   readonly id?: number | string;
   cityId: number | string;
@@ -13,3 +15,26 @@ export interface Family {
   // Extra data
   balance: number;
 }
+
+export type ImportReport = {
+  status: 'Em espera' | 'Finalizado' | 'Falhou' | 'Lendo arquivos' | 'Filtrando dados' | 'Salvando' | 'Cruzando dados';
+  message?: string;
+  percentage?: number;
+  cityId?: NonNullable<City['id']>;
+  inProgress?: boolean;
+  originalFamilyCount?: number;
+  originalSislameCount?: number;
+  originalNurseryCount?: number;
+  filteredFamilyCount?: number;
+  grantedFamilyCount?: number;
+  aboveAgeFamilyCount?: number;
+  aboveAgeSislameCount?: number;
+  foundOnlyNameFamilyCount?: number;
+  grantedAnotherParentCount?: number;
+  notFoundFamilyCount?: number;
+  dependentsCount?: number;
+  duplicatedCount?: number;
+  sislameWithoutParentCount?: number;
+  fourteenOrLessGrantedCount?: number;
+  fourteenOrLessFilteredCount?: number;
+};
