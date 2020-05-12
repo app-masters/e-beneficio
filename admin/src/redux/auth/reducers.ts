@@ -5,7 +5,8 @@ import {
   doLoginUserFailed,
   doGetToken,
   doGetTokenSuccess,
-  doGetTokenFailed
+  doGetTokenFailed,
+  doLogoutUser
 } from './actions';
 import { User } from '../../interfaces/user';
 
@@ -20,6 +21,11 @@ const initialState = {
 };
 
 export default createReducer<AuthReducerState>(initialState, {
+  [doLogoutUser.toString()]: (state: AuthReducerState) => {
+    state.loading = false;
+    state.user = undefined;
+    state.error = undefined;
+  },
   [doLoginUser.toString()]: (state: AuthReducerState) => {
     state.loading = true;
     state.error = undefined;
