@@ -4,14 +4,19 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     const transaction = await queryInterface.sequelize.transaction();
     try {
-      await queryInterface.addColumn('Families', 'phone', { type: Sequelize.STRING, allowNull: true }, { transaction });
-
       await queryInterface.addColumn(
         'Families',
-        'address',
+        'phone2',
         { type: Sequelize.STRING, allowNull: true },
         { transaction }
       );
+      await queryInterface.addColumn(
+        'Families',
+        'deactivatedAt',
+        { type: Sequelize.DATE, allowNull: true },
+        { transaction }
+      );
+
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
@@ -23,8 +28,8 @@ module.exports = {
     const transaction = await queryInterface.sequelize.transaction();
     try {
       // SupCourses
-      await queryInterface.removeColumn('Families', 'address', { transaction });
-      await queryInterface.removeColumn('Families', 'phone', { transaction });
+      await queryInterface.removeColumn('Families', 'phone2', { transaction });
+      await queryInterface.removeColumn('Families', 'deactivatedAt', { transaction });
 
       await transaction.commit();
     } catch (error) {
