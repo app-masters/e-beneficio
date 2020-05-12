@@ -4,13 +4,24 @@ import { ThunkResult } from '../store';
 import path from 'path';
 import { CSVReport } from '../../interfaces/csvReport';
 import { DashboardFamily } from '../../interfaces/dashboardFamily';
-import { Family } from '../../interfaces/family';
+import { Family, ImportReport } from '../../interfaces/family';
 import { User } from '../../interfaces/user';
 
 export const doUploadFamilyFile = createAction<void>('families/UPLOAD');
 export const doUploadFamilyFileSuccess = createAction<CSVReport>('families/UPLOAD_SUCCESS');
 export const doUploadFamilyFileFailed = createAction<string | undefined>('families/UPLOAD_FAILED');
 export const doUploadFamilyFileRestart = createAction<void>('families/UPLOAD_RESTART');
+
+export const doUploadSislameFiles = createAction<void>('families/UPLOAD_SISLAME');
+export const doUploadSislameFilesSuccess = createAction<{ uploaded: boolean }>('families/UPLOAD_SISLAME_SUCCESS');
+export const doUploadSislameFilesFailed = createAction<string | undefined>('families/UPLOAD_SISLAME_FAILED');
+
+export const doGetImportReport = createAction<void>('families/GET_IMPORT_REPORT');
+export const doGetImportReportSuccess = createAction<ImportReport>('families/GET_IMPORT_REPORT_SUCCESS');
+export const doGetImportReportFailed = createAction<string | undefined>('families/GET_IMPORT_REPORT_FAILED');
+
+export const doStartImportReportSync = createAction<number>('families/START_IMPORT_REPORT_SYNC');
+export const doStopImportReportSync = createAction<void>('families/STOP_IMPORT_REPORT_SYNC');
 
 export const doGetDashboardFamily = createAction<void>('dashboardFamily/GET');
 export const doGetDashboardFamilySuccess = createAction<DashboardFamily>('dashboardFamily/GET_SUCCESS');
@@ -50,8 +61,6 @@ export const requestUploadFamilyFile = (
       if (file) {
         // If the extension is correct
         if (path.extname(file.name) === '.csv') {
-          // If file is smaller than 2MB
-          // if (file.size < 2097152) {
           // Start request - starting loading state
           dispatch(doUploadFamilyFile());
 
@@ -68,10 +77,124 @@ export const requestUploadFamilyFile = (
             // Request without response - probably won't happen, but cancel the request
             onError(`Ocorreu um erro no servidor. Tente novamente.`);
           }
-          // } else {
-          //   dispatch(doUploadFamilyFileFailed());
-          //   if (onFailure) onFailure();
-          // }
+        } else {
+          onError(`O tipo de arquivo precisa ser .csv.`);
+        }
+      } else {
+        onError(`Nenhum arquivo encontrado.`);
+      }
+    } catch (error) {
+      onError(error.message);
+    }
+  };
+};
+
+/**
+ * Stop import Report Sync
+ */
+export const requestStopImportReportSync = (): ThunkResult<void> => {
+  return async (dispatch, getState) => {
+    const interval = getState().familiesReducer.importSyncInterval;
+    if (interval) {
+      // Another sync in progress, stop it
+      clearInterval(interval);
+    }
+    dispatch(doStopImportReportSync());
+  };
+};
+
+/**
+ * Get current import report Thunk action
+ */
+export const requestGetImportReport = (): ThunkResult<void> => {
+  return async (dispatch) => {
+    try {
+      // Start request - starting loading state
+      dispatch(doGetImportReport());
+      // Request
+      const response = await backend.get<ImportReport>(`/families/import-status`);
+      if (response && response.data) {
+        // Request finished
+        dispatch(doGetImportReportSuccess(response.data)); // Dispatch result
+        if (!response.data.inProgress) {
+          dispatch(requestStopImportReportSync());
+        }
+      } else {
+        // Request without response - probably won't happen, but cancel the request
+        dispatch(doGetImportReportFailed());
+      }
+    } catch (error) {
+      // Request failed: dispatch error
+      dispatch(doGetImportReportFailed(error));
+      dispatch(requestStopImportReportSync());
+    }
+  };
+};
+
+/**
+ * Start import Report Sync
+ */
+export const requestStartImportReportSync = (): ThunkResult<void> => {
+  return async (dispatch, getState) => {
+    let interval = getState().familiesReducer.importSyncInterval;
+    if (interval) {
+      // Another sync in progress, stop it
+      clearInterval(interval);
+    }
+    dispatch(requestGetImportReport()); // Dispatch the first time, so we will not have to wait
+    const time = 1000; // Time between requests in ms
+    interval = setInterval(() => dispatch(requestGetImportReport()), time);
+    dispatch(doStartImportReportSync(interval));
+  };
+};
+
+/**
+ * Upload family and sislame files Thunk action
+ */
+export const requestUploadSislameFile = (
+  familyFile: File,
+  sislameFile: File,
+  nurseryFile: File,
+  onSuccess?: () => void,
+  onFailure?: (error?: string) => void
+): ThunkResult<void> => {
+  return async (dispatch) => {
+    /**
+     * Calls the failure functions
+     * @param error The error string
+     */
+    const onError = (error?: string) => {
+      dispatch(doUploadSislameFilesFailed(error));
+      if (onFailure) onFailure(error);
+    };
+
+    try {
+      if (familyFile && sislameFile && nurseryFile) {
+        // If the extension is correct
+        if (
+          path.extname(familyFile.name) === '.csv' &&
+          path.extname(sislameFile.name) === '.csv' &&
+          path.extname(nurseryFile.name) === '.csv'
+        ) {
+          // Start request - starting loading state
+          dispatch(doUploadSislameFiles());
+
+          const data = new FormData();
+          data.append('families', familyFile);
+          data.append('sislame', sislameFile);
+          data.append('nursery', nurseryFile);
+
+          // Request
+          const response = await backend.post<{ uploaded: boolean }>(`/families/file-sislame`, data);
+          if (response && response.data && response.status === 200) {
+            // Request finished
+            dispatch(doUploadSislameFilesSuccess(response.data)); // Dispatch result
+            if (onSuccess) onSuccess();
+            dispatch(requestStartImportReportSync());
+          } else {
+            // Request without response - probably won't happen, but cancel the request
+            onError(`Ocorreu um erro no servidor. Tente novamente.`);
+          }
         } else {
           onError(`O tipo de arquivo precisa ser .csv.`);
         }
@@ -102,7 +225,6 @@ export const requestGetDashboardFamily = (): ThunkResult<void> => {
         dispatch(doGetDashboardFamilyFailed());
       }
     } catch (error) {
-      // alert(JSON.stringify(error));
       // Request failed: dispatch error
       dispatch(doGetDashboardFamilyFailed(error));
     }
