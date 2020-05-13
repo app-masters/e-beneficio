@@ -24,7 +24,10 @@ import {
   doGetImportReportFailed,
   doUploadSislameFiles,
   doUploadSislameFilesSuccess,
-  doUploadSislameFilesFailed
+  doUploadSislameFilesFailed,
+  doGetFileFamily,
+  doGetFileFamilySuccess,
+  doGetFileFamilyFailed
 } from './actions';
 import { DashboardFamily } from '../../interfaces/dashboardFamily';
 import { Family, ImportReport } from '../../interfaces/family';
@@ -33,6 +36,10 @@ export interface FamilyReducerState {
   loading: boolean;
   error?: string;
   uploadReport?: CSVReport;
+
+  fileFamilyLoading: boolean;
+  fileFamily?: File | null;
+  fileFamilyError?: Error;
 
   dashboardLoading: boolean;
   dashboard?: DashboardFamily;
@@ -53,6 +60,7 @@ export interface FamilyReducerState {
 
 const initialState = {
   loading: false,
+  fileFamilyLoading: false,
   dashboardLoading: false,
   familyLoading: false,
   familySaveLoading: false,
@@ -173,5 +181,19 @@ export default createReducer<FamilyReducerState>(initialState, (builder) =>
     .addCase(doDeleteFamilyFailed, (state, action) => {
       state.familySaveLoading = false;
       state.familySaveError = action.payload;
+    })
+    // File actions
+    .addCase(doGetFileFamily, (state) => {
+      state.fileFamilyLoading = true;
+      state.fileFamily = undefined;
+      state.fileFamilyError = undefined;
+    })
+    .addCase(doGetFileFamilySuccess, (state, action) => {
+      state.fileFamilyLoading = false;
+      state.fileFamily = action.payload;
+    })
+    .addCase(doGetFileFamilyFailed, (state, action) => {
+      state.fileFamilyLoading = false;
+      state.fileFamilyError = action.payload;
     })
 );
