@@ -211,7 +211,7 @@ export const FamiliesList: React.FC<{}> = () => {
                       <Typography.Text type="secondary" style={{ marginRight: spacing.default }}>
                         {`(${(
                           (100 * (importReport.notFoundFamilyCount || 0)) /
-                          importReport.filteredFamilyCount
+                          (importReport.filteredFamilyCount * (importReport.percentage || 1))
                         ).toFixed(1)}%)`}
                       </Typography.Text>
                     )}
@@ -224,7 +224,7 @@ export const FamiliesList: React.FC<{}> = () => {
                       <Typography.Text type="secondary" style={{ marginRight: spacing.default }}>
                         {`(${(
                           (100 * (importReport.aboveAgeSislameCount || 0)) /
-                          importReport.filteredFamilyCount
+                          (importReport.filteredFamilyCount * (importReport.percentage || 1))
                         ).toFixed(1)}%)`}
                       </Typography.Text>
                     )}
@@ -237,7 +237,7 @@ export const FamiliesList: React.FC<{}> = () => {
                       <Typography.Text type="secondary" style={{ marginRight: spacing.default }}>
                         {`(${(
                           (100 * (importReport.foundOnlyNameFamilyCount || 0)) /
-                          importReport.filteredFamilyCount
+                          (importReport.filteredFamilyCount * (importReport.percentage || 1))
                         ).toFixed(1)}%)`}
                       </Typography.Text>
                     )}
@@ -253,9 +253,10 @@ export const FamiliesList: React.FC<{}> = () => {
                   <CounterItem bold>
                     {importReport.filteredFamilyCount && importReport.filteredFamilyCount > 0 && (
                       <Typography.Text type="secondary" style={{ marginRight: spacing.sm }}>
-                        {`(${((100 * (importReport.dependentsCount || 0)) / importReport.filteredFamilyCount).toFixed(
-                          1
-                        )}%)`}
+                        {`(${(
+                          (100 * (importReport.dependentsCount || 0)) /
+                          (importReport.filteredFamilyCount * (importReport.percentage || 1))
+                        ).toFixed(1)}%)`}
                       </Typography.Text>
                     )}
                     {importReport.dependentsCount}
