@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Card, Input, Button, Form, Typography } from 'antd';
 
-import { requestLoginUser } from '../../redux/auth/actions';
+import { requestLoginUser, requestLogout } from '../../redux/auth/actions';
 import { AppState } from '../../redux/rootReducer';
 
 import { FormContainer, PageContainer } from './styles';
@@ -19,6 +19,11 @@ export const LoginPage: React.FC<{}> = () => {
   const dispatch = useDispatch();
   const loading = useSelector<AppState, boolean>((state) => state.authReducer.loading);
   const error = useSelector<AppState, Error | undefined>((state) => state.authReducer.error);
+
+  useEffect(() => {
+    dispatch(requestLogout());
+  }, [dispatch]);
+
   return (
     <PageContainer>
       <Card>
@@ -35,6 +40,7 @@ export const LoginPage: React.FC<{}> = () => {
                 size="large"
                 value={email}
                 required
+                type="email"
                 placeholder={'Email'}
                 onChange={(event) => setEmail(event.target.value)}
               />

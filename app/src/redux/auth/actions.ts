@@ -5,12 +5,24 @@ import { backend } from '../../utils/networking';
 import { getRefresh, setAuthorization, setRefresh } from '../../utils/auth';
 
 // Simple actions and types
+export const doLogoutUser = createAction<void>('auth/USER_LOGOUT');
 export const doLoginUser = createAction<void>('auth/LOGIN_USER');
 export const doLoginUserSuccess = createAction<TokenResponse>('auth/LOGIN_USER_SUCCESS');
 export const doLoginUserFailed = createAction<Error | undefined>('auth/LOGIN_USER_FAILED');
 export const doGetToken = createAction<void>('auth/GET_TOKEN');
 export const doGetTokenSuccess = createAction<TokenResponse>('auth/GET_TOKEN_SUCCESS');
 export const doGetTokenFailed = createAction<Error | undefined>('auth/GET_TOKEN_FAILED');
+
+/**
+ * Logout user thunk action
+ */
+export const requestLogout = (): ThunkResult<void> => {
+  return async (dispatch) => {
+    setAuthorization();
+    setRefresh();
+    dispatch(doLogoutUser());
+  };
+};
 
 /**
  * Login user thunk action
@@ -37,6 +49,20 @@ export const requestLoginUser = (email: string, password: string): ThunkResult<v
       // Request failed: dispatch error
       setAuthorization();
       setRefresh();
+
+      if (error.response) {
+        switch (error.response.status) {
+          case 401:
+            error.message = 'Usuário ou senha inválidos.';
+            break;
+          case 404:
+            error.message = 'Usuário não econtrado.';
+            break;
+        }
+      } else {
+        error.message = 'Ocorreu um erro inesperado.';
+      }
+
       dispatch(doLoginUserFailed(error));
     }
   };

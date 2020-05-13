@@ -23,7 +23,8 @@ import {
   doUploadFamilyFileRestart,
   requestGetDashboardFamily,
   requestStartImportReportSync,
-  requestUploadSislameFile
+  requestUploadSislameFile,
+  requestGetFileFamilies
 } from '../../redux/families/actions';
 import { AppState } from '../../redux/rootReducer';
 import { PageContainer, ColAlignRight, CounterItem } from './styles';
@@ -58,6 +59,10 @@ export const FamiliesList: React.FC<{}> = () => {
     ({ familiesReducer }) => familiesReducer.importReportLoading
   );
 
+  const fileFamily = useSelector<AppState, File | null | undefined>(
+    ({ familiesReducer }) => familiesReducer.fileFamily
+  );
+
   const dashboardLoading = useSelector<AppState, boolean>(({ familiesReducer }) => familiesReducer.dashboardLoading);
   const dashboardData = useSelector<AppState, DashboardFamily | undefined>(
     ({ familiesReducer }) => familiesReducer.dashboard
@@ -67,6 +72,17 @@ export const FamiliesList: React.FC<{}> = () => {
   const [familyFile, setFamilyFile] = useState<File | null>(null);
   const [sislameFile, setSislameFile] = useState<File | null>(null);
   const [nurseryFile, setNurseryFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    if (fileFamily) {
+      const url = window.URL.createObjectURL(new Blob([fileFamily]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `relatorio_${moment().format('YYYYMMDDHHmmss')}.csv`);
+      document.body.appendChild(link);
+      link.click();
+    }
+  }, [fileFamily]);
 
   /**
    * Save files and upload if all are defined
@@ -159,7 +175,18 @@ export const FamiliesList: React.FC<{}> = () => {
       {importReport && (
         <Row gutter={[16, 16]}>
           <Col span={24}>
-            <Card title="Relatório da importação" extra={importReportLoading ? <Spin size="small" /> : null}>
+            <Card
+              title="Relatório da importação"
+              extra={
+                importReportLoading ? (
+                  <Spin size="small" />
+                ) : (
+                  <Button icon={<DownloadOutlined />} type="dashed" onClick={() => dispatch(requestGetFileFamilies())}>
+                    Baixar Arquivo
+                  </Button>
+                )
+              }
+            >
               <Descriptions bordered size="small" column={1} style={{ marginBottom: spacing.default }}>
                 <Descriptions.Item label="Dependentes na base do Bolsa Família">
                   <CounterItem>{importReport.originalFamilyCount}</CounterItem>
