@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Typography, Layout, Collapse, Button, Card } from 'antd';
 import {
   PageContainer,
@@ -13,6 +13,7 @@ import {
 import { FamilySearch } from '../../components/familySearch';
 import { Flex } from '../../components/flex';
 import { env } from '../../env';
+import { ConsumptionForm } from './form';
 
 const { Panel } = Collapse;
 const { Title, Text, Paragraph } = Typography;
@@ -23,6 +24,7 @@ const { Footer } = Layout;
  * @param props component props
  */
 export const DashboardPage: React.FC<{}> = () => {
+  const [modal, setModal] = useState(false);
   return (
     <PageContainer>
       <Layout style={{ backgroundColor: '#F9F9F9' }}>
@@ -57,6 +59,15 @@ export const DashboardPage: React.FC<{}> = () => {
           <BodyContainer id="saldo">
             <Title level={4}>Consultar saldo no programa</Title>
             <FamilySearch />
+          </BodyContainer>
+        </Container>
+        <Container>
+          <BodyContainer id="consumo">
+            <Title level={4}>Adicionar consumo</Title>
+            <div>
+              <Button onClick={() => setModal(!modal)}>Adicionar</Button>
+              <ConsumptionForm open={modal} closeModal={() => setModal(false)} />
+            </div>
           </BodyContainer>
         </Container>
         {/* <Flex style={{ backgroundColor: '#FFF' }} justifyContent="center"> */}
@@ -114,7 +125,6 @@ export const DashboardPage: React.FC<{}> = () => {
           </BodyContainer>
         </Container>
         {/* </Flex> */}
-
         <Footer>
           <Flex vertical justifyContent="center" alignItems="center">
             <Paragraph style={{ textAlign: 'center' }}>

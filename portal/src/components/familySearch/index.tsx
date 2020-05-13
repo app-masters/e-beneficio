@@ -5,7 +5,6 @@ import { FamilyWrapper, InfoContainer, PriceStyle, PriceLabelStyle, HowToHeaderC
 import { AppState } from '../../redux/rootReducer';
 import { requestGetFamily } from '../../redux/family/actions';
 import { Family } from '../../interfaces/family';
-import { Flex } from '../flex';
 import moment from 'moment';
 import { env } from '../../env';
 
@@ -76,7 +75,7 @@ export const FamilySearch: React.FC<ComponentProps> = () => {
       {!familyLoading && family && (
         <FamilyWrapper>
           <Card>
-            {!sameBirthday ? (
+            {sameBirthday ? (
               <>
                 <Text style={PriceLabelStyle}>{'Saldo disponível: '}</Text>
                 <Text style={PriceStyle}>{`R$${(family.balance || 0).toFixed(2).replace('.', ',')}`}</Text>

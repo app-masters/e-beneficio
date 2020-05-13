@@ -39,6 +39,35 @@ export const doDeleteFamily = createAction<void>('family/DELETE');
 export const doDeleteFamilySuccess = createAction<{ id: number }>('family/DELETE_SUCCESS');
 export const doDeleteFamilyFailed = createAction<Error | undefined>('family/DELETE_FAILED');
 
+export const doGetFileFamily = createAction<void>('families/GET');
+export const doGetFileFamilySuccess = createAction<File | null>('families/GET_SUCCESS');
+export const doGetFileFamilyFailed = createAction<Error | undefined>('families/GET_FAILED');
+
+/**
+ * Get current import report Thunk action
+ */
+export const requestGetFileFamilies = (): ThunkResult<void> => {
+  return async (dispatch) => {
+    try {
+      // Start request - starting loading state
+      dispatch(doGetFileFamily());
+      // Request
+      const response = await backend.get(`/families/list-file`);
+      if (response && response.data) {
+        // Request finished
+        dispatch(doGetFileFamilySuccess(response.data)); // Dispatch result
+      } else {
+        // Request without response - probably won't happen, but cancel the request
+        dispatch(doGetFileFamilyFailed());
+      }
+    } catch (error) {
+      // Request failed: dispatch error
+      console.log(error);
+      dispatch(doGetFileFamilyFailed(error));
+    }
+  };
+};
+
 /**
  * Save User Thunk action
  */
