@@ -395,24 +395,6 @@ export const updateById = async (
   return null;
 };
 
-/**
- * Convert CSV family to DB family
- * @param family CSV family
- * @param cityId logged user city unique ID
- * @returns DB family
- */
-export const parseFamilyItem = (family: FamilyItem, cityId: NonNullable<City['id']>): Family => {
-  return {
-    responsibleNis: family['NISTITULAR'],
-    responsibleName: family['TITULAR'],
-    responsibleBirthday: moment(family['DTNASCTIT'], 'DD/MM/YYYY').toDate(),
-    responsibleMotherName: '',
-    code: '',
-    groupName: getFamilyGroupByCode(0).key,
-    cityId
-  };
-};
-
 // Official Sislame file
 const keys = {
   dependentName: 'NOME DO ALUNO',
@@ -424,19 +406,42 @@ const keys = {
   responsibleName: 'Nome Responsavel',
   originalResponsibleName: 'Nome Responsável',
   schoolName: 'NOME ESCOLA',
-  uniqueNumber: 'ID_ALUNO_MATRICULA'
+  uniqueNumber: 'ID_ALUNO_MATRICULA',
+  phone: 'Telefone',
+  phone2: 'Telefone Celular',
+  zip: 'CEP',
+  district: 'Bairro',
+  originalNumber: 'Número',
+  number: 'Numero',
+  street: 'Logradouro',
+  complement: 'Complemento'
 };
 
-// First Sislame file
-// const keys = {
-//   dependentName: 'Aluno',
-//   birthday: 'Data Nascimento',
-//   motherName: 'Mae',
-//   fatherName: 'Pai',
-//   responsibleName: 'Nome Responsavel',
-//   schoolName: 'Escola',
-//   uniqueNumber: 'Matricula'
-// };
+/**
+ * Convert CSV family to DB family
+ * @param family CSV family
+ * @param cityId logged user city unique ID
+ * @param extra address optional data
+ * @returns DB family
+ */
+export const parseFamilyItem = (
+  family: FamilyItem,
+  cityId: NonNullable<City['id']>,
+  extra?: { phone?: string; phone2?: string; address?: string }
+): Family => {
+  return {
+    responsibleNis: family['NISTITULAR'],
+    responsibleName: family['TITULAR'],
+    responsibleBirthday: moment(family['DTNASCTIT'], 'DD/MM/YYYY').toDate(),
+    responsibleMotherName: '',
+    code: '',
+    groupName: getFamilyGroupByCode(0).key,
+    cityId,
+    phone: extra?.phone,
+    phone2: extra?.phone2,
+    address: extra?.address
+  };
+};
 
 /**
  * Check item and throw error if required key is not found
@@ -544,7 +549,11 @@ export const importFamilyFromCadAndSislameCSV = async (
           [keys.dependentName]: item['Criança'],
           [keys.originalResponsibleName]: item['RESPONSAVEL'],
           [keys.schoolName]: item['Creche'],
-          [keys.uniqueNumber]: `nursery-${index}`
+          [keys.uniqueNumber]: `nursery-${index}`,
+          [keys.phone]: item['TELEFONE 1'],
+          [keys.phone2]: item['TELEFONE 2'],
+          [keys.district]: item['BAIRRO'],
+          [keys.street]: item['ENDERECO']
         } as OriginalSislameItem)
     )
   ];
@@ -556,23 +565,23 @@ export const importFamilyFromCadAndSislameCSV = async (
   addOnReportCount(cityId, 'duplicatedCount', countFamilyBefore - originalFamilyData.length);
 
   // Filtrando dados: The reduce will create two arrays, one with the valid data and one with the invalid
-  let removedFamilies: FamilyItem[] = [];
-  [originalFamilyData, removedFamilies] = originalFamilyData.reduce(
-    ([valid, invalid], item) => {
-      // Checking the birthday, the dependent can't have more than 17 years
-      const validAge = moment().startOf('month').diff(moment(item['DTNASCDEP'], 'DD/MM/YYYY'), 'years') < 18;
-      if (!validAge) {
-        // Add to invalid data
-        return [valid, [...invalid, { ...item, reason: 'Depedente maior de idade' }]];
-      }
-      // Add to valid data
-      return [[...valid, item], invalid];
-    },
-    [[], []] as FamilyItem[][]
-  );
-  // Loging invalid data
-  await CSVWriter.writeRecords(removedFamilies);
-  addOnReportCount(cityId, 'aboveAgeFamilyCount', removedFamilies.length);
+  // let removedFamilies: FamilyItem[] = [];
+  // [originalFamilyData, removedFamilies] = originalFamilyData.reduce(
+  //   ([valid, invalid], item) => {
+  //     // Checking the birthday, the dependent can't have more than 17 years
+  //     const validAge = moment().startOf('month').diff(moment(item['DTNASCDEP'], 'DD/MM/YYYY'), 'years') < 18;
+  //     if (!validAge) {
+  //       // Add to invalid data
+  //       return [valid, [...invalid, { ...item, reason: 'Depedente maior de idade' }]];
+  //     }
+  //     // Add to valid data
+  //     return [[...valid, item], invalid];
+  //   },
+  //   [[], []] as FamilyItem[][]
+  // );
+  // // Loging invalid data
+  // await CSVWriter.writeRecords(removedFamilies);
+  // addOnReportCount(cityId, 'aboveAgeFamilyCount', removedFamilies.length);
 
   // Removing special characters
   const familyData: FamilyItem[] = JSON.parse(deburr(JSON.stringify(originalFamilyData)));
@@ -607,9 +616,9 @@ export const importFamilyFromCadAndSislameCSV = async (
         }
         // On nursery or not the same age, check the parent
         const sameResponsible =
-          compareNames(sislameItem[keys.motherName], familyItem['TITULAR']) ||
-          compareNames(sislameItem[keys.fatherName], familyItem['TITULAR']) ||
-          compareNames(sislameItem[keys.dependentName], familyItem['TITULAR']);
+          compareNames(sislameItem[keys.motherName], familyItem['TITULAR'], true) ||
+          compareNames(sislameItem[keys.fatherName], familyItem['TITULAR'], true) ||
+          compareNames(sislameItem[keys.responsibleName], familyItem['TITULAR'], true);
         return sameResponsible;
       }
       return false;
@@ -624,7 +633,18 @@ export const importFamilyFromCadAndSislameCSV = async (
       const dependent = parseFamilyAndSislameItems(originalFamilyData[familyIndex], originalSislameData[sislameIndex]);
       if (alreadyOnListIndex < 0) {
         // Not on the list yet, add it
-        grantedFamilies.push({ ...parseFamilyItem(originalFamilyData[familyIndex], cityId), dependents: [dependent] });
+        const extraData = {
+          phone: originalSislameData[sislameIndex]['Telefone'],
+          phone2: originalSislameData[sislameIndex]['Telefone Celular'],
+          address: ['Logradouro', 'Número', 'Complemento', 'Bairro', 'CEP']
+            .map((key) => originalSislameData[sislameIndex][key])
+            .join(' ')
+            .replace(/\#/g, '')
+        };
+        grantedFamilies.push({
+          ...parseFamilyItem(originalFamilyData[familyIndex], cityId, extraData),
+          dependents: [dependent]
+        });
         addOnReportCount(cityId, 'grantedFamilyCount');
       } else {
         // Already on the list, just update the number of children
@@ -663,7 +683,7 @@ export const importFamilyFromCadAndSislameCSV = async (
 
   // Saving families on the DB
   try {
-    const dbFamilies: Family[] = [];
+    const dbFamiliesIds: NonNullable<Family['id']>[] = [];
     for (const index in grantedFamilies) {
       process.stdout.write(
         `[import] Famílias salvas: ${index}/${grantedFamilies.length} (${(
@@ -675,10 +695,21 @@ export const importFamilyFromCadAndSislameCSV = async (
       // Certify family + dependent list
       const family = grantedFamilies[index];
       const dbFamily = await certifyFamilyAndDependents(family);
-      dbFamilies.push(dbFamily);
+      dbFamiliesIds.push(dbFamily.id as number);
     }
     removeCSVWriter(cityId);
     updateImportReport({ status: 'Finalizado', inProgress: false }, cityId);
+    // Deactivate all families that are not on the list
+    await db.families.update(
+      { deactivatedAt: moment().toDate() },
+      { where: { id: { [Sequelize.Op.notIn]: dbFamiliesIds }, deactivatedAt: null } }
+    );
+    await db.dependents.update(
+      { deactivatedAt: moment().toDate() },
+      {
+        where: { familyId: { [Sequelize.Op.notIn]: dbFamiliesIds }, deactivatedAt: null }
+      }
+    );
   } catch (error) {
     // Something failed, update the report and throw error
     removeCSVWriter(cityId);
@@ -695,8 +726,8 @@ export const importFamilyFromCadAndSislameCSV = async (
  */
 export const generateListFile = async (cityId: NonNullable<City['id']>) => {
   const families = await db.families.findAll({
-    where: { cityId },
-    include: [{ model: db.dependents, as: 'dependents', required: true }]
+    where: { cityId, deactivatedAt: null },
+    include: [{ model: db.dependents, as: 'dependents', required: true, where: { deactivatedAt: null } }]
   });
 
   const filePath = `${path.dirname(__dirname)}/../database/storage/list_${cityId}.csv`;
@@ -710,6 +741,7 @@ export const generateListFile = async (cityId: NonNullable<City['id']>) => {
       { id: 'responsibleNis', title: 'NISTITULAR' },
       { id: 'address', title: 'ENDEREÇO' },
       { id: 'phone', title: 'TELEFONE' },
+      { id: 'phone2', title: 'TELEFONE 2' },
       { id: 'dependents', title: 'DEPENDENTES' },
       { id: 'balance', title: 'SALDO' }
     ]
@@ -727,6 +759,7 @@ export const generateListFile = async (cityId: NonNullable<City['id']>) => {
       responsibleName: family.responsibleName,
       responsibleNis: family.responsibleNis,
       phone: family.phone,
+      phone2: family.phone2,
       address: family.address,
       balance,
       dependents: family.dependents.length,
