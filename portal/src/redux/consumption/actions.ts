@@ -40,7 +40,7 @@ export const requestSaveConsumption = (
       data.append('image', file);
 
       // Request
-      const response = await backend.post<Consumption>(`/consumptions`, data, {
+      const response = await backend.post<Consumption>(`/public/consumptions`, data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 

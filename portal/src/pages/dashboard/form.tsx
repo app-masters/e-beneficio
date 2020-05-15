@@ -3,9 +3,9 @@ import { Alert, Button, Checkbox, Form, Input, InputNumber, Modal, Typography } 
 import { useFormik } from 'formik';
 import React, { useEffect, useRef, useState } from 'react';
 import QrReader from 'react-qr-reader';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import Webcam from 'react-webcam';
-import { FamilySearch } from '../../components/familySearch';
+import { FamilySearch } from '../../components/familyValidation';
 import { Family } from '../../interfaces/family';
 import { AppState } from '../../redux/rootReducer';
 import yup from '../../utils/yup';
@@ -37,6 +37,7 @@ const handleQRCode = (value: string | null) => {
  */
 export const ConsumptionForm: React.FC<{ open: boolean; closeModal: Function }> = ({ open, closeModal }) => {
   const cameraRef = useRef(null);
+  const dispatch = useDispatch();
 
   // Local state
   const [, setPermission] = useState('prompt');
@@ -76,19 +77,21 @@ export const ConsumptionForm: React.FC<{ open: boolean; closeModal: Function }> 
     validationSchema: schema,
     onSubmit: (values, { setStatus }) => {
       setStatus();
-      const invalidConsumptionValue = !!(family && values.value > 0 && values.value > family.balance);
-      if (!(!family || invalidConsumptionValue || !values.acceptCheck)) {
-        requestSaveConsumption(
-          {
-            nfce: values.nfce,
-            value: Number(values.value),
-            proofImageUrl: values.proofImageUrl,
-            familyId: values.familyId
-          },
-          () => {
-            Modal.success({ title: 'Consumo salvo com sucesso', onOk: () => closeModal() });
-          },
-          () => setStatus('Ocorreu um erro ao confirmar consumo.')
+      const invalidConsumptionValue = !!(family && values.value > family.balance);
+      if (family && !invalidConsumptionValue && values.acceptCheck) {
+        dispatch(
+          requestSaveConsumption(
+            {
+              nfce: values.nfce,
+              value: Number(values.value),
+              proofImageUrl: values.proofImageUrl,
+              familyId: values.familyId
+            },
+            () => {
+              Modal.success({ title: 'Consumo salvo com sucesso', onOk: () => closeModal() });
+            },
+            () => setStatus('Ocorreu um erro ao confirmar consumo.')
+          )
         );
       }
     }
