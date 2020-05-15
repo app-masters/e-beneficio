@@ -161,7 +161,7 @@ export const getFamilyBalance = async (family: Family): Promise<number> => {
  */
 export const addConsumption = async (
   values: Consumption,
-  placeStoreId: NonNullable<PlaceStore['id']>
+  placeStoreId?: NonNullable<PlaceStore['id']>
 ): Promise<SequelizeConsumption> => {
   // TODO: this is the main function of the entire application, but for now will be really basic
   const [consumption] = await db.consumptions.findAll({ where: { nfce: values.nfce } });
