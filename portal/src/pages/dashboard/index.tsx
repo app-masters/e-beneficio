@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Typography, Spin, Layout, Collapse, Button, Col, Row, Card } from 'antd';
+import React, { useState } from 'react';
+import { Typography, Layout, Collapse, Button, Card } from 'antd';
 import {
   PageContainer,
   HeaderContainer,
@@ -10,13 +10,10 @@ import {
   Container,
   LogoContainer
 } from './styles';
-import { PlaceStoreItem } from '../../components/placeStoreItem';
-import { PlaceStore } from '../../interfaces/placeStore';
-import { requestGetPlaceStore } from '../../redux/placeStore/actions';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppState } from '../../redux/rootReducer';
 import { FamilySearch } from '../../components/familySearch';
 import { Flex } from '../../components/flex';
+import { env } from '../../env';
+import { ConsumptionForm } from './form';
 
 const { Panel } = Collapse;
 const { Title, Text, Paragraph } = Typography;
@@ -27,17 +24,7 @@ const { Footer } = Layout;
  * @param props component props
  */
 export const DashboardPage: React.FC<{}> = () => {
-  const dispatch = useDispatch();
-
-  const cityId = process.env.REACT_APP_ENV_CITY_ID as string;
-
-  const placeStoreLoading = useSelector<AppState, boolean>((state) => state.placeStoreReducer.loading);
-  const placeStore = useSelector<AppState, [PlaceStore] | null | undefined>((state) => state.placeStoreReducer.item);
-
-  useEffect(() => {
-    dispatch(requestGetPlaceStore(cityId));
-  }, [cityId, dispatch]);
-
+  const [modal, setModal] = useState(false);
   return (
     <PageContainer>
       <Layout style={{ backgroundColor: '#F9F9F9' }}>
@@ -47,7 +34,7 @@ export const DashboardPage: React.FC<{}> = () => {
               <img src={require('../../assets/logo.png')} alt="" />
             </LogoContainer>
             <Title level={2} style={{ color: '#FFFFFF', marginBottom: 0 }}>
-              Mercado Popular
+              e-Benefício
             </Title>
             <Title level={4} style={{ color: '#FFFFFF' }}>
               Suporte para famílias em situação de vulnerabilidade
@@ -74,6 +61,15 @@ export const DashboardPage: React.FC<{}> = () => {
             <FamilySearch />
           </BodyContainer>
         </Container>
+        <Container>
+          <BodyContainer id="consumo">
+            <Title level={4}>Adicionar consumo</Title>
+            <div>
+              <Button onClick={() => setModal(!modal)}>Adicionar</Button>
+              <ConsumptionForm open={modal} closeModal={() => setModal(false)} />
+            </div>
+          </BodyContainer>
+        </Container>
         {/* <Flex style={{ backgroundColor: '#FFF' }} justifyContent="center"> */}
         <Container>
           <BodyContainer id="info">
@@ -82,32 +78,44 @@ export const DashboardPage: React.FC<{}> = () => {
               <Collapse bordered={false} style={PanelStyle}>
                 <Panel header="O que é o programa?" key="what">
                   <Text>
-                    O programa Mercado Popular oferece suporte para famílias em situação de vulnerabilidade enfrentando
-                    a crise causada pela pandemia do Coronavírus.
+                    O programa e-Benefício oferece suporte para famílias em situação de vulnerabilidade com dependentes
+                    matriculados na rede municipal de ensino enfrentando a crise causada pela pandemia do Coronavírus.
                     <br />
-                    Você pode utilizar o saldo disponível nos estabelecimentos parceiros fazendo compras dos produtos da
-                    cesta básica de maneira gratúita.
+                    Faça a busca pelo NIS do responsável familiar e saiba se você tem direito ao benefício e onde buscar
+                    o seu cartão.
                   </Text>
                 </Panel>
                 <Panel header="Tenho direito ao benefício?" key="who">
                   <Text>
-                    Tem direito ao benefício quem está cadastrado e possúir o código NIS do responsável familiar.
-                    Famílias na seguinte situação estão cadastradas no sistema:
+                    Tem direito ao benefício quem está cadastrado e possuir o código NIS do responsável familiar. Estão
+                    cadastradas famílias atendidas pelo Bolsa Família com dependentes matriculados na rede municipal de
+                    ensino.
                   </Text>
-                  <Typography>
+                  {/* <Typography>
                     <ul>
-                      <li>Residentes de {process.env.REACT_APP_ENV_CITY_NAME}</li>
+                      <li>Residentes de {env.REACT_APP_ENV_CITY_NAME}</li>
                       <li>No perfil de extrema pobreza, linha da pobreza ou cadastradas no CAD único</li>
                     </ul>
-                  </Typography>
+                  </Typography> */}
+                </Panel>
+                <Panel header="Tenho direito mas não estou na lista" key="direito">
+                  <Text>
+                    Caso acredite que tem o direito ao benefício, mas não encontrou seu NIS na busca, faça seu cadastro
+                    com a prefeitura.
+                  </Text>
+                  <PanelActionContainer>
+                    <Button href={env.REACT_APP_ENV_FORM_URL} target="_blank">
+                      Fazer cadastro
+                    </Button>
+                  </PanelActionContainer>
                 </Panel>
                 <Panel header="Obter mais informações" key="info">
                   <Text>
-                    Para obter mais informações, ligue para {process.env.REACT_APP_ENV_INFO_PHONE} ou entre no seguinte
-                    link e estaremos prontos para te ajudar
+                    Para obter mais informações, ligue para {env.REACT_APP_ENV_INFO_PHONE} ou entre no seguinte link e
+                    estaremos prontos para te ajudar
                   </Text>
                   <PanelActionContainer>
-                    <Button href={process.env.REACT_APP_ENV_INFO_LINK} target="_blank">
+                    <Button href={env.REACT_APP_ENV_INFO_LINK} target="_blank">
                       Saiba mais
                     </Button>
                   </PanelActionContainer>
@@ -117,23 +125,6 @@ export const DashboardPage: React.FC<{}> = () => {
           </BodyContainer>
         </Container>
         {/* </Flex> */}
-        <Container>
-          <BodyContainer id="estabelecimentos">
-            <Title level={4}>Estabelecimentos parceiros</Title>
-            <Paragraph>Esses são os locais onde você pode usar seus créditos no programa</Paragraph>
-            <Spin spinning={placeStoreLoading}>
-              {placeStore && (
-                <Row gutter={[8, 8]}>
-                  {placeStore.map((item, index) => (
-                    <Col key={index} xs={24} sm={24} md={8} lg={8} xl={8}>
-                      <PlaceStoreItem {...item} />
-                    </Col>
-                  ))}
-                </Row>
-              )}
-            </Spin>
-          </BodyContainer>
-        </Container>
         <Footer>
           <Flex vertical justifyContent="center" alignItems="center">
             <Paragraph style={{ textAlign: 'center' }}>

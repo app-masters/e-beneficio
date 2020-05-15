@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Card, Input, Button, Form, Typography } from 'antd';
 
-import { requestLoginUser } from '../../redux/auth/actions';
+import { requestLoginUser, requestLogout } from '../../redux/auth/actions';
 import { AppState } from '../../redux/rootReducer';
 
 import { FormContainer, PageContainer } from './styles';
@@ -19,15 +19,28 @@ export const LoginPage: React.FC<{}> = () => {
   const dispatch = useDispatch();
   const loading = useSelector<AppState, boolean>((state) => state.authReducer.loading);
   const error = useSelector<AppState, Error | undefined>((state) => state.authReducer.error);
+
+  useEffect(() => {
+    dispatch(requestLogout());
+  }, [dispatch]);
+
   return (
     <PageContainer>
       <Card>
         <FormContainer>
-          <Form style={{ width: '300px' }}>
+          <Form
+            style={{ width: '300px' }}
+            name="login"
+            onFinish={() => {
+              dispatch(requestLoginUser(email, password));
+            }}
+          >
             <Form.Item>
               <Input
                 size="large"
                 value={email}
+                required
+                type="email"
                 placeholder={'Email'}
                 onChange={(event) => setEmail(event.target.value)}
               />
@@ -36,6 +49,7 @@ export const LoginPage: React.FC<{}> = () => {
               <Input.Password
                 size="large"
                 value={password}
+                required
                 placeholder={'Password'}
                 onChange={(event) => setPassword(event.target.value)}
               />
@@ -45,15 +59,11 @@ export const LoginPage: React.FC<{}> = () => {
                 <Typography.Text type="danger">{error.message || 'Ocorreu um erro inesperado'}</Typography.Text>
               </Form.Item>
             )}
-            <Button
-              size="large"
-              loading={loading}
-              type="primary"
-              onClick={() => dispatch(requestLoginUser(email, password))}
-              style={{ width: '100%' }}
-            >
-              Entrar
-            </Button>
+            <Form.Item>
+              <Button size="large" loading={loading} htmlType="submit" type="primary" style={{ width: '100%' }}>
+                Entrar
+              </Button>
+            </Form.Item>
           </Form>
         </FormContainer>
       </Card>

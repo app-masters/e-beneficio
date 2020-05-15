@@ -60,7 +60,7 @@
     "prettier-check": "^2.0.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "chmod +x ./create_env.sh && sh ./create_env.sh && cp env-config.js ./public/ && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "checks": "npm run check-prettier && npm run check-lint && npm run check-typescript",

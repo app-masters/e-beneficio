@@ -22,7 +22,6 @@ const seedAll = async () => {
     await benefits.seed();
     await families.seed();
     await consumptions.seed();
-    await families.csv(); // CSV example seed
   } else {
     // Production seed - one city and admin user
     await cities.seed();

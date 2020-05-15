@@ -11,28 +11,24 @@ services:
       - .env.backend
     environment:
       PORT: 3001
-  frontend:
+  portal:
     image: gcr.io/covid19jf/resource-4-vulnerable-frontend
-    container_name: frontend
+    container_name: portal
     networks:
       - resources-net
     ports:
       - 3000:3000
     environment:
       PORT: 3000
-  nginx:
-    image: nginx:latest
-    container_name: nginx
+  admin:
+    image: gcr.io/covid19jf/resource-4-vulnerable-frontend
+    container_name: admin
     networks:
       - resources-net
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
     ports:
-      - 80:80
-      - 443:443
-    depends_on:
-      - backend
-      - frontend
+      - 3000:3000
+    environment:
+      PORT: 3000
 
 networks:
   resources-net:

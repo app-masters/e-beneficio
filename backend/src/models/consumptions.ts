@@ -7,6 +7,91 @@ import moment from 'moment';
 import logging from '../utils/logging';
 import { Place } from '../schemas/places';
 import { City } from '../schemas/cities';
+import { Benefit } from '../schemas/benefits';
+
+/**
+ * a
+ * @param family a
+ * @param availableBenefits a
+ */
+export const getFamilyDependentBalance = async (family: Family, availableBenefits?: Benefit[]) => {
+  if (!family.dependents || family.dependents.length < 1) {
+    // Family witihout dependents, weird
+    return 0;
+  }
+
+  if (!availableBenefits) {
+    // Populating benefits if it's not available
+    availableBenefits = await db.benefits.findAll({
+      where: { groupName: family.groupName },
+      include: [
+        { model: db.institutions, as: 'institution', where: { cityId: family.cityId } },
+        { model: db.consumptions, as: 'consumptions' }
+      ]
+    });
+  }
+
+  const todayMonth = moment().month() + 1;
+  const todayYear = moment().year();
+
+  let balance = 0;
+  for (const dependent of family.dependents) {
+    const startMonth = moment(dependent.createdAt as Date).month() + 1;
+    const startYear = moment(dependent.createdAt as Date).year();
+    const endMonth = moment(dependent.deactivatedAt as Date).month() + 1;
+    const endYear = moment(dependent.deactivatedAt as Date).year();
+
+    for (const benefit of availableBenefits) {
+      if (benefit.groupName !== family.groupName) continue; // Don't check if it's from another group
+
+      // Check all the dates
+      const notInFuture = benefit.year < todayYear || (benefit.year === todayYear && benefit.month <= todayMonth);
+      const afterCreation = benefit.year > startYear || (benefit.year === startYear && benefit.month >= startMonth);
+      const beforeDeactivation = dependent.deactivatedAt
+        ? benefit.year < endYear || (benefit.year === endYear && benefit.month < endMonth)
+        : true;
+
+      if (notInFuture && afterCreation && beforeDeactivation) {
+        // Valid benefit
+        balance += benefit.value;
+      }
+    }
+  }
+  if (!family.consumptions || family.consumptions.length < 1) {
+    // Family without consumptions
+    return balance;
+  }
+
+  // Calculating consumption
+  const consumption = family.consumptions.reduce((sum, item) => sum + item.value, 0);
+  return balance - consumption;
+};
+
+/**
+ * Get balance report for all families
+ * @param cityId logged user city unique ID
+ */
+export const getBalanceReport = async (cityId: NonNullable<City['id']>) => {
+  const families = await db.families.findAll({
+    where: { cityId },
+    include: [
+      { model: db.dependents, as: 'dependents' },
+      { model: db.consumptions, as: 'consumptions', required: false }
+    ]
+  });
+
+  const benefits = await db.benefits.findAll({
+    include: [{ model: db.institutions, as: 'institution', where: { cityId } }]
+  });
+
+  const balanceList: (Family & { balance: number })[] = [];
+  for (const family of families) {
+    const balance = await getFamilyDependentBalance(family, benefits);
+    balanceList.push({ ...(family.toJSON() as Family), balance });
+  }
+
+  return balanceList;
+};
 
 /**
  * Get family balace looking for benefits and consumptions
@@ -96,7 +181,7 @@ export const addConsumption = async (
     throw { status: 422, message: 'Família não encontrada' };
   }
 
-  const balance = await getFamilyBalance(family);
+  const balance = await getFamilyDependentBalance(family);
   if (balance < values.value) {
     // Insuficient balance
     throw { status: 422, message: 'Saldo insuficiente' };
@@ -203,28 +288,33 @@ export const sumConsumptions = async (
 export const getConsumptionDashboardInfo = async (cityId: NonNullable<City['id']>, placeStoreId?: PlaceStore['id']) => {
   const dashboardReturn = {
     todayFamilies: 0,
+    weekFamilies: 0,
     monthFamilies: 0,
     todayConsumption: 0,
+    weekConsumption: 0,
     monthConsumption: 0
   };
 
-  const today = moment();
-  const startToday = today.startOf('day').toDate();
-  const endToday = today.endOf('day').toDate();
-  const startMonth = today.startOf('month').toDate();
-  const endMonth = today.endOf('month').toDate();
+  const today = moment().toDate();
+  const startToday = moment().startOf('day').toDate();
+  const startWeek = moment().subtract(7, 'days').toDate();
+  const startMonth = moment().subtract(30, 'days').toDate();
 
   // Await for all the promises
   [
     dashboardReturn.todayConsumption,
+    dashboardReturn.weekConsumption,
     dashboardReturn.monthConsumption,
     dashboardReturn.todayFamilies,
+    dashboardReturn.weekFamilies,
     dashboardReturn.monthFamilies
   ] = await Promise.all([
-    sumConsumptions(startToday, endToday, placeStoreId),
-    sumConsumptions(startMonth, endMonth, placeStoreId),
-    countFamilies(startToday, endToday, placeStoreId),
-    countFamilies(startMonth, endMonth, placeStoreId)
+    sumConsumptions(startToday, today, placeStoreId),
+    sumConsumptions(startWeek, today, placeStoreId),
+    sumConsumptions(startMonth, today, placeStoreId),
+    countFamilies(startToday, today, placeStoreId),
+    countFamilies(startWeek, today, placeStoreId),
+    countFamilies(startMonth, today, placeStoreId)
   ]);
 
   return dashboardReturn;

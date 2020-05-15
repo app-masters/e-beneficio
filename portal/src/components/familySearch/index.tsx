@@ -5,8 +5,8 @@ import { FamilyWrapper, InfoContainer, PriceStyle, PriceLabelStyle, HowToHeaderC
 import { AppState } from '../../redux/rootReducer';
 import { requestGetFamily } from '../../redux/family/actions';
 import { Family } from '../../interfaces/family';
-import { Flex } from '../flex';
 import moment from 'moment';
+import { env } from '../../env';
 
 const { Text } = Typography;
 
@@ -31,7 +31,7 @@ export const FamilySearch: React.FC<ComponentProps> = () => {
   const family = useSelector<AppState, Family | null | undefined>((state) => state.familyReducer.item);
 
   // .env
-  const cityId = process.env.REACT_APP_ENV_CITY_ID as string;
+  const cityId = env.REACT_APP_ENV_CITY_ID as string;
 
   const sameBirthday = moment(family?.responsibleBirthday).diff(moment(birthday, 'DD/MM/YYYY'), 'days') === 0;
 
@@ -85,10 +85,10 @@ export const FamilySearch: React.FC<ComponentProps> = () => {
                     Para utilizar os seus créditos, vá até um dos estabelecimentos parceiros e informe que faz parte do
                     programa
                   </HowToLabel>
+                  {family.school && (
+                    <HowToLabel>{`Caso não tenha pego seu cartão, entre em contato com a escola ${family.school}`}</HowToLabel>
+                  )}
                 </HowToHeaderContainer>
-                <Flex justifyContent="center">
-                  <Button href={'#estabelecimentos'}>Ver Estabelecimentos</Button>
-                </Flex>
               </>
             ) : (
               <Form.Item

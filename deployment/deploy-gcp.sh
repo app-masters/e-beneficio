@@ -32,12 +32,15 @@ cd ..
 gcloud config set compute/zone ${ZONE}
 
 ### BACKEND
+cd backend
 echo -e "\n# 1/9 - Building and tagging backend dockerfile...\n"
 docker build -f deployment/backend.Dockerfile -t ${BACKEND_IMAGE_TAG} .
 docker tag ${BACKEND_IMAGE_TAG} ${BACKEND_CONTAINER_IMAGE}
 
 echo -e "\n# 2/9 - Pushing docker image to Google Container Registry...\n"
 docker push ${BACKEND_CONTAINER_IMAGE}
+exit 1;
+
 #
 ## FRONTEND
 # build and copy admin
