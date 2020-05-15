@@ -4,7 +4,7 @@ import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize'
 export interface Consumption {
   readonly id?: number | string;
   familyId: number | string;
-  placeStoreId: number | string;
+  placeStoreId?: number | string;
   nfce: string;
   value: number;
   proofImageUrl?: string;
@@ -43,7 +43,7 @@ export const attributes = {
       model: 'PlaceStores',
       id: 'id'
     },
-    allowNull: false
+    allowNull: true
   },
   nfce: {
     type: DataTypes.STRING,

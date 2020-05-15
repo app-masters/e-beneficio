@@ -61,15 +61,6 @@ export const DashboardPage: React.FC<{}> = () => {
             <FamilySearch />
           </BodyContainer>
         </Container>
-        <Container>
-          <BodyContainer id="consumo">
-            <Title level={4}>Adicionar consumo</Title>
-            <div>
-              <Button onClick={() => setModal(!modal)}>Adicionar</Button>
-              <ConsumptionForm open={modal} closeModal={() => setModal(false)} />
-            </div>
-          </BodyContainer>
-        </Container>
         {/* <Flex style={{ backgroundColor: '#FFF' }} justifyContent="center"> */}
         <Container>
           <BodyContainer id="info">
@@ -91,12 +82,6 @@ export const DashboardPage: React.FC<{}> = () => {
                     cadastradas famílias atendidas pelo Bolsa Família com dependentes matriculados na rede municipal de
                     ensino.
                   </Text>
-                  {/* <Typography>
-                    <ul>
-                      <li>Residentes de {env.REACT_APP_ENV_CITY_NAME}</li>
-                      <li>No perfil de extrema pobreza, linha da pobreza ou cadastradas no CAD único</li>
-                    </ul>
-                  </Typography> */}
                 </Panel>
                 <Panel header="Tenho direito mas não estou na lista" key="direito">
                   <Text>
@@ -125,6 +110,21 @@ export const DashboardPage: React.FC<{}> = () => {
           </BodyContainer>
         </Container>
         {/* </Flex> */}
+        <Container>
+          <BodyContainer id="consumo">
+            <Title level={4}>Salvar compras</Title>
+            <Card>
+              <Paragraph style={{ marginBottom: 0 }}>
+                Para saber se você tem direito, escreva o código NIS do responsável familiar e veja seu saldo
+                disponível.
+              </Paragraph>
+              <PanelActionContainer>
+                <Button onClick={() => setModal(!modal)}>Adicionar</Button>
+                <ConsumptionForm open={modal} closeModal={() => setModal(false)} />
+              </PanelActionContainer>
+            </Card>
+          </BodyContainer>
+        </Container>
         <Footer>
           <Flex vertical justifyContent="center" alignItems="center">
             <Paragraph style={{ textAlign: 'center' }}>
