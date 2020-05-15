@@ -105,10 +105,11 @@ export const DashboardPage: React.FC<{}> = () => {
                     </Button>
                   </PanelActionContainer>
                 </Panel>
-                <Panel header="Não tenho um NIS" key="dont have">
+                <Panel header="Não tenho ou não sei o meu NIS" key="dont have">
                   <Text>
                     O NIS é o Número de Identificação Social, pode ser encontrado no seu cartão do programa Bolsa
                     Família ou seu Cartão do Cidadão. A inscrição no programa é requisito para fazer parte do
+                    e-Benefício.
                   </Text>
                 </Panel>
                 <Panel header="Obter mais informações" key="info">
