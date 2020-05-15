@@ -93,13 +93,21 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
                   <Descriptions.Item label="Data de nascimento do responsável">
                     {moment(family.responsibleBirthday).format('DD/MM/YYYY')}
                   </Descriptions.Item>
-                  <Descriptions.Item label="Nome da mãe do responsável">
-                    {family.responsibleMotherName}
-                  </Descriptions.Item>
                 </Descriptions>
                 <FamilyActions>
                   <Flex alignItems="center" justifyContent="flex-end" gap>
-                    <Typography.Paragraph strong>Os dados foram validados com o responsável?</Typography.Paragraph>
+                    <Typography.Paragraph strong>Os dados estão corretos?</Typography.Paragraph>
+                    <Button
+                      htmlType="button"
+                      type="default"
+                      onClick={() => {
+                        setBirthday('');
+                        changeFamilyId(undefined);
+                        setNis('');
+                      }}
+                    >
+                      Não
+                    </Button>
                     <Button htmlType="button" type="primary" onClick={() => changeFamilyId(family.id)}>
                       Sim, confirmar
                     </Button>
