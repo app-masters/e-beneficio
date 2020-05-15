@@ -2,3 +2,6 @@
 .env.backend
 .env.frontend
 *.json
+**/.env.backend
+**/.env.admin
+**/.env.portal
