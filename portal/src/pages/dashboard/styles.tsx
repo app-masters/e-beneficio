@@ -39,6 +39,7 @@ export const PanelActionContainer = styled.div`
   width: 100%;
   justify-content: center;
   padding: ${(props) => props.theme.spacing.md};
+  padding-bottom: ${(props) => props.theme.spacing.sm};
 `;
 
 export const ActionContainer = styled.div`

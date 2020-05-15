@@ -78,7 +78,7 @@ export const FamiliesList: React.FC<{}> = () => {
       const url = window.URL.createObjectURL(new Blob([fileFamily]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `relatorio_${moment().format('YYYYMMDDHHmmss')}.csv`);
+      link.setAttribute('download', `Familias_Beneficiadas_${moment().format('YYYYMMDDHHmmss')}.csv`);
       document.body.appendChild(link);
       link.click();
     }
@@ -175,18 +175,7 @@ export const FamiliesList: React.FC<{}> = () => {
       {importReport && (
         <Row gutter={[16, 16]}>
           <Col span={24}>
-            <Card
-              title="Relatório da importação"
-              extra={
-                importReportLoading ? (
-                  <Spin size="small" />
-                ) : (
-                  <Button icon={<DownloadOutlined />} type="dashed" onClick={() => dispatch(requestGetFileFamilies())}>
-                    Baixar Arquivo
-                  </Button>
-                )
-              }
-            >
+            <Card title="Relatório da importação" extra={importReportLoading ? <Spin size="small" /> : null}>
               <Descriptions bordered size="small" column={1} style={{ marginBottom: spacing.default }}>
                 <Descriptions.Item label="Dependentes na base do Bolsa Família">
                   <CounterItem>{importReport.originalFamilyCount}</CounterItem>
@@ -238,7 +227,7 @@ export const FamiliesList: React.FC<{}> = () => {
                       <Typography.Text type="secondary" style={{ marginRight: spacing.default }}>
                         {`(${(
                           (100 * (importReport.notFoundFamilyCount || 0)) /
-                          importReport.filteredFamilyCount
+                          (importReport.filteredFamilyCount * (importReport.percentage || 1))
                         ).toFixed(1)}%)`}
                       </Typography.Text>
                     )}
@@ -251,7 +240,7 @@ export const FamiliesList: React.FC<{}> = () => {
                       <Typography.Text type="secondary" style={{ marginRight: spacing.default }}>
                         {`(${(
                           (100 * (importReport.aboveAgeSislameCount || 0)) /
-                          importReport.filteredFamilyCount
+                          (importReport.filteredFamilyCount * (importReport.percentage || 1))
                         ).toFixed(1)}%)`}
                       </Typography.Text>
                     )}
@@ -264,7 +253,7 @@ export const FamiliesList: React.FC<{}> = () => {
                       <Typography.Text type="secondary" style={{ marginRight: spacing.default }}>
                         {`(${(
                           (100 * (importReport.foundOnlyNameFamilyCount || 0)) /
-                          importReport.filteredFamilyCount
+                          (importReport.filteredFamilyCount * (importReport.percentage || 1))
                         ).toFixed(1)}%)`}
                       </Typography.Text>
                     )}
@@ -280,9 +269,10 @@ export const FamiliesList: React.FC<{}> = () => {
                   <CounterItem bold>
                     {importReport.filteredFamilyCount && importReport.filteredFamilyCount > 0 && (
                       <Typography.Text type="secondary" style={{ marginRight: spacing.sm }}>
-                        {`(${((100 * (importReport.dependentsCount || 0)) / importReport.filteredFamilyCount).toFixed(
-                          1
-                        )}%)`}
+                        {`(${(
+                          (100 * (importReport.dependentsCount || 0)) /
+                          (importReport.filteredFamilyCount * (importReport.percentage || 1))
+                        ).toFixed(1)}%)`}
                       </Typography.Text>
                     )}
                     {importReport.dependentsCount}
@@ -325,11 +315,16 @@ export const FamiliesList: React.FC<{}> = () => {
                   style={{ marginBottom: spacing.default }}
                 />
               )}
-              {!importReport.inProgress &&
-                !importReport.message &&
-                importReport.notFoundFamilyCount &&
-                importReport.notFoundFamilyCount > 0 && (
-                  <Flex style={{ marginTop: spacing.default }}>
+
+              <Flex style={{ marginTop: spacing.default }} gap>
+                <Button icon={<DownloadOutlined />} type="dashed" onClick={() => dispatch(requestGetFileFamilies())}>
+                  Baixar lista de famílias e saldos
+                </Button>
+
+                {!importReport.inProgress &&
+                  !importReport.message &&
+                  importReport.notFoundFamilyCount &&
+                  importReport.notFoundFamilyCount > 0 && (
                     <Button
                       icon={<DownloadOutlined />}
                       onClick={() =>
@@ -337,16 +332,19 @@ export const FamiliesList: React.FC<{}> = () => {
                           const url = window.URL.createObjectURL(new Blob([response.data]));
                           const link = document.createElement('a');
                           link.href = url;
-                          link.setAttribute('download', `relatorio_${moment().format('YYYYMMDDHHmmss')}.csv`);
+                          link.setAttribute(
+                            'download',
+                            `Excluidos_Bolsa_Familia_${moment().format('YYYYMMDDHHmmss')}.csv`
+                          );
                           document.body.appendChild(link);
                           link.click();
                         })
                       }
                     >
-                      Fazer download do último relatório de motivos
+                      Baixar lista de dependentes excluídos na importação
                     </Button>
-                  </Flex>
-                )}
+                  )}
+              </Flex>
             </Card>
           </Col>
         </Row>

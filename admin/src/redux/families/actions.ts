@@ -269,7 +269,7 @@ export const requestGetFamily = (nis: string, cityId: string): ThunkResult<void>
       // Start request - starting loading state
       dispatch(doGetFamily());
       // Request
-      const response = await backend.get<Family>(`/public/families`, { params: { nis, cityId } });
+      const response = await backend.get<Family>(`/families`, { params: { nis, cityId } });
       if (response && response.data) {
         // Request finished
         dispatch(doGetFamilySuccess(response.data)); // Dispatch result

@@ -6,7 +6,7 @@ import { uploadFile } from '../utils/file';
 const router = express.Router({ mergeParams: true });
 
 /**
- * Search of family by NIS number
+ * Create new consumption for the placeStore the logged user
  */
 router.post('/', async (req, res) => {
   try {
