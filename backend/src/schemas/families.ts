@@ -14,6 +14,8 @@ export interface Family {
   responsibleMotherName: string;
   address?: string;
   phone?: string;
+  phone2?: string;
+  deactivatedAt?: number | Date | null;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
@@ -74,8 +76,16 @@ export const attributes = {
     type: DataTypes.STRING,
     allowNull: true
   },
+  phone2: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   address: {
     type: DataTypes.STRING,
+    allowNull: true
+  },
+  deactivatedAt: {
+    type: DataTypes.DATE,
     allowNull: true
   }
 };
