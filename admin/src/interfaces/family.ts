@@ -1,5 +1,3 @@
-import { City } from '../../../backend/src/schemas/cities';
-
 export interface Family {
   readonly id?: number | string;
   cityId: number | string;
@@ -20,7 +18,7 @@ export type ImportReport = {
   status: 'Em espera' | 'Finalizado' | 'Falhou' | 'Lendo arquivos' | 'Filtrando dados' | 'Salvando' | 'Cruzando dados';
   message?: string;
   percentage?: number;
-  cityId?: NonNullable<City['id']>;
+  cityId?: number | string;
   inProgress?: boolean;
   originalFamilyCount?: number;
   originalSislameCount?: number;
