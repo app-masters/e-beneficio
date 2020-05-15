@@ -68,13 +68,21 @@ export const DashboardPage: React.FC<{}> = () => {
             <Card size="small">
               <Collapse bordered={false} style={PanelStyle}>
                 <Panel header="O que é o programa?" key="what">
-                  <Text>
+                  <Typography.Paragraph>
                     O programa e-Benefício oferece suporte para famílias em situação de vulnerabilidade com dependentes
                     matriculados na rede municipal de ensino enfrentando a crise causada pela pandemia do Coronavírus.
-                    <br />
+                  </Typography.Paragraph>
+                  <Typography.Paragraph>
                     Faça a busca pelo NIS do responsável familiar e saiba se você tem direito ao benefício e onde buscar
                     o seu cartão.
-                  </Text>
+                  </Typography.Paragraph>
+                  <Typography.Paragraph>
+                    Após utilizar seu cartão, você pode soliciar a recarga do valor gasto se apenas foram comprados os
+                    itens permitidos.
+                    <PanelActionContainer>
+                      <Button href={'#compra'}>Informar compra</Button>
+                    </PanelActionContainer>
+                  </Typography.Paragraph>
                 </Panel>
                 <Panel header="Tenho direito ao benefício?" key="who">
                   <Text>
@@ -83,7 +91,7 @@ export const DashboardPage: React.FC<{}> = () => {
                     ensino.
                   </Text>
                 </Panel>
-                <Panel header="Tenho direito mas não estou na lista" key="direito">
+                <Panel header="Acho que tenho direito mas não estou na lista" key="direito">
                   <Text>
                     Caso acredite que tem o direito ao benefício, mas não encontrou seu NIS na busca, faça seu cadastro
                     com a prefeitura.
@@ -93,6 +101,12 @@ export const DashboardPage: React.FC<{}> = () => {
                       Fazer cadastro
                     </Button>
                   </PanelActionContainer>
+                </Panel>
+                <Panel header="Não tenho um NIS" key="who">
+                  <Text>
+                    O NIS é o Número de Identificação Social, pode ser encontrado no seu cartão do programa Bolsa
+                    Família ou seu Cartão do Cidadão.
+                  </Text>
                 </Panel>
                 <Panel header="Obter mais informações" key="info">
                   <Text>
@@ -111,15 +125,18 @@ export const DashboardPage: React.FC<{}> = () => {
         </Container>
         {/* </Flex> */}
         <Container>
-          <BodyContainer id="consumo">
-            <Title level={4}>Salvar compras</Title>
+          <BodyContainer id="compra">
+            <Title level={4}>Recarda do valor das compras</Title>
             <Card>
               <Paragraph style={{ marginBottom: 0 }}>
-                Para saber se você tem direito, escreva o código NIS do responsável familiar e veja seu saldo
-                disponível.
+                Se você fez uma compra utilizando o cartão, você pode informar ela aqui para ser avaliada e receber a
+                recarga do valor gasto no próximo mês. Para fazer isso você vai precisar das informações do responsável
+                familiar e do comprovante da compra.
               </Paragraph>
               <PanelActionContainer>
-                <Button onClick={() => setModal(!modal)}>Adicionar</Button>
+                <Button type="primary" onClick={() => setModal(!modal)}>
+                  Informar compra
+                </Button>
                 <ConsumptionForm open={modal} closeModal={() => setModal(false)} />
               </PanelActionContainer>
             </Card>
@@ -129,7 +146,7 @@ export const DashboardPage: React.FC<{}> = () => {
           <Flex vertical justifyContent="center" alignItems="center">
             <Paragraph style={{ textAlign: 'center' }}>
               Esse projeto é open-source e você pode contribuir com ele indo no repositório no{' '}
-              <a href="https://github.com/TiagoGouvea/resources4vulnerable">GitHub</a>
+              <a href="https://github.com/app-masters/e-beneficio">GitHub</a>
             </Paragraph>
             <Paragraph style={{ textAlign: 'center', fontSize: '12px' }}>
               Feito pela <a href="https://appmasters.io/pt">App Masters</a> para a{' '}
