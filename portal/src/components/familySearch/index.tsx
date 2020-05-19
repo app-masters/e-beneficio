@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Form, Button, Input, Typography, Card } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { FamilyWrapper, InfoContainer, PriceStyle, PriceLabelStyle, HowToHeaderContainer, HowToLabel } from './styles';
+import { Flex } from '../flex';
 import { AppState } from '../../redux/rootReducer';
 import { requestGetFamily } from '../../redux/family/actions';
 import { Family } from '../../interfaces/family';
@@ -81,13 +82,17 @@ export const FamilySearch: React.FC<ComponentProps> = () => {
                 <Text style={PriceStyle}>{`R$${(family.balance || 0).toFixed(2).replace('.', ',')}`}</Text>
 
                 <HowToHeaderContainer>
-                  <HowToLabel>
-                    Para utilizar os seus créditos, vá até um dos estabelecimentos parceiros e informe que faz parte do
-                    programa
-                  </HowToLabel>
+                  <HowToLabel>Você pode utilizar seus créditos utilizando o cartão recebido.</HowToLabel>
                   {family.school && (
-                    <HowToLabel>{`Caso não tenha pego seu cartão, entre em contato com a escola ${family.school}`}</HowToLabel>
+                    <HowToLabel>{`Caso não tenha pego seu cartão, entre em contato com a escola `}<b>{`${family.school}`}</b></HowToLabel>
                   )}
+                  <HowToLabel>
+                    Se o saldo for superior ao disponível, possivelmente você precisa informar suas últimas compras para
+                    receber o reembolso.
+                  </HowToLabel>
+                  <Flex justifyContent="center">
+                    <Button href={'#compra'}>Informar compra</Button>
+                  </Flex>
                 </HowToHeaderContainer>
               </>
             ) : (
