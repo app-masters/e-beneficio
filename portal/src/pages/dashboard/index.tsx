@@ -58,7 +58,7 @@ export const DashboardPage: React.FC<{}> = () => {
         <Container>
           <BodyContainer id="saldo">
             <Title level={4}>Consultar saldo no programa</Title>
-            <FamilySearch />
+            {!modal && <FamilySearch />}
           </BodyContainer>
         </Container>
         {/* <Flex style={{ backgroundColor: '#FFF' }} justifyContent="center"> */}
@@ -80,18 +80,21 @@ export const DashboardPage: React.FC<{}> = () => {
                     Após utilizar seu cartão, você pode soliciar a recarga do valor gasto se apenas foram comprados os
                     itens permitidos.
                     <PanelActionContainer>
-                      <Button href={'#compra'}>Informar compra</Button>
+                      <Button href={'#saldo'}>Informar compra</Button>
                     </PanelActionContainer>
                   </Typography.Paragraph>
                 </Panel>
                 <Panel header="Tenho direito ao benefício?" key="who">
                   <Text>
-                    Tem direito ao benefício quem está cadastrado e possuir o código NIS do responsável familiar. Estão
-                    cadastradas famílias atendidas pelo Bolsa Família com dependentes matriculados na rede municipal de
-                    ensino.
+                    O cadastro no programa foi feita de forma automática e você foi incluído se você é o responsável
+                    familiar cadastrado no programa Bolsa Família com depedentes que estão matriculados na rede
+                    municipal de ensino. Para saber se está incluído, faça a busca pelo seu NIS.
+                    <PanelActionContainer>
+                      <Button href={'#compra'}>Consultar saldo pelo NIS</Button>
+                    </PanelActionContainer>
                   </Text>
                 </Panel>
-                <Panel header="Acho que tenho direito mas não estou na lista" key="direito">
+                <Panel header="Acho que tenho direito mas não estou na lista" key="list">
                   <Text>
                     Caso acredite que tem o direito ao benefício, mas não encontrou seu NIS na busca, faça seu cadastro
                     com a prefeitura.
@@ -102,10 +105,11 @@ export const DashboardPage: React.FC<{}> = () => {
                     </Button>
                   </PanelActionContainer>
                 </Panel>
-                <Panel header="Não tenho um NIS" key="who">
+                <Panel header="Não tenho ou não sei o meu NIS" key="dont have">
                   <Text>
                     O NIS é o Número de Identificação Social, pode ser encontrado no seu cartão do programa Bolsa
-                    Família ou seu Cartão do Cidadão.
+                    Família ou seu Cartão do Cidadão. A inscrição no programa é requisito para fazer parte do
+                    e-Benefício.
                   </Text>
                 </Panel>
                 <Panel header="Obter mais informações" key="info">
@@ -126,7 +130,7 @@ export const DashboardPage: React.FC<{}> = () => {
         {/* </Flex> */}
         <Container>
           <BodyContainer id="compra">
-            <Title level={4}>Recarda do valor das compras</Title>
+            <Title level={4}>Recarga do valor das compras</Title>
             <Card>
               <Paragraph style={{ marginBottom: 0 }}>
                 Se você fez uma compra utilizando o cartão, você pode informar ela aqui para ser avaliada e receber a

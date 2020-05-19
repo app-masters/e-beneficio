@@ -55,10 +55,11 @@ export const BodyContainer = styled.div`
   margin-bottom: ${(props) => props.theme.spacing.default};
 `;
 
-export const Container = styled.div`
+export const Container = styled.div<{ backgroudColor?: string }>`
   max-width: 800px;
   width: 100%;
   align-self: center;
+  background-color: ${(props) => props.backgroundColor || 'initial'};
 `;
 
 export const LogoContainer = styled.div`

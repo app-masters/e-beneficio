@@ -41,7 +41,11 @@ export const BenefitList: React.FC<{}> = () => {
           />
           <Table.Column title="Mês" dataIndex="month" />
           <Table.Column title="Ano" dataIndex="year" />
-          <Table.Column title="Valor" dataIndex="value" render={(data: Benefit['value']) => `R$ ${data}`} />
+          <Table.Column
+            title="Valor por dependente"
+            dataIndex="value"
+            render={(data: Benefit['value']) => `R$ ${data}`}
+          />
           <Table.Column
             title="Criado"
             dataIndex="createdAt"

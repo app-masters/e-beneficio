@@ -1,13 +1,13 @@
 import {
-  BarChartOutlined,
+  // BarChartOutlined,
   CarryOutOutlined,
   BankOutlined,
   IdcardOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  ShopOutlined,
-  SolutionOutlined,
+  // ShopOutlined,
+  // SolutionOutlined,
   UserOutlined,
   HomeOutlined
 } from '@ant-design/icons';
@@ -37,11 +37,11 @@ const routes: RouteItem[] = [
     icon: () => <HomeOutlined />,
     name: 'Início'
   },
-  {
-    path: '/relatorios',
-    icon: () => <BarChartOutlined />,
-    name: 'Relatórios'
-  },
+  // {
+  //   path: '/relatorios',
+  //   icon: () => <BarChartOutlined />,
+  //   name: 'Relatórios'
+  // },
   {
     path: '/beneficios',
     icon: () => <CarryOutOutlined />,
@@ -57,16 +57,16 @@ const routes: RouteItem[] = [
     icon: () => <UserOutlined />,
     name: 'Usuários'
   },
-  {
-    path: '/lojas',
-    icon: () => <ShopOutlined />,
-    name: 'Lojas'
-  },
-  {
-    path: '/estabelecimentos',
-    icon: () => <SolutionOutlined />,
-    name: 'Estabelecimentos'
-  },
+  // {
+  //   path: '/lojas',
+  //   icon: () => <ShopOutlined />,
+  //   name: 'Lojas'
+  // },
+  // {
+  //   path: '/estabelecimentos',
+  //   icon: () => <SolutionOutlined />,
+  //   name: 'Estabelecimentos'
+  // },
   {
     path: '/instituicoes',
     icon: () => <BankOutlined />,
