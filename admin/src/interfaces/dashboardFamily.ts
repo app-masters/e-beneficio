@@ -1,7 +1,5 @@
 export type DashboardFamily = {
-  total: number;
-  cad: number;
-  'extreme-poverty': number;
-  'poverty-line': number;
+  familyCount: number;
+  dependentCount: number;
   lastCreatedDate: Date;
 };

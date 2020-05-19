@@ -25,10 +25,11 @@ const schema = yup.object().shape({
  */
 const handleQRCode = (value: string | null) => {
   if (!value) return null;
-  // https://nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=31200417745613005462650030000484351494810435|2|1|1|d3bfca6136abee66286116203f747bc8e6fd3300
-  const nfce = value.split('nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=')[1];
-  if (!nfce) return null; // Not a valid nfce QRCode
-  return nfce.split('|')[0];
+  return value;
+  // // https://nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=31200417745613005462650030000484351494810435|2|1|1|d3bfca6136abee66286116203f747bc8e6fd3300
+  // const nfce = value.split('nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=')[1];
+  // if (!nfce) return null; // Not a valid nfce QRCode
+  // return nfce.split('|')[0];
 };
 
 /**
@@ -107,12 +108,12 @@ export const ConsumptionForm: React.FC<{ open: boolean; closeModal: Function }> 
   const invalidConsumptionValue = !!(family && values.value > 0 && values.value > family.balance);
   return (
     <Modal
-      title={'Registrar consumo'}
+      title={'Informar compra'}
       visible={open}
       onCancel={() => closeModal()}
       onOk={submitForm}
       confirmLoading={loading}
-      okText="Confirmar consumo"
+      okText="Confirmar compra"
       okButtonProps={{
         disabled:
           !!(errors && Object.keys(errors).length > 0 && touched) ||
@@ -128,6 +129,33 @@ export const ConsumptionForm: React.FC<{ open: boolean; closeModal: Function }> 
           <FamilySearch onFamilySelect={(id) => setFieldValue('familyId', id)} />
           {values.familyId && (
             <>
+              <Form.Item
+                label="Valor total da compra"
+                validateStatus={(!!valueMeta.error && !!valueMeta.touched) || invalidConsumptionValue ? 'error' : ''}
+                help={
+                  !!valueMeta.error && !!valueMeta.touched
+                    ? valueMeta.error
+                    : invalidConsumptionValue
+                    ? 'Valor maior que saldo disponível'
+                    : undefined
+                }
+              >
+                <InputNumber
+                  style={{ width: '100%' }}
+                  id="value"
+                  name="value"
+                  size="large"
+                  onChange={(value) => setFieldValue('value', value)}
+                  value={Number(values.value)}
+                  decimalSeparator=","
+                  step={0.01}
+                  precision={2}
+                  min={0}
+                  // max={family?.balance}
+                  formatter={(value) => `R$ ${value}`}
+                  parser={(value) => (value ? value.replace(/(R)|(\$)/g, '').trim() : '')}
+                />
+              </Form.Item>
               <Form.Item
                 label="NFCe"
                 validateStatus={!!nfceMeta.error && !!nfceMeta.touched ? 'error' : ''}
@@ -168,33 +196,6 @@ export const ConsumptionForm: React.FC<{ open: boolean; closeModal: Function }> 
                   </>
                 </Modal>
               </Form.Item>
-              <Form.Item
-                label="Valor da compra"
-                validateStatus={(!!valueMeta.error && !!valueMeta.touched) || invalidConsumptionValue ? 'error' : ''}
-                help={
-                  !!valueMeta.error && !!valueMeta.touched
-                    ? valueMeta.error
-                    : invalidConsumptionValue
-                    ? 'Valor maior que saldo disponível'
-                    : undefined
-                }
-              >
-                <InputNumber
-                  style={{ width: '100%' }}
-                  id="value"
-                  name="value"
-                  size="large"
-                  onChange={(value) => setFieldValue('value', value)}
-                  value={Number(values.value)}
-                  decimalSeparator=","
-                  step={0.01}
-                  precision={2}
-                  min={0}
-                  // max={family?.balance}
-                  formatter={(value) => `R$ ${value}`}
-                  parser={(value) => (value ? value.replace(/(R)|(\$)/g, '').trim() : '')}
-                />
-              </Form.Item>
 
               <Form.Item
                 validateStatus={!!imageMeta.error && !!imageMeta.touched ? 'error' : ''}
@@ -229,7 +230,7 @@ export const ConsumptionForm: React.FC<{ open: boolean; closeModal: Function }> 
                     Na foto, tentar mostrar:
                     <ul>
                       <li>Nota fiscal</li>
-                      <li>Documento do comprador</li>
+                      <li>Documento</li>
                     </ul>
                     Tente manter a foto o mais nítida possível.
                   </Typography.Paragraph>

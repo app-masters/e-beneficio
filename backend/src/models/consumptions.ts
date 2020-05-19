@@ -8,6 +8,7 @@ import logging from '../utils/logging';
 import { Place } from '../schemas/places';
 import { City } from '../schemas/cities';
 import { Benefit } from '../schemas/benefits';
+import { Dependent } from '../schemas/depedents';
 
 /**
  * a
@@ -15,19 +16,24 @@ import { Benefit } from '../schemas/benefits';
  * @param availableBenefits a
  */
 export const getFamilyDependentBalance = async (family: Family, availableBenefits?: Benefit[]) => {
-  if (!family.dependents || family.dependents.length < 1) {
-    // Family witihout dependents, weird
-    return 0;
+  if (!family.dependents || !family.consumptions) {
+    // Be sure that everything necessesary is populated
+    const populatedFamily = await db.families.findByPk(family.id, {
+      include: [
+        { model: db.dependents, as: 'dependents' },
+        { model: db.consumptions, as: 'consumptions' }
+      ]
+    });
+    if (populatedFamily) {
+      family = populatedFamily;
+    }
   }
 
   if (!availableBenefits) {
     // Populating benefits if it's not available
     availableBenefits = await db.benefits.findAll({
       where: { groupName: family.groupName },
-      include: [
-        { model: db.institutions, as: 'institution', where: { cityId: family.cityId } },
-        { model: db.consumptions, as: 'consumptions' }
-      ]
+      include: [{ model: db.institutions, as: 'institution', where: { cityId: family.cityId } }]
     });
   }
 
@@ -35,7 +41,7 @@ export const getFamilyDependentBalance = async (family: Family, availableBenefit
   const todayYear = moment().year();
 
   let balance = 0;
-  for (const dependent of family.dependents) {
+  for (const dependent of family.dependents as Dependent[]) {
     const startMonth = moment(dependent.createdAt as Date).month() + 1;
     const startYear = moment(dependent.createdAt as Date).year();
     const endMonth = moment(dependent.deactivatedAt as Date).month() + 1;
@@ -57,6 +63,7 @@ export const getFamilyDependentBalance = async (family: Family, availableBenefit
       }
     }
   }
+
   if (!family.consumptions || family.consumptions.length < 1) {
     // Family without consumptions
     return balance;
