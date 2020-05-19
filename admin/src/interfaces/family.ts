@@ -1,3 +1,5 @@
+import { Dependent } from './depedents';
+
 export interface Family {
   readonly id?: number | string;
   cityId: number | string;
@@ -7,11 +9,16 @@ export interface Family {
   responsibleNis: string;
   responsibleBirthday: Date;
   responsibleMotherName: string;
+  address?: string;
+  phone?: string;
+  phone2?: string;
+  deactivatedAt?: number | Date | null;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
-  // Extra data
-  balance: number;
+  // Join
+  dependents: Dependent[];
+  balance?: number;
 }
 
 export type ImportReport = {

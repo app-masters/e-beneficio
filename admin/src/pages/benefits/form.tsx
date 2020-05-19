@@ -59,8 +59,8 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
     setFieldTouched
   } = useFormik({
     initialValues: benefit || {
-      institutionId: !institutionLoading && institutionList && institutionList.length > 0 ? institutionList[0].id : -1,
-      groupName: 'extreme-poverty',
+      institutionId: !institutionLoading && institutionList && institutionList.length > 0 ? institutionList[0].id : 1,
+      groupName: 'children',
       title: '',
       month: undefined,
       year: undefined,
@@ -193,7 +193,7 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
           </Row>
 
           <Form.Item
-            label="Valor"
+            label="Valor por dependente"
             validateStatus={!!valueMeta.error && !!valueMeta.touched ? 'error' : ''}
             help={!!valueMeta.error && !!valueMeta.touched ? valueMeta.error : undefined}
           >

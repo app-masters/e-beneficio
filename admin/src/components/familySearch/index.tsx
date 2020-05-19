@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Typography, Card, Descriptions, Row, Col } from 'antd';
+import { Form, Input, Typography, Card, Descriptions, Row, Col } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { FamilyWrapper, InfoContainer } from './styles';
 import { AppState } from '../../redux/rootReducer';
 import { requestGetFamily } from '../../redux/families/actions';
 import { Family } from '../../interfaces/family';
 import moment from 'moment';
-import { Link } from 'react-router-dom';
 
 const { Text } = Typography;
 
@@ -72,21 +71,26 @@ export const FamilySearch: React.FC<ComponentProps> = () => {
                 <Descriptions.Item label="Data de nascimento">
                   {moment(family.responsibleBirthday).format('DD/MM/YYYY')}
                 </Descriptions.Item>
-                <Descriptions.Item label="Nome da mãe">{family.responsibleMotherName}</Descriptions.Item>
                 <Descriptions.Item label="Saldo disponível">
                   <Typography.Paragraph strong>{`R$${(family.balance || 0)
                     .toFixed(2)
                     .replace('.', ',')}`}</Typography.Paragraph>
                 </Descriptions.Item>
+                <Descriptions.Item label="Endereço">{family.address}</Descriptions.Item>
+                <Descriptions.Item label="Telefone">{family.phone}</Descriptions.Item>
+                <Descriptions.Item label="Telefone 2">{family.phone2}</Descriptions.Item>
+                {family.dependents && (
+                  <>
+                    {family.dependents.map((dependent: NonNullable<Family['dependents'][number]>) => (
+                      <Descriptions.Item key={dependent.id} label="Dependente">
+                        {`${dependent.name} (${moment(dependent.birthday).format('DD/MM/YYYY')}) - ${
+                          dependent.schoolName
+                        }`}
+                      </Descriptions.Item>
+                    ))}
+                  </>
+                )}
               </Descriptions>
-            </Col>
-          </Row>
-          <Row gutter={[16, 16]}>
-            <Col flex={1} />
-            <Col>
-              <Link to={`/familias/${family.id}/editar`}>
-                <Button>Editar</Button>
-              </Link>
             </Col>
           </Row>
         </FamilyWrapper>

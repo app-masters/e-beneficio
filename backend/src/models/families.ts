@@ -176,13 +176,19 @@ export const updateImportReport = (importReport: ImportReport, cityId: NonNullab
  * Get all items on the table without any filter
  * @param nis searched nis code
  * @param cityId logged user city ID`
+ * @param populateDependents should the dependents be returned?
  * @returns Promise<List of items>
  */
 export const findByNis = async (
   nis: NonNullable<Family['responsibleNis']>,
-  cityId: NonNullable<City['id']>
+  cityId: NonNullable<City['id']>,
+  populateDependents?: boolean
 ): Promise<SequelizeFamily> => {
-  const [family] = await db.families.findAll({ where: { responsibleNis: nis, cityId }, limit: 1 });
+  const [family] = await db.families.findAll({
+    where: { responsibleNis: nis, cityId },
+    limit: 1,
+    include: !populateDependents ? [] : [{ model: db.dependents, as: 'dependents' }]
+  });
   return family;
 };
 
@@ -346,17 +352,16 @@ export const importFamilyFromCSVFile = async (
 export const getDashboardInfo = async (cityId: NonNullable<City['id']>) => {
   const dashboard: { [key: string]: number | Date } = { total: 0 };
 
-  const data = await db.families.findAll({
-    where: { cityId },
-    attributes: ['groupName', [Sequelize.fn('count', Sequelize.fn('distinct', Sequelize.col('id'))), 'count']],
-    group: ['groupName']
+  const families = await db.families.findAll({
+    where: { cityId, deactivatedAt: null }
   });
+  dashboard.familyCount = families.length;
 
-  for (const item of data) {
-    const { count } = item.toJSON() as { count: number };
-    dashboard[item.groupName] = Number(count);
-    (dashboard.total as number) += Number(count);
-  }
+  const dependents = await db.dependents.findAll({
+    where: { deactivatedAt: null },
+    include: [{ model: db.families, as: 'family', where: { deactivatedAt: null, cityId } }]
+  });
+  dashboard.dependentCount = dependents.length;
 
   const last = await db.families.max<SequelizeFamily, SequelizeFamily['createdAt']>('createdAt');
   if (last) {
