@@ -15,4 +15,7 @@ COPY ./package.json .
 COPY ./.sequelizerc .
 RUN date > build-date.txt
 RUN yarn install --production --ignore-scripts --prefer-offline
+
+EXPOSE 80
+
 CMD ["/bin/sh", "-c", "cd /var/www; cat build-date.txt; yarn migrate; yarn seed-production; yarn start-production; "]

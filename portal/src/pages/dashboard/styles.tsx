@@ -55,7 +55,7 @@ export const BodyContainer = styled.div`
   margin-bottom: ${(props) => props.theme.spacing.default};
 `;
 
-export const Container = styled.div<{ backgroudColor?: string }>`
+export const Container = styled.div<{ backgroundColor?: string }>`
   max-width: 800px;
   width: 100%;
   align-self: center;

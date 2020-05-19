@@ -25,7 +25,7 @@ source ${ENV}/config.sh
 
 ## Use node 11
 if hash nvm 2>/dev/null; then
-    nvm use 11
+    nvm use 13
 fi
 cd ..
 
@@ -35,7 +35,7 @@ gcloud config set compute/zone ${ZONE}
 ## Login on GCR
 gcloud auth configure-docker --quiet
 
-### BACKEND
+## BACKEND
 ## build and push backend
 #cd backend
 #echo -e "\n# 1/9 - Building and tagging backend dockerfile...\n"
@@ -91,12 +91,6 @@ if test -f "$FILE"; then
 else
     echo "Not sending ${FILE}";
 fi
-#FILE=./${ENV}/nginx.conf
-#if test -f "$FILE"; then
-#    gcloud compute scp ${FILE} ${INSTANCE_NAME}:${REMOTE_PATH}
-#else
-#    echo "Not sending ${FILE}";
-#fi
 
 ## Call "docker-compose up -d" on github
 if [[ -z ${GITHUB_RUN_ID} ]]; then
@@ -106,6 +100,8 @@ else
 fi
 
 echo "Daemon: ${DAEMON}"
+
+set -x
 
 echo -e "\n\n# 8/9 - Updating remote machine...\n"
 gcloud compute ssh ${INSTANCE_NAME} --command="cd ${REMOTE_PATH} && docker-compose pull && docker-compose up ${DAEMON} --remove-orphans"
