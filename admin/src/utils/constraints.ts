@@ -9,9 +9,10 @@ export const localStorageConstraints = {
 };
 
 export const familyGroupList = {
-  'extreme-poverty': { code: 1, title: 'Extrema pobreza' },
-  'poverty-line': { code: 2, title: 'Linha da pobreza' },
-  cad: { code: 3, title: 'Perfil CAD único' }
+  children: { code: 0, title: 'Dependentes matriculados na rede pública' },
+  // 'extreme-poverty': { code: 1, title: 'Extrema pobreza' },
+  // 'poverty-line': { code: 2, title: 'Linha da pobreza' },
+  // cad: { code: 3, title: 'Perfil CAD único' }
 };
 
 export const roleList = {
