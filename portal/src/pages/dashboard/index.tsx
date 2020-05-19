@@ -45,8 +45,8 @@ export const DashboardPage: React.FC<{}> = () => {
           <BodyContainer id="about">
             <Card size="small">
               <Paragraph>
-                O programa Mercardo Popular oferece suporte para famílias em situação de vulnerabilidade, permitindo
-                comprar produtos nos estabelecimentos parceiros utilizando apenas o saldo do programa.
+                O programa e-Benefício oferece suporte para famílias em situação de vulnerabilidade, permitindo comprar
+                produtos nos estabelecimentos parceiros utilizando apenas o saldo do programa.
               </Paragraph>
               <Paragraph style={{ marginBottom: 0 }}>
                 Para saber se você tem direito, escreva o código NIS do responsável familiar e veja seu saldo
@@ -57,7 +57,7 @@ export const DashboardPage: React.FC<{}> = () => {
         </Container>
         <Container>
           <BodyContainer id="saldo">
-            <Title level={4}>Consultar saldo no programa</Title>
+            <Title level={4}>Ver situação no programa</Title>
             {!modal && <FamilySearch />}
           </BodyContainer>
         </Container>
@@ -110,7 +110,16 @@ export const DashboardPage: React.FC<{}> = () => {
                     O NIS é o Número de Identificação Social, pode ser encontrado no seu cartão do programa Bolsa
                     Família ou seu Cartão do Cidadão. A inscrição no programa é requisito para fazer parte do
                     e-Benefício.
+                    <br />
+                    <br />
+                    Se você faz parte do programa, mas não lembra seu NIS, você pode encontrar ele utilizando o portal
+                    do <b>Meu CadÚnico</b>.
                   </Text>
+                  <PanelActionContainer>
+                    <Button href={'https://meucadunico.cidadania.gov.br/meu_cadunico/'} target="_blank">
+                      Encontrar NIS
+                    </Button>
+                  </PanelActionContainer>
                 </Panel>
                 <Panel header="Obter mais informações" key="info">
                   <Text>
