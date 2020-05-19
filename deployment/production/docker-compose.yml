@@ -9,35 +9,34 @@ services:
   backend:
     image: gcr.io/covid19jf/resource-4-vulnerable-backend
     container_name: backend
-    networks:
-      - resources-net
-    ports:
-      - 3001:3001
+#    ports:
+#      - 80:8080
     env_file:
       - .env.backend
     environment:
-      PORT: 3001
-      VIRTUAL_HOST: api.e-beneficio.com
+      PORT: 80
+#      VIRTUAL_HOST: api.e-beneficio.com, api.localhost
   portal:
-    image: gcr.io/covid19jf/resource-4-vulnerable-frontend
+    image: gcr.io/covid19jf/resource-4-vulnerable-portal
     container_name: portal
-    networks:
-      - resources-net
-    ports:
-      - 3000:3000
+#    ports:
+#      - 80:3000
+    volumes:
+      - ${PWD}/.env.portal:/usr/share/nginx/html/.env
     environment:
-      PORT: 3000
-      VIRTUAL_HOST: jf.e-beneficio.com
+      PORT: 80
+      VIRTUAL_HOST: jf.e-beneficio.com, e-beneficio.com, localhost
   admin:
-    image: gcr.io/covid19jf/resource-4-vulnerable-frontend
+    image: gcr.io/covid19jf/resource-4-vulnerable-admin
     container_name: admin
-    networks:
-      - resources-net
-    ports:
-      - 3000:3000
+#    networks:
+#      - resources-net
+#    ports:
+#      - 80:3000
+    volumes:
+      - ${PWD}/.env.admin:/usr/share/nginx/html/.env
     environment:
-      PORT: 3000
-      VIRTUAL_HOST: admin.e-beneficio.com
+      PORT: 80
+      VIRTUAL_HOST: admin.e-beneficio.com, admin.localhost
 
-networks:
-  resources-net:
+
