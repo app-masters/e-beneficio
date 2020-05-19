@@ -9,7 +9,7 @@ export const localStorageConstraints = {
 };
 
 export const familyGroupList = {
-  children: { code: 0, title: 'Dependentes matriculados na rede pública' },
+  children: { code: 0, title: 'Dependentes matriculados na rede pública' }
   // 'extreme-poverty': { code: 1, title: 'Extrema pobreza' },
   // 'poverty-line': { code: 2, title: 'Linha da pobreza' },
   // cad: { code: 3, title: 'Perfil CAD único' }
