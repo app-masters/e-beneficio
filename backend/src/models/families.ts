@@ -16,6 +16,7 @@ import { getFamilyDependentBalance } from './consumptions';
 import { FamilyItem, SislameItem, OriginalSislameItem, OriginalNurseryItem } from '../typings/filesItems';
 import { Family, SequelizeFamily } from '../schemas/families';
 import { City } from '../schemas/cities';
+import { Dependent } from '../schemas/depedents';
 
 type ImportReport = {
   status: 'Em espera' | 'Finalizado' | 'Falhou' | 'Lendo arquivos' | 'Filtrando dados' | 'Salvando' | 'Cruzando dados';
@@ -177,18 +178,25 @@ export const updateImportReport = (importReport: ImportReport, cityId: NonNullab
  * @param nis searched nis code
  * @param cityId logged user city ID`
  * @param populateDependents should the dependents be returned?
+ * @param populateSchool should the school be returned?
  * @returns Promise<List of items>
  */
 export const findByNis = async (
   nis: NonNullable<Family['responsibleNis']>,
   cityId: NonNullable<City['id']>,
-  populateDependents?: boolean
-): Promise<SequelizeFamily> => {
+  populateDependents?: boolean,
+  populateSchool?: boolean
+): Promise<SequelizeFamily & { school?: Dependent['schoolName'] }> => {
   const [family] = await db.families.findAll({
     where: { responsibleNis: nis, cityId },
     limit: 1,
-    include: !populateDependents ? [] : [{ model: db.dependents, as: 'dependents' }]
+    include: !populateDependents && !populateSchool ? [] : [{ model: db.dependents, as: 'dependents' }]
   });
+  if (populateSchool && family.dependents) {
+    const yongerDepedent = family.dependents.sort((a, b) => moment(b.birthday).diff(moment(a.birthday)))[0];
+    family.setDataValue('dependents', undefined);
+    family.setDataValue('school' as 'id', yongerDepedent.schoolName);
+  }
   return family;
 };
 
