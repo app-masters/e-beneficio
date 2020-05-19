@@ -1,12 +1,12 @@
 import { combineReducers } from 'redux';
 
 // Reducers
-import authReducer from './auth/reducers';
 import familyReducer from './family/reducers';
+import consumptionReducer from './consumption/reducers';
 
 const rootReducer = combineReducers({
-  authReducer,
-  familyReducer
+  familyReducer,
+  consumptionReducer
 });
 
 export type AppState = ReturnType<typeof rootReducer>;

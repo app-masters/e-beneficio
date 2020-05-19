@@ -6,6 +6,7 @@ import logging from '../utils/logging';
 import { sequelize } from '../schemas';
 // Midlewares
 import { jwtMiddleware } from '../middlewares/auth';
+import { requirePublicAuth } from '../middlewares/publicAuth';
 
 // Sub-routers
 import authRoutes from './auth';
@@ -47,7 +48,7 @@ router.get(
 );
 // Sub-routers
 router.use('/auth', authRoutes);
-router.use('/public', publicRoutes);
+router.use('/public', requirePublicAuth, publicRoutes);
 router.use('/cities', jwtMiddleware, cityRoutes);
 router.use('/places', jwtMiddleware, placeRoutes);
 router.use('/place-stores', jwtMiddleware, placeStoreRoutes);
