@@ -63,10 +63,12 @@ export const FamilyActions = styled.div`
 
 export const HowToHeaderContainer = styled.div`
   display: flex;
-  margin-top: ${(props) => props.theme.spacing.sm};
-  margin-bottom: ${(props) => props.theme.spacing.sm};
+  flex-direction: column;
+  margin-top: ${(props) => props.theme.spacing.md};
+  margin-bottom: ${(props) => props.theme.spacing.md};
 `;
 
 export const HowToLabel = styled.label`
   font-size: 10pt;
+  margin-bottom: ${(props) => props.theme.spacing.sm};
 `;

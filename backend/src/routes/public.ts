@@ -12,7 +12,7 @@ const router = express.Router({ mergeParams: true });
  */
 router.get('/families', async (req, res) => {
   try {
-    const item = await familyModel.findByNis(req.query.nis as string, req.query.cityId as string);
+    const item = await familyModel.findByNis(req.query.nis as string, req.query.cityId as string, undefined, true);
     if (!item) return res.status(404).send('Not found');
     const balance = await consumptionModel.getFamilyDependentBalance(item);
     return res.send({ ...item.toJSON(), balance });
