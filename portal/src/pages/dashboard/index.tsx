@@ -37,7 +37,7 @@ export const DashboardPage: React.FC<{}> = () => {
               e-Benefício
             </Title>
             <Title level={4} style={{ color: '#FFFFFF' }}>
-              Suporte para famílias em situação de vulnerabilidade
+              Programa para famílias em situação de vulnerabilidade social
             </Title>
           </HeaderContent>
         </HeaderContainer>
@@ -45,12 +45,11 @@ export const DashboardPage: React.FC<{}> = () => {
           <BodyContainer id="about">
             <Card size="small">
               <Paragraph>
-                O programa e-Benefício oferece suporte para famílias em situação de vulnerabilidade, permitindo comprar
-                produtos nos estabelecimentos parceiros utilizando apenas o saldo do programa.
-              </Paragraph>
-              <Paragraph style={{ marginBottom: 0 }}>
-                Para saber se você tem direito, escreva o código NIS do responsável familiar e veja seu saldo
-                disponível.
+                O programa e-Beneficio oferece suporte para famílias em situação de vulnerabilidade social que estejam
+                inseridas no Programa Bolsa Família e que possuam dependentes regularmente matriculados na rede de
+                educação. O e-Beneficio possibilita que as famílias que atendam os requisitos, recebam um cartão em nome
+                do responsável familiar, que por sua vez poderá ser utilizado na rede credenciada de acordo com o saldo
+                disponível no cartão.
               </Paragraph>
             </Card>
           </BodyContainer>
@@ -61,43 +60,53 @@ export const DashboardPage: React.FC<{}> = () => {
             {!modal && <FamilySearch />}
           </BodyContainer>
         </Container>
-        {/* <Flex style={{ backgroundColor: '#FFF' }} justifyContent="center"> */}
         <Container>
           <BodyContainer id="info">
             <Title level={4}>Informações sobre o programa</Title>
             <Card size="small">
               <Collapse bordered={false} style={PanelStyle}>
                 <Panel header="O que é o programa?" key="what">
-                  <Typography.Paragraph>
-                    O programa e-Benefício oferece suporte para famílias em situação de vulnerabilidade com dependentes
-                    matriculados na rede municipal de ensino enfrentando a crise causada pela pandemia do Coronavírus.
-                  </Typography.Paragraph>
-                  <Typography.Paragraph>
+                  <Paragraph>
+                    O programa e-Beneficio oferece suporte às famílias em situação de vulnerabilidade social que estejam
+                    ativas no programa de transferência de renda Bolsa Família e possuam dependentes regularmente
+                    matriculados na rede municipal de educação no município de Juiz de Fora.
+                  </Paragraph>
+                  <Paragraph>
                     Faça a busca pelo NIS do responsável familiar e saiba se você tem direito ao benefício e onde buscar
                     o seu cartão.
-                  </Typography.Paragraph>
-                  <Typography.Paragraph>
+                  </Paragraph>
+                  <Paragraph>
                     Após utilizar seu cartão, você pode soliciar a recarga do valor gasto se apenas foram comprados os
                     itens permitidos.
                     <PanelActionContainer>
-                      <Button href={'#saldo'}>Informar compra</Button>
+                      <Button href={'#compra'}>Informar compra</Button>
                     </PanelActionContainer>
-                  </Typography.Paragraph>
+                  </Paragraph>
                 </Panel>
                 <Panel header="Tenho direito ao benefício?" key="who">
-                  <Text>
-                    O cadastro no programa foi feita de forma automática e você foi incluído se você é o responsável
-                    familiar cadastrado no programa Bolsa Família com depedentes que estão matriculados na rede
-                    municipal de ensino. Para saber se está incluído, faça a busca pelo seu NIS.
-                    <PanelActionContainer>
-                      <Button href={'#compra'}>Consultar saldo pelo NIS</Button>
-                    </PanelActionContainer>
-                  </Text>
+                  <Paragraph>
+                    O cadastro no programa e-Benefício foi feito de maneira automática a partir das informações dos
+                    beneficiários do Programa Bolsa Família e de alunos inscritos na rede municipal de ensino.
+                  </Paragraph>
+                  <Text>Para saber se você está incluído, faça a busca pelo NIS do responsável familiar.</Text>
+                  <PanelActionContainer>
+                    <Button href={'#saldo'}>Consultar saldo pelo NIS</Button>
+                  </PanelActionContainer>
                 </Panel>
                 <Panel header="Acho que tenho direito mas não estou na lista" key="list">
+                  <Paragraph>
+                    Caso acredite que tem o direito ao benefício, mas não encontrou o NIS do responsável familiar na
+                    busca, verifique se sua família atende aos requisitos do programa:
+                  </Paragraph>
+                  <Paragraph>
+                    <ul>
+                      <li>Você é beneficiário do Programa Bolsa Família?</li>
+                      <li>Você possui dependentes matriculados na rede municipal de educação?</li>
+                    </ul>
+                  </Paragraph>
                   <Text>
-                    Caso acredite que tem o direito ao benefício, mas não encontrou seu NIS na busca, faça seu cadastro
-                    com a prefeitura.
+                    Se você atende os requisitos, faça o cadastro utilizando o formulário da Prefeitura logo abaixo e
+                    sua situação será avaliada.
                   </Text>
                   <PanelActionContainer>
                     <Button href={env.REACT_APP_ENV_FORM_URL} target="_blank">
@@ -106,12 +115,11 @@ export const DashboardPage: React.FC<{}> = () => {
                   </PanelActionContainer>
                 </Panel>
                 <Panel header="Não tenho ou não sei o meu NIS" key="dont have">
+                  <Paragraph>
+                    O NIS é o Número de Identificação Social, pode ser encontrado no cartão do programa Bolsa Família do
+                    responsável familiar. A inscrição no programa é requisito para fazer parte do e-Benefício.
+                  </Paragraph>
                   <Text>
-                    O NIS é o Número de Identificação Social, pode ser encontrado no seu cartão do programa Bolsa
-                    Família ou seu Cartão do Cidadão. A inscrição no programa é requisito para fazer parte do
-                    e-Benefício.
-                    <br />
-                    <br />
                     Se você faz parte do programa, mas não lembra seu NIS, você pode encontrar ele utilizando o portal
                     do <b>Meu CadÚnico</b>.
                   </Text>
@@ -136,7 +144,6 @@ export const DashboardPage: React.FC<{}> = () => {
             </Card>
           </BodyContainer>
         </Container>
-        {/* </Flex> */}
         <Container>
           <BodyContainer id="compra">
             <Title level={4}>Recarga do valor das compras</Title>
