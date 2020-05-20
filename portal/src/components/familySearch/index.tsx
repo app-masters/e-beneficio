@@ -18,7 +18,7 @@ type ComponentProps = {
 
 /**
  * Family search component
- * @param props component props
+ * @param ComponentProps component props
  */
 export const FamilySearch: React.FC<ComponentProps> = () => {
   const dispatch = useDispatch();
@@ -84,7 +84,10 @@ export const FamilySearch: React.FC<ComponentProps> = () => {
                 <HowToHeaderContainer>
                   <HowToLabel>Você pode utilizar seus créditos utilizando o cartão recebido.</HowToLabel>
                   {family.school && (
-                    <HowToLabel>{`Caso não tenha pego seu cartão, entre em contato com a escola `}<b>{`${family.school}`}</b></HowToLabel>
+                    <HowToLabel>
+                      {`Caso não tenha pego seu cartão, entre em contato com a escola `}
+                      <b>{`${family.school}`}</b>
+                    </HowToLabel>
                   )}
                   <HowToLabel>
                     Se o saldo for superior ao disponível, possivelmente você precisa informar suas últimas compras para
