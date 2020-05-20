@@ -5,7 +5,7 @@ export interface Consumption {
   readonly id?: number | string;
   familyId: number | string;
   placeStoreId?: number | string;
-  nfce: string;
+  nfce?: string;
   value: number;
   proofImageUrl?: string;
   createdAt?: number | Date | null;
@@ -47,7 +47,7 @@ export const attributes = {
   },
   nfce: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   },
   value: {
     type: DataTypes.FLOAT,
