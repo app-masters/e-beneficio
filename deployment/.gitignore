@@ -5,5 +5,5 @@
 **/.env.backend
 **/.env.admin
 **/.env.portal
-**/config.sh
+#**/config.sh
 **/docker-compose.yml
