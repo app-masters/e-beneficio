@@ -1,7 +1,7 @@
 import Rollbar from 'rollbar';
 import { env } from '../env';
 
-const localStorageKey = 'e-beneficio-admin-log-user';
+const localStorageKey = 'e-beneficio-app-log-user';
 
 /**
  * List with the last date record for a given log message

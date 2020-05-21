@@ -54,9 +54,9 @@ export const requestLoginUser = (email: string, password: string): ThunkResult<v
       }
     } catch (error) {
       // Request failed: dispatch error
-      logging.error(error);
       setAuthorization();
       setRefresh();
+      logging.removePerson();
 
       if (error.response) {
         switch (error.response.status) {
@@ -69,6 +69,7 @@ export const requestLoginUser = (email: string, password: string): ThunkResult<v
         }
       } else {
         error.message = 'Ocorreu um erro inesperado.';
+        logging.error(error);
       }
 
       dispatch(doLoginUserFailed(error));
