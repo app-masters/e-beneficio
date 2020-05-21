@@ -47,42 +47,41 @@ export const ConsumptionFamilySearch: React.FC<ComponentProps> = (props) => {
 
   return (
     <>
-      <Form layout="vertical">
-        <Form.Item label="Código NIS do responsável">
-          <Input.Search
-            loading={familyLoading}
-            enterButton
-            onChange={(event) => setNis(event.target.value)}
-            value={nis}
-            maxLength={11}
-            onPressEnter={() => {
-              changeFamilyId(undefined);
-              setBirthday('');
-              dispatch(requestGetFamily(nis, cityId));
-            }}
-            onSearch={(value) => {
-              changeFamilyId(undefined);
-              setBirthday('');
-              dispatch(requestGetFamily(value, cityId));
-            }}
+      <Form.Item label="Código NIS do responsável">
+        <Input.Search
+          loading={familyLoading}
+          enterButton
+          type={'number'}
+          onChange={(event) => setNis(event.target.value)}
+          value={nis}
+          maxLength={11}
+          onPressEnter={() => {
+            changeFamilyId(undefined);
+            setBirthday('');
+            dispatch(requestGetFamily(nis, cityId));
+          }}
+          onSearch={(value) => {
+            changeFamilyId(undefined);
+            setBirthday('');
+            dispatch(requestGetFamily(value, cityId));
+          }}
+        />
+      </Form.Item>
+      {family && props.askForBirthday && (
+        <Form.Item
+          label="Aniversário do responsável"
+          validateStatus={birthday.length > 9 && !sameBirthday ? 'error' : ''}
+          help={birthday.length > 9 && !sameBirthday ? 'Aniversário incorreto' : ''}
+        >
+          <Input
+            style={{ width: '100%' }}
+            id="birthday"
+            name="birthday"
+            onChange={(event) => setBirthday(event.target.value)}
+            placeholder="DD/MM/YYYY"
           />
         </Form.Item>
-        {family && props.askForBirthday && (
-          <Form.Item
-            label="Aniversário do responsável"
-            validateStatus={birthday.length > 9 && !sameBirthday ? 'error' : ''}
-            help={birthday.length > 9 && !sameBirthday ? 'Aniversário incorreto' : ''}
-          >
-            <Input
-              style={{ width: '100%' }}
-              id="birthday"
-              name="birthday"
-              onChange={(event) => setBirthday(event.target.value)}
-              placeholder="DD/MM/YYYY"
-            />
-          </Form.Item>
-        )}
-      </Form>
+      )}
       {!familyId && !familyLoading && family && (!props.askForBirthday || sameBirthday) && (
         <FamilyWrapper>
           <Alert
