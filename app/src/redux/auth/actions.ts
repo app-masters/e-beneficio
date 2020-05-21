@@ -3,6 +3,7 @@ import { TokenResponse } from '../../interfaces/auth';
 import { ThunkResult } from '../store';
 import { backend } from '../../utils/networking';
 import { getRefresh, setAuthorization, setRefresh } from '../../utils/auth';
+import { logging } from '../../lib/logging';
 
 // Simple actions and types
 export const doLogoutUser = createAction<void>('auth/USER_LOGOUT');
@@ -20,6 +21,7 @@ export const requestLogout = (): ThunkResult<void> => {
   return async (dispatch) => {
     setAuthorization();
     setRefresh();
+    logging.removePerson();
     dispatch(doLogoutUser());
   };
 };
@@ -38,15 +40,21 @@ export const requestLoginUser = (email: string, password: string): ThunkResult<v
         setAuthorization(response.data.token);
         setRefresh(response.data.refreshToken);
 
+        if (response.data.user.id) {
+          logging.setPerson(response.data.user.id, response.data.user.name, response.data.user.email);
+        }
+
         dispatch(doLoginUserSuccess(response.data)); // Dispatch result
       } else {
         // Request without response - probably won't happen, but cancel the request
         setAuthorization();
         setRefresh();
+        logging.removePerson();
         dispatch(doLoginUserFailed());
       }
     } catch (error) {
       // Request failed: dispatch error
+      logging.error(error);
       setAuthorization();
       setRefresh();
 
@@ -97,6 +105,7 @@ export const requestGetToken = (): ThunkResult<void> => {
       }
     } catch (error) {
       // Request failed: dispatch error
+      logging.error(error);
       setAuthorization();
       setRefresh();
       dispatch(doGetTokenFailed(error));
