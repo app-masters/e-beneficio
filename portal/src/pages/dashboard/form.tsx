@@ -10,7 +10,7 @@ import { AppState } from '../../redux/rootReducer';
 import yup from '../../utils/yup';
 import { requestSaveConsumption } from '../../redux/consumption/actions';
 import { requestResetFamily } from '../../redux/family/actions';
-import { IconCheckStyle, ImageContainer } from './styles';
+import { IconCheckStyle, ImageContainer, PriceStyle, PriceLabelStyle } from './styles';
 
 /**
  * Clear NFCe QRCode result
@@ -34,7 +34,6 @@ export const ConsumptionForm: React.FC<{ closeModal: Function }> = ({ closeModal
   const [pickQr, setPickQr] = useState<string>('');
 
   const dispatch = useDispatch();
-  const family = useSelector<AppState, Family | null | undefined>((state) => state.familyReducer.item);
 
   /**
    * Close modal
@@ -48,7 +47,7 @@ export const ConsumptionForm: React.FC<{ closeModal: Function }> = ({ closeModal
     <Modal title={'Informar compra'} visible={true} centered maskClosable={false} onCancel={close} footer={null}>
       <FamilySearch onFamilySelect={(id) => setFamilyId(id)} />
       {familyId && pickQr === '' && <StepQRCodeChose onPick={(pick) => setPickQr(pick)} />}
-      {pickQr === 'withoutQr' && <StepNoQRCode family={family} onBack={() => setPickQr('')} onConfirm={close} />}
+      {pickQr === 'withoutQr' && <StepNoQRCode onBack={() => setPickQr('')} onConfirm={close} />}
       {pickQr === 'withQr' && <StepWithQRCode onBack={() => setPickQr('')} onFinish={close} />}
     </Modal>
   );
@@ -88,19 +87,16 @@ export const StepQRCodeChose: React.FC<{ onPick: (pick: string) => void }> = ({ 
  * StepNoQRCode component
  * @param props component props
  */
-export const StepNoQRCode: React.FC<{ family?: Family | null; onBack: () => void; onConfirm: () => void }> = ({
-  family,
-  onBack,
-  onConfirm
-}) => {
+export const StepNoQRCode: React.FC<{ onBack: () => void; onConfirm: () => void }> = ({ onBack, onConfirm }) => {
   return (
     <div>
       <Typography.Paragraph>
-        Sem o QRCode, precisamos que você leve o comprovante da sua compra para a escola responsável pelo seu cadastro
-        para assim adicionar sua compra na lista da recarga.
+        Sem o QRCode, precisamos que você entregue o comprovante da sua compra para que um responsável possa adicionar
+        sua compra na lista da recarga. Junto com a nota fiscal, trava seu documento.
       </Typography.Paragraph>
       <Typography.Paragraph>
-        Levar em <b>{family?.school}</b>
+        Entregue sua nota fiscal na Secreataria de Educação, no horário de 12:00 às 17:00 no endereço:
+        <b> Avenida Getúlio Vargas, 200 - Segundo piso, Centro - Espaço Mascarenhas</b>
       </Typography.Paragraph>
       <Row typeof="flex" gutter={[16, 16]}>
         <Col span={'12'}>
@@ -170,6 +166,12 @@ export const StepWithQRCode: React.FC<{ onBack: () => void; onFinish: () => void
   return (
     <Form layout="vertical" onSubmitCapture={handleSubmit}>
       {status && <Alert message="Erro no formulário" description={status} type="error" />}
+      <Form.Item>
+        <Typography.Text style={PriceLabelStyle}>{'Saldo disponível: '}</Typography.Text>
+        <Typography.Text style={PriceStyle}>{`R$${(family?.balance || 0)
+          .toFixed(2)
+          .replace('.', ',')}`}</Typography.Text>
+      </Form.Item>
       <Form.Item
         label="Valor total da compra"
         validateStatus={(!!valueMeta.error && !!valueMeta.touched) || invalidConsumptionValue ? 'error' : ''}

@@ -7,6 +7,16 @@ export const PanelStyle = {
   marginTop: 0
 };
 
+export const PriceLabelStyle = {
+  fontSize: '12pt'
+} as React.CSSProperties;
+
+export const PriceStyle = {
+  color: '#00B41E',
+  fontWeight: 'bolder',
+  fontSize: '13pt'
+} as React.CSSProperties;
+
 export const IconCheckStyle = {
   color: '#2ecc71',
   fontSize: 18,
