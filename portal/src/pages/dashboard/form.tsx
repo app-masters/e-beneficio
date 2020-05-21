@@ -204,7 +204,7 @@ export const StepWithQRCode: React.FC<{ onBack: () => void; onFinish: () => void
       <Form.Item
         label={
           <>
-            {'NFCe'}
+            {'Nota fiscal (NFCe)'}
             {values.nfce && <CheckOutlined style={IconCheckStyle} />}
           </>
         }
