@@ -1,7 +1,7 @@
 import Rollbar from 'rollbar';
 import { env } from '../env';
 
-const localStorageKey = 'e-beneficio-admin-log-user';
+const localStorageKey = 'admin/log-user';
 
 /**
  * List with the last date record for a given log message
@@ -27,7 +27,7 @@ const loggedLastHour = (message: string | object) => {
  * Get user data from the local storage
  */
 const getUserLogData = () => {
-  const userData = JSON.parse(localStorage.getItem(localStorageKey) || 'undefined');
+  const userData = JSON.parse(localStorage.getItem(localStorageKey) || 'null');
   return userData;
 };
 
