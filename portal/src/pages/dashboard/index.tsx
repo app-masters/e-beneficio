@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Typography, Layout, Collapse, Button, Card } from 'antd';
+import { Typography, Layout, Collapse, Button, Card, Col } from 'antd';
 import {
   PageContainer,
   HeaderContainer,
@@ -8,7 +8,8 @@ import {
   HeaderContent,
   PanelStyle,
   Container,
-  LogoContainer
+  LogoContainer,
+  ActionContainer
 } from './styles';
 import { FamilySearch } from '../../components/familySearch';
 import { Flex } from '../../components/flex';
@@ -39,6 +40,23 @@ export const DashboardPage: React.FC<{}> = () => {
             <Title level={4} style={{ color: '#FFFFFF' }}>
               Programa para famílias em situação de vulnerabilidade social
             </Title>
+            <ActionContainer justify="center" gutter={[16, 16]}>
+              <Col xs={{ span: 24 }} lg={{ span: 6 }}>
+                <Button block href={'#saldo'} type={'primary'}>
+                  Consultar saldo
+                </Button>
+              </Col>
+              <Col xs={{ span: 24 }} lg={{ span: 6 }}>
+                <Button block href={'#compra'} type={'primary'}>
+                  Informar compra
+                </Button>
+              </Col>
+              <Col xs={{ span: 24 }} lg={{ span: 6 }}>
+                <Button block href={'#info'} type={'primary'}>
+                  Informações sobre o programa
+                </Button>
+              </Col>
+            </ActionContainer>
           </HeaderContent>
         </HeaderContainer>
         <Container>
