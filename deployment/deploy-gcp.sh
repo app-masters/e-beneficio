@@ -105,7 +105,6 @@ if [[ -z ${GITHUB_RUN_ID} ]]; then
 else
     DAEMON="-d";
 fi
-
 echo "Daemon: ${DAEMON}"
 
 echo -e "\n\n# 8/9 - Updating remote machine...\n"
