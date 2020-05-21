@@ -4,7 +4,6 @@ import * as familyModel from '../models/families';
 import * as consumptionModel from '../models/consumptions';
 import * as placeStoreModel from '../models/placeStores';
 import { uploadFile } from '../utils/file';
-import seed from '../../database/seeders/families';
 
 const router = express.Router({ mergeParams: true });
 

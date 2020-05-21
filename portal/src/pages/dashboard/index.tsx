@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Typography, Layout, Collapse, Button, Card, Col } from 'antd';
+import { Typography, Layout, Collapse, Button, Card, Col, Row } from 'antd';
 import {
   PageContainer,
   HeaderContainer,
@@ -9,12 +9,14 @@ import {
   PanelStyle,
   Container,
   LogoContainer,
-  ActionContainer
+  ActionContainer,
+  FooterImageContainer
 } from './styles';
 import { FamilySearch } from '../../components/familySearch';
 import { Flex } from '../../components/flex';
 import { env } from '../../env';
 import { ConsumptionForm } from './form';
+import { GithubOutlined } from '@ant-design/icons';
 
 const { Panel } = Collapse;
 const { Title, Text, Paragraph } = Typography;
@@ -183,12 +185,44 @@ export const DashboardPage: React.FC<{}> = () => {
         <Footer>
           <Flex vertical justifyContent="center" alignItems="center">
             <Paragraph style={{ textAlign: 'center' }}>
-              Esse projeto é open-source. Visite-nos no <a href="https://github.com/app-masters/e-beneficio">GitHub</a>
+              Esse projeto é open-source. Visite-nos no
+              <a
+                href="https://github.com/app-masters/e-beneficio"
+                style={{ color: '#00000090', fontWeight: 'bolder', marginLeft: 5 }}
+              >
+                <GithubOutlined style={{ fontSize: 16, marginRight: 3 }} />
+                {'GitHub'}
+              </a>
             </Paragraph>
-            <Paragraph style={{ textAlign: 'center', fontSize: '12px' }}>
-              Desenvolvido pela <a href="https://appmasters.io/pt">App Masters</a> para a{' '}
-              <a href="https://www.pjf.mg.gov.br/">Prefeitura de Juiz de Fora</a>
-            </Paragraph>
+            <div
+              style={{
+                width: '100%',
+                maxWidth: 1200
+              }}
+            >
+              <Row style={{ flex: 1, justifyContent: 'space-around' }}>
+                <Col>
+                  <Paragraph style={{ textAlign: 'center', fontSize: 12 }}>Desenvolvido pela</Paragraph>
+                  <FooterImageContainer>
+                    <a href="https://appmasters.io/pt">
+                      <img src={require('../../assets/AppMastersLogo.png')} width={'100%'} style={{ maxWidth: 180 }} />
+                    </a>
+                  </FooterImageContainer>
+                </Col>
+                <Col>
+                  <Paragraph style={{ textAlign: 'center', fontSize: 12 }}>Em Parceria</Paragraph>
+                  <FooterImageContainer>
+                    <a href="https://www.pjf.mg.gov.br/">
+                      <img
+                        src={require('../../assets/PrefJuizForaLogo.png')}
+                        width={'100%'}
+                        style={{ maxWidth: 180 }}
+                      />
+                    </a>
+                  </FooterImageContainer>
+                </Col>
+              </Row>
+            </div>
           </Flex>
         </Footer>
       </Layout>
