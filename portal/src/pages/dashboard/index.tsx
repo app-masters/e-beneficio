@@ -210,7 +210,7 @@ export const DashboardPage: React.FC<{}> = () => {
                   </FooterImageContainer>
                 </Col>
                 <Col>
-                  <Paragraph style={{ textAlign: 'center', fontSize: 12 }}>Em Parceria</Paragraph>
+                  <Paragraph style={{ textAlign: 'center', fontSize: 12 }}>Em parceria com</Paragraph>
                   <FooterImageContainer>
                     <a href="https://www.pjf.mg.gov.br/">
                       <img
