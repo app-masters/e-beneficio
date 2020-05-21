@@ -74,6 +74,6 @@ jobs:
 ## Tasks
 ## - [ ] cache stages
 ## - [ ] VARIABLE relate branch and project, project_id (e-beneficio-jf)
-## - [ ] Multile destinations, multiple accounts, multile
-## roles/storage.admin (push images)
-## - [ ] Fix revision GITHUB_SHA
+## - [ ] Multiple destinations, multiple account
+## - [x] Fix revision GITHUB_SHA
+## - [x] roles/storage.admin (push images)
