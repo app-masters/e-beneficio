@@ -1,8 +1,9 @@
 # e-Benefício
+=======
 
 Projeto open-source desenvolvido pela App Masters para a prefeitura da cidade de Juiz de Fora para auxiliar a transferência de renda para as famílias em situação de vulnerabilidade social cadastradas no Bolsa Família e com dependentes cadastrados na rede municipal de ensino. O sistema é responsável pelo cruzamento dos dados das bases municipais, assim como o registro das compras feitas pelas famílias, permitindo o cálculo do saldo mensalmente da mesma.
 
-Projeto feito utilizando `node` e `react`, com código e documentação em inglês.
+Projeto feito utilizando `node` e `react`.
 
 ## Getting started
 
@@ -74,4 +75,16 @@ You can login with the admin user in the admin project or the financial or manag
 ### Endpoints
 The list of available endpoints can be easily accessed on the folder `/backend/docs/postman` or using [this link](https://documenter.getpostman.com/view/3342022/SzYaVdaV).
 
+# Deployment
 
+O projeto é composto por 3 partes:
+
+- Portal (/portal) que é a página onde o cidadão vê informações sobre o programa, consulta seu saldo e informa seu consumo
+- Admin (/admin) é por onde os gestores administram o programa
+- API (/backend) que é quem mantem as informações e interage com os frontends
+
+Em [deployment](/deployment) existem os scripts necessários para realizar o build e deploy de toda a estrututa para a núvem.
+
+## Containers e proxys
+
+Usei o [nginx-proxy](https://github.com/nginx-proxy/nginx-proxy) para "mapear" o domínio e subdomínios dentro de um único docker-compose. Veja um [exemplo](/deployment/production/docker-compose.yml.example). 

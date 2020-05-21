@@ -1,0 +1,79 @@
+name: Deploy Staging Branch > GCP
+on:
+  push:
+    branches:
+      - devops-fixes
+      - devops-tests
+      - devops
+  pull_request:
+    types: closed
+    branches: master
+
+jobs:
+  build_publish_gcr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "13.x"
+      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          service_account_key: ${{ secrets.GCP_KEY_JF_EBENEFICIO }}
+          project_id: "e-beneficio-jf"
+          export_default_credentials: true
+
+      - name: Extract branch name
+        id: vars
+        shell: bash
+        run: |
+          echo ${GITHUB_SHA}
+          printenv
+          echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+          echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+          echo ${{ github.event.pull_request.head.sha }}
+
+      - name: Notify start deploy to Rollbar
+        uses: rollbar/github-deploy-action@v1.0.0
+        with:
+          environment: ${{ steps.vars.outputs.branch }}
+          version: ${{ steps.vars.outputs.sha_short }}
+          status: 'started'
+        env:
+          ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
+
+      - run: gcloud components install --quiet beta
+      - run: gcloud info
+      - run: gcloud auth configure-docker
+
+      - name: Full build and push
+        if: steps.cache-frontend.outputs.cache-hit != 'true'
+        run: |
+          cd deployment
+          ./deploy-gcp.sh master
+
+      - name: Notify fail status to Rollbar
+        if: failure()
+        uses: rollbar/github-deploy-action@v1.0.0
+        env:
+          ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
+        with:
+          environment: ${{ steps.vars.outputs.branch }}
+          version: ${{ steps.vars.outputs.sha_short }}
+          status: 'failed'
+
+      - name: Notify success deploy to Rollbar
+        uses: rollbar/github-deploy-action@v1.0.0
+        with:
+          environment: ${{ steps.vars.outputs.branch }}
+          version: ${{ steps.vars.outputs.sha_short }}
+          status: 'succeeded'
+        env:
+          ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
+
+## Tasks
+## - [ ] cache stages
+## - [ ] VARIABLE relate branch and project, project_id (e-beneficio-jf)
+## - [ ] Multiple destinations, multiple account
+## - [x] Fix revision GITHUB_SHA
+## - [x] roles/storage.admin (push images)

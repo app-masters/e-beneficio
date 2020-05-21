@@ -12,7 +12,7 @@ import consumptions from './consumptions';
  * Seed all tables
  */
 const seedAll = async () => {
-  if (process.env.NODE_ENV !== 'development') {
+  if (process.env.NODE_ENV === 'development') {
     // Development seed
     await cities.seed();
     await places.seed();
