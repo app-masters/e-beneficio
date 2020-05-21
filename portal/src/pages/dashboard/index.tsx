@@ -175,7 +175,7 @@ export const DashboardPage: React.FC<{}> = () => {
                 <Button type="primary" onClick={() => setModal(!modal)}>
                   Informar compra
                 </Button>
-                <ConsumptionForm open={modal} closeModal={() => setModal(false)} />
+                {modal && <ConsumptionForm closeModal={() => setModal(false)} />}
               </PanelActionContainer>
             </Card>
           </BodyContainer>
