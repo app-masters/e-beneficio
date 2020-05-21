@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { doGetFamily, doGetFamilySuccess, doGetFamilyFailed } from './actions';
+import { doResetFamily, doGetFamily, doGetFamilySuccess, doGetFamilyFailed } from './actions';
 import { Family } from '../../interfaces/family';
 
 export interface FamilyReducerState {
@@ -14,6 +14,11 @@ const initialState = {
 
 export default createReducer<FamilyReducerState>(initialState, {
   // Get actions
+  [doResetFamily.toString()]: (state) => {
+    state.loading = false;
+    state.error = undefined;
+    state.item = undefined;
+  },
   [doGetFamily.toString()]: (state) => {
     state.loading = true;
     state.error = undefined;

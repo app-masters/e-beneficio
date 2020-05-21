@@ -4,6 +4,7 @@ import { backend } from '../../utils/networking';
 import { Family } from '../../interfaces/family';
 
 // Simple actions and types
+export const doResetFamily = createAction<void>('family/RESET');
 export const doGetFamily = createAction<void>('family/GET');
 export const doGetFamilySuccess = createAction<Family | Family[]>('family/GET_SUCCESS');
 export const doGetFamilyFailed = createAction<Error | undefined>('family/GET_FAILED');
@@ -29,5 +30,14 @@ export const requestGetFamily = (nis: string, cityId: string): ThunkResult<void>
       // Request failed: dispatch error
       dispatch(doGetFamilyFailed(error));
     }
+  };
+};
+
+/**
+ * Get family Thunk action
+ */
+export const requestResetFamily = (): ThunkResult<void> => {
+  return async (dispatch) => {
+    dispatch(doResetFamily());
   };
 };
