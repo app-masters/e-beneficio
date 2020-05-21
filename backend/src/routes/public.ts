@@ -41,7 +41,21 @@ router.get('/place-stores', async (req, res) => {
  */
 router.post('/consumptions', async (req, res) => {
   try {
-    const item = await consumptionModel.addConsumption({ ...req.body });
+    let proofImageUrl: string | null = null;
+    // Check if there is a image in the request
+    if (req.files && Object.keys(req.files).length !== 0) {
+      let image = req.files.image;
+      if (Array.isArray(image)) {
+        image = image[0];
+      }
+      const data = await uploadFile(`image`, `public/consumption-${new Date().getTime()}`, image);
+      if (!data) {
+        throw { message: `Failed to upload image to the store` };
+      } else {
+        proofImageUrl = data.url;
+      }
+    }
+    const item = await consumptionModel.addConsumption({ ...req.body, proofImageUrl });
     return res.send(item);
   } catch (error) {
     logging.error(error);

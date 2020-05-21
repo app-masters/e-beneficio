@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import backgroundImage from '../../assets/banner.jpg';
+import { Row } from 'antd';
 
 export const PanelStyle = {
   backgroundColor: '#00000000',
@@ -40,6 +41,7 @@ export const HeaderContent = styled.div`
   justify-content: center;
   text-align: center;
   padding: ${(props) => props.theme.spacing.lg};
+  padding-bottom: 0;
 `;
 
 export const PageContainer = styled.div`
@@ -55,10 +57,9 @@ export const PanelActionContainer = styled.div`
   padding-bottom: ${(props) => props.theme.spacing.sm};
 `;
 
-export const ActionContainer = styled.div`
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
+export const ActionContainer = styled(Row)`
+  padding-top: ${(props) => props.theme.spacing.md};
+  padding-bottom: ${(props) => props.theme.spacing.sm};
 `;
 
 export const BodyContainer = styled.div`
