@@ -2,6 +2,7 @@ import { createAction } from '@reduxjs/toolkit';
 import { ThunkResult } from '../store';
 import { backend } from '../../utils/networking';
 import { PlaceStore } from '../../interfaces/placeStore';
+import { logging } from '../../lib/logging';
 
 // Simple actions and types
 export const doGetPlaceStore = createAction<void>('placeStore/GET');
@@ -35,6 +36,7 @@ export const requestGetPlaceStore = (id?: number): ThunkResult<void> => {
       }
     } catch (error) {
       // Request failed: dispatch error
+      logging.error(error);
       dispatch(doGetPlaceStoreFailed(error));
     }
   };
@@ -71,6 +73,7 @@ export const requestSavePlaceStore = (
       }
     } catch (error) {
       // Request failed: dispatch error
+      logging.error(error);
       dispatch(doSavePlaceStoreFailed(error));
       if (onFailure) onFailure(error);
     }
@@ -91,6 +94,7 @@ export const requestDeletePlaceStore = (id: number): ThunkResult<void> => {
       dispatch(doDeletePlaceStoreSuccess({ id })); // Dispatch result
     } catch (error) {
       // Request failed: dispatch error
+      logging.error(error);
       dispatch(doDeletePlaceStoreFailed(error));
     }
   };
