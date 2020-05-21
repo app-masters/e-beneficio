@@ -20,6 +20,13 @@ export const ImageContainer = styled.div`
   padding: ${(props) => props.theme.spacing.md};
 `;
 
+export const FooterImageContainer = styled.div`
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 export const HeaderContainer = styled.div`
   display: flex;
   flex-direction: column;
