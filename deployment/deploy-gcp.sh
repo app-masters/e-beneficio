@@ -45,18 +45,18 @@ gcloud auth configure-docker --quiet
 #echo -e "\n# 2/9 - Pushing backend docker image to Google Container Registry...\n"
 #docker push ${BACKEND_CONTAINER_IMAGE}
 #cd ..
-#
-### FRONTEND
-## build and push admin
-#cd admin
-#echo -e "\n# 3/9 - Building and tagging admin dockerfile...\n"
-#docker build -f production.Dockerfile -t ${ADMIN_IMAGE_TAG} .
-#docker tag ${ADMIN_IMAGE_TAG} ${ADMIN_CONTAINER_IMAGE}
-#
-#echo -e "\n# 4/9 - Pushing admin docker image to Google Container Registry...\n"
-#docker push ${ADMIN_CONTAINER_IMAGE}
-#cd ..
-#
+
+## FRONTEND
+# build and push admin
+cd admin
+echo -e "\n# 3/9 - Building and tagging admin dockerfile...\n"
+docker build -f production.Dockerfile -t ${ADMIN_IMAGE_TAG} .
+docker tag ${ADMIN_IMAGE_TAG} ${ADMIN_CONTAINER_IMAGE}
+
+echo -e "\n# 4/9 - Pushing admin docker image to Google Container Registry...\n"
+docker push ${ADMIN_CONTAINER_IMAGE}
+cd ..
+
 ### PORTAL
 ## build and copy portal
 #cd portal
@@ -74,6 +74,7 @@ cd deployment
 gcloud compute scp ./${ENV}/docker-compose.yml ${INSTANCE_NAME}:${REMOTE_PATH}
 #gcloud compute scp ./${ENV}/wait-for-file/Dockerfile ${INSTANCE_NAME}:${REMOTE_PATH}/wait-for-file/Dockerfile
 #gcloud compute scp ./${ENV}/wait-for-file/wait-for-file.sh ${INSTANCE_NAME}:${REMOTE_PATH}/wait-for-file/wait-for-file.sh
+gcloud compute scp ./${ENV}/nginx.tmpl ${INSTANCE_NAME}:${REMOTE_PATH}
 set -x
 FILE=./${ENV}/.env.backend
 if test -f "$FILE"; then
