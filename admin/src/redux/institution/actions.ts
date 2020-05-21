@@ -2,6 +2,7 @@ import { createAction } from '@reduxjs/toolkit';
 import { ThunkResult } from '../store';
 import { backend } from '../../utils/networking';
 import { Institution } from '../../interfaces/institution';
+import { logging } from '../../lib/logging';
 
 // Simple actions and types
 export const doGetInstitution = createAction<void>('Institution/GET');
@@ -35,6 +36,7 @@ export const requestGetInstitution = (id?: number): ThunkResult<void> => {
       }
     } catch (error) {
       // Request failed: dispatch error
+      logging.error(error);
       dispatch(doGetInstitutionFailed(error));
     }
   };
@@ -71,6 +73,7 @@ export const requestSaveInstitution = (
       }
     } catch (error) {
       // Request failed: dispatch error
+      logging.error(error);
       dispatch(doSaveInstitutionFailed(error));
       if (onFailure) onFailure(error);
     }
@@ -91,6 +94,7 @@ export const requestDeleteInstitution = (id: number): ThunkResult<void> => {
       dispatch(doDeleteInstitutionSuccess({ id })); // Dispatch result
     } catch (error) {
       // Request failed: dispatch error
+      logging.error(error);
       dispatch(doDeleteInstitutionFailed(error));
     }
   };

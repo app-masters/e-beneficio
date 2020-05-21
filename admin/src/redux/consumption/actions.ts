@@ -2,6 +2,7 @@ import { createAction } from '@reduxjs/toolkit';
 import { ThunkResult } from '../store';
 import { backend } from '../../utils/networking';
 import { Report } from '../../interfaces/report';
+import { logging } from '../../lib/logging';
 
 // Simple actions and types
 export const doGetConsumption = createAction<void>('consumption/GET');
@@ -35,6 +36,7 @@ export const requestGetConsumption = (
       }
     } catch (error) {
       // Request failed: dispatch error
+      logging.error(error);
       dispatch(doGetConsumptionFailed(error));
     }
   };
