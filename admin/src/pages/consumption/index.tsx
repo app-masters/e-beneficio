@@ -1,5 +1,5 @@
-import { CameraOutlined, QrcodeOutlined } from '@ant-design/icons';
-import { Alert, Button, Card, Checkbox, Form, Input, InputNumber, Modal, Typography } from 'antd';
+import { CameraOutlined, QrcodeOutlined, WarningFilled } from '@ant-design/icons';
+import { Alert, Button, Card, Checkbox, Form, Input, InputNumber, Modal, Typography, Divider } from 'antd';
 import { useFormik } from 'formik';
 import React, { useEffect, useRef, useState } from 'react';
 import QrReader from 'react-qr-reader';
@@ -44,16 +44,19 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
   const cameraRef = useRef(null);
 
   // Local state
-  const [, setPermission] = useState('prompt');
+  const [permission, setPermission] = useState<string>('');
   const [showQRCodeModal, setShowQRCodeModal] = useState(false);
   const [showCameraModal, setShowCameraModal] = useState(false);
   // Redux state
   const family = useSelector<AppState, Family | null | undefined>((state) => state.familiesReducer.familyItem);
 
   useEffect(() => {
-    navigator.permissions.query({ name: 'camera' }).then((value) => {
-      setPermission(value.state);
-    });
+    navigator.permissions
+      .query({ name: 'camera' })
+      .then((value) => {
+        setPermission(value.state);
+      })
+      .catch((err) => console.log(err));
   }, []);
 
   const {
@@ -148,20 +151,44 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                     visible={showQRCodeModal}
                   >
                     <>
-                      {showQRCodeModal && ( // Necessary to disable the camera
-                        <QrReader
-                          delay={200}
-                          resolution={800}
-                          onError={console.error}
-                          onScan={(item) => {
-                            const nfce = handleQRCode(item);
-                            if (nfce) {
-                              setFieldValue('nfce', nfce);
-                              setShowQRCodeModal(false);
-                            } else console.log(new Date().getTime(), 'reading...');
-                          }}
-                        />
-                      )}
+                      {showQRCodeModal && // Necessary to disable the camera
+                        (permission !== 'denied' ? (
+                          <QrReader
+                            delay={200}
+                            resolution={800}
+                            onError={console.error}
+                            onScan={(item) => {
+                              const nfce = handleQRCode(item);
+                              if (nfce) {
+                                setFieldValue('nfce', nfce);
+                                setShowQRCodeModal(false);
+                              } else console.log(new Date().getTime(), 'reading...');
+                            }}
+                          />
+                        ) : (
+                          <>
+                            <Typography.Title level={3}>{' Acesso não permitido a câmera.'}</Typography.Title>
+                            <Divider />
+                            <Typography.Paragraph>
+                              Para continuar é necessário acesso a câmera do aparelho.
+                            </Typography.Paragraph>
+                            <Typography>
+                              <ul>
+                                <li>
+                                  Clique no ícone <WarningFilled /> próximo ao endereço do site.
+                                </li>
+                                <li>
+                                  Acesse <span style={{ color: 'blue' }}>Configurações do site</span>
+                                </li>
+                                <li>
+                                  Clique em <span style={{ color: 'blue' }}>Acessar sua câmera</span> e permita o
+                                  acesso.
+                                </li>
+                                <li>Clique em Fechar e em seguida clique no botão de leitura novamente.</li>
+                              </ul>
+                            </Typography>
+                          </>
+                        ))}
                     </>
                   </Modal>
                 </Form.Item>
@@ -188,7 +215,9 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                     precision={2}
                     min={0}
                     // max={family?.balance}
-                    formatter={(value) => `R$ ${value}`}
+                    formatter={(value) =>
+                      value && Number(value) !== 0 && !Number.isNaN(Number(value)) ? `R$ ${value}` : ''
+                    }
                     parser={(value) => (value ? value.replace(/(R)|(\$)/g, '').trim() : '')}
                   />
                 </Form.Item>

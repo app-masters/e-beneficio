@@ -60,23 +60,25 @@ export const requestSaveConsumption = (
       // Start request - starting loading state
       dispatch(doSaveConsumption());
 
-      if (!item.proofImageUrl) {
-        throw new Error('Image is required');
+      if (!item.proofImageUrl && !item.nfce) {
+        throw new Error('Image or NFCe are required');
       }
 
       // Adding image as File on the form
-      const file = await fetch(item.proofImageUrl)
-        .then((res) => res.blob())
-        .then((blob) => {
-          const file = new File([blob], 'File name', { type: 'image/png' });
-          return file;
-        });
+      const file = item.proofImageUrl
+        ? await fetch(item.proofImageUrl)
+            .then((res) => res.blob())
+            .then((blob) => {
+              const file = new File([blob], 'File name', { type: 'image/png' });
+              return file;
+            })
+        : undefined;
 
       const data = new FormData();
       data.append('familyId', item.familyId.toString());
-      data.append('nfce', item.nfce);
       data.append('value', item.value.toString());
-      data.append('image', file);
+      if (item.nfce) data.append('nfce', item.nfce);
+      if (item.proofImageUrl && file) data.append('image', file);
 
       // Request
       const response = await backend.post<Consumption>(`/consumptions`, data, {
