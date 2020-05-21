@@ -2,6 +2,7 @@ import { createAction } from '@reduxjs/toolkit';
 import { User } from '../../interfaces/user';
 import { backend } from '../../utils/networking';
 import { ThunkResult } from '../store';
+import { logging } from '../../lib/logging';
 
 // Simple actions and types
 export const doGetUser = createAction<void>('user/GET');
@@ -35,6 +36,7 @@ export const requestGetUser = (id?: number): ThunkResult<void> => {
       }
     } catch (error) {
       // Request failed: dispatch error
+      logging.error(error);
       dispatch(doGetUserFailed(error));
     }
   };
@@ -73,6 +75,7 @@ export const requestSaveUser = (
       }
     } catch (error) {
       // Request failed: dispatch error
+      logging.error(error);
       dispatch(doSaveUserFailed(error));
       if (onFailure) onFailure(error);
     }
@@ -93,6 +96,7 @@ export const requestDeleteUser = (id: number): ThunkResult<void> => {
       dispatch(doDeleteUserSuccess({ id })); // Dispatch result
     } catch (error) {
       // Request failed: dispatch error
+      logging.error(error);
       dispatch(doDeleteUserFailed(error));
     }
   };
