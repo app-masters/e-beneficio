@@ -2,6 +2,7 @@ import { createAction } from '@reduxjs/toolkit';
 import { ThunkResult } from '../store';
 import { backend } from '../../utils/networking';
 import { Benefit } from '../../interfaces/benefit';
+import { logging } from '../../lib/logging';
 
 // Simple actions and types
 export const doGetBenefit = createAction<void>('benefit/GET');
@@ -35,6 +36,7 @@ export const requestGetBenefit = (id?: number): ThunkResult<void> => {
       }
     } catch (error) {
       // Request failed: dispatch error
+      logging.error(error);
       dispatch(doGetBenefitFailed(error));
     }
   };
@@ -71,6 +73,7 @@ export const requestSaveBenefit = (
       }
     } catch (error) {
       // Request failed: dispatch error
+      logging.error(error);
       dispatch(doSaveBenefitFailed(error));
       if (onFailure) onFailure(error);
     }
@@ -91,6 +94,7 @@ export const requestDeleteBenefit = (id: number): ThunkResult<void> => {
       dispatch(doDeleteBenefitSuccess({ id })); // Dispatch result
     } catch (error) {
       // Request failed: dispatch error
+      logging.error(error);
       dispatch(doDeleteBenefitFailed(error));
     }
   };
