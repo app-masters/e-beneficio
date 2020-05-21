@@ -46,6 +46,14 @@ jobs:
       - run: gcloud info
       - run: gcloud auth configure-docker
 
+      - name: Extract config file
+        run: |
+          echo "$CONFIG_FILE" > /deployment/production/config.sh
+          ls /deployment/production/
+        shell: bash
+        env:
+          CONFIG_FILE: ${{secrets.CONFIG_JF_EBENEFICIO}}
+
       - name: Full build and push
         if: steps.cache-frontend.outputs.cache-hit != 'true'
         run: |
