@@ -36,7 +36,7 @@ gcloud config set compute/zone ${ZONE}
 gcloud auth configure-docker --quiet
 
 # BACKEND
- build and push backend
+# build and push backend
 cd backend
 echo -e "\n# 1/9 - Building and tagging backend dockerfile...\n"
 docker build -f production.Dockerfile -t ${BACKEND_IMAGE_TAG} .
