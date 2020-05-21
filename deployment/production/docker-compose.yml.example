@@ -1,0 +1,43 @@
+version: '3.7'
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+  backend:
+    image: gcr.io/covid19jf/resource-4-vulnerable-backend
+    container_name: backend
+    networks:
+      - resources-net
+    ports:
+      - 3001:3001
+    env_file:
+      - .env.backend
+    environment:
+      PORT: 3001
+      VIRTUAL_HOST: api.e-beneficio.com
+  portal:
+    image: gcr.io/covid19jf/resource-4-vulnerable-frontend
+    container_name: portal
+    networks:
+      - resources-net
+    ports:
+      - 3000:3000
+    environment:
+      PORT: 3000
+      VIRTUAL_HOST: jf.e-beneficio.com
+  admin:
+    image: gcr.io/covid19jf/resource-4-vulnerable-frontend
+    container_name: admin
+    networks:
+      - resources-net
+    ports:
+      - 3000:3000
+    environment:
+      PORT: 3000
+      VIRTUAL_HOST: admin.e-beneficio.com
+
+networks:
+  resources-net:

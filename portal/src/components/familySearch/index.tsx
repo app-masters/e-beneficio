@@ -18,7 +18,7 @@ type ComponentProps = {
 
 /**
  * Family search component
- * @param props component props
+ * @param ComponentProps component props
  */
 export const FamilySearch: React.FC<ComponentProps> = () => {
   const dispatch = useDispatch();

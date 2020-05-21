@@ -2,6 +2,10 @@
   "name": "admin",
   "version": "0.0.1",
   "private": true,
+  "homepage": ".",
+  "engines": {
+    "node": "13.x"
+  },
   "dependencies": {
     "@ant-design/icons": "^4.0.5",
     "@reduxjs/toolkit": "^1.3.2",
