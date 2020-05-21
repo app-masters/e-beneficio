@@ -4,6 +4,7 @@ import * as familyModel from '../models/families';
 import * as consumptionModel from '../models/consumptions';
 import * as placeStoreModel from '../models/placeStores';
 import { uploadFile } from '../utils/file';
+import seed from '../../database/seeders/families';
 
 const router = express.Router({ mergeParams: true });
 
@@ -40,18 +41,7 @@ router.get('/place-stores', async (req, res) => {
  */
 router.post('/consumptions', async (req, res) => {
   try {
-    if (!req.files || Object.keys(req.files).length === 0) {
-      return res.status(400).send('No files were uploaded.');
-    }
-    let image = req.files.image;
-    if (Array.isArray(image)) {
-      image = image[0];
-    }
-    const data = await uploadFile(`image`, `public/consumption-${new Date().getTime()}`, image);
-    if (!data) {
-      throw { message: `Failed to upload image to the store` };
-    }
-    const item = await consumptionModel.addConsumption({ ...req.body, proofImageUrl: data.url });
+    const item = await consumptionModel.addConsumption({ ...req.body });
     return res.send(item);
   } catch (error) {
     logging.error(error);
