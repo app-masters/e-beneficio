@@ -2,6 +2,7 @@ import { createAction } from '@reduxjs/toolkit';
 import { Dashboard } from '../../interfaces/dashboard';
 import { ThunkResult } from '../store';
 import { backend } from '../../utils/networking';
+import { logging } from '../../lib/logging';
 
 // Simple actions and types
 export const doGetDashboard = createAction<void>('dashboard/GET');
@@ -27,6 +28,7 @@ export const requestGetDashboard = (): ThunkResult<void> => {
       }
     } catch (error) {
       // Request failed: dispatch error
+      logging.error(error);
       dispatch(doGetDashboardFailed(error));
     }
   };

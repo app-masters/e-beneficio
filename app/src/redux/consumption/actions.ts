@@ -2,6 +2,7 @@ import { createAction } from '@reduxjs/toolkit';
 import { ThunkResult } from '../store';
 import { backend } from '../../utils/networking';
 import { Consumption } from '../../interfaces/consumption';
+import { logging } from '../../lib/logging';
 
 // Simple actions and types
 export const doSaveConsumption = createAction<void>('consumption/SAVE');
@@ -55,6 +56,7 @@ export const requestSaveConsumption = (
       }
     } catch (error) {
       // Request failed: dispatch error
+      logging.error(error);
       dispatch(doSaveConsumptionFailed(error));
       if (onFailure) onFailure(error);
     }

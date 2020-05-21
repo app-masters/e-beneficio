@@ -118,15 +118,18 @@ export const createAuthAxios = (baseAxios: AxiosInstance) => {
     (res) => res, // If succeeded just return the response
     // If there's an error within the response
     async (err) => {
-      const {
-        config: originalReq,
-        response: { status }
-      } = err;
+      const { config: originalReq, response: originalRes } = err;
 
       // If we get a 401 error
       // And we have not tried before
       // And the error is not in the token url(to prevent looping)
-      if (err.config && status === 401 && !originalReq._retry && originalReq.url !== '/auth/token') {
+      if (
+        err.config &&
+        originalRes &&
+        originalRes.status === 401 &&
+        !originalReq._retry &&
+        originalReq.url !== '/auth/token'
+      ) {
         // Update the retry value so we don't retry more than once
         originalReq._retry = true;
 
@@ -134,7 +137,7 @@ export const createAuthAxios = (baseAxios: AxiosInstance) => {
         const response = await baseAxios.post<TokenResponse>('/auth/token', { refreshToken: getRefresh() });
 
         // If successfully got the token
-        if (response.status === 200 && response.data) {
+        if (response && response.status === 200 && response.data) {
           // Store the new values
           setAuthorization(response.data.token);
           setRefresh(response.data.refreshToken);
