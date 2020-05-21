@@ -6,6 +6,19 @@ export const PanelStyle = {
   marginTop: 0
 };
 
+export const IconCheckStyle = {
+  color: '#2ecc71',
+  fontSize: 18,
+  marginLeft: 5
+};
+
+export const ImageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: ${(props) => props.theme.spacing.md};
+`;
+
 export const HeaderContainer = styled.div`
   display: flex;
   flex-direction: column;
