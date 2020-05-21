@@ -57,25 +57,32 @@ echo -e "\n# 4/9 - Pushing admin docker image to Google Container Registry...\n"
 docker push ${ADMIN_CONTAINER_IMAGE}
 cd ..
 
-### PORTAL
-## build and copy portal
-#cd portal
-#echo -e "\n# 5/9 - Building and tagging portal dockerfile...\n"
-#docker build -f production.Dockerfile -t ${PORTAL_IMAGE_TAG} .
-#docker tag ${PORTAL_IMAGE_TAG} ${PORTAL_CONTAINER_IMAGE}
-#
-#echo -e "\n# 6/9 - Pushing admin docker image to Google Container Registry...\n"
-#docker push ${PORTAL_CONTAINER_IMAGE}
-#cd ..
+## PORTAL
+# build and copy portal
+cd portal
+echo -e "\n# 5/9 - Building and tagging portal dockerfile...\n"
+docker build -f production.Dockerfile -t ${PORTAL_IMAGE_TAG} .
+docker tag ${PORTAL_IMAGE_TAG} ${PORTAL_CONTAINER_IMAGE}
+
+echo -e "\n# 6/9 - Pushing admin docker image to Google Container Registry...\n"
+docker push ${PORTAL_CONTAINER_IMAGE}
+cd ..
 
 ### FILES AND FINAL PULL
 echo -e "\n# 7/9 - Copying config files to remote machine...\n"
 cd deployment
-gcloud compute scp ./${ENV}/docker-compose.yml ${INSTANCE_NAME}:${REMOTE_PATH}
-#gcloud compute scp ./${ENV}/wait-for-file/Dockerfile ${INSTANCE_NAME}:${REMOTE_PATH}/wait-for-file/Dockerfile
-#gcloud compute scp ./${ENV}/wait-for-file/wait-for-file.sh ${INSTANCE_NAME}:${REMOTE_PATH}/wait-for-file/wait-for-file.sh
-gcloud compute scp ./${ENV}/nginx.tmpl ${INSTANCE_NAME}:${REMOTE_PATH}
-set -x
+FILE=./${ENV}/docker-compose.yml
+if test -f "$FILE"; then
+    gcloud compute scp ${FILE} ${INSTANCE_NAME}:${REMOTE_PATH}
+else
+    echo "Not sending ${FILE}";
+fi
+FILE=./${ENV}/nginx.tmpl
+if test -f "$FILE"; then
+    gcloud compute scp ${FILE} ${INSTANCE_NAME}:${REMOTE_PATH}
+else
+    echo "Not sending ${FILE}";
+fi
 FILE=./${ENV}/.env.backend
 if test -f "$FILE"; then
     gcloud compute scp ${FILE} ${INSTANCE_NAME}:${REMOTE_PATH}
@@ -104,11 +111,7 @@ fi
 
 echo "Daemon: ${DAEMON}"
 
-
-
 echo -e "\n\n# 8/9 - Updating remote machine...\n"
-gcloud compute ssh ${INSTANCE_NAME} --command="cd ${REMOTE_PATH} && docker network create nginx-proxy || true && docker-compose pull && docker-compose up ${DAEMON} --remove-orphans"
-#gcloud compute ssh ${INSTANCE_NAME} --command="cd ${REMOTE_PATH} && ls -la && docker-compose down --remove-orphans && docker-compose pull && docker-compose up ${DAEMON} --remove-orphans"
-#gcloud compute ssh ${INSTANCE_NAME} --command="cd ${REMOTE_PATH} && ls -la && docker image prune -a --force && docker-compose down --remove-orphans && docker-compose pull && docker-compose up ${DAEMON} --remove-orphans"
+#gcloud compute ssh ${INSTANCE_NAME} --command="cd ${REMOTE_PATH} && docker network create nginx-proxy || true && docker-compose pull && docker-compose up ${DAEMON} --remove-orphans"
 
 echo -e "\n\n# 9/9 - Waiting healthy response...\n"
