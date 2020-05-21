@@ -270,9 +270,6 @@ export const FamiliesList: React.FC<{}> = () => {
                     {importReport.duplicatedCount}
                   </CounterItem>
                 </Descriptions.Item>
-                <Descriptions.Item label="Alunos sem nenhum responsável no Sislame">
-                  <CounterItem>{importReport.sislameWithoutParentCount}</CounterItem>
-                </Descriptions.Item>
                 <Descriptions.Item label="Dependentes após filtros de duplicidade">
                   <CounterItem bold>
                     {importReport.originalFamilyCount && importReport.originalFamilyCount > 0 && (
