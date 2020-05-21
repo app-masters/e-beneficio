@@ -35,38 +35,35 @@ gcloud config set compute/zone ${ZONE}
 ## Login on GCR
 gcloud auth configure-docker --quiet
 
-## BACKEND
-# build and push backend
-#cd backend
-#echo -e "\n# 1/9 - Building and tagging backend dockerfile...\n"
-#docker build -f production.Dockerfile -t ${BACKEND_IMAGE_TAG} .
-#docker tag ${BACKEND_IMAGE_TAG} ${BACKEND_CONTAINER_IMAGE}
-#
-#echo -e "\n# 2/9 - Pushing backend docker image to Google Container Registry...\n"
-#docker push ${BACKEND_CONTAINER_IMAGE}
-#cd ..
-#
-### FRONTEND
-## build and push admin
-#cd admin
-#echo -e "\n# 3/9 - Building and tagging admin dockerfile...\n"
-#docker build -f production.Dockerfile -t ${ADMIN_IMAGE_TAG} .
-#docker tag ${ADMIN_IMAGE_TAG} ${ADMIN_CONTAINER_IMAGE}
-#
-#echo -e "\n# 4/9 - Pushing admin docker image to Google Container Registry...\n"
-#docker push ${ADMIN_CONTAINER_IMAGE}
-#cd ..
-#
-### PORTAL
-## build and copy portal
-#cd portal
-#echo -e "\n# 5/9 - Building and tagging portal dockerfile...\n"
-#docker build -f production.Dockerfile -t ${PORTAL_IMAGE_TAG} .
-#docker tag ${PORTAL_IMAGE_TAG} ${PORTAL_CONTAINER_IMAGE}
-#
-#echo -e "\n# 6/9 - Pushing admin docker image to Google Container Registry...\n"
-#docker push ${PORTAL_CONTAINER_IMAGE}
-#cd ..
+# BACKEND
+ build and push backend
+cd backend
+echo -e "\n# 1/9 - Building and tagging backend dockerfile...\n"
+docker build -f production.Dockerfile -t ${BACKEND_IMAGE_TAG} .
+docker tag ${BACKEND_IMAGE_TAG} ${BACKEND_CONTAINER_IMAGE}
+echo -e "\n# 2/9 - Pushing backend docker image to Google Container Registry...\n"
+docker push ${BACKEND_CONTAINER_IMAGE}
+cd ..
+
+## FRONTEND
+# build and push admin
+cd admin
+echo -e "\n# 3/9 - Building and tagging admin dockerfile...\n"
+docker build -f production.Dockerfile -t ${ADMIN_IMAGE_TAG} .
+docker tag ${ADMIN_IMAGE_TAG} ${ADMIN_CONTAINER_IMAGE}
+echo -e "\n# 4/9 - Pushing admin docker image to Google Container Registry...\n"
+docker push ${ADMIN_CONTAINER_IMAGE}
+cd ..
+
+## PORTAL
+# build and copy portal
+cd portal
+echo -e "\n# 5/9 - Building and tagging portal dockerfile...\n"
+docker build -f production.Dockerfile -t ${PORTAL_IMAGE_TAG} .
+docker tag ${PORTAL_IMAGE_TAG} ${PORTAL_CONTAINER_IMAGE}
+echo -e "\n# 6/9 - Pushing admin docker image to Google Container Registry...\n"
+docker push ${PORTAL_CONTAINER_IMAGE}
+cd ..
 
 ### FILES AND FINAL PULL
 echo -e "\n# 7/9 - Copying config files to remote machine...\n"
