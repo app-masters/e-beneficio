@@ -1,23 +1,16 @@
-import { CameraOutlined, QrcodeOutlined } from '@ant-design/icons';
-import { Alert, Button, Checkbox, Form, Input, InputNumber, Modal, Typography } from 'antd';
+import { QrcodeOutlined, WarningFilled, CheckOutlined } from '@ant-design/icons';
+import { Button, Modal, Row, Col, Typography, Form, InputNumber, Divider, Alert } from 'antd';
 import { useFormik } from 'formik';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import QrReader from 'react-qr-reader';
 import { useSelector, useDispatch } from 'react-redux';
-import Webcam from 'react-webcam';
 import { FamilySearch } from '../../components/familyValidation';
 import { Family } from '../../interfaces/family';
 import { AppState } from '../../redux/rootReducer';
 import yup from '../../utils/yup';
 import { requestSaveConsumption } from '../../redux/consumption/actions';
-
-const schema = yup.object().shape({
-  nfce: yup.string().label('Nota fiscal eletrônica').required(),
-  value: yup.number().label('Valor em reais').min(0).required(),
-  proofImageUrl: yup.string().label('Link da imagem').required(),
-  familyId: yup.string().label('Família').required('É preciso selecionar uma família ao digitar um NIS'),
-  birthday: yup.string().label('Aniversário')
-});
+import { requestResetFamily } from '../../redux/family/actions';
+import { IconCheckStyle, ImageContainer } from './styles';
 
 /**
  * Clear NFCe QRCode result
@@ -36,62 +29,134 @@ const handleQRCode = (value: string | null) => {
  * Dashboard page component
  * @param props component props
  */
-export const ConsumptionForm: React.FC<{ open: boolean; closeModal: Function }> = ({ open, closeModal }) => {
-  const cameraRef = useRef(null);
+export const ConsumptionForm: React.FC<{ closeModal: Function }> = ({ closeModal }) => {
+  const [familyId, setFamilyId] = useState<string | number | undefined>();
+  const [pickQr, setPickQr] = useState<string>('');
+
+  const dispatch = useDispatch();
+  const family = useSelector<AppState, Family | null | undefined>((state) => state.familyReducer.item);
+
+  /**
+   * Close modal
+   */
+  const close = () => {
+    closeModal();
+    dispatch(requestResetFamily());
+  };
+
+  return (
+    <Modal title={'Informar compra'} visible={true} centered maskClosable={false} onCancel={close} footer={null}>
+      <FamilySearch onFamilySelect={(id) => setFamilyId(id)} />
+      {familyId && pickQr === '' && <StepQRCodeChose onPick={(pick) => setPickQr(pick)} />}
+      {pickQr === 'withoutQr' && <StepNoQRCode family={family} onBack={() => setPickQr('')} onConfirm={close} />}
+      {pickQr === 'withQr' && <StepWithQRCode onBack={() => setPickQr('')} onFinish={close} />}
+    </Modal>
+  );
+};
+
+/**
+ * StepQRCodeChose component
+ * @param props component props
+ */
+export const StepQRCodeChose: React.FC<{ onPick: (pick: string) => void }> = ({ onPick }) => {
+  return (
+    <div>
+      <Typography.Paragraph style={{ marginBottom: 0 }}>
+        No comprovante da sua compra, verifique se está presente o código QRCode. O código consuma estar na parte de
+        baixo da nota e parece com o seguinte:
+      </Typography.Paragraph>
+      <ImageContainer>
+        <img src={require('../../assets/qrCodeImage.png')} height="80%" style={{ maxHeight: 200 }} />
+      </ImageContainer>
+      <Row typeof="flex" gutter={[16, 16]}>
+        <Col span={'24'}>
+          <Button block onClick={() => onPick('withQr')}>
+            Meu comprovante tem o QRCode
+          </Button>
+        </Col>
+        <Col span={'24'}>
+          <Button block onClick={() => onPick('withoutQr')}>
+            Meu comprovante não tem o QRCode
+          </Button>
+        </Col>
+      </Row>
+    </div>
+  );
+};
+
+/**
+ * StepNoQRCode component
+ * @param props component props
+ */
+export const StepNoQRCode: React.FC<{ family?: Family | null; onBack: () => void; onConfirm: () => void }> = ({
+  family,
+  onBack,
+  onConfirm
+}) => {
+  return (
+    <div>
+      <Typography.Paragraph>
+        Sem o QRCode, precisamos que você leve o comprovante da sua compra para a escola responsável pelo seu cadastro
+        para assim adicionar sua compra na lista da recarga.
+      </Typography.Paragraph>
+      <Typography.Paragraph>
+        Levar em <b>{family?.school}</b>
+      </Typography.Paragraph>
+      <Row typeof="flex" gutter={[16, 16]}>
+        <Col span={'12'}>
+          <Button block onClick={onBack}>
+            Voltar
+          </Button>
+        </Col>
+        <Col span={'12'}>
+          <Button block type="primary" onClick={onConfirm}>
+            Concluir
+          </Button>
+        </Col>
+      </Row>
+    </div>
+  );
+};
+
+const schema = yup.object().shape({
+  nfce: yup.string().label('Nota fiscal eletrônica').required(),
+  value: yup.number().label('Valor em reais').min(0).required()
+});
+
+/**
+ * StepWithQRCode component
+ * @param props component props
+ */
+export const StepWithQRCode: React.FC<{ onBack: () => void; onFinish: () => void }> = ({ onBack, onFinish }) => {
+  const family = useSelector<AppState, Family | null | undefined>((state) => state.familyReducer.item);
+  const [showQRModal, setQRModal] = React.useState<boolean>(false);
+
   const dispatch = useDispatch();
 
-  // Local state
-  const [, setPermission] = useState('prompt');
-  const [showQRCodeModal, setShowQRCodeModal] = useState(false);
-  const [showCameraModal, setShowCameraModal] = useState(false);
-  // Redux state
-  const family = useSelector<AppState, Family | null | undefined>((state) => state.familyReducer.item);
-  const loading = false;
-
-  useEffect(() => {
-    navigator.permissions.query({ name: 'camera' }).then((value) => {
-      setPermission(value.state);
-    });
-  }, []);
-
-  const {
-    handleSubmit,
-    handleChange,
-    values,
-    getFieldMeta,
-    submitForm,
-    status,
-    errors,
-    touched,
-    setFieldValue,
-    getFieldProps
-  } = useFormik({
+  const { handleSubmit, values, getFieldMeta, status, setFieldValue } = useFormik({
     initialValues: {
       nfce: '',
-      value: 0,
-      proofImageUrl: '',
-      nisCode: '',
-      familyId: '',
-      birthday: '',
-      acceptCheck: false
+      value: ''
     },
     validationSchema: schema,
     onSubmit: (values, { setStatus }) => {
       setStatus();
-      const invalidConsumptionValue = !!(family && values.value > family.balance);
-      if (family && !invalidConsumptionValue && values.acceptCheck) {
+      const invalidConsumptionValue = !!(family && Number(values.value) > family.balance);
+      if (family && !invalidConsumptionValue) {
+        const data = {
+          nfce: values.nfce,
+          value: Number(values.value),
+          familyId: Number(family?.id)
+        };
         dispatch(
           requestSaveConsumption(
-            {
-              nfce: values.nfce,
-              value: Number(values.value),
-              proofImageUrl: values.proofImageUrl,
-              familyId: values.familyId
+            data,
+            () => {
+              Modal.success({ title: 'Consumo salvo com sucesso', onOk: () => onFinish() });
             },
             () => {
-              Modal.success({ title: 'Consumo salvo com sucesso', onOk: () => closeModal() });
-            },
-            () => setStatus('Ocorreu um erro ao confirmar consumo.')
+              setStatus('Ocorreu um erro durante o processamento.');
+            }
           )
         );
       }
@@ -99,160 +164,158 @@ export const ConsumptionForm: React.FC<{ open: boolean; closeModal: Function }> 
   });
 
   const valueMeta = getFieldMeta('value');
-  const imageMeta = getFieldMeta('proofImageUrl');
   const nfceMeta = getFieldMeta('nfce');
 
-  const acceptCheckMeta = getFieldMeta('acceptCheck');
-  const acceptCheckField = getFieldProps('acceptCheck');
+  const invalidConsumptionValue = !!(family && Number(values.value) > 0 && Number(values.value) > family.balance);
+  return (
+    <Form layout="vertical" onSubmitCapture={handleSubmit}>
+      {status && <Alert message="Erro no formulário" description={status} type="error" />}
+      <Form.Item
+        label="Valor total da compra"
+        validateStatus={(!!valueMeta.error && !!valueMeta.touched) || invalidConsumptionValue ? 'error' : ''}
+        help={
+          !!valueMeta.error && !!valueMeta.touched
+            ? valueMeta.error
+            : invalidConsumptionValue
+            ? 'Valor maior que saldo disponível'
+            : undefined
+        }
+      >
+        <InputNumber
+          style={{ width: '100%' }}
+          id="value"
+          name="value"
+          size="large"
+          type="numeric"
+          onChange={(val) => {
+            if (val && Number(val) !== 0 && !Number.isNaN(Number(val))) setFieldValue('value', val);
+            else setFieldValue('value', '');
+          }}
+          value={Number(values.value)}
+          decimalSeparator=","
+          step={0.01}
+          precision={2}
+          min={0}
+          formatter={(value) => (value && Number(value) !== 0 && !Number.isNaN(Number(value)) ? `R$ ${value}` : '')}
+          parser={(value) => (value ? value.replace(/(R)|(\$)/g, '').trim() : '')}
+        />
+      </Form.Item>
 
-  const invalidConsumptionValue = !!(family && values.value > 0 && values.value > family.balance);
+      <Form.Item
+        label={
+          <>
+            {'NFCe'}
+            {values.nfce && <CheckOutlined style={IconCheckStyle} />}
+          </>
+        }
+        validateStatus={!!nfceMeta.error && !!nfceMeta.touched ? 'error' : ''}
+        help={!!nfceMeta.error && !!nfceMeta.touched ? nfceMeta.error : undefined}
+      >
+        <Button icon={<QrcodeOutlined />} block onClick={() => setQRModal(true)}>
+          Ler código QRCode
+        </Button>
+        {showQRModal && (
+          <ModalQrCode onQrRead={(nfce) => setFieldValue('nfce', nfce)} onClose={() => setQRModal(false)} />
+        )}
+      </Form.Item>
+
+      <Form.Item style={{ marginTop: 10, marginBottom: 0, textAlign: 'right' }}>
+        <Row typeof="flex" gutter={[16, 16]}>
+          <Col span={'12'}>
+            <Button block onClick={onBack}>
+              Voltar
+            </Button>
+          </Col>
+          <Col span={'12'}>
+            <Button
+              block
+              type="primary"
+              // disabled={values.nfce === ''}
+              htmlType={'submit'}
+            >
+              Confirmar
+            </Button>
+          </Col>
+        </Row>
+      </Form.Item>
+    </Form>
+  );
+};
+
+/**
+ * ModalQrCode component
+ * @param props component props
+ */
+export const ModalQrCode: React.FC<{ onClose: () => void; onQrRead: (nfce: string) => void }> = ({
+  onClose,
+  onQrRead
+}) => {
+  const [permission, setPermission] = useState<string>('');
+
+  useEffect(() => {
+    // if (navigator.getUserMedia) {
+    // navigator.getUserMedia({ video: true },
+    //   (localMediaStream) => {
+    //     setPermission(localMediaStream.active ? 'grant' : 'denied');
+    //   },
+    //   (err) => {
+    //     // Log the error to the console.
+    //     // alert(JSON.stringify(err));
+    //   }
+    // );
+    // } else {
+    navigator.permissions
+      .query({ name: 'camera' })
+      .then((value) => {
+        setPermission(value.state);
+      })
+      .catch((err) => console.log(err));
+  }, []);
+
   return (
     <Modal
-      title={'Informar compra'}
-      visible={open}
-      onCancel={() => closeModal()}
-      onOk={submitForm}
-      confirmLoading={loading}
-      okText="Confirmar compra"
-      okButtonProps={{
-        disabled:
-          !!(errors && Object.keys(errors).length > 0 && touched) ||
-          !family ||
-          invalidConsumptionValue ||
-          !values.acceptCheck
-      }}
-      okType={errors && Object.keys(errors).length > 0 && touched ? 'danger' : 'primary'}
+      okButtonProps={{ disabled: true, hidden: true }}
+      cancelText="Fechar"
+      maskClosable={false}
+      closable={false}
+      onCancel={onClose}
+      visible={true}
     >
-      {status && <Alert message="Erro no formulário" description={status} type="error" />}
-      <form onSubmit={handleSubmit}>
-        <Form layout="vertical">
-          <FamilySearch onFamilySelect={(id) => setFieldValue('familyId', id)} />
-          {values.familyId && (
-            <>
-              <Form.Item
-                label="Valor total da compra"
-                validateStatus={(!!valueMeta.error && !!valueMeta.touched) || invalidConsumptionValue ? 'error' : ''}
-                help={
-                  !!valueMeta.error && !!valueMeta.touched
-                    ? valueMeta.error
-                    : invalidConsumptionValue
-                    ? 'Valor maior que saldo disponível'
-                    : undefined
-                }
-              >
-                <InputNumber
-                  style={{ width: '100%' }}
-                  id="value"
-                  name="value"
-                  size="large"
-                  onChange={(value) => setFieldValue('value', value)}
-                  value={Number(values.value)}
-                  decimalSeparator=","
-                  step={0.01}
-                  precision={2}
-                  min={0}
-                  // max={family?.balance}
-                  formatter={(value) => `R$ ${value}`}
-                  parser={(value) => (value ? value.replace(/(R)|(\$)/g, '').trim() : '')}
-                />
-              </Form.Item>
-              <Form.Item
-                label="NFCe"
-                validateStatus={!!nfceMeta.error && !!nfceMeta.touched ? 'error' : ''}
-                help={!!nfceMeta.error && !!nfceMeta.touched ? nfceMeta.error : undefined}
-              >
-                <Input
-                  id="nfce"
-                  name="nfce"
-                  size="large"
-                  onChange={handleChange}
-                  value={values.nfce}
-                  onPressEnter={submitForm}
-                  disabled
-                  addonAfter={<Button type="link" onClick={() => setShowQRCodeModal(true)} icon={<QrcodeOutlined />} />}
-                />
-                <Modal
-                  okButtonProps={{ disabled: true }}
-                  okText="Confirmar"
-                  cancelText="Cancelar"
-                  onCancel={() => setShowQRCodeModal(false)}
-                  visible={showQRCodeModal}
-                >
-                  <>
-                    {showQRCodeModal && ( // Necessary to disable the camera
-                      <QrReader
-                        delay={200}
-                        resolution={800}
-                        onError={console.error}
-                        onScan={(item) => {
-                          const nfce = handleQRCode(item);
-                          if (nfce) {
-                            setFieldValue('nfce', nfce);
-                            setShowQRCodeModal(false);
-                          } else console.log(new Date().getTime(), 'reading...');
-                        }}
-                      />
-                    )}
-                  </>
-                </Modal>
-              </Form.Item>
-
-              <Form.Item
-                validateStatus={!!imageMeta.error && !!imageMeta.touched ? 'error' : ''}
-                help={!!imageMeta.error && !!imageMeta.touched ? imageMeta.error : undefined}
-              >
-                <Button
-                  size="large"
-                  style={{ width: '100%' }}
-                  onClick={() => setShowCameraModal(true)}
-                  icon={<CameraOutlined />}
-                >
-                  {values.proofImageUrl ? 'Alterar foto dos comprovantes' : 'Adicionar foto dos comprovantes'}
-                </Button>
-                <Modal
-                  okText="Confirmar"
-                  cancelText="Cancelar"
-                  onCancel={() => setShowCameraModal(false)}
-                  onOk={async () => {
-                    if (cameraRef && cameraRef.current) {
-                      // weird ts error
-                      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-                      // @ts-ignore
-                      const imageUri = cameraRef.current.getScreenshot();
-                      setShowCameraModal(false);
-                      setFieldValue('proofImageUrl', imageUri);
-                    }
-                  }}
-                  visible={showCameraModal}
-                >
-                  {showCameraModal && <Webcam audio={false} width="100%" ref={cameraRef} />}
-                  <Typography.Paragraph>
-                    Na foto, tentar mostrar:
-                    <ul>
-                      <li>Nota fiscal</li>
-                      <li>Documento</li>
-                    </ul>
-                    Tente manter a foto o mais nítida possível.
-                  </Typography.Paragraph>
-                </Modal>
-              </Form.Item>
-              {values.proofImageUrl.length > 0 && (
-                <Form.Item>
-                  <img alt="example" style={{ width: '100%', maxWidth: '600px' }} src={values.proofImageUrl} />
-                </Form.Item>
-              )}
-              <Form.Item
-                validateStatus={!!acceptCheckMeta.error && !!acceptCheckMeta.touched ? 'error' : ''}
-                help={!!acceptCheckMeta.error && !!acceptCheckMeta.touched ? acceptCheckMeta.error : undefined}
-              >
-                <Checkbox checked={values.acceptCheck} {...acceptCheckField}>
-                  Apenas itens contemplados pelo o programa estão incluídos na compra que está sendo inserida
-                </Checkbox>
-              </Form.Item>
-            </>
-          )}
-        </Form>
-      </form>
+      {permission !== 'denied' ? (
+        // Necessary to disable the camera
+        <QrReader
+          delay={200}
+          resolution={800}
+          onError={console.error}
+          onScan={(item) => {
+            const nfce = handleQRCode(item);
+            if (nfce) {
+              onQrRead(nfce);
+              onClose();
+            } else console.log(new Date().getTime(), 'reading...');
+          }}
+        />
+      ) : (
+        <>
+          <Typography.Title level={3}>{' Acesso não permitido a câmera.'}</Typography.Title>
+          <Divider />
+          <Typography.Paragraph>Para continuar é necessário acesso a câmera do aparelho.</Typography.Paragraph>
+          <Typography>
+            <ul>
+              <li>
+                Clique no ícone <WarningFilled /> próximo ao endereço do site.
+              </li>
+              <li>
+                Acesse <span style={{ color: 'blue' }}>Configurações do site</span>
+              </li>
+              <li>
+                Clique em <span style={{ color: 'blue' }}>Acessar sua câmera</span> e permita o acesso.
+              </li>
+              <li>Clique em Fechar e em seguida clique no botão de leitura novamente.</li>
+            </ul>
+          </Typography>
+        </>
+      )}
     </Modal>
   );
 };

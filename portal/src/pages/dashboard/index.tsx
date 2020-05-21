@@ -175,7 +175,7 @@ export const DashboardPage: React.FC<{}> = () => {
                 <Button type="primary" onClick={() => setModal(!modal)}>
                   Informar compra
                 </Button>
-                <ConsumptionForm open={modal} closeModal={() => setModal(false)} />
+                {modal && <ConsumptionForm closeModal={() => setModal(false)} />}
               </PanelActionContainer>
             </Card>
           </BodyContainer>
@@ -183,11 +183,10 @@ export const DashboardPage: React.FC<{}> = () => {
         <Footer>
           <Flex vertical justifyContent="center" alignItems="center">
             <Paragraph style={{ textAlign: 'center' }}>
-              Esse projeto é open-source e você pode contribuir com ele indo no repositório no{' '}
-              <a href="https://github.com/app-masters/e-beneficio">GitHub</a>
+              Esse projeto é open-source. Visite-nos no <a href="https://github.com/app-masters/e-beneficio">GitHub</a>
             </Paragraph>
             <Paragraph style={{ textAlign: 'center', fontSize: '12px' }}>
-              Feito pela <a href="https://appmasters.io/pt">App Masters</a> para a{' '}
+              Desenvolvido pela <a href="https://appmasters.io/pt">App Masters</a> para a{' '}
               <a href="https://www.pjf.mg.gov.br/">Prefeitura de Juiz de Fora</a>
             </Paragraph>
           </Flex>
