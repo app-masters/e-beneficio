@@ -6,6 +6,7 @@ import { CSVReport } from '../../interfaces/csvReport';
 import { DashboardFamily } from '../../interfaces/dashboardFamily';
 import { Family, ImportReport } from '../../interfaces/family';
 import { User } from '../../interfaces/user';
+import { logging } from '../../lib/logging';
 
 export const doUploadFamilyFile = createAction<void>('families/UPLOAD');
 export const doUploadFamilyFileSuccess = createAction<CSVReport>('families/UPLOAD_SUCCESS');
@@ -62,7 +63,7 @@ export const requestGetFileFamilies = (): ThunkResult<void> => {
       }
     } catch (error) {
       // Request failed: dispatch error
-      console.log(error);
+      logging.error(error);
       dispatch(doGetFileFamilyFailed(error));
     }
   };
@@ -113,6 +114,7 @@ export const requestUploadFamilyFile = (
         onError(`Nenhum arquivo encontrado.`);
       }
     } catch (error) {
+      logging.error(error);
       onError(error.message);
     }
   };
@@ -154,6 +156,7 @@ export const requestGetImportReport = (): ThunkResult<void> => {
       }
     } catch (error) {
       // Request failed: dispatch error
+      logging.error(error);
       dispatch(doGetImportReportFailed(error));
       dispatch(requestStopImportReportSync());
     }
@@ -231,6 +234,7 @@ export const requestUploadSislameFile = (
         onError(`Nenhum arquivo encontrado.`);
       }
     } catch (error) {
+      logging.error(error);
       onError(error.message);
     }
   };
@@ -255,6 +259,7 @@ export const requestGetDashboardFamily = (): ThunkResult<void> => {
       }
     } catch (error) {
       // Request failed: dispatch error
+      logging.error(error);
       dispatch(doGetDashboardFamilyFailed(error));
     }
   };
@@ -279,6 +284,7 @@ export const requestGetFamily = (nis: string, cityId: string): ThunkResult<void>
       }
     } catch (error) {
       // Request failed: dispatch error
+      logging.error(error);
       dispatch(doGetFamilyFailed(error));
     }
   };
@@ -317,7 +323,7 @@ export const requestSaveFamily = (
       }
     } catch (error) {
       // Request failed: dispatch error
-      alert(JSON.stringify(error));
+      logging.error(error);
       dispatch(doSaveFamilyFailed(error));
       if (onFailure) onFailure(error);
     }

@@ -1,10 +1,31 @@
 import styled from 'styled-components';
 import backgroundImage from '../../assets/banner.jpg';
+import { Row } from 'antd';
 
 export const PanelStyle = {
   backgroundColor: '#00000000',
   marginTop: 0
 };
+
+export const IconCheckStyle = {
+  color: '#2ecc71',
+  fontSize: 18,
+  marginLeft: 5
+};
+
+export const ImageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: ${(props) => props.theme.spacing.md};
+`;
+
+export const FooterImageContainer = styled.div`
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 export const HeaderContainer = styled.div`
   display: flex;
@@ -27,6 +48,7 @@ export const HeaderContent = styled.div`
   justify-content: center;
   text-align: center;
   padding: ${(props) => props.theme.spacing.lg};
+  padding-bottom: 0;
 `;
 
 export const PageContainer = styled.div`
@@ -42,10 +64,9 @@ export const PanelActionContainer = styled.div`
   padding-bottom: ${(props) => props.theme.spacing.sm};
 `;
 
-export const ActionContainer = styled.div`
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
+export const ActionContainer = styled(Row)`
+  padding-top: ${(props) => props.theme.spacing.md};
+  padding-bottom: ${(props) => props.theme.spacing.sm};
 `;
 
 export const BodyContainer = styled.div`
