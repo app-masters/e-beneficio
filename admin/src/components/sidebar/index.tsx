@@ -57,6 +57,11 @@ const routes: RouteItem[] = [
     icon: () => <UserOutlined />,
     name: 'Usuários'
   },
+  {
+    path: '/consumo',
+    icon: () => <CarryOutOutlined />,
+    name: 'Informar consumo'
+  },
   // {
   //   path: '/lojas',
   //   icon: () => <ShopOutlined />,
