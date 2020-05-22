@@ -40,7 +40,7 @@ export const requirePublicAuth = async (req: Request, res: Response, next: NextF
     }
     const debugTimeDiff = moment(now).diff(moment(), 'minutes');
     if (debugTimeDiff > 10) {
-      logging.error('Request took more than 10 minutes', { decryptedData, serverNow: moment().toISOString() });
+      logging.log('Request took more than 10 minutes', { decryptedData, serverNow: moment().toISOString() });
     }
 
     // Check if token match
