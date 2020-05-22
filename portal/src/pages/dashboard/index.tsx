@@ -78,7 +78,7 @@ export const DashboardPage: React.FC<{}> = () => {
         <Container>
           <BodyContainer id="saldo">
             <Title level={4}>Ver situação no programa</Title>
-            {!modal && <FamilySearch />}
+            {!modal && <FamilySearch askForConfirmation />}
           </BodyContainer>
         </Container>
         <Container>
