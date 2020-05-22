@@ -7,6 +7,11 @@ export const PanelStyle = {
   marginTop: 0
 };
 
+export const FooterImageWrapper = styled.div`
+  width: 100%;
+  max-width: 1200px;
+`;
+
 export const PriceLabelStyle = {
   fontSize: '12pt'
 } as React.CSSProperties;
@@ -53,6 +58,7 @@ export const HeaderContent = styled.div`
   display: flex;
   width: 100%;
   height: 100%;
+  max-height: 1200px;
   flex-direction: column;
   background-color: #00000080;
   justify-content: center;

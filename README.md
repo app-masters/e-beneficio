@@ -3,7 +3,10 @@
 
 Projeto open-source desenvolvido pela App Masters para a prefeitura da cidade de Juiz de Fora para auxiliar a transferência de renda para as famílias em situação de vulnerabilidade social cadastradas no Bolsa Família e com dependentes cadastrados na rede municipal de ensino. O sistema é responsável pelo cruzamento dos dados das bases municipais, assim como o registro das compras feitas pelas famílias, permitindo o cálculo do saldo mensalmente da mesma.
 
-Projeto feito utilizando `node` e `react`.
+As informações detalhadas sobre o sistema para o público em geral estão no site da App Masters.
+
+Projeto feito utilizando primáriamente `node` no backend e `react` no frontend.
+
 
 ## Getting started
 
