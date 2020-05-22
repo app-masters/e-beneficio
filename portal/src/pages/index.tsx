@@ -3,6 +3,7 @@ import { BrowserRouter, Route } from 'react-router-dom';
 
 // Pages
 import { DashboardPage } from './dashboard';
+import { InstructionsPage } from './instructions';
 
 /**
  * Router component
@@ -11,7 +12,8 @@ import { DashboardPage } from './dashboard';
 export const Router: React.FC<{}> = () => {
   return (
     <BrowserRouter>
-      <Route component={DashboardPage} />
+      <Route path="/passo-a-passo" component={InstructionsPage} />
+      <Route path="/" component={DashboardPage} exact />
     </BrowserRouter>
   );
 };
