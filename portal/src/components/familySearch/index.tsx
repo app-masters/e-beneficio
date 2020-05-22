@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Form, Button, Input, Typography, Card, Alert, Descriptions } from 'antd';
+import { Form, Button, Input, Typography, Card, Alert, Descriptions, Row, Col } from 'antd';
+import { useFormik } from 'formik';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   FamilyWrapper,
@@ -16,7 +17,8 @@ import { requestGetFamily, requestResetFamily } from '../../redux/family/actions
 import { Family } from '../../interfaces/family';
 import moment from 'moment';
 import { env } from '../../env';
-import { StepBirthDay } from '../familyValidation/steps';
+import yup from '../../utils/yup';
+import { formatDate } from '../../utils/formatters';
 
 const { Text } = Typography;
 
@@ -25,6 +27,11 @@ type ComponentProps = {
   askForBirthday?: boolean;
   askForConfirmation?: boolean;
 };
+
+// Birthday validation schema
+const schemaBirthday = yup.object().shape({
+  birthday: yup.string().label('Data').required()
+});
 
 /**
  * Family search component
@@ -35,7 +42,8 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
 
   // Local state
   const [nis, setNis] = useState('');
-  const [sameBirthday, setSameBirthday] = useState(false);
+  const [invalidNIS, setInvalidNIS] = useState(false);
+  const [validBirthday, setValidBirthday] = useState(false);
   const [familyConfirmed, setFamilyConfirmed] = useState(false);
   // Redux state
   const familyLoading = useSelector<AppState, boolean>((state) => state.familyReducer.loading);
@@ -58,29 +66,43 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
   const onCancel = () => {
     dispatch(requestResetFamily());
     setNis('');
-    setSameBirthday(false);
+    setValidBirthday(false);
   };
 
   return (
     <>
       <Form layout="vertical">
-        <Form.Item>
+        <Form.Item
+          validateStatus={invalidNIS ? 'error' : ''}
+          help={invalidNIS ? 'NIS é um campo obrigatório' : undefined}
+        >
           <Input.Search
             loading={familyLoading}
             enterButton
+            type={'number'}
             onChange={(event) => setNis(event.target.value)}
             value={nis}
             maxLength={11}
             placeholder="Código NIS do responsável"
             onPressEnter={() => {
-              dispatch(requestGetFamily(nis, cityId));
-              setSameBirthday(false);
-              setFamilyConfirmed(false);
+              if (!nis) {
+                setInvalidNIS(true);
+              } else {
+                dispatch(requestGetFamily(nis, cityId));
+                setValidBirthday(false);
+                setFamilyConfirmed(false);
+                setInvalidNIS(false);
+              }
             }}
             onSearch={(value) => {
-              dispatch(requestGetFamily(value, cityId));
-              setSameBirthday(false);
-              setFamilyConfirmed(false);
+              if (!value) {
+                setInvalidNIS(true);
+              } else {
+                dispatch(requestGetFamily(value, cityId));
+                setValidBirthday(false);
+                setFamilyConfirmed(false);
+                setInvalidNIS(false);
+              }
             }}
           />
         </Form.Item>
@@ -103,61 +125,16 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
       {!familyLoading && family && (
         <FamilyWrapper>
           <Card>
-            {sameBirthday ? (
+            {!validBirthday ? (
+              <ConfirmBirthday family={family} onValidBirthday={() => setValidBirthday(true)} />
+            ) : (
               <>
                 {props.askForConfirmation && !familyConfirmed ? (
-                  <Alert
-                    type="info"
-                    message={
-                      <div>
-                        <Descriptions layout="vertical" size="small" title="Família encontrada" colon={false} bordered>
-                          <Descriptions.Item label="Nome do responsável">{family?.responsibleName}</Descriptions.Item>
-                          <Descriptions.Item label="Data de nascimento do responsável">
-                            {family?.responsibleBirthday
-                              ? moment(family?.responsibleBirthday).format('DD/MM/YYYY')
-                              : ''}
-                          </Descriptions.Item>
-                        </Descriptions>
-                        <FamilyActions>
-                          <Typography.Paragraph strong>Os dados estão corretos?</Typography.Paragraph>
-                          <Flex alignItems="center" justifyContent="flex-end" gap>
-                            <Button htmlType="button" type="default" onClick={onCancel}>
-                              Não
-                            </Button>
-                            <Button htmlType="button" type="primary" onClick={onConfirm}>
-                              Sim, confirmar
-                            </Button>
-                          </Flex>
-                        </FamilyActions>
-                      </div>
-                    }
-                  />
+                  <ConfirmFamily family={family} onConfirm={onConfirm} onCancel={onCancel} />
                 ) : (
-                  <>
-                    <Text style={PriceLabelStyle}>{'Saldo disponível: '}</Text>
-                    <Text style={PriceStyle}>{`R$${(family.balance || 0).toFixed(2).replace('.', ',')}`}</Text>
-
-                    <HowToHeaderContainer>
-                      <HowToLabel>Você pode utilizar seus créditos utilizando o cartão recebido.</HowToLabel>
-                      {family.school && (
-                        <HowToLabel>
-                          {`Caso não tenha pego seu cartão, entre em contato com a escola `}
-                          <b>{`${family.school}`}</b>
-                        </HowToLabel>
-                      )}
-                      <HowToLabel>
-                        Se o saldo for superior ao disponível, possivelmente você precisa informar suas últimas compras
-                        para receber o reembolso.
-                      </HowToLabel>
-                      <Flex justifyContent="center">
-                        <Button href={'#compra'}>Informar compra</Button>
-                      </Flex>
-                    </HowToHeaderContainer>
-                  </>
+                  <FamilyBalance family={family} />
                 )}
               </>
-            ) : (
-              <StepBirthDay family={family} onValidBirthday={() => setSameBirthday(true)} />
             )}
           </Card>
         </FamilyWrapper>
@@ -165,3 +142,116 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
     </>
   );
 };
+
+/**
+ * Form for birthday confirmation
+ */
+const ConfirmBirthday: React.FC<{ family: Family; onValidBirthday: () => void }> = ({ family, onValidBirthday }) => {
+  const { handleSubmit, values, status, getFieldMeta, setFieldValue } = useFormik({
+    initialValues: {
+      birthday: ''
+    },
+    validationSchema: schemaBirthday,
+    enableReinitialize: true,
+    onSubmit: (values, { setStatus }) => {
+      const sameBirthday =
+        moment(family?.responsibleBirthday).diff(moment(values.birthday, 'DD/MM/YYYY'), 'days') === 0;
+      if (sameBirthday && onValidBirthday) onValidBirthday();
+      else setStatus('Data de aniversário inválida.');
+    }
+  });
+
+  const birthdayMeta = getFieldMeta('birthday');
+
+  return (
+    <Form layout="vertical" onSubmitCapture={handleSubmit}>
+      {status && <Alert message="" description={status} type="error" />}
+      <Form.Item
+        label="Aniversário do responsável"
+        validateStatus={!!birthdayMeta.error && !!birthdayMeta.touched ? 'error' : ''}
+        help={!!birthdayMeta.error && !!birthdayMeta.touched ? birthdayMeta.error : undefined}
+      >
+        <Input
+          style={{ width: '100%' }}
+          id="birthday"
+          name="birthday"
+          onChange={(event) => {
+            setFieldValue('birthday', formatDate(event.target.value));
+          }}
+          value={values.birthday}
+          placeholder="DD/MM/YYYY"
+        />
+      </Form.Item>
+      <Form.Item style={{ marginBottom: 0 }}>
+        <Row typeof="flex">
+          <Col offset={12} span={12}>
+            <Button block htmlType="submit" type={'primary'}>
+              Validar
+            </Button>
+          </Col>
+        </Row>
+      </Form.Item>
+    </Form>
+  );
+};
+
+/**
+ * Family cofirmation alert message
+ */
+const ConfirmFamily: React.FC<{ family: Family | null | undefined; onConfirm: () => void; onCancel: () => void }> = ({
+  family,
+  onCancel,
+  onConfirm
+}) => (
+  <Alert
+    type="info"
+    message={
+      <div>
+        <Descriptions layout="vertical" size="small" title="Família encontrada" colon={false} bordered>
+          <Descriptions.Item label="Nome do responsável">{family?.responsibleName}</Descriptions.Item>
+          <Descriptions.Item label="Data de nascimento do responsável">
+            {family?.responsibleBirthday ? moment(family?.responsibleBirthday).format('DD/MM/YYYY') : ''}
+          </Descriptions.Item>
+        </Descriptions>
+        <FamilyActions>
+          <Typography.Paragraph strong>Os dados estão corretos?</Typography.Paragraph>
+          <Flex alignItems="center" justifyContent="flex-end" gap>
+            <Button htmlType="button" type="default" onClick={onCancel}>
+              Não
+            </Button>
+            <Button htmlType="button" type="primary" onClick={onConfirm}>
+              Sim, confirmar
+            </Button>
+          </Flex>
+        </FamilyActions>
+      </div>
+    }
+  />
+);
+
+/**
+ * Component for displaying the family balance
+ */
+const FamilyBalance: React.FC<{ family: Family }> = ({ family }) => (
+  <>
+    <Text style={PriceLabelStyle}>{'Saldo disponível: '}</Text>
+    <Text style={PriceStyle}>{`R$${(family.balance || 0).toFixed(2).replace('.', ',')}`}</Text>
+
+    <HowToHeaderContainer>
+      <HowToLabel>Você pode utilizar seus créditos utilizando o cartão recebido.</HowToLabel>
+      {family.school && (
+        <HowToLabel>
+          {`Caso não tenha pego seu cartão, entre em contato com a escola `}
+          <b>{`${family.school}`}</b>
+        </HowToLabel>
+      )}
+      <HowToLabel>
+        Se o saldo for superior ao disponível, possivelmente você precisa informar suas últimas compras para receber o
+        reembolso.
+      </HowToLabel>
+      <Flex justifyContent="center">
+        <Button href={'#compra'}>Informar compra</Button>
+      </Flex>
+    </HowToHeaderContainer>
+  </>
+);
