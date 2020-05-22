@@ -33,13 +33,19 @@ export const requirePublicAuth = async (req: Request, res: Response, next: NextF
     }
 
     // Check if token is too old
-    const timeDiff = moment(now).diff(moment(), 'second');
-    if (timeDiff > 30) {
+    const timeDiff = moment(now).diff(moment(), 'hours');
+    if (timeDiff > 6) {
+      logging.error('Request on public route took too long', decryptedData);
       return res.status(401).send('Unauthorized');
+    }
+    const secondTimeDiff = moment(now).diff(moment(), 'seconds');
+    if (secondTimeDiff > 30) {
+      logging.error('Request took more than 30 seconds', { decryptedData, serverNow: moment().toISOString() });
     }
 
     // Check if token match
     if (token !== process.env.AUTH_TOKEN) {
+      logging.error('Request on public route with invalid token', decryptedData);
       return res.status(401).send('Unauthorized');
     }
 

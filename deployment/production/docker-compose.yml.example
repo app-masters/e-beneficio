@@ -2,42 +2,99 @@ version: '3.7'
 services:
   nginx-proxy:
     image: jwilder/nginx-proxy
+    container_name: nginx-proxy
     ports:
-      - "80:80"
+      - 80:80
+      - 443:443
     volumes:
+      - conf:/etc/nginx/conf.d
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - dhparam:/etc/nginx/dhparam
+      - certs:/etc/nginx/certs:ro
       - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ${PWD}/nginx.tmpl:/app/nginx.tmpl
+    restart: always
+
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: letsencrypt
+    depends_on:
+      - nginx-proxy
+    volumes:
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - dhparam:/etc/nginx/dhparam:ro
+      - certs:/etc/nginx/certs
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+    restart: always
+
+  portal:
+    image: gcr.io/e-beneficio-jf/e-beneficio-portal
+    container_name: portal
+    depends_on:
+      - letsencrypt
+    expose:
+      - 80
+      - 443
+    volumes:
+      - ${PWD}/.env.portal:/usr/share/nginx/html/.env
+      - certs:/etc/nginx/certs
+    environment:
+      PORT: 443
+      VIRTUAL_PORT: 443
+      VIRTUAL_PROTO: https
+      VIRTUAL_HOST: my-domain.com, jf.my-domain.com, www.my-domain.com, www.jf.my-domain.com
+      LETSENCRYPT_HOST: my-domain.com, jf.my-domain.com, www.my-domain.com, www.jf.my-domain.com
+      DEFAULT_EMAIL: admin@myemail.com
+    restart: on-failure
+
+  admin:
+    image: gcr.io/e-beneficio-jf/e-beneficio-admin
+    container_name: admin
+    depends_on:
+      - letsencrypt
+    expose:
+      - 80
+      - 443
+    volumes:
+      - ${PWD}/.env.admin:/usr/share/nginx/html/.env
+      - certs:/etc/nginx/certs
+    environment:
+      PORT: 443
+      VIRTUAL_PORT: 443
+      VIRTUAL_PROTO: https
+      VIRTUAL_HOST: admin.my-domain.com
+      LETSENCRYPT_HOST: admin.my-domain.com
+      DEFAULT_EMAIL: admin@myemail.com
+    restart: on-failure
+
   backend:
-    image: gcr.io/covid19jf/resource-4-vulnerable-backend
+    image: gcr.io/e-beneficio-jf/e-beneficio-backend
     container_name: backend
-    networks:
-      - resources-net
-    ports:
-      - 3001:3001
+    depends_on:
+      - letsencrypt
+    expose:
+      - 80
+      - 443
     env_file:
       - .env.backend
     environment:
-      PORT: 3001
-      VIRTUAL_HOST: api.e-beneficio.com
-  portal:
-    image: gcr.io/covid19jf/resource-4-vulnerable-frontend
-    container_name: portal
-    networks:
-      - resources-net
-    ports:
-      - 3000:3000
-    environment:
-      PORT: 3000
-      VIRTUAL_HOST: jf.e-beneficio.com
-  admin:
-    image: gcr.io/covid19jf/resource-4-vulnerable-frontend
-    container_name: admin
-    networks:
-      - resources-net
-    ports:
-      - 3000:3000
-    environment:
-      PORT: 3000
-      VIRTUAL_HOST: admin.e-beneficio.com
+      PORT: 80
+      VIRTUAL_HOST: api.my-domain.com
+      LETSENCRYPT_HOST: api.my-domain.com
+      DEFAULT_EMAIL: admin@myemail.com
+
+volumes:
+  conf:
+  vhost:
+  html:
+  dhparam:
+  certs:
 
 networks:
-  resources-net:
+  default:
+    external:
+      name: nginx-proxy
