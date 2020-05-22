@@ -38,9 +38,9 @@ export const requirePublicAuth = async (req: Request, res: Response, next: NextF
       logging.error('Request on public route took too long', decryptedData);
       return res.status(401).send('Unauthorized');
     }
-    const secondTimeDiff = moment(now).diff(moment(), 'seconds');
-    if (secondTimeDiff > 30) {
-      logging.error('Request took more than 30 seconds', { decryptedData, serverNow: moment().toISOString() });
+    const debugTimeDiff = moment(now).diff(moment(), 'minutes');
+    if (debugTimeDiff > 10) {
+      logging.log('Request took more than 10 minutes', { decryptedData, serverNow: moment().toISOString() });
     }
 
     // Check if token match
