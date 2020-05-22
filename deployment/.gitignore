@@ -1,0 +1,9 @@
+# Ignore deployment sensible data
+.env.backend
+.env.frontend
+*.json
+**/.env.backend
+**/.env.admin
+**/.env.portal
+#**/config.sh
+**/docker-compose.yml

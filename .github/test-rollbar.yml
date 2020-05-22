@@ -1,0 +1,42 @@
+name: Test -  Rollbar
+on:
+  push:
+    branches:
+      - devops-fixes
+      - devops-tests
+      - devops
+
+jobs:
+  test_permissions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify start deploy to Rollbar
+        uses: rollbar/github-deploy-action@v1.0.0
+        with:
+          environment: 'devops'
+          version: GITHUB_SHA
+          status: 'started'
+        env:
+          ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
+      - name: Notify start deploy to Rollbar
+        uses: rollbar/github-deploy-action@v1.0.0
+        with:
+          environment: 'devops'
+          version: GITHUB_SHA
+          status: 'succeeded'
+        env:
+          ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
+#      - name: Notify start deploy to Rollbar
+#        uses: rollbar/github-deploy-action@v1.0.0
+#        with:
+#          environment: 'devops'
+#          version: GITHUB_SHA
+#          status: 'failed'
+#        env:
+#          ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
+#
+#      - name: show job status
+#        if: always()
+#        run: echo $status
+#        env:
+#          status: ${{job.status}}

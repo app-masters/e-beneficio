@@ -1,0 +1,2113 @@
+{
+	"info": {
+		"_postman_id": "40b5d2cf-41e9-4dab-a67b-7b37283b02d4",
+		"name": "Resources 4 Vulnerables",
+		"description": "Endpoints of the project\n",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "/auth/login - Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e3789afa-0407-4a1d-a963-344cb5d238ef",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.token) {",
+									"    pm.collectionVariables.set('authTokenAdmin', jsonData.token);",
+									"}",
+									"if (jsonData && jsonData.refreshToken) {",
+									"    pm.collectionVariables.set('refreshTokenAdmin', jsonData.refreshToken);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "admin@login.com",
+									"description": "Registered email",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "admin@login",
+									"description": "Non-hashed password",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Log in the user using the email and password"
+					},
+					"response": [
+						{
+							"name": "/auth/login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "email",
+											"value": "admin@login.com",
+											"description": "Registered email",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "admin@login",
+											"description": "Non-hashed password",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/login?",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									],
+									"query": [
+										{
+											"key": "",
+											"value": null
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNTg1ODU3OTU0LCJleHAiOjE1ODU4NTgyNTR9.P8GFrNl8LpdzcnhYIlt2Yf0gqjfdsfrfZDqFaoJwZkk\",\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNTg1ODU3OTU0LCJleHAiOjE1ODYyODk5NTR9.4ei-Qph_0sBVesVXNVB9xQa2qUohMu_Sd9LQCyYNneA\",\n    \"user\": {\n        \"id\": 1,\n        \"cityId\": 1,\n        \"placeStoreId\": null,\n        \"cpf\": \"00000000000\",\n        \"name\": \"Usuário admin\",\n        \"role\": \"admin\",\n        \"email\": \"admin@login.com\",\n        \"password\": \"$2a$08$criG7dYn64PoLkYHBQyFfuBQ14k/bb1QAoW1qmJYkpAZ4MxrZPtN.\",\n        \"active\": true,\n        \"createdAt\": \"2020-04-02T16:43:20.928Z\",\n        \"updatedAt\": \"2020-04-02T16:43:20.928Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "/auth/token - Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e3789afa-0407-4a1d-a963-344cb5d238ef",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.token) {",
+									"    pm.collectionVariables.set('authTokenAdmin', jsonData.token);",
+									"}",
+									"if (jsonData && jsonData.refreshToken) {",
+									"    pm.collectionVariables.set('refreshTokenAdmin', jsonData.refreshToken);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "refreshToken",
+									"value": "{{refreshToken}}",
+									"description": "Refresh token provided on login or other token request",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/token",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"token"
+							]
+						},
+						"description": "Log in the user using the email and password"
+					},
+					"response": []
+				},
+				{
+					"name": "/auth/login - Operator",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e3789afa-0407-4a1d-a963-344cb5d238ef",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.token) {",
+									"    pm.collectionVariables.set('authTokenOperator', jsonData.token);",
+									"}",
+									"if (jsonData && jsonData.refreshToken) {",
+									"    pm.collectionVariables.set('refreshTokenOperator', jsonData.refreshToken);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "operator@login.com",
+									"description": "Registered email",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "operator@login",
+									"description": "Non-hashed password",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Log in the user using the email and password"
+					},
+					"response": [
+						{
+							"name": "/auth/login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "email",
+											"value": "admin@login.com",
+											"description": "Registered email",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "admin@login",
+											"description": "Non-hashed password",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/login?",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									],
+									"query": [
+										{
+											"key": "",
+											"value": null
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNTg1ODU3OTU0LCJleHAiOjE1ODU4NTgyNTR9.P8GFrNl8LpdzcnhYIlt2Yf0gqjfdsfrfZDqFaoJwZkk\",\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNTg1ODU3OTU0LCJleHAiOjE1ODYyODk5NTR9.4ei-Qph_0sBVesVXNVB9xQa2qUohMu_Sd9LQCyYNneA\",\n    \"user\": {\n        \"id\": 1,\n        \"cityId\": 1,\n        \"placeStoreId\": null,\n        \"cpf\": \"00000000000\",\n        \"name\": \"Usuário admin\",\n        \"role\": \"admin\",\n        \"email\": \"admin@login.com\",\n        \"password\": \"$2a$08$criG7dYn64PoLkYHBQyFfuBQ14k/bb1QAoW1qmJYkpAZ4MxrZPtN.\",\n        \"active\": true,\n        \"createdAt\": \"2020-04-02T16:43:20.928Z\",\n        \"updatedAt\": \"2020-04-02T16:43:20.928Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "/auth/token - Operator",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e3789afa-0407-4a1d-a963-344cb5d238ef",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.token) {",
+									"    pm.collectionVariables.set('authTokenOperator', jsonData.token);",
+									"}",
+									"if (jsonData && jsonData.refreshToken) {",
+									"    pm.collectionVariables.set('refreshTokenOperator', jsonData.refreshToken);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "refreshToken",
+									"value": "{{refreshToken}}",
+									"description": "Refresh token provided on login or other token request",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/token",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"token"
+							]
+						},
+						"description": "Log in the user using the email and password"
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication routes to allow the user to get or refresh the JWT.\n\n\nTo be able to make the requests other than the auth, you will need to send the JWT token on the header of the request as:\n```JSON\n\"Authorization\": \"Bearer {{token}}\"\n```\n",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "47d00904-64e2-45b4-b377-b1f06dc453f8",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "d4892237-2a45-42ba-8417-4453d20082a6",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Public",
+			"item": [
+				{
+					"name": "/public/families",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/public/families?nis=10000000000&cityId=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"public",
+								"families"
+							],
+							"query": [
+								{
+									"key": "nis",
+									"value": "10000000000",
+									"description": "Family code"
+								},
+								{
+									"key": "cityId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Get family using the NIS code and the city ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/public/place-stores",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/public/place-stores?cityId=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"public",
+								"place-stores"
+							],
+							"query": [
+								{
+									"key": "cityId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Get list of place-stores on the city"
+					},
+					"response": []
+				}
+			],
+			"description": "Public endpoints that don't need an authorization token to be requested",
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Cities",
+			"item": [
+				{
+					"name": "/cities",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bbd3d500-1773-4ed2-848c-89f003013227",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set('cityId', jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "Belo Horizonte/MG",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/cities",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cities"
+							]
+						},
+						"description": "Create a new item using the defined data"
+					},
+					"response": []
+				},
+				{
+					"name": "/cities/:id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "Juiz de Fora/MG",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/cities/{{cityId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cities",
+								"{{cityId}}"
+							]
+						},
+						"description": "Update item using the defined data and unique ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/cities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/cities",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cities"
+							]
+						},
+						"description": "List of all items without any filter"
+					},
+					"response": []
+				},
+				{
+					"name": "/cities/:id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/cities/{{cityId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cities",
+								"{{cityId}}"
+							]
+						},
+						"description": "Get item detail using the unique ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/cities/:id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/cities/{{cityId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cities",
+								"{{cityId}}"
+							]
+						},
+						"description": "Delete item using the unique ID"
+					},
+					"response": []
+				}
+			],
+			"description": "Cities covered by the application",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "42aa2627-0008-48c0-ad44-4a91cfe57720",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "9ac24a10-1275-4ed0-9854-34fbb33175ca",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Places",
+			"item": [
+				{
+					"name": "/places",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bbd3d500-1773-4ed2-848c-89f003013227",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set('placeId', jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "Baraky Corporation",
+									"type": "text"
+								},
+								{
+									"key": "cityId",
+									"value": "{{cityId}}",
+									"type": "text",
+									"disabled": true
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/places",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"places"
+							]
+						},
+						"description": "Create a new item using the defined data"
+					},
+					"response": []
+				},
+				{
+					"name": "/places/:id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "Baraky Corp.",
+									"type": "text"
+								},
+								{
+									"key": "cityId",
+									"value": "{{cityId}}",
+									"type": "text",
+									"disabled": true
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/places/{{placeId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"places",
+								"{{placeId}}"
+							]
+						},
+						"description": "Update item using the defined data and unique ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/places",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/places",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"places"
+							]
+						},
+						"description": "List of all items without any filter"
+					},
+					"response": []
+				},
+				{
+					"name": "/places/:id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/places/{{placeId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"places",
+								"{{placeId}}"
+							]
+						},
+						"description": "Get item detail using the unique ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/places/:id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/places/{{placeId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"places",
+								"{{placeId}}"
+							]
+						},
+						"description": "Delete item using the unique ID"
+					},
+					"response": []
+				}
+			],
+			"description": "Places that the family can go to use the benefit",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "42aa2627-0008-48c0-ad44-4a91cfe57720",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "9ac24a10-1275-4ed0-9854-34fbb33175ca",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Place Stores",
+			"item": [
+				{
+					"name": "/place-stores",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bbd3d500-1773-4ed2-848c-89f003013227",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set('placeStoreId', jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "BC Centro",
+									"type": "text"
+								},
+								{
+									"key": "cityId",
+									"value": "{{cityId}}",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "placeId",
+									"value": "{{placeId}}",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "Rua Central, Bairro Centro",
+									"description": "Just the first line of the address",
+									"type": "text"
+								},
+								{
+									"key": "cnpj",
+									"value": "0000",
+									"description": "Brazilian company register",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/place-stores",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"place-stores"
+							]
+						},
+						"description": "Create a new item using the defined data"
+					},
+					"response": []
+				},
+				{
+					"name": "/place-stores/:id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bbd3d500-1773-4ed2-848c-89f003013227",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set('placeStoreId', jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "BC Centro",
+									"type": "text"
+								},
+								{
+									"key": "cityId",
+									"value": "{{cityId}}",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "placeId",
+									"value": "{{placeId}}",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "Rua Central, Bairro Centro",
+									"description": "Just the first line of the address",
+									"type": "text"
+								},
+								{
+									"key": "cnpj",
+									"value": "0000",
+									"description": "Brazilian company register",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/place-stores/{{placeStoreId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"place-stores",
+								"{{placeStoreId}}"
+							]
+						},
+						"description": "Update an item using the defined data and the unique ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/place-stores",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/place-stores",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"place-stores"
+							]
+						},
+						"description": "List of all items without any filter"
+					},
+					"response": []
+				},
+				{
+					"name": "/place-stores/:id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/place-stores/{{placeStoreId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"place-stores",
+								"{{placeStoreId}}"
+							]
+						},
+						"description": "Get item detail using the unique ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/place-stores/:id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/place-stores/{{placeStoreId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"place-stores",
+								"{{placeStoreId}}"
+							]
+						},
+						"description": "Delete item using the unique ID"
+					},
+					"response": []
+				}
+			],
+			"description": "Stores covered by the application, where the family can use the benefit",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "42aa2627-0008-48c0-ad44-4a91cfe57720",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "9ac24a10-1275-4ed0-9854-34fbb33175ca",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "/users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bbd3d500-1773-4ed2-848c-89f003013227",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set('userId', jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "João Baraky",
+									"type": "text"
+								},
+								{
+									"key": "cityId",
+									"value": "{{cityId}}",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "placeStoreId",
+									"value": "{{placeStoreId}}",
+									"type": "text"
+								},
+								{
+									"key": "cpf",
+									"value": "00000000000",
+									"description": "Brazilian personal register",
+									"type": "text"
+								},
+								{
+									"key": "role",
+									"value": "admin",
+									"description": "Possible values: admin | manager | financial | operator",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "user@admin.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "1234",
+									"type": "text"
+								},
+								{
+									"key": "active",
+									"value": "true",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
+							]
+						},
+						"description": "Create a new item using the defined data"
+					},
+					"response": []
+				},
+				{
+					"name": "/users/:id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bbd3d500-1773-4ed2-848c-89f003013227",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set('userId', jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "João Baraky",
+									"type": "text"
+								},
+								{
+									"key": "cityId",
+									"value": "{{cityId}}",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "placeStoreId",
+									"value": "{{placeStoreId}}",
+									"type": "text"
+								},
+								{
+									"key": "cpf",
+									"value": "00000000000",
+									"description": "Brazilian personal register",
+									"type": "text"
+								},
+								{
+									"key": "role",
+									"value": "admin",
+									"description": "Possible values: admin | manager | financial | operator",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "user@admin.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "1234",
+									"type": "text"
+								},
+								{
+									"key": "active",
+									"value": "true",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}"
+							]
+						},
+						"description": "Update item using the defined data and unique ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
+							]
+						},
+						"description": "List of all items without any filter"
+					},
+					"response": []
+				},
+				{
+					"name": "/users/:id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}"
+							]
+						},
+						"description": "Get item detail using the unique ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/users/:id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}"
+							]
+						},
+						"description": "Delete item using the unique ID"
+					},
+					"response": []
+				}
+			],
+			"description": "User that will log on the system: Admin and Store users",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "42aa2627-0008-48c0-ad44-4a91cfe57720",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "9ac24a10-1275-4ed0-9854-34fbb33175ca",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Institutions",
+			"item": [
+				{
+					"name": "/institutions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bbd3d500-1773-4ed2-848c-89f003013227",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set('institutionId', jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "Government",
+									"type": "text"
+								},
+								{
+									"key": "cityId",
+									"value": "{{cityId}}",
+									"type": "text",
+									"disabled": true
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/institutions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"institutions"
+							]
+						},
+						"description": "Create a new item using the defined data"
+					},
+					"response": []
+				},
+				{
+					"name": "/institutions/:id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "Government",
+									"type": "text"
+								},
+								{
+									"key": "cityId",
+									"value": "{{cityId}}",
+									"type": "text",
+									"disabled": true
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/institutions/{{institutionId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"institutions",
+								"{{institutionId}}"
+							]
+						},
+						"description": "Update item using the defined data and unique ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/institutions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/institutions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"institutions"
+							]
+						},
+						"description": "List of all items without any filter"
+					},
+					"response": []
+				},
+				{
+					"name": "/institutions/:id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/institutions/{{institutionId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"institutions",
+								"{{institutionId}}"
+							]
+						},
+						"description": "Get item detail using the unique ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/institutions/:id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/institutions/{{institutionId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"institutions",
+								"{{institutionId}}"
+							]
+						},
+						"description": "Delete item using the unique ID"
+					},
+					"response": []
+				}
+			],
+			"description": "Institutions that will generate the benefits for the families",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "42aa2627-0008-48c0-ad44-4a91cfe57720",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "9ac24a10-1275-4ed0-9854-34fbb33175ca",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Benefits",
+			"item": [
+				{
+					"name": "/benefits",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bbd3d500-1773-4ed2-848c-89f003013227",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set('benefitId', jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "institutionId",
+									"value": "{{institutionId}}",
+									"type": "text"
+								},
+								{
+									"key": "title",
+									"value": "Municipal Social Help",
+									"type": "text"
+								},
+								{
+									"key": "groupName",
+									"value": "Extreme Poverty",
+									"type": "text"
+								},
+								{
+									"key": "month",
+									"value": "3",
+									"type": "text"
+								},
+								{
+									"key": "year",
+									"value": "2020",
+									"type": "text"
+								},
+								{
+									"key": "value",
+									"value": "500",
+									"description": "Individual money value in BRL",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/benefits",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"benefits"
+							]
+						},
+						"description": "Create a new item using the defined data"
+					},
+					"response": []
+				},
+				{
+					"name": "/benefits/:id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "institutionId",
+									"value": "{{institutionId}}",
+									"type": "text"
+								},
+								{
+									"key": "title",
+									"value": "Municipal Social Help",
+									"type": "text"
+								},
+								{
+									"key": "groupName",
+									"value": "Extreme Poverty",
+									"type": "text"
+								},
+								{
+									"key": "month",
+									"value": "3",
+									"type": "text"
+								},
+								{
+									"key": "year",
+									"value": "2020",
+									"type": "text"
+								},
+								{
+									"key": "value",
+									"value": "500",
+									"description": "Individual money value in BRL",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/benefits/{{benefitId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"benefits",
+								"{{benefitId}}"
+							]
+						},
+						"description": "Update item using the defined data and unique ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/benefits",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/benefits",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"benefits"
+							]
+						},
+						"description": "List of all items without any filter"
+					},
+					"response": []
+				},
+				{
+					"name": "/benefits/:id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/benefits/{{benefitId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"benefits",
+								"{{benefitId}}"
+							]
+						},
+						"description": "Get item detail using the unique ID"
+					},
+					"response": []
+				},
+				{
+					"name": "/benefits/:id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/benefits/{{benefitId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"benefits",
+								"{{benefitId}}"
+							]
+						},
+						"description": "Delete item using the unique ID"
+					},
+					"response": []
+				}
+			],
+			"description": "Benefits that the families can use in the places",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "42aa2627-0008-48c0-ad44-4a91cfe57720",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "9ac24a10-1275-4ed0-9854-34fbb33175ca",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Families",
+			"item": [
+				{
+					"name": "/families - Search by NIS",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7243e34e-59ec-4f42-8445-b3201463ec88",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set('familyId', jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/families?nis=10000000000",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"families"
+							],
+							"query": [
+								{
+									"key": "nis",
+									"value": "10000000000",
+									"description": "Family code"
+								}
+							]
+						},
+						"description": "Search the family by the responsible unique NIS (Número de Identificação Social)"
+					},
+					"response": []
+				},
+				{
+					"name": "/familes/file",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"description": "CSV file in the expected format",
+									"type": "file",
+									"src": "/Users/baraky/Projetos/resources4vulnerables/backend/docs/postman/files/families_example.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/families/file",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"families",
+								"file"
+							]
+						},
+						"description": "Send the CSV file with the family list that will be used to populate the database"
+					},
+					"response": []
+				},
+				{
+					"name": "/families/dashboard",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "d3af934c-b820-4347-b87a-2010f3b329d2",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/families/dashboard",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"families",
+								"dashboard"
+							]
+						},
+						"description": "Dashboard info for the families"
+					},
+					"response": []
+				}
+			],
+			"description": "Families that will receive the benefits",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "42aa2627-0008-48c0-ad44-4a91cfe57720",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "9ac24a10-1275-4ed0-9854-34fbb33175ca",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Consumptions",
+			"item": [
+				{
+					"name": "/consumptions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7243e34e-59ec-4f42-8445-b3201463ec88",
+								"exec": [
+									"// JSON DATA",
+									"const jsonData = JSON.parse(responseBody);",
+									"",
+									"// SET ENV VARS",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set('consumptionId', jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authTokenOperator}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "familyId",
+									"value": "{{familyId}}",
+									"type": "text"
+								},
+								{
+									"key": "value",
+									"value": "50",
+									"type": "text"
+								},
+								{
+									"key": "nfce",
+									"value": "00000",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/Users/baraky/Projetos/resources4vulnerables/backend/docs/postman/files/image_example.png"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/consumptions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"consumptions"
+							]
+						},
+						"description": "Search the family by the responsible unique NIS (Número de Identificação Social)"
+					},
+					"response": []
+				},
+				{
+					"name": "/consumptions/image",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authTokenOperator}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"description": "Image file",
+									"type": "file",
+									"src": "/Users/baraky/Projetos/resources4vulnerables/backend/docs/postman/files/image_example.png"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/consumptions/image",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"consumptions",
+								"image"
+							]
+						},
+						"description": "Send consumption image and save it to the storage"
+					},
+					"response": []
+				},
+				{
+					"name": "/consumptions/report",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/consumptions/report?minDate=02-20-2020&maxDate=05-30-2020&placeId=1&placeStoreId=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"consumptions",
+								"report"
+							],
+							"query": [
+								{
+									"key": "minDate",
+									"value": "02-20-2020",
+									"description": "Any format that the moment.js will understand"
+								},
+								{
+									"key": "maxDate",
+									"value": "05-30-2020",
+									"description": "Any format that the moment.js will understand"
+								},
+								{
+									"key": "placeId",
+									"value": "1",
+									"description": "Optional if sending the placeStoreId"
+								},
+								{
+									"key": "placeStoreId",
+									"value": "1",
+									"description": "Optional if sending the placeId"
+								}
+							]
+						},
+						"description": "Report about the consumptions in the defined interval"
+					},
+					"response": []
+				}
+			],
+			"description": "Families that will receive the benefits",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "42aa2627-0008-48c0-ad44-4a91cfe57720",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "9ac24a10-1275-4ed0-9854-34fbb33175ca",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "/dashboard",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"dashboard"
+							]
+						},
+						"description": "Basic dashboard endpoints, returning data about consumptions"
+					},
+					"response": []
+				}
+			],
+			"description": "General dashboard info endpoints",
+			"protocolProfileBehavior": {}
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{authTokenAdmin}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "adae17f8-0f9b-480e-9765-acfa50b4be39",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "658bd9ce-d4f4-4fff-92c6-5e5a942a57f8",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "3fc9e218-53b3-4a50-b791-3c7bba6a2018",
+			"key": "baseUrl",
+			"value": "http://localhost:3001",
+			"type": "string"
+		},
+		{
+			"id": "fbb208a8-fd7b-4188-9e67-b18f3e03f33a",
+			"key": "authTokenAdmin",
+			"value": "_token_",
+			"type": "string"
+		},
+		{
+			"id": "4e21da21-0c4f-4905-a4c3-2edbbbfa9b88",
+			"key": "refreshTokenAdmin",
+			"value": "_token_",
+			"type": "string"
+		},
+		{
+			"id": "797fb4d7-4129-44f7-b013-7a638158939c",
+			"key": "authTokenOperator",
+			"value": "_token_",
+			"type": "string"
+		},
+		{
+			"id": "5f1bc9f9-cc89-4650-b249-b52263b94b30",
+			"key": "refreshTokenOperator",
+			"value": "_token_",
+			"type": "string"
+		},
+		{
+			"id": "7c03b2bd-ea65-4976-b207-2554317a7232",
+			"key": "cityId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"id": "2de7606c-1218-468f-9141-0b153345eb6a",
+			"key": "placeId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"id": "c9081b92-e429-4b54-a36d-b12f0e459199",
+			"key": "placeStoreId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"id": "38445c67-1233-4ff1-9dd3-3eceffc2de28",
+			"key": "userId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"id": "fe712a68-f884-46e7-bc3a-1a798310e661",
+			"key": "institutionId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"id": "f596127a-ed33-45b9-9eb5-b0632fdf9263",
+			"key": "benefitId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"id": "b95e4bf9-cfaf-4880-95ea-0c543f9726f4",
+			"key": "familyId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"id": "24bb8e55-1486-4181-9d0d-6db4bf080b5a",
+			"key": "consumptionId",
+			"value": "1",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

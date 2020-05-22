@@ -1,0 +1,37 @@
+{
+  "env": {
+    "development": {
+      "plugins": [
+        [
+          "babel-plugin-styled-components",
+          {
+            "fileName": false,
+            "ssr": false
+          }
+        ]
+      ]
+    },
+    "production": {
+      "plugins": [
+        [
+          "babel-plugin-styled-components",
+          {
+            "displayName": false,
+            "ssr": false
+          }
+        ]
+      ]
+    },
+    "test": {
+      "plugins": [
+        [
+          "babel-plugin-styled-components",
+          {
+            "displayName": false,
+            "ssr": false
+          }
+        ]
+      ]
+    }
+  }
+}

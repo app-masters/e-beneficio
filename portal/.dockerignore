@@ -1,0 +1,5 @@
+node_modules
+*.log
+/public/env-config.js
+env-config.js
+build
