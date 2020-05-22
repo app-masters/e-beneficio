@@ -7,6 +7,11 @@ export const PanelStyle = {
   marginTop: 0
 };
 
+export const FooterImageWrapper = styled.div`
+  width: 100%;
+  max-width: 1200px;
+`;
+
 export const PriceLabelStyle = {
   fontSize: '12pt'
 } as React.CSSProperties;

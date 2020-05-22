@@ -11,6 +11,7 @@ import yup from '../../utils/yup';
 import { requestSaveConsumption } from '../../redux/consumption/actions';
 import { requestResetFamily } from '../../redux/family/actions';
 import { IconCheckStyle, ImageContainer, PriceStyle, PriceLabelStyle } from './styles';
+import { logging } from '../../utils/logging';
 
 /**
  * Clear NFCe QRCode result
@@ -65,7 +66,7 @@ export const StepQRCodeChose: React.FC<{ onPick: (pick: string) => void }> = ({ 
         baixo da nota e parece com o seguinte:
       </Typography.Paragraph>
       <ImageContainer>
-        <img src={require('../../assets/qrCodeImage.png')} height="80%" style={{ maxHeight: 200 }} />
+        <img src={require('../../assets/qrCodeImage.png')} alt="QRCode" height="80%" style={{ maxHeight: 200 }} />
       </ImageContainer>
       <Row typeof="flex" gutter={[16, 16]}>
         <Col span={'24'}>
@@ -271,7 +272,7 @@ export const ModalQrCode: React.FC<{ onClose: () => void; onQrRead: (nfce: strin
       .then((value) => {
         setPermission(value.state);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => logging.error(err));
   }, []);
 
   return (
@@ -288,7 +289,7 @@ export const ModalQrCode: React.FC<{ onClose: () => void; onQrRead: (nfce: strin
         <QrReader
           delay={200}
           resolution={800}
-          onError={console.error}
+          onError={logging.critical}
           onScan={(item) => {
             const nfce = handleQRCode(item);
             if (nfce) {

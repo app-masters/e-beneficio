@@ -192,7 +192,7 @@ export const findByNis = async (
     limit: 1,
     include: !populateDependents && !populateSchool ? [] : [{ model: db.dependents, as: 'dependents' }]
   });
-  if (populateSchool && family.dependents) {
+  if (family && populateSchool && family.dependents) {
     const yongerDepedent = family.dependents.sort((a, b) => moment(b.birthday).diff(moment(a.birthday)))[0];
     family.setDataValue('dependents', undefined);
     family.setDataValue('school' as 'id', yongerDepedent.schoolName);
