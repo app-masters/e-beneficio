@@ -7,6 +7,7 @@ import institutions from './institutions';
 import benefits from './benefits';
 import families from './families';
 import consumptions from './consumptions';
+import dependents from './dependents';
 
 /**
  * Seed all tables
@@ -21,6 +22,7 @@ const seedAll = async () => {
     await institutions.seed();
     await benefits.seed();
     await families.seed();
+    await dependents.seed();
     await consumptions.seed();
   } else {
     // Production seed - one city and admin user
