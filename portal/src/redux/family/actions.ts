@@ -29,7 +29,32 @@ export const requestGetFamily = (nis: string, cityId: string): ThunkResult<void>
       }
     } catch (error) {
       // Request failed: dispatch error
-      logging.error(error);
+      if (error.response) {
+        switch (Number(error.response.status)) {
+          case 404:
+            error.message =
+              'Não encontramos nenhuma família utilizando esse NIS.' +
+              'Tenha certeza que é o NIS do responsável familiar para conseguir consultar o saldo.';
+            break;
+          default:
+            logging.error(error);
+            error.message = 'Ocorreu um erro inesperado e os programadores já foram avisados.';
+            break;
+        }
+      } else if (error.message === 'Network Error') {
+        switch (error.message) {
+          case 'Network Error':
+            logging.critical(error);
+            error.message =
+              'Ocorreu um erro ao conectar aos nossos servidores.' +
+              'Verifique se a conexão com a internet está funcionando corretamente.';
+            break;
+          default:
+            logging.error(error);
+            error.message = 'Ocorreu um erro inesperado e os programadores já foram avisados';
+            break;
+        }
+      }
       dispatch(doGetFamilyFailed(error));
     }
   };

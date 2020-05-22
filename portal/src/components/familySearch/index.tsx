@@ -111,10 +111,7 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
       {familyError && !familyLoading && (
         <FamilyWrapper>
           <Card>
-            <Text>
-              Não encontramos nenhuma família utilizando esse NIS. Tenha certeza que é o NIS do responsável familiar
-              para conseguir consultar o saldo
-            </Text>
+            <Text>{familyError.message}</Text>
             <InfoContainer>
               <Button href={'#info'}>Mais informações</Button>
             </InfoContainer>

@@ -47,7 +47,7 @@ export const StepNIS: React.FC<{}> = () => {
 
   return (
     <Form layout="vertical" onSubmitCapture={handleSubmit}>
-      {familyError && <Alert message="" description={'NIS não encontrado'} type="error" />}
+      {familyError && <Alert message="" description={familyError.message} type="error" />}
       <Form.Item
         label="Código NIS do responsável"
         validateStatus={!!nisMeta.error && !!nisMeta.touched ? 'error' : ''}
