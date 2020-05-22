@@ -38,22 +38,16 @@ export const requestGetFamily = (nis: string, cityId: string): ThunkResult<void>
             break;
           default:
             logging.error(error);
-            error.message = 'Ocorreu um erro inesperado e os programadores já foram avisados.';
+            error.message = 'Ocorreu uma falha inesperada e já fomos avisados. Tente novamente em algumas horas.';
             break;
         }
-      } else if (error.message === 'Network Error') {
-        switch (error.message) {
-          case 'Network Error':
-            logging.critical(error);
-            error.message =
-              'Ocorreu um erro ao conectar aos nossos servidores.' +
-              'Verifique se a conexão com a internet está funcionando corretamente.';
-            break;
-          default:
-            logging.error(error);
-            error.message = 'Ocorreu um erro inesperado e os programadores já foram avisados';
-            break;
-        }
+      } else if (error.message === 'Network Error' && !window.navigator.onLine) {
+        error.message =
+          'Ocorreu um erro ao conectar ao servidor. ' +
+          'Verifique se a conexão com a internet está funcionando corretamente.';
+      } else {
+        logging.error(error);
+        error.message = 'Ocorreu uma falha inesperada e já fomos avisados. Tente novamente em algumas horas.';
       }
       dispatch(doGetFamilyFailed(error));
     }
