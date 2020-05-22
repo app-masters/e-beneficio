@@ -2,6 +2,7 @@ import { createAction } from '@reduxjs/toolkit';
 import { ThunkResult } from '../store';
 import { backend } from '../../utils/networking';
 import { Family } from '../../interfaces/family';
+import { logging } from '../../utils/logging';
 
 // Simple actions and types
 export const doResetFamily = createAction<void>('family/RESET');
@@ -28,6 +29,7 @@ export const requestGetFamily = (nis: string, cityId: string): ThunkResult<void>
       }
     } catch (error) {
       // Request failed: dispatch error
+      logging.error(error);
       dispatch(doGetFamilyFailed(error));
     }
   };
