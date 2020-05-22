@@ -17,7 +17,9 @@ setProject
 
 ### FILES AND FINAL PULL
 # BACKEND
-echo -e "\n# 4/9 - Pushing admin docker image to Google Container Registry...\n"
+echo -e "\n# > Pushing backend dockerfile...\n"
 docker push ${BACKEND_CONTAINER_IMAGE}
+echo -e "\n# > Pushing admin dockerfile...\n"
 docker push ${ADMIN_CONTAINER_IMAGE}
+echo -e "\n# > Pushing portal dockerfile...\n"
 docker push ${PORTAL_CONTAINER_IMAGE}

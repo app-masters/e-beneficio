@@ -21,10 +21,7 @@ if [[ -z ${GITHUB_RUN_ID} ]]; then
 else
     DAEMON="-d";
 fi
-echo "Daemon: ${DAEMON}"
 
-echo -e "\n\n# 8/9 - Updating remote machine...\n"
 gcloud compute ssh ${INSTANCE_NAME} --command="cd ${REMOTE_PATH} && docker network create nginx-proxy || true && docker-compose pull && docker-compose down && docker-compose up ${DAEMON} --remove-orphans"
-#gcloud compute ssh ${INSTANCE_NAME} --command="cd ${REMOTE_PATH} && docker network create nginx-proxy || true && docker-compose pull && docker-compose up ${DAEMON} --remove-orphans"
 
-echo -e "\n\n# 9/9 - Waiting healthy response...\n"
+#echo -e "\n\n# 9/9 - Waiting healthy response...\n"

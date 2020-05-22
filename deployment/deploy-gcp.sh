@@ -26,5 +26,5 @@ echo -e "\n# 4/5 - Copying config files to remote machine...\n"
 source 3-copy-files.sh $1
 
 ### FILES AND FINAL PULL
-echo -e "\n# 5/5 - Copying config files to remote machine...\n"
+echo -e "\n# 5/5 - Updating remote server...\n"
 source 4-update-server.sh $1

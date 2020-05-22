@@ -16,8 +16,6 @@ setProject
 
 
 ### FILES AND FINAL PULL
-echo -e "\n# 7/9 - Copying config files to remote machine...\n"
-cd deployment
 FILE=./${ENV}/docker-compose.yml
 if test -f "$FILE"; then
     gcloud compute scp ${FILE} ${INSTANCE_NAME}:${REMOTE_PATH}
