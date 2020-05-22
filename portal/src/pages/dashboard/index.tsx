@@ -152,8 +152,11 @@ export const DashboardPage: React.FC<{}> = () => {
                 </Panel>
                 <Panel header="Obter mais informações" key="info">
                   <Text>
-                    Para obter mais informações, ligue para {env.REACT_APP_ENV_INFO_PHONE} ou entre no seguinte link e
-                    estaremos prontos para te ajudar
+                    Para obter mais informações, ligue para{' '}
+                    {env.REACT_APP_ENV_INFO_PHONE && env.REACT_APP_ENV_INFO_PHONE.length > 0
+                      ? env.REACT_APP_ENV_INFO_PHONE
+                      : '(32)3690-7342 ou (32)3690-8196 (Secretaria de Educação) (32)3690-7681 ou (32)2104-8177 (SEDETA),'}{' '}
+                    ou entre no seguinte link e estaremos prontos para te ajudar
                   </Text>
                   <PanelActionContainer>
                     <Button href={env.REACT_APP_ENV_INFO_LINK} target="_blank">
