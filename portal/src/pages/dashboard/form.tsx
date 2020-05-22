@@ -65,7 +65,7 @@ export const StepQRCodeChose: React.FC<{ onPick: (pick: string) => void }> = ({ 
         baixo da nota e parece com o seguinte:
       </Typography.Paragraph>
       <ImageContainer>
-        <img src={require('../../assets/qrCodeImage.png')} height="80%" style={{ maxHeight: 200 }} />
+        <img src={require('../../assets/qrCodeImage.png')} alt="QRCode" height="80%" style={{ maxHeight: 200 }} />
       </ImageContainer>
       <Row typeof="flex" gutter={[16, 16]}>
         <Col span={'24'}>
