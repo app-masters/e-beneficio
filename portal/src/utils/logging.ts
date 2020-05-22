@@ -27,7 +27,6 @@ const loggedLastHour = (message: string | object) => {
  * Setup Rollbar
  */
 const createRollbar = (): Rollbar => {
-
   const rollbar = new Rollbar({
     accessToken: env.REACT_APP_ENV_ROLLBAR_SERVER_TOKEN,
     environment: env.REACT_APP_ENV_ROLLBAR_ENVIRONMENT,
