@@ -10,7 +10,8 @@ import {
   Container,
   LogoContainer,
   ActionContainer,
-  FooterImageContainer
+  FooterImageContainer,
+  FooterImageWrapper
 } from './styles';
 import { FamilySearch } from '../../components/familySearch';
 import { Flex } from '../../components/flex';
@@ -182,6 +183,39 @@ export const DashboardPage: React.FC<{}> = () => {
             </Card>
           </BodyContainer>
         </Container>
+
+        <Container>
+          <BodyContainer id="bought">
+            <Title level={4}>O que posso comprar com meu saldo do programa?</Title>
+            <Card size="small">
+              <Collapse bordered={false} style={PanelStyle}>
+                <Panel header="Pode ser comprado" key="canBought">
+                  <Paragraph>
+                    Poderão ser adquiridos com o cartão Vale-Alimentação os seguintes alimentos para atender as
+                    necessidades alimentares especiais dos alunos: alimentos in natura como frutas, legumes, verduras,
+                    carnes, arroz, feijão, macarrão, farinha, laticínios, fubá, grãos, ovos, queijo, pão, frutas,
+                    legumes, verduras e ovos; minimamente processados como os cereais, as leguminosas, as farinhas,
+                    macarrão ou massa fresca ou seca, as carnes resfriadas ou congeladas e os leites; e processados como
+                    as conservas, as frutas em caldas ou cristalizadas, extratos ou concentrados de tomate, carnes
+                    salgadas e peixes enlatados, queijos e pães.
+                  </Paragraph>
+                </Panel>
+                <Panel header="Não pode ser comprado" key="cantBought">
+                  <Paragraph>
+                    É expressamente proibida a compra de alimentos ultraprocessados como por exemplo, bebida alcoólica,
+                    refrigerante, sorvete, bala, doce, petiscos, biscoitos, e guloseimas em geral, cereais açucarados,
+                    bolos prontos e misturas para bolo, barras de cereal, sopas prontas, macarrão e temperos
+                    ‘instantâneos’, molhos, salgadinhos “de pacote”, refrescos e refrigerantes, iogurtes e bebidas
+                    lácteas adoçados e aromatizados, bebidas energéticas, produtos congelados e prontos para aquecimento
+                    como pratos de massas, pizzas, hambúrgueres e extratos de carne de frango ou peixe empanados do tipo
+                    nuggets, salsichas e outros embutidos.
+                  </Paragraph>
+                </Panel>
+              </Collapse>
+            </Card>
+          </BodyContainer>
+        </Container>
+
         <Footer>
           <Flex vertical justifyContent="center" alignItems="center">
             <Paragraph style={{ textAlign: 'center' }}>
@@ -194,18 +228,18 @@ export const DashboardPage: React.FC<{}> = () => {
                 {'GitHub'}
               </a>
             </Paragraph>
-            <div
-              style={{
-                width: '100%',
-                maxWidth: 1200
-              }}
-            >
+            <FooterImageWrapper>
               <Row style={{ flex: 1, justifyContent: 'space-around' }}>
                 <Col>
                   <Paragraph style={{ textAlign: 'center', fontSize: 12 }}>Desenvolvido pela</Paragraph>
                   <FooterImageContainer>
                     <a href="https://appmasters.io/pt">
-                      <img src={require('../../assets/AppMastersLogo.png')} width={'100%'} style={{ maxWidth: 180 }} />
+                      <img
+                        src={require('../../assets/AppMastersLogo.png')}
+                        alt="AppMastersLogo"
+                        width={'100%'}
+                        style={{ maxWidth: 180 }}
+                      />
                     </a>
                   </FooterImageContainer>
                 </Col>
@@ -215,6 +249,7 @@ export const DashboardPage: React.FC<{}> = () => {
                     <a href="https://www.pjf.mg.gov.br/">
                       <img
                         src={require('../../assets/PrefJuizForaLogo.png')}
+                        alt="PJFLogo"
                         width={'100%'}
                         style={{ maxWidth: 180 }}
                       />
@@ -222,7 +257,7 @@ export const DashboardPage: React.FC<{}> = () => {
                   </FooterImageContainer>
                 </Col>
               </Row>
-            </div>
+            </FooterImageWrapper>
           </Flex>
         </Footer>
       </Layout>
