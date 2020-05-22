@@ -37,7 +37,7 @@ jobs:
         uses: rollbar/github-deploy-action@1.0.2
         with:
           environment: ${{ steps.vars.outputs.branch }}
-          version: ${{ steps.vars.outputs.sha_short }}
+          version: ${{ github.sha }}
           status: 'started'
         env:
           ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
@@ -59,14 +59,14 @@ jobs:
           ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
         with:
           environment: ${{ steps.vars.outputs.branch }}
-          version: ${{ steps.vars.outputs.sha_short }}
+          version: ${{ github.sha }}
           status: 'failed'
 
       - name: Notify success deploy to Rollbar
         uses: rollbar/github-deploy-action@1.0.2
         with:
           environment: ${{ steps.vars.outputs.branch }}
-          version: ${{ steps.vars.outputs.sha_short }}
+          version: ${{ github.sha }}
           status: 'succeeded'
         env:
           ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
