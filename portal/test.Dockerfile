@@ -16,9 +16,12 @@ WORKDIR /usr/share/nginx/html
 COPY --from=build /var/www/build /usr/share/nginx/html
 COPY ./env.sh /usr/share/nginx/html
 RUN rm /etc/nginx/conf.d/default.conf
-COPY ./nginx/nginx.production.conf /etc/nginx/conf.d/default.conf
+COPY ./nginx/nginx.test.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80 443
 
-## Run it! // ADD script to get env
-CMD ["sh", "-c", "sh /usr/share/nginx/html/env.sh && cat /usr/share/nginx/html/env-config.js && exec nginx -g 'daemon off;' "]
+## Run it (will create a env-config.js)
+#CMD ["sh", "-c", "sh /usr/share/nginx/html/env.sh && cat /usr/share/nginx/html/env-config.js && exec nginx -g 'daemon off;' "]
+
+## Run it (using YOUR env-config.js)
+CMD ["nginx", "-g", "daemon off;"]

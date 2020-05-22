@@ -37,11 +37,12 @@ export const DashboardPage: React.FC<{}> = () => {
             <LogoContainer>
               <img src={require('../../assets/logo.png')} alt="" />
             </LogoContainer>
-            <Title level={2} style={{ color: '#FFFFFF', marginBottom: 0 }}>
+            <Title level={1} style={{ color: '#FFFFFF', marginBottom: 0 }}>
               e-Benefício
             </Title>
-            <Title level={4} style={{ color: '#FFFFFF' }}>
-              Programa para famílias em situação de vulnerabilidade social
+            <Title level={2} style={{ color: '#FFFFFF', fontSize: '16pt' }}>
+              Programa da Prefeitura de Juiz de Fora para garantir alimentação para famílias em situação de
+              vulnerabilidade social
             </Title>
             <ActionContainer justify="center" gutter={[16, 16]}>
               <Col xs={{ span: 24 }} lg={{ span: 6 }}>

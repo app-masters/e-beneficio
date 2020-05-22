@@ -58,6 +58,7 @@ export const HeaderContent = styled.div`
   display: flex;
   width: 100%;
   height: 100%;
+  max-height: 1200px;
   flex-direction: column;
   background-color: #00000080;
   justify-content: center;
