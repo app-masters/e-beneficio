@@ -3,6 +3,7 @@ import { ThunkResult } from '../store';
 import { backend } from '../../utils/networking';
 import { Family } from '../../interfaces/family';
 import { logging } from '../../utils/logging';
+import analytics from '../../utils/analytics';
 
 // Simple actions and types
 export const doResetFamily = createAction<void>('family/RESET');
@@ -23,9 +24,17 @@ export const requestGetFamily = (nis: string, cityId: string): ThunkResult<void>
       if (response && response.data) {
         // Request finished
         dispatch(doGetFamilySuccess(response.data)); // Dispatch result
+
+        // Log the query to rollbar and GA
+        analytics.event('Consulta - participante do programa', 'Consulta', 'Participante');
+        logging.info('Consulta - participante do programa');
       } else {
         // Request finished, but no item was found
         dispatch(doGetFamilyFailed());
+
+        // Log the query to rollbar and GA
+        analytics.event('Consulta - não participante', 'Consulta', 'Não participante');
+        logging.info('Consulta - não participante');
       }
     } catch (error) {
       // Request failed: dispatch error
@@ -35,6 +44,10 @@ export const requestGetFamily = (nis: string, cityId: string): ThunkResult<void>
             error.message =
               'Não encontramos nenhuma família utilizando esse NIS.' +
               'Tenha certeza que é o NIS do responsável familiar para conseguir consultar o saldo.';
+
+            // Log the query to rollbar and GA
+            logging.info('Consulta - não participante');
+            analytics.event('Consulta - não participante', 'Consulta', 'Não participante');
             break;
           default:
             logging.error(error);
