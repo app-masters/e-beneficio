@@ -1,7 +1,7 @@
 import { QrcodeOutlined, WarningFilled, CheckOutlined } from '@ant-design/icons';
 import { Button, Modal, Row, Col, Typography, Form, InputNumber, Divider, Alert } from 'antd';
 import { useFormik } from 'formik';
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import QrReader from 'react-qr-reader';
 import { useSelector, useDispatch } from 'react-redux';
 import { FamilySearch } from '../../components/familyValidation';
@@ -255,19 +255,6 @@ export const ModalQrCode: React.FC<{ onClose: () => void; onQrRead: (nfce: strin
 }) => {
   const [permission, setPermission] = useState<string>('');
 
-  const updatePermission = useCallback(() => {
-    navigator.permissions
-      .query({ name: 'camera' })
-      .then((value) => {
-        setPermission(value.state);
-      })
-      .catch((err) => logging.error(err));
-  }, []);
-
-  useEffect(() => {
-    updatePermission();
-  }, [updatePermission]);
-
   return (
     <Modal
       okButtonProps={{ disabled: true, hidden: true }}
@@ -277,14 +264,16 @@ export const ModalQrCode: React.FC<{ onClose: () => void; onQrRead: (nfce: strin
       onCancel={onClose}
       visible={true}
     >
-      {permission !== 'denied' ? (
+      {permission !== 'denied' && permission !== 'notFound' ? (
         // Necessary to disable the camera
         <QrReader
           delay={200}
           resolution={800}
           onError={(error) => {
-            updatePermission();
-            logging.critical(error);
+            if (error.name === 'NotAllowedError') setPermission('denied');
+            else if (error.name === 'NotFoundError' || error.name === 'NoVideoInputDevicesError')
+              setPermission('notFound');
+            else logging.critical(error);
           }}
           onScan={(item) => {
             const nfce = handleQRCode(item);
@@ -294,7 +283,7 @@ export const ModalQrCode: React.FC<{ onClose: () => void; onQrRead: (nfce: strin
             } else console.log(new Date().getTime(), 'reading...');
           }}
         />
-      ) : (
+      ) : permission === 'denied' ? (
         <>
           <Typography.Title level={3}>{' Acesso não permitido a câmera.'}</Typography.Title>
           <Divider />
@@ -313,6 +302,12 @@ export const ModalQrCode: React.FC<{ onClose: () => void; onQrRead: (nfce: strin
               <li>Clique em Fechar e em seguida clique no botão de leitura novamente.</li>
             </ul>
           </Typography>
+        </>
+      ) : (
+        <>
+          <Typography.Title level={3}>{'Falha ao acessar a câmera.'}</Typography.Title>
+          <Divider />
+          <Typography.Paragraph>Ocorreu um erro ao acessar a câmera do aparelho.</Typography.Paragraph>
         </>
       )}
     </Modal>
