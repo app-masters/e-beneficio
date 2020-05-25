@@ -33,6 +33,7 @@ export const ImageContainer = styled.div`
   flex-direction: column;
   align-items: center;
   padding: ${(props) => props.theme.spacing.md};
+  overflow: hidden;
 `;
 
 export const FooterImageContainer = styled.div`
