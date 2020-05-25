@@ -93,7 +93,7 @@ export const StepNoQRCode: React.FC<{ onBack: () => void; onConfirm: () => void 
     <div>
       <Typography.Paragraph>
         Sem o QRCode, precisamos que você entregue o comprovante da sua compra para que um responsável possa adicionar
-        sua compra na lista da recarga. Junto com a nota fiscal, trava seu documento.
+        sua compra na lista da recarga. Junto com a nota fiscal, traga seu documento.
       </Typography.Paragraph>
       <Typography.Paragraph>
         Entregue sua nota fiscal na Secreataria de Educação, no horário de 12:00 às 17:00 no endereço:
