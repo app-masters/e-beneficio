@@ -46,11 +46,6 @@ export const DashboardPage: React.FC<{}> = () => {
             </Title>
             <ActionContainer justify="center" gutter={[16, 16]}>
               <Col xs={{ span: 24 }} lg={{ span: 4 }}>
-                <Button block href={'/passo-a-passo'} type={'primary'}>
-                  Ver passo-a-passo
-                </Button>
-              </Col>
-              <Col xs={{ span: 24 }} lg={{ span: 4 }}>
                 <Button block href={'#saldo'} type={'primary'}>
                   Consultar saldo
                 </Button>
@@ -63,6 +58,11 @@ export const DashboardPage: React.FC<{}> = () => {
               <Col xs={{ span: 24 }} lg={{ span: 4 }}>
                 <Button block href={'#info'} type={'primary'}>
                   Informações sobre o programa
+                </Button>
+              </Col>
+              <Col xs={{ span: 24 }} lg={{ span: 4 }}>
+                <Button block href={'/passo-a-passo'} type={'primary'}>
+                  Ver passo-a-passo
                 </Button>
               </Col>
             </ActionContainer>

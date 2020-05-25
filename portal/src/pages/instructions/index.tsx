@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography, Layout, Card, Col, Row } from 'antd';
+import { Typography, Layout, Card, Col, Row, Button } from 'antd';
 import {
   PageContainer,
   HeaderContainer,
@@ -30,6 +30,9 @@ import imageStep07 from '../../assets/help/help_step2_08.jpg';
 const { Title, Paragraph } = Typography;
 const { Footer } = Layout;
 
+let step = 1;
+const totalSteps = 8;
+
 /**
  * Instructions page component
  * @param props component props
@@ -57,7 +60,7 @@ export const InstructionsPage: React.FC<{}> = () => {
           <BodyContainer id="help">
             <Title level={2}>Passo a passo na utilização do Cartão Vale Alimentação</Title>
             <Card size="small">
-              <Title level={4}>Passo 1 de 7</Title>
+              <Title level={4}>{`Passo ${step++} de ${totalSteps}`}</Title>
               <Paragraph>
                 <strong>Ao receber o cartão você receberá uma senha.</strong> Na primeira utilização o cartão já
                 desbloqueia. <strong>IMPORTANTE: não passe o cartão nem a senha para ninguém.</strong>
@@ -66,17 +69,18 @@ export const InstructionsPage: React.FC<{}> = () => {
                 <img style={{ width: '90%', alignSelf: 'center' }} src={ticketCard} alt="Cartão ticket alimentação" />
               </ImageContainer>
 
-              <Title level={4}>Passo 2 de 7</Title>
+              <Title level={4}>{`Passo ${step++} de ${totalSteps}`}</Title>
               <Paragraph>
                 Quando for ao mercado, antes de passar as compras na esteira e o cartão na máquina, peça ao Caixa para
                 colocar o número do seu CPF na nota fiscal para que você consiga prestar contas e não tenha o cartão
                 bloqueado e o benefício suspenso.
               </Paragraph>
 
+              <Title level={4}>{`Passo ${step++} de ${totalSteps}`}</Title>
               <Paragraph>
-                Entre no site na parte <a href="/#compra">INFORMAR COMPRA</a> (Inclusão de Consumo – Informações
-                Iniciais) e digite o código do <strong>NIS da Referência Familiar</strong> e o aniversário do
-                responsável – não se esqueça de sempre apertar a tecla azul para <strong>confirmar a compra</strong>.
+                Entre na parte <a href="/#compra">INFORMAR COMPRA</a> e digite o código do{' '}
+                <strong>NIS da Referência Familiar</strong> e o aniversário do responsável – não se esqueça de sempre
+                apertar a tecla azul para <strong>confirmar a compra</strong>.
               </Paragraph>
 
               <ImageContainer>
@@ -89,7 +93,7 @@ export const InstructionsPage: React.FC<{}> = () => {
                 <img style={{ width: '130%' }} src={imageStep02} alt="Confirmar data de anivesário do responsável" />
               </ImageContainer>
 
-              <Title level={4}>Passo 3 de 7</Title>
+              <Title level={4}>{`Passo ${step++} de ${totalSteps}`}</Title>
               <Paragraph>
                 Confira se seus dados estão <strong>corretos</strong>. Não se esqueça de confirmar.
               </Paragraph>
@@ -97,7 +101,7 @@ export const InstructionsPage: React.FC<{}> = () => {
                 <img style={{ width: '130%' }} src={imageStep03} alt="Confira seus dados" />
               </ImageContainer>
 
-              <Title level={4}>Passo 4 de 7</Title>
+              <Title level={4}>{`Passo ${step++} de ${totalSteps}`}</Title>
               <Paragraph>
                 Pegue a sua <strong>Nota fiscal</strong> do mercado onde fez as compras e veja se ela tem esse
                 quadradinho. Ele se chama <strong>QRCode</strong>.
@@ -123,7 +127,7 @@ export const InstructionsPage: React.FC<{}> = () => {
                 <b> Avenida Getúlio Vargas, 200 - Segundo piso, Centro - Espaço Mascarenhas</b>
               </Typography.Paragraph>
 
-              <Title level={4}>Passo 5 de 7</Title>
+              <Title level={4}>{`Passo ${step++} de ${totalSteps}`}</Title>
               <Paragraph>
                 Digite o valor da sua compra no campo <strong>Valor total da compra</strong>.
               </Paragraph>
@@ -131,7 +135,7 @@ export const InstructionsPage: React.FC<{}> = () => {
                 <img style={{ width: '130%' }} src={imageStep06} alt="Selecione QR-Code" />
               </ImageContainer>
 
-              <Title level={4}>Passo 6 de 7</Title>
+              <Title level={4}>{`Passo ${step++} de ${totalSteps}`}</Title>
               <Paragraph>
                 Selecione a opção <strong>Ler código QRCode</strong> e aponte a câmera do seu celular para o QRCode na
                 sua <strong>Nota Fiscal</strong>.
@@ -140,10 +144,10 @@ export const InstructionsPage: React.FC<{}> = () => {
                 <img style={{ width: '130%' }} src={imageStep05} alt="Escaneie o QRCode" />
               </ImageContainer>
 
-              <Title level={4}>Passo 7 de 7</Title>
+              <Title level={4}>{`Passo ${step++} de ${totalSteps}`}</Title>
               <Paragraph>
-                <strong>Consumo Efetivado</strong> – Confira os dados da sua compra e{' '}
-                <strong>não se esqueça de confirmar.</strong>
+                <strong>Consumo Efetivado</strong> – Sua compra foi salva com sucesso e vamos avaliar ela para realizar
+                seu reembolso
               </Paragraph>
               <ImageContainer>
                 <img style={{ width: '130%' }} src={imageStep07} alt="Selecione QR-Code" />
@@ -152,6 +156,11 @@ export const InstructionsPage: React.FC<{}> = () => {
                 Você finalizou a prestação de contas. Não se esqueça de <a href="/#saldo">CONSULTAR O SALDO</a> antes de
                 qualquer compra.
               </Paragraph>
+              <Flex justifyContent="center">
+                <Button block href={'/'} type={'primary'}>
+                  Voltar para o início
+                </Button>
+              </Flex>
             </Card>
           </BodyContainer>
         </Container>
