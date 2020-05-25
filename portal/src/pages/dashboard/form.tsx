@@ -1,7 +1,7 @@
 import { QrcodeOutlined, WarningFilled, CheckOutlined } from '@ant-design/icons';
 import { Button, Modal, Row, Col, Typography, Form, InputNumber, Divider, Alert } from 'antd';
 import { useFormik } from 'formik';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import QrReader from 'react-qr-reader';
 import { useSelector, useDispatch } from 'react-redux';
 import { FamilySearch } from '../../components/familyValidation';
@@ -255,18 +255,7 @@ export const ModalQrCode: React.FC<{ onClose: () => void; onQrRead: (nfce: strin
 }) => {
   const [permission, setPermission] = useState<string>('');
 
-  useEffect(() => {
-    // if (navigator.getUserMedia) {
-    // navigator.getUserMedia({ video: true },
-    //   (localMediaStream) => {
-    //     setPermission(localMediaStream.active ? 'grant' : 'denied');
-    //   },
-    //   (err) => {
-    //     // Log the error to the console.
-    //     // alert(JSON.stringify(err));
-    //   }
-    // );
-    // } else {
+  const updatePermission = useCallback(() => {
     navigator.permissions
       .query({ name: 'camera' })
       .then((value) => {
@@ -274,6 +263,10 @@ export const ModalQrCode: React.FC<{ onClose: () => void; onQrRead: (nfce: strin
       })
       .catch((err) => logging.error(err));
   }, []);
+
+  useEffect(() => {
+    updatePermission();
+  }, [updatePermission]);
 
   return (
     <Modal
@@ -289,7 +282,10 @@ export const ModalQrCode: React.FC<{ onClose: () => void; onQrRead: (nfce: strin
         <QrReader
           delay={200}
           resolution={800}
-          onError={logging.critical}
+          onError={(error) => {
+            updatePermission();
+            logging.critical(error);
+          }}
           onScan={(item) => {
             const nfce = handleQRCode(item);
             if (nfce) {
