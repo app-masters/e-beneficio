@@ -1,7 +1,7 @@
 import styled from 'styled-components';
+import { Flex } from '../../components/flex';
 
-export const ItemContainer = styled.div`
-  display: flex;
+export const ItemContainer = styled(Flex)`
   flex-direction: column;
 `;
 
