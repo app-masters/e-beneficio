@@ -41,6 +41,8 @@ export const Flex = styled.div<FlexProps>`
   flex component for your specific case instead. */
 
   display: flex;
+  flex: 1 0 auto;
+
   align-items: ${(props) => (props.alignItems ? props.alignItems : 'initial')};
   justify-content: ${(props) => (props.justifyContent ? props.justifyContent : 'initial')};
   flex-direction: ${(props) => (props.vertical ? 'column' : 'row')};
