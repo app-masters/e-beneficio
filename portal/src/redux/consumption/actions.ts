@@ -38,16 +38,14 @@ export const requestSaveConsumption = (
         dispatch(doSaveConsumptionSuccess(response.data)); // Dispatch result
         if (onSuccess) onSuccess();
 
-        // Log the query to rollbar and GA
-        logging.info('Consumo - com sucesso');
+        // Log the query to GA
         analytics.event('Consumo - com sucesso', 'Consumo', 'Incluído');
       } else {
         // Request without response - probably won't happen, but cancel the request
         dispatch(doSaveConsumptionFailed());
         if (onFailure) onFailure();
 
-        // Log the query to rollbar and GA
-        logging.info('Consumo - falha na inclusão');
+        // Log the query to GA
         analytics.event('Consumo - falha na inclusão', 'Consumo', 'Falha na inclusão');
       }
     } catch (error) {
@@ -56,8 +54,7 @@ export const requestSaveConsumption = (
       dispatch(doSaveConsumptionFailed(error));
       if (onFailure) onFailure(error);
 
-      // Log the query to rollbar and GA
-      logging.info('Consumo - falha na inclusão');
+      // Log the query to GA
       analytics.event('Consumo - falha na inclusão', 'Consumo', 'Falha na inclusão');
     }
   };
