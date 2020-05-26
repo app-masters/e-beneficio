@@ -281,7 +281,6 @@ export const ModalQrCode: React.FC<{ onClose: () => void; onQrRead: (nfce: strin
             if (error.name === 'NotAllowedError') setPermission('denied');
             else if (error.name === 'NotFoundError' || error.name === 'NoVideoInputDevicesError') {
               setPermission('unsupported');
-              logging.info(usingIOS ? 'Unsupported iOS device' : 'Unsupported device', error);
             } else {
               setPermission('unknown');
               logging.error(error);
