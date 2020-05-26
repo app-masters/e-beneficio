@@ -255,6 +255,9 @@ export const ModalQrCode: React.FC<{ onClose: () => void; onQrRead: (nfce: strin
 }) => {
   const [permission, setPermission] = useState<string>('');
 
+  // Check for ios so the user is advised to use another device
+  const usingIOS = /(iPad|iPhone|iPod)/g.test(navigator?.userAgent || '');
+
   return (
     <Modal
       okButtonProps={{ disabled: true, hidden: true }}
@@ -264,16 +267,25 @@ export const ModalQrCode: React.FC<{ onClose: () => void; onQrRead: (nfce: strin
       onCancel={onClose}
       visible={true}
     >
-      {permission !== 'denied' && permission !== 'notFound' ? (
+      {// User needs to allow the user of the camera
+      permission !== 'denied' &&
+      // User device don't have a camera or it is not enabled (Apple errors falls here)
+      permission !== 'unsupported' &&
+      // Unknown error
+      permission !== 'unknown' ? (
         // Necessary to disable the camera
         <QrReader
           delay={200}
           resolution={800}
           onError={(error) => {
             if (error.name === 'NotAllowedError') setPermission('denied');
-            else if (error.name === 'NotFoundError' || error.name === 'NoVideoInputDevicesError')
-              setPermission('notFound');
-            else logging.critical(error);
+            else if (error.name === 'NotFoundError' || error.name === 'NoVideoInputDevicesError') {
+              setPermission('unsupported');
+              logging.info(usingIOS ? 'Unsupported iOS device' : 'Unsupported device', error);
+            } else {
+              setPermission('unknown');
+              logging.error(error);
+            }
           }}
           onScan={(item) => {
             const nfce = handleQRCode(item);
@@ -307,7 +319,19 @@ export const ModalQrCode: React.FC<{ onClose: () => void; onQrRead: (nfce: strin
         <>
           <Typography.Title level={3}>{'Falha ao acessar a câmera.'}</Typography.Title>
           <Divider />
-          <Typography.Paragraph>Ocorreu um erro ao acessar a câmera do aparelho.</Typography.Paragraph>
+          {usingIOS ? (
+            <Typography.Paragraph>
+              Infelizmente aparelhos iOS ainda não são suportados, tente acessar o site por outro aparelho
+            </Typography.Paragraph>
+          ) : (
+            <>
+              <Typography.Paragraph>Ocorreu um erro ao acessar a câmera do aparelho.</Typography.Paragraph>
+              <Typography.Paragraph>
+                Verifique se a câmera do seu aparelho está funcionando corretamente. Se o erro continuar, tente acessar
+                o site por outro dispositivo
+              </Typography.Paragraph>
+            </>
+          )}
         </>
       )}
     </Modal>
