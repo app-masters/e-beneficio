@@ -1,7 +1,7 @@
 import { QrcodeOutlined, WarningFilled, CheckOutlined } from '@ant-design/icons';
 import { Button, Modal, Row, Col, Typography, Form, InputNumber, Divider, Alert } from 'antd';
 import { useFormik } from 'formik';
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import QrReader from 'react-qr-reader';
 import { useSelector, useDispatch } from 'react-redux';
 import { FamilySearch } from '../../components/familyValidation';
@@ -93,7 +93,7 @@ export const StepNoQRCode: React.FC<{ onBack: () => void; onConfirm: () => void 
     <div>
       <Typography.Paragraph>
         Sem o QRCode, precisamos que você entregue o comprovante da sua compra para que um responsável possa adicionar
-        sua compra na lista da recarga. Junto com a nota fiscal, trava seu documento.
+        sua compra na lista da recarga. Junto com a nota fiscal, traga seu documento.
       </Typography.Paragraph>
       <Typography.Paragraph>
         Entregue sua nota fiscal na Secreataria de Educação, no horário de 12:00 às 17:00 no endereço:
@@ -255,18 +255,8 @@ export const ModalQrCode: React.FC<{ onClose: () => void; onQrRead: (nfce: strin
 }) => {
   const [permission, setPermission] = useState<string>('');
 
-  const updatePermission = useCallback(() => {
-    navigator.permissions
-      .query({ name: 'camera' })
-      .then((value) => {
-        setPermission(value.state);
-      })
-      .catch((err) => logging.error(err));
-  }, []);
-
-  useEffect(() => {
-    updatePermission();
-  }, [updatePermission]);
+  // Check for ios so the user is advised to use another device
+  const usingIOS = /(iPad|iPhone|iPod)/g.test(navigator?.userAgent || '');
 
   return (
     <Modal
@@ -277,14 +267,24 @@ export const ModalQrCode: React.FC<{ onClose: () => void; onQrRead: (nfce: strin
       onCancel={onClose}
       visible={true}
     >
-      {permission !== 'denied' ? (
+      {// User needs to allow the user of the camera
+      permission !== 'denied' &&
+      // User device don't have a camera or it is not enabled (Apple errors falls here)
+      permission !== 'unsupported' &&
+      // Unknown error
+      permission !== 'unknown' ? (
         // Necessary to disable the camera
         <QrReader
           delay={200}
           resolution={800}
           onError={(error) => {
-            updatePermission();
-            logging.critical(error);
+            if (error.name === 'NotAllowedError') setPermission('denied');
+            else if (error.name === 'NotFoundError' || error.name === 'NoVideoInputDevicesError') {
+              setPermission('unsupported');
+            } else {
+              setPermission('unknown');
+              logging.error(error);
+            }
           }}
           onScan={(item) => {
             const nfce = handleQRCode(item);
@@ -294,7 +294,7 @@ export const ModalQrCode: React.FC<{ onClose: () => void; onQrRead: (nfce: strin
             } else console.log(new Date().getTime(), 'reading...');
           }}
         />
-      ) : (
+      ) : permission === 'denied' ? (
         <>
           <Typography.Title level={3}>{' Acesso não permitido a câmera.'}</Typography.Title>
           <Divider />
@@ -313,6 +313,24 @@ export const ModalQrCode: React.FC<{ onClose: () => void; onQrRead: (nfce: strin
               <li>Clique em Fechar e em seguida clique no botão de leitura novamente.</li>
             </ul>
           </Typography>
+        </>
+      ) : (
+        <>
+          <Typography.Title level={3}>{'Falha ao acessar a câmera.'}</Typography.Title>
+          <Divider />
+          {usingIOS ? (
+            <Typography.Paragraph>
+              Infelizmente aparelhos iOS ainda não são suportados, tente acessar o site por outro aparelho
+            </Typography.Paragraph>
+          ) : (
+            <>
+              <Typography.Paragraph>Ocorreu um erro ao acessar a câmera do aparelho.</Typography.Paragraph>
+              <Typography.Paragraph>
+                Verifique se a câmera do seu aparelho está funcionando corretamente. Se o erro continuar, tente acessar
+                o site por outro dispositivo
+              </Typography.Paragraph>
+            </>
+          )}
         </>
       )}
     </Modal>

@@ -45,19 +45,24 @@ export const DashboardPage: React.FC<{}> = () => {
               vulnerabilidade social
             </Title>
             <ActionContainer justify="center" gutter={[16, 16]}>
-              <Col xs={{ span: 24 }} lg={{ span: 6 }}>
+              <Col xs={{ span: 24 }} lg={{ span: 4 }}>
                 <Button block href={'#saldo'} type={'primary'}>
                   Consultar saldo
                 </Button>
               </Col>
-              <Col xs={{ span: 24 }} lg={{ span: 6 }}>
+              <Col xs={{ span: 24 }} lg={{ span: 4 }}>
                 <Button block href={'#compra'} type={'primary'}>
                   Informar compra
                 </Button>
               </Col>
-              <Col xs={{ span: 24 }} lg={{ span: 6 }}>
+              <Col xs={{ span: 24 }} lg={{ span: 4 }}>
                 <Button block href={'#info'} type={'primary'}>
                   Informações sobre o programa
+                </Button>
+              </Col>
+              <Col xs={{ span: 24 }} lg={{ span: 4 }}>
+                <Button block href={'/passo-a-passo'} type={'primary'}>
+                  Ver passo-a-passo
                 </Button>
               </Col>
             </ActionContainer>

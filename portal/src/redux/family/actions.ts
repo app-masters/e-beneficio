@@ -25,16 +25,14 @@ export const requestGetFamily = (nis: string, cityId: string): ThunkResult<void>
         // Request finished
         dispatch(doGetFamilySuccess(response.data)); // Dispatch result
 
-        // Log the query to rollbar and GA
+        // Log the query to GA
         analytics.event('Consulta - participante do programa', 'Consulta', 'Participante');
-        logging.info('Consulta - participante do programa');
       } else {
         // Request finished, but no item was found
         dispatch(doGetFamilyFailed());
 
-        // Log the query to rollbar and GA
+        // Log the query to GA
         analytics.event('Consulta - não participante', 'Consulta', 'Não participante');
-        logging.info('Consulta - não participante');
       }
     } catch (error) {
       // Request failed: dispatch error
@@ -45,8 +43,7 @@ export const requestGetFamily = (nis: string, cityId: string): ThunkResult<void>
               'Não encontramos nenhuma família utilizando esse NIS.' +
               'Tenha certeza que é o NIS do responsável familiar para conseguir consultar o saldo.';
 
-            // Log the query to rollbar and GA
-            logging.info('Consulta - não participante');
+            // Log the query to GA
             analytics.event('Consulta - não participante', 'Consulta', 'Não participante');
             break;
           default:
