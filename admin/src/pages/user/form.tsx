@@ -1,14 +1,10 @@
-import { Alert, Checkbox, Form, Input, Modal, Select, Spin } from 'antd';
+import { Alert, Checkbox, Form, Input, Modal, Select } from 'antd';
 import { useFormik } from 'formik';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
 import { InputFormatter } from '../../components/inputFormatter';
-import { Place } from '../../interfaces/place';
-import { PlaceStore } from '../../interfaces/placeStore';
 import { User } from '../../interfaces/user';
-import { requestGetPlace } from '../../redux/place/actions';
-import { requestGetPlaceStore } from '../../redux/placeStore/actions';
 import { AppState } from '../../redux/rootReducer';
 import { requestSaveUser } from '../../redux/user/actions';
 import { formatCPF } from '../../utils/string';
@@ -18,7 +14,6 @@ import { roleList } from './../../utils/constraints';
 const { Option } = Select;
 
 const schema = yup.object().shape({
-  placeStoreId: yup.number().label('Loja').required(),
   name: yup.string().label('Nome').required(),
   password: yup.string().label('Senha').required(),
   cpf: yup.string().label('CPF').required(),
@@ -39,21 +34,9 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
     userReducer.list.find((item) => item.id === Number(props.match.params.id))
   );
   const loading = useSelector<AppState, boolean>(({ userReducer }) => userReducer.loading);
-  const placeStoreLoading = useSelector<AppState, boolean>(({ placeStoreReducer }) => placeStoreReducer.loading);
-  const placeStoreList = useSelector<AppState, PlaceStore[]>(({ placeStoreReducer }) => placeStoreReducer.list);
-  const placeList = useSelector<AppState, Place[]>(({ placeReducer }) => placeReducer.list);
 
   // Redux actions
   const dispatch = useDispatch();
-  useEffect(() => {
-    if (!placeStoreList || placeStoreList.length <= 0) {
-      dispatch(requestGetPlaceStore());
-    }
-
-    if (!placeList || placeList.length <= 0) {
-      dispatch(requestGetPlace());
-    }
-  }, [dispatch, placeStoreList, placeList]);
 
   const {
     handleSubmit,
@@ -69,7 +52,6 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
     getFieldProps
   } = useFormik({
     initialValues: user || {
-      placeStoreId: !placeStoreLoading && placeStoreList && placeStoreList.length > 0 ? placeStoreList[0].id : -1,
       name: '',
       password: '',
       cpf: '',
@@ -94,7 +76,6 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
   const passwordMeta = getFieldMeta('password');
   const cpfMeta = getFieldMeta('cpf');
   const emailMeta = getFieldMeta('email');
-  const placeStoreMeta = getFieldMeta('placeStoreId');
   const roleMeta = getFieldMeta('role');
   const activeMeta = getFieldMeta('active');
   const activeField = getFieldProps('active');
@@ -157,38 +138,6 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
               formatter={(value) => formatCPF(value?.toString())}
               parser={(value) => (value ? value.replace(/[./-]/g, '').trim() : '')}
             />
-          </Form.Item>
-
-          <Form.Item
-            label={'Loja'}
-            validateStatus={!!placeStoreMeta.error && !!placeStoreMeta.touched ? 'error' : ''}
-            help={!!placeStoreMeta.error && !!placeStoreMeta.touched ? placeStoreMeta.error : undefined}
-          >
-            <Select
-              disabled={placeStoreLoading}
-              defaultValue={values.placeStoreId?.toString()}
-              onSelect={(value) => setFieldValue('placeStoreId', Number(value))}
-              value={values.placeStoreId?.toString() || undefined}
-              notFoundContent={placeStoreLoading ? <Spin size="small" /> : null}
-              onChange={(value: string) => {
-                setFieldValue('placeStoreId', Number(value));
-              }}
-              onBlur={() => {
-                setFieldTouched('placeStoreId', true);
-              }}
-            >
-              {!placeStoreLoading &&
-                placeStoreList &&
-                placeStoreList.length > 0 &&
-                placeStoreList.map((placeStore) => (
-                  <Option key={placeStore.id} value={placeStore.id?.toString() || '-1'}>
-                    {placeList && placeList.length > 0
-                      ? `${placeList.find((place) => place.id === placeStore.placeId)?.title} - `
-                      : ''}
-                    {placeStore.title}
-                  </Option>
-                ))}
-            </Select>
           </Form.Item>
 
           <Form.Item
