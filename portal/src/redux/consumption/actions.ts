@@ -16,7 +16,7 @@ export const doSaveConsumptionFailed = createAction<Error | undefined>('consumpt
 export const requestSaveConsumption = (
   item: Pick<Consumption, 'familyId' | 'nfce' | 'proofImageUrl' | 'value'>,
   onSuccess?: () => void,
-  onFailure?: (error?: Error) => void
+  onFailure?: (error?: Error & { status?: number }) => void
 ): ThunkResult<void> => {
   return async (dispatch) => {
     try {

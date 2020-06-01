@@ -28,10 +28,11 @@ const schema = yup.object().shape({
  */
 const handleQRCode = (value: string | null) => {
   if (!value) return null;
+  return value;
   // https://nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=31200417745613005462650030000484351494810435|2|1|1|d3bfca6136abee66286116203f747bc8e6fd3300
-  const nfce = value.split('nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=')[1];
-  if (!nfce) return null; // Not a valid nfce QRCode
-  return nfce.split('|')[0];
+  // const nfce = value.split('nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=')[1];
+  // if (!nfce) return null; // Not a valid nfce QRCode
+  // return nfce.split('|')[0];
 };
 
 /**

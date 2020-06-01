@@ -151,8 +151,12 @@ export const StepWithQRCode: React.FC<{ onBack: () => void; onFinish: () => void
             () => {
               Modal.success({ title: 'Consumo salvo com sucesso', onOk: () => onFinish() });
             },
-            () => {
-              setStatus('Ocorreu um erro durante o processamento.');
+            (error) => {
+              if (error && error.message.indexOf('409') > -1) {
+                setStatus('Essa nota fiscal já está vinculada no nosso sistema');
+              } else {
+                setStatus('Ocorreu um erro durante o processamento. Por favor tente novamente em algumas horas');
+              }
             }
           )
         );

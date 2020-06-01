@@ -268,6 +268,9 @@ export const DashboardPage: React.FC<{}> = () => {
               </Row>
             </FooterImageWrapper>
           </Flex>
+          <Flex justifyContent="center" style={{ marginTop: '20px', fontSize: 10 }}>
+            <Paragraph type="secondary">{`Versão ${env.REACT_APP_VERSION || '0.0.1'}`}</Paragraph>
+          </Flex>
         </Footer>
       </Layout>
     </PageContainer>
