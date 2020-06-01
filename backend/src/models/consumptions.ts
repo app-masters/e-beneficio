@@ -173,8 +173,10 @@ export const addConsumption = async (
   // TODO: this is the main function of the entire application, but for now will be really basic
   const [consumption] = values.nfce ? await db.consumptions.findAll({ where: { nfce: values.nfce } }) : [null];
   if (consumption) {
-    logging.warning('Adding consumption with duplicated NFCe', { consumption: consumption.toJSON(), values });
-    // return consumption; // Just retuning it for now
+    if (process.env.NODE_ENV === 'development') {
+      return consumption;
+    }
+    throw { status: 409, message: 'Esse NFCe já foi registrado' };
   }
 
   // Checking everyting
