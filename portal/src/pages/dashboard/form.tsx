@@ -19,6 +19,10 @@ import { logging } from '../../utils/logging';
  */
 const handleQRCode = (value: string | null) => {
   if (!value) return null;
+  if (value.indexOf('nfce.fazenda.mg.gov.br') < 0) {
+    // Invalid QRCode
+    return 'invalid';
+  }
   return value;
   // // https://nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=31200417745613005462650030000484351494810435|2|1|1|d3bfca6136abee66286116203f747bc8e6fd3300
   // const nfce = value.split('nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=')[1];
@@ -130,7 +134,7 @@ export const StepWithQRCode: React.FC<{ onBack: () => void; onFinish: () => void
 
   const dispatch = useDispatch();
 
-  const { handleSubmit, values, getFieldMeta, status, setFieldValue } = useFormik({
+  const { handleSubmit, values, getFieldMeta, status, setFieldValue, setStatus } = useFormik({
     initialValues: {
       nfce: '',
       value: ''
@@ -222,7 +226,11 @@ export const StepWithQRCode: React.FC<{ onBack: () => void; onFinish: () => void
           Ler código QRCode
         </Button>
         {showQRModal && (
-          <ModalQrCode onQrRead={(nfce) => setFieldValue('nfce', nfce)} onClose={() => setQRModal(false)} />
+          <ModalQrCode
+            onQrRead={(nfce) => setFieldValue('nfce', nfce)}
+            onClose={() => setQRModal(false)}
+            onInvalid={setStatus}
+          />
         )}
       </Form.Item>
 
@@ -253,10 +261,11 @@ export const StepWithQRCode: React.FC<{ onBack: () => void; onFinish: () => void
  * ModalQrCode component
  * @param props component props
  */
-export const ModalQrCode: React.FC<{ onClose: () => void; onQrRead: (nfce: string) => void }> = ({
-  onClose,
-  onQrRead
-}) => {
+export const ModalQrCode: React.FC<{
+  onClose: () => void;
+  onQrRead: (nfce: string) => void;
+  onInvalid: (message?: string) => void;
+}> = ({ onClose, onQrRead, onInvalid }) => {
   const [permission, setPermission] = useState<string>('');
 
   // Check for ios so the user is advised to use another device
@@ -292,10 +301,23 @@ export const ModalQrCode: React.FC<{ onClose: () => void; onQrRead: (nfce: strin
           }}
           onScan={(item) => {
             const nfce = handleQRCode(item);
+            onInvalid();
             if (nfce) {
-              onQrRead(nfce);
-              onClose();
-            } else console.log(new Date().getTime(), 'reading...');
+              if (nfce !== 'invalid') {
+                // Readed and it's a valid code
+                onQrRead(nfce);
+                onClose();
+              } else {
+                // Readed but it's a invalid QRCode
+                onClose();
+                onInvalid(
+                  'Esse código QRCode não tem os dados da nota fiscal da compra. Se sua nota fiscal não tem outro QRCode, precisamos que traga a nota para a Secreataria de Educação, no horário de 12:00 às 17:00 no endereço: Avenida Getúlio Vargas, 200 - Segundo piso, Centro - Espaço Mascarenhas'
+                );
+              }
+            } else {
+              // Not readed yet
+              console.log(new Date().getTime(), 'reading...');
+            }
           }}
         />
       ) : permission === 'denied' ? (
