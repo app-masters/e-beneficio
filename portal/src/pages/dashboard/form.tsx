@@ -130,6 +130,7 @@ const schema = yup.object().shape({
  */
 export const StepWithQRCode: React.FC<{ onBack: () => void; onFinish: () => void }> = ({ onBack, onFinish }) => {
   const family = useSelector<AppState, Family | null | undefined>((state) => state.familyReducer.item);
+  const loading = useSelector<AppState, boolean>((state) => state.consumptionReducer.loading);
   const [showQRModal, setQRModal] = React.useState<boolean>(false);
 
   const dispatch = useDispatch();
@@ -143,7 +144,7 @@ export const StepWithQRCode: React.FC<{ onBack: () => void; onFinish: () => void
     onSubmit: (values, { setStatus }) => {
       setStatus();
       const invalidConsumptionValue = !!(family && Number(values.value) > family.balance);
-      if (family && !invalidConsumptionValue) {
+      if (!loading && family && !invalidConsumptionValue) {
         const data = {
           nfce: values.nfce,
           value: Number(values.value),
@@ -242,12 +243,7 @@ export const StepWithQRCode: React.FC<{ onBack: () => void; onFinish: () => void
             </Button>
           </Col>
           <Col span={'12'}>
-            <Button
-              block
-              type="primary"
-              // disabled={values.nfce === ''}
-              htmlType={'submit'}
-            >
+            <Button block type="primary" disabled={loading} htmlType="submit">
               Confirmar
             </Button>
           </Col>
