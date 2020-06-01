@@ -207,7 +207,7 @@ const ConfirmFamily: React.FC<{ family: Family | null | undefined; onConfirm: ()
         <Descriptions layout="vertical" size="small" title="Família encontrada" colon={false} bordered>
           <Descriptions.Item label="Nome do responsável">{family?.responsibleName}</Descriptions.Item>
           <Descriptions.Item label="Data de nascimento do responsável">
-            {family?.responsibleBirthday ? moment(family?.responsibleBirthday).format('DD/MM/YYYY') : ''}
+            {family?.responsibleBirthday ? moment(family?.responsibleBirthday).utc().format('DD/MM/YYYY') : ''}
           </Descriptions.Item>
         </Descriptions>
         <FamilyActions>
