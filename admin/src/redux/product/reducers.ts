@@ -8,7 +8,7 @@ import {
   doSaveProductFailed,
   doDeleteProduct,
   doDeleteProductSuccess,
-  doDeleteProductFailed,
+  doDeleteProductFailed
 } from './actions';
 import { Product } from '../../interfaces/product';
 import { addToList } from '../../utils/list';

@@ -31,7 +31,7 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
 
   // Redux state
   const user = useSelector<AppState, User | undefined>(({ userReducer }) =>
-    userReducer.list.find((item: any) => item.id === Number(props.match.params.id))
+    userReducer.list.find((item: User) => item.id === Number(props.match.params.id))
   );
   const loading = useSelector<AppState, boolean>(({ userReducer }) => userReducer.loading);
 

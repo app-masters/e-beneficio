@@ -24,7 +24,7 @@ type TypeReducers = {
   reportReducer: ReportReducerState;
   dashboardReducer: DashboardReducerState;
   consumptionReducer: ConsumptionReducerState;
-  productReducer: ProductReducerState
+  productReducer: ProductReducerState;
 };
 
 const appReducer = combineReducers({

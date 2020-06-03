@@ -20,7 +20,7 @@ export const doDeleteProductFailed = createAction<Error | undefined>('product/DE
 /**
  * Get Product Thunk action
  */
-export const requestGetProduct = (id?: number): ThunkResult<void> => {
+export const requestGetProduct = (): ThunkResult<void> => {
   return async (dispatch) => {
     try {
       // Start request - starting loading state
@@ -56,7 +56,6 @@ export const requestSaveProduct = (
     try {
       // Start request - starting loading state
       dispatch(doSaveProduct());
-      
       // Request
       let response;
       if (item.id) {

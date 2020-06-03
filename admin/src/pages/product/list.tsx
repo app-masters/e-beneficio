@@ -27,20 +27,16 @@ export const ProductList: React.FC<{}> = () => {
     setTimeout(() => {
       setData(list);
     }, 1);
-  }, [list])
+  }, [list]);
 
   return (
     <PageContainer>
-      <Card
-        title={<Typography.Title>{`Produtos`}</Typography.Title>}
-      >
+      <Card title={<Typography.Title>{`Produtos`}</Typography.Title>}>
         <Table rowKey="id" dataSource={data}>
           <Table.Column title="Nome" dataIndex="name" />
           <Table.Column
             render={(item: Product) => {
-              return (
-                <ProductAction key={item.id} item={item}/>
-              );
+              return <ProductAction key={item.id} item={item} />;
             }}
           />
         </Table>
@@ -49,34 +45,41 @@ export const ProductList: React.FC<{}> = () => {
   );
 };
 
-
-
 /**
  * ProductAction component
  * @param props component props
  */
-export const ProductAction: React.FC<{item: Product}> = ({item}) => {
+export const ProductAction: React.FC<{ item: Product }> = ({ item }) => {
   const [isLoading, setLoading] = React.useState<string>('');
   // Redux actions
   const dispatch = useDispatch();
 
+  /**
+   * Function to change the status of a product
+   */
   const onValidateProduct = (item: Product, isValid: boolean) => () => {
     setLoading(isValid ? 'valid' : 'invalid');
     dispatch(requestSaveProduct(item, isValid));
-  }
+  };
 
   return (
     <ActionWrapper>
-      <Button 
+      <Button
         type="primary"
         disabled={isLoading === 'invalid'}
         onClick={onValidateProduct(item, true)}
-        loading={isLoading === 'valid'}>Válido</Button>
-      <Button 
-        danger 
+        loading={isLoading === 'valid'}
+      >
+        Válido
+      </Button>
+      <Button
+        danger
         disabled={isLoading === 'valid'}
         onClick={onValidateProduct(item, false)}
-        loading={isLoading === 'invalid'}>Inválido</Button>
+        loading={isLoading === 'invalid'}
+      >
+        Inválido
+      </Button>
     </ActionWrapper>
-  )
-}
+  );
+};
