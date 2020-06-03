@@ -6,7 +6,7 @@ import {
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  // ShopOutlined,
+  ShopOutlined,
   // SolutionOutlined,
   UserOutlined,
   HomeOutlined
@@ -36,6 +36,11 @@ const routes: RouteItem[] = [
     path: '/',
     icon: () => <HomeOutlined />,
     name: 'Início'
+  },
+  {
+    path: '/produto',
+    icon: () => <ShopOutlined />,
+    name: 'Produtos'
   },
   // {
   //   path: '/relatorios',

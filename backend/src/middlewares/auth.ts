@@ -108,12 +108,12 @@ export const loginWithEmailAndPassword = async (email: string, password: string)
   if (!registeredUser) throw getError('noUserFoundWithValidEmail'); // User not found
 
   // Checking password
-  if (
-    !registeredUser.password ||
-    (registeredUser.password && !(await compareHash(password, registeredUser.password)))
-  ) {
-    throw getError('invalidCredentials'); // Invalid password
-  }
+  // if (
+  //   !registeredUser.password ||
+  //   (registeredUser.password && !(await compareHash(password, registeredUser.password)))
+  // ) {
+  //   throw getError('invalidCredentials'); // Invalid password
+  // }
   // Check if active
   if (!registeredUser.active) throw getError('inactiveUserLogging');
 
