@@ -23,7 +23,7 @@ export const InstitutionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
 
   // Redux state
   const institution = useSelector<AppState, Institution | undefined>(({ institutionReducer }) =>
-    institutionReducer.list.find((item) => item.id === Number(props.match.params.id))
+    institutionReducer.list.find((item: Institution) => item.id === Number(props.match.params.id))
   );
 
   const loading = useSelector<AppState, boolean>(({ institutionReducer }) => institutionReducer.loading);
