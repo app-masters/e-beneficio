@@ -20,6 +20,7 @@ import benefitRoutes from './benefits';
 import familyRoutes from './families';
 import consumptionRoutes from './consumptions';
 import dashboardRoutes from './dashboard';
+import productsRoutes from './products';
 
 const router = express.Router();
 
@@ -58,6 +59,7 @@ router.use('/benefits', jwtMiddleware, benefitRoutes);
 router.use('/families', jwtMiddleware, familyRoutes);
 router.use('/consumptions', jwtMiddleware, consumptionRoutes);
 router.use('/dashboard', jwtMiddleware, dashboardRoutes);
+router.use('/products', jwtMiddleware, productsRoutes);
 router.use('/static', jwtMiddleware, express.static(`${path.dirname(__dirname)}/../database/storage`));
 
 export default router;
