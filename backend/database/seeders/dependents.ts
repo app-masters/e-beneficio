@@ -1,5 +1,5 @@
 import db from '../../src/schemas';
-import faker from 'faker';
+import faker from 'faker/locale/pt_BR';
 import logging from '../../src/utils/logging';
 import { Dependent } from '../../src/schemas/depedents';
 
@@ -14,13 +14,13 @@ const seed = async () => {
     const dependentsToCreate: Dependent[] = [];
     families.forEach(async (family) => {
       // Check if the family has at least one dependent
-      if (family.dependents && family.dependents.length === 0) {
+      if (family.dependents && family.dependents.length < 2) {
         const lastName = faker.name.lastName();
-        const numberOfDependents = Math.floor(1 + Math.random() * 4);
+        const numberOfDependents = 2;
         for (let i = 0; i < numberOfDependents; i++) {
           dependentsToCreate.push({
             familyId: family.id || 0,
-            name: `${faker.name.firstName()} ${lastName}`,
+            name: `${faker.name.firstName()} ${faker.name.lastName()} ${lastName}`.toLocaleUpperCase(),
             nis: new Array<string>(11)
               .fill('')
               .map(() => nisPattern[Math.floor(Math.random() * nisPattern.length)])
