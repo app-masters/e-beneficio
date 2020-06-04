@@ -73,6 +73,9 @@ export const attributes = {
     type: DataTypes.FLOAT,
     allowNull: false
   },
+  reviewedAt: {
+    type: DataTypes.DATE
+  },
   proofImageUrl: {
     type: DataTypes.STRING,
     allowNull: true
