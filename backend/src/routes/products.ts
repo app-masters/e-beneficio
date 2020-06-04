@@ -75,4 +75,18 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+/**
+ * Sub-route to DELETE an existing item
+ */
+router.delete('/:id', async (req, res) => {
+  try {
+    // Call the model
+    await productModel.deleteById(req.params.id);
+    res.send({ success: true });
+  } catch (error) {
+    logging.error(error);
+    res.status(500).send(error.message);
+  }
+});
+
 export default router;
