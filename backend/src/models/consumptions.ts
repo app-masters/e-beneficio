@@ -334,8 +334,9 @@ export const getConsumptionDashboardInfo = async (cityId: NonNullable<City['id']
  * Scrape the consumption nfce page for details about the purchase
  *
  * @param consumption Consumption object with the nfce link
+ * @param shouldThrow Whether this function should throw an error or just log (used by conjobs)
  */
-export const scrapeConsumption = async (consumption: Consumption) => {
+export const scrapeConsumption = async (consumption: Consumption, shouldThrow = false) => {
   try {
     const link = consumption.nfce;
     if (!link || !consumption.id) return;
@@ -357,6 +358,9 @@ export const scrapeConsumption = async (consumption: Consumption) => {
       })
     );
   } catch (error) {
+    if (shouldThrow) {
+      throw error;
+    }
     logging.error('Failed to scrape nfce link data', error);
   }
 };
