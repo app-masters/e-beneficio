@@ -11,6 +11,7 @@ import { Family } from '../../interfaces/family';
 import { requestSaveConsumption } from '../../redux/consumption/actions';
 import { AppState } from '../../redux/rootReducer';
 import yup from '../../utils/yup';
+import moment from 'moment';
 import { PageContainer } from './styles';
 import { ConsumptionFamilySearch } from '../../components/consumptionFamilySearch';
 
@@ -74,6 +75,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
   } = useFormik({
     initialValues: {
       nfce: '',
+      invalidValue: 0,
       value: 0,
       proofImageUrl: '',
       nisCode: '',
@@ -91,8 +93,10 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
             {
               nfce: values.nfce,
               value: Number(values.value),
+              invalidValue: Number(values.value),
               proofImageUrl: values.proofImageUrl,
-              familyId: values.familyId
+              familyId: values.familyId,
+              reviewedAt: moment().toDate()
             },
             () => {
               Modal.success({ title: 'Consumo salvo com sucesso', onOk: () => history.push('/') });
@@ -105,6 +109,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
   });
 
   const valueMeta = getFieldMeta('value');
+  const invalidValueMeta = getFieldMeta('invalidValue');
   const imageMeta = getFieldMeta('proofImageUrl');
   const nfceMeta = getFieldMeta('nfce');
 
@@ -112,6 +117,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
   const acceptCheckField = getFieldProps('acceptCheck');
 
   const invalidConsumptionValue = !!(family && family.balance && values.value > 0 && values.value > family.balance);
+  const invalidValueConsumption = !!(values.value < values.invalidValue);
 
   return (
     <PageContainer>
@@ -222,7 +228,36 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                     parser={(value) => (value ? value.replace(/(R)|(\$)/g, '').trim() : '')}
                   />
                 </Form.Item>
-
+                <Form.Item
+                  label="Valor total dos items inválidos"
+                  validateStatus={
+                    (!!invalidValueMeta.error && !!invalidValueMeta.touched) || invalidValueConsumption ? 'error' : ''
+                  }
+                  help={
+                    !!invalidValueMeta.error && !!invalidValueMeta.touched
+                      ? invalidValueMeta.error
+                      : invalidValueConsumption
+                      ? 'Valor maior que o valor da compra'
+                      : undefined
+                  }
+                >
+                  <InputNumber
+                    style={{ width: '100%' }}
+                    id="invalidValue"
+                    name="invalidValue"
+                    size="large"
+                    onChange={(value) => setFieldValue('invalidValue', value)}
+                    value={Number(values.invalidValue)}
+                    decimalSeparator=","
+                    step={0.01}
+                    min={0}
+                    precision={2}
+                    formatter={(value) =>
+                      value && Number(value) !== 0 && !Number.isNaN(Number(value)) ? `R$ ${value}` : ''
+                    }
+                    parser={(value) => (value ? value.replace(/(R)|(\$)/g, '').trim() : '')}
+                  />
+                </Form.Item>
                 <Form.Item
                   validateStatus={!!imageMeta.error && !!imageMeta.touched ? 'error' : ''}
                   help={!!imageMeta.error && !!imageMeta.touched ? imageMeta.error : undefined}

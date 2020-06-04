@@ -4,8 +4,10 @@ export interface Consumption {
   placeStoreId: number | string;
   nfce: string;
   value: number;
+  invalidValue: number;
   proofImageUrl?: string;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
+  reviewedAt?: number | Date | null;
 }

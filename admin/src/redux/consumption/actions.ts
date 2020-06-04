@@ -51,7 +51,7 @@ export const requestGetConsumption = (
  * Save consumption Thunk action
  */
 export const requestSaveConsumption = (
-  item: Pick<Consumption, 'familyId' | 'nfce' | 'proofImageUrl' | 'value'>,
+  item: Pick<Consumption, 'familyId' | 'nfce' | 'proofImageUrl' | 'value' | 'invalidValue' | 'reviewedAt'>,
   onSuccess?: () => void,
   onFailure?: (error?: Error) => void
 ): ThunkResult<void> => {
