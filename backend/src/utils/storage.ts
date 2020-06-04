@@ -8,6 +8,7 @@ interface Provider {
   download(localFilePath: string, remoteFileName: string): void;
   delete(remoteFileName: string): boolean | undefined;
   setProvider(storageProvider: Provider): void;
+  check(): Promise<boolean>;
 }
 
 const storage: Provider = {
@@ -29,6 +30,9 @@ const storage: Provider = {
   },
   setProvider: (storageProvider: Provider) => {
     storage.provider = storageProvider;
+  },
+  check: async () => {
+    return storage.provider?.check() || false;
   }
 };
 
