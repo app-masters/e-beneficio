@@ -65,6 +65,26 @@ const googleCloud = {
       logging.error(e);
       return false;
     }
+  },
+  check: async () => {
+    try {
+      const filePath = `${__dirname}/test.file`;
+      let result: any;
+      result = await googleCloud.upload(filePath, 'test.file');
+      if (!result) throw new Error('Google Cloud upload didt worked');
+      result = await googleCloud.exists('test.file');
+      if (!result) throw new Error('Google Cloud exists didt worked');
+      result = await googleCloud.findByPrefix('test');
+      if (!result) throw new Error('Google Cloud findByPrefix didt worked');
+      result = await googleCloud.download('test.file', filePath);
+      if (!result) throw new Error('Google Cloud download didt worked');
+      result = await googleCloud.delete('test.file');
+      if (!result) throw new Error('Google Cloud delete didt worked');
+      return true;
+    } catch (e) {
+      logging.error(e);
+      return false;
+    }
   }
 };
 
