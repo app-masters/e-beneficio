@@ -65,6 +65,6 @@ export const updateById = async (
 export const deleteById = async (id: NonNullable<BenefitProduct['id']>): Promise<void> => {
   const cityItem = await getById(id);
   if (cityItem) {
-    await db.benefits.destroy({ where: { id } });
+    await db.benefitProducts.destroy({ where: { id } });
   }
 };
