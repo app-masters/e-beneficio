@@ -358,18 +358,33 @@ export const importFamilyFromCSVFile = async (
  * @param cityId logged user city ID
  */
 export const getDashboardInfo = async (cityId: NonNullable<City['id']>) => {
+  const currentMonth = moment().month();
+
   const dashboard: { [key: string]: number | Date } = { total: 0 };
 
   const families = await db.families.findAll({
-    where: { cityId, deactivatedAt: null }
+    where: { cityId }
   });
-  dashboard.familyCount = families.length;
+
+  dashboard.familyCount = families.filter((f) => !f.deactivatedAt).length;
+  dashboard.familyDeactivatedCount = families.filter((f) => f.deactivatedAt).length;
+
+  dashboard.familyDeactivatedMonthCount = families.filter(
+    (f) => f.deactivatedAt && moment(f.deactivatedAt as Date).month() === currentMonth
+  ).length;
+  dashboard.familyCreatedMonthCount = families.filter(
+    (f) => moment(f.createdAt as Date).month() === currentMonth
+  ).length;
 
   const dependents = await db.dependents.findAll({
-    where: { deactivatedAt: null },
     include: [{ model: db.families, as: 'family', where: { deactivatedAt: null, cityId } }]
   });
-  dashboard.dependentCount = dependents.length;
+
+  dashboard.dependentCreatedMonthCount = dependents.filter(
+    (f) => !f.deactivatedAt && moment(f.createdAt as Date).month() === currentMonth
+  ).length;
+
+  dashboard.dependentCount = dependents.filter((f) => !f.deactivatedAt).length;
 
   const last = await db.families.max<SequelizeFamily, SequelizeFamily['createdAt']>('createdAt');
   if (last) {
