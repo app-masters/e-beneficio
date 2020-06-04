@@ -6,7 +6,7 @@ import { Product, SequelizeProduct } from '../schemas/products';
  * @returns Promise<List of items>
  */
 export const getAll = (): Promise<SequelizeProduct[]> => {
-  return db.products.findAll();
+  return db.products.findAll({ order: [['name', 'ASC']] });
 };
 
 /**
