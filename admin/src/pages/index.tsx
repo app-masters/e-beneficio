@@ -24,7 +24,9 @@ import { FamiliesList } from './families/list';
 import { FamilyForm } from './families/form';
 import { ConsumptionForm } from './consumption';
 import { ReportList } from './report';
+import { ProductValidationList } from './product/validationList';
 import { ProductList } from './product/list';
+import { ProductForm } from './product/form';
 
 /**
  * Router available only for logged users
@@ -38,7 +40,9 @@ const PrivateRouter: React.FC<{}> = () => {
       <>
         <Route path="/logout" component={LogoutPage} />
         {/* Product routes */}
-        <Route path="/produto" component={ProductList} />
+        <Route path="/validar" component={ProductValidationList} />
+        <Route path="/produtos" component={ProductList} />
+        <Route path="/produtos/:id" component={ProductForm} />
         {/* Report routes */}
         <Route path="/estabelecimentos" component={PlaceList} />
         {/* Place routes */}
