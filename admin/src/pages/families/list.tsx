@@ -118,17 +118,49 @@ export const FamiliesList: React.FC<{}> = () => {
         <Col span={24}>
           <Card loading={dashboardLoading}>
             <Row gutter={[16, 16]}>
-              <Col span={12}>
+              <Col span={8}>
+                <Statistic
+                  title={'Famílias beneficiadas este mês'}
+                  value={dashboardData?.familyCreatedMonthCount}
+                  groupSeparator={'.'}
+                />
+              </Col>
+              <Col span={8}>
+                <Statistic
+                  title={'Dependentes beneficiados este mês'}
+                  value={dashboardData?.dependentCreatedMonthCount}
+                  groupSeparator={'.'}
+                />
+              </Col>
+              <Col span={8}>
+                <Statistic
+                  title={'Famílias desativadas este mês'}
+                  value={dashboardData?.familyDeactivatedMonthCount}
+                  groupSeparator={'.'}
+                />
+              </Col>
+            </Row>
+
+            <Row gutter={[16, 16]}>
+              <Col span={8}>
                 <Statistic title={'Famílias beneficiadas'} value={dashboardData?.familyCount} groupSeparator={'.'} />
               </Col>
-              <Col span={12}>
+              <Col span={8}>
                 <Statistic
                   title={'Dependentes beneficiados'}
                   value={dashboardData?.dependentCount}
                   groupSeparator={'.'}
                 />
               </Col>
+              <Col span={8}>
+                <Statistic
+                  title={'Famílias desativadas'}
+                  value={dashboardData?.familyDeactivatedCount}
+                  groupSeparator={'.'}
+                />
+              </Col>
             </Row>
+
             <Divider />
             <Row gutter={[16, 16]}>
               <Col span={24} style={ColAlignRight}>

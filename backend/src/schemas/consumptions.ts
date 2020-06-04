@@ -22,8 +22,8 @@ export interface Consumption {
   value: number;
   invalidValue: number;
   proofImageUrl?: string;
-  purchaseData?: PurchaseData;
   reviewedAt?: number | Date | null;
+  purchaseData?: PurchaseData;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
@@ -71,10 +71,12 @@ export const attributes = {
   },
   invalidValue: {
     type: DataTypes.FLOAT,
-    allowNull: false
+    allowNull: true,
+    defaultValue: 0.0
   },
   reviewedAt: {
-    type: DataTypes.DATE
+    type: DataTypes.DATE,
+    allowNull: true
   },
   proofImageUrl: {
     type: DataTypes.STRING,
