@@ -55,6 +55,10 @@ router.post('/consumptions', async (req, res) => {
       }
     }
     const item = await consumptionModel.addConsumption({ ...req.body, proofImageUrl });
+
+    // Scrape the purchase data, but don't wait for it
+    consumptionModel.scrapeConsumption(item);
+
     return res.send(item);
   } catch (error) {
     logging.error(error);

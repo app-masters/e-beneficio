@@ -1,5 +1,18 @@
 import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize';
 
+export interface PurchaseData {
+  place?: string;
+  totalValue?: number;
+  payment: {
+    name?: string;
+    value?: number;
+  }[];
+  products: {
+    name?: string;
+    totalValue?: number;
+  }[];
+}
+
 // Simple item type
 export interface Consumption {
   readonly id?: number | string;
@@ -8,6 +21,7 @@ export interface Consumption {
   nfce?: string;
   value: number;
   proofImageUrl?: string;
+  purchaseData?: PurchaseData;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
@@ -55,6 +69,10 @@ export const attributes = {
   },
   proofImageUrl: {
     type: DataTypes.STRING,
+    allowNull: true
+  },
+  purchaseData: {
+    type: DataTypes.JSON,
     allowNull: true
   }
 };
