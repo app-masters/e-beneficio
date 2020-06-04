@@ -7,6 +7,7 @@ export const env = {
     window._env_?.REACT_APP_ENV_ROLLBAR_ENVIRONMENT || process.env.REACT_APP_ENV_ROLLBAR_ENVIRONMENT,
   REACT_APP_COMMIT_SHA: window._env_?.REACT_APP_COMMIT_SHA || process.env.REACT_APP_COMMIT_SHA,
   REACT_APP_ENV_CITY_ID: window._env_?.REACT_APP_ENV_CITY_ID || process.env.REACT_APP_ENV_CITY_ID,
-  REACT_APP_CONSUMPTION_TYPE: 'ticket',
+  REACT_APP_CONSUMPTION_TYPE:
+    window._env_?.REACT_APP_CONSUMPTION_TYPE || process.env.REACT_APP_CONSUMPTION_TYPE || 'ticket',
   NODE_ENV: window._env_?.NODE_ENV || process.env.NODE_ENV
 };
