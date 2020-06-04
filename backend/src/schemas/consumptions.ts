@@ -57,7 +57,12 @@ export const attributes = {
   },
   invalidValue: {
     type: DataTypes.FLOAT,
-    allowNull: false
+    allowNull: true,
+    defaultValue: 0.0
+  },
+  reviewedAt: {
+    type: DataTypes.DATE,
+    allowNull: true
   },
   proofImageUrl: {
     type: DataTypes.STRING,

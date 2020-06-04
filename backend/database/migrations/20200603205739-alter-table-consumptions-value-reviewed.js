@@ -7,7 +7,7 @@ module.exports = {
       await queryInterface.addColumn(
         'Consumptions',
         'invalidValue',
-        { type: Sequelize.FLOAT, allowNull: false },
+        { type: Sequelize.FLOAT, allowNull: true, defaultValue: 0.0 },
         { transaction }
       );
       await queryInterface.addColumn(
