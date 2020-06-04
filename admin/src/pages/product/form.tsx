@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Product } from '../../interfaces/product';
 import { AppState } from '../../redux/rootReducer';
 import { useFormik } from 'formik';
-import { Form, Modal, Alert, Input } from 'antd';
+import { Form, Modal, Alert, Input, Checkbox } from 'antd';
 import yup from '../../utils/yup';
 import { requestSaveProduct } from '../../redux/product/actions';
 
@@ -34,15 +34,15 @@ export const ProductForm: React.FC<RouteComponentProps<{ id: string }>> = (props
     handleChange,
     values,
     getFieldMeta,
+    getFieldProps,
     submitForm,
     status,
     errors,
-    touched,
-    setFieldValue,
-    setFieldTouched
+    touched
   } = useFormik({
     initialValues: product || {
-      name: ''
+      name: '',
+      isValid: true
     },
     validationSchema: schema,
     onSubmit: (values, { setStatus }) => {
@@ -50,7 +50,7 @@ export const ProductForm: React.FC<RouteComponentProps<{ id: string }>> = (props
       dispatch(
         requestSaveProduct(
           values,
-          true,
+          !!values.isValid,
           'insert',
           () => history.push('/produtos'),
           () => setStatus('Ocorreu um erro ao realizar a requisição.')
@@ -60,6 +60,7 @@ export const ProductForm: React.FC<RouteComponentProps<{ id: string }>> = (props
   });
 
   const nameMeta = getFieldMeta('name');
+  const isValidField = getFieldProps('isValid');
 
   return (
     <Modal
@@ -79,6 +80,11 @@ export const ProductForm: React.FC<RouteComponentProps<{ id: string }>> = (props
             help={!!nameMeta.error && !!nameMeta.touched ? nameMeta.error : undefined}
           >
             <Input id="name" name="name" onChange={handleChange} value={values.name} onPressEnter={submitForm} />
+          </Form.Item>
+          <Form.Item label={''}>
+            <Checkbox name={'isvalid'} checked={values.isValid || false} {...isValidField}>
+              Válido
+            </Checkbox>
           </Form.Item>
         </Form>
       </form>

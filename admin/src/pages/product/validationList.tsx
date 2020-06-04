@@ -13,7 +13,7 @@ import { ActionWrapper, PageContainer } from './styles';
 export const ProductValidationList: React.FC<{}> = () => {
   // Redux state
   const list = useSelector<AppState, Product[]>(
-    (state: any) => state.productReducer.listValidate.filter((f: Product) => f.isValid === null) as Product[]
+    (state) => state.productReducer.listValidate.filter((f: Product) => f.isValid === null) as Product[]
   );
   // Redux actions
   const dispatch = useDispatch();

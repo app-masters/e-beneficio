@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { BrowserRouter, Switch, Route, Redirect, RouteProps } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { AppState } from '../redux/rootReducer';
 import { User } from '../interfaces/user';
@@ -29,6 +29,21 @@ import { ProductList } from './product/list';
 import { ProductForm } from './product/form';
 
 /**
+ * Router available only for when env is ticket
+ * @param props component props
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const PrivateTypeRoute = ({ component, ...rest }: any) => {
+  const isTicket = process.env.REACT_APP_CONSUMPTION_TYPE === 'ticket';
+  /**
+   * Function to redirect user
+   */
+  const routeComponent = (props: RouteProps) =>
+    isTicket ? React.createElement(component, props) : <Redirect to={{ pathname: '/' }} />;
+  return <Route {...rest} render={routeComponent} />;
+};
+
+/**
  * Router available only for logged users
  * @param props component props
  */
@@ -41,8 +56,8 @@ const PrivateRouter: React.FC<{}> = () => {
         <Route path="/logout" component={LogoutPage} />
         {/* Product routes */}
         <Route path="/validar" component={ProductValidationList} />
-        <Route path="/produtos" component={ProductList} />
-        <Route path="/produtos/:id" component={ProductForm} />
+        <PrivateTypeRoute path="/produtos" component={ProductList} />
+        <PrivateTypeRoute path="/produtos/:id" component={ProductForm} />
         {/* Report routes */}
         <Route path="/estabelecimentos" component={PlaceList} />
         {/* Place routes */}

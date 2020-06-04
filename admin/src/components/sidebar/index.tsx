@@ -137,7 +137,7 @@ export const Sidebar: React.FC = () => {
   const location = useLocation();
   const theme = useTheme();
 
-  const isTicket = process.env.REACT_APP_CONSUMPTION_TYPE;
+  const isTicket = process.env.REACT_APP_CONSUMPTION_TYPE === 'ticket';
 
   // The collapse state for the sidebar
   const [collapsed, setCollapsed] = useState(

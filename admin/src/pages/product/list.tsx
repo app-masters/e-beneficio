@@ -14,8 +14,8 @@ import { Link } from 'react-router-dom';
  */
 export const ProductList: React.FC<{}> = () => {
   // Redux state
-  const loading = useSelector<AppState, boolean>((state: any) => state.productReducer.loading);
-  const list = useSelector<AppState, Product[]>((state: any) => state.productReducer.list as Product[]);
+  const loading = useSelector<AppState, boolean>((state) => state.productReducer.loading);
+  const list = useSelector<AppState, Product[]>((state) => state.productReducer.list as Product[]);
   // Redux actions
   const dispatch = useDispatch();
   React.useEffect(() => {
