@@ -1,5 +1,4 @@
 import {
-  // BarChartOutlined,
   CarryOutOutlined,
   BankOutlined,
   IdcardOutlined,
@@ -7,9 +6,9 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   ShopOutlined,
-  // SolutionOutlined,
   UserOutlined,
-  HomeOutlined
+  HomeOutlined,
+  BookOutlined
 } from '@ant-design/icons';
 import { Button, Layout, Menu, Popover } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -38,9 +37,9 @@ const routes: RouteItem[] = [
     name: 'Início'
   },
   {
-    path: '/produto',
-    icon: () => <ShopOutlined />,
-    name: 'Produtos'
+    path: '/validar',
+    icon: () => <BookOutlined />,
+    name: 'Validar Produtos'
   },
   // {
   //   path: '/relatorios',
@@ -81,6 +80,14 @@ const routes: RouteItem[] = [
     path: '/instituicoes',
     icon: () => <BankOutlined />,
     name: 'Instituições'
+  }
+];
+
+const privateRoutes: RouteItem[] = [
+  {
+    path: '/produtos',
+    icon: () => <ShopOutlined />,
+    name: 'Produtos'
   }
 ];
 
@@ -130,6 +137,8 @@ export const Sidebar: React.FC = () => {
   const location = useLocation();
   const theme = useTheme();
 
+  const isTicket = process.env.REACT_APP_CONSUMPTION_TYPE === 'ticket';
+
   // The collapse state for the sidebar
   const [collapsed, setCollapsed] = useState(
     Boolean(localStorage.getItem(localStorageConstraints.SIDEBAR_COLLAPSED)) || false
@@ -152,6 +161,7 @@ export const Sidebar: React.FC = () => {
           <Menu theme="light" mode="inline" defaultSelectedKeys={[location ? location.pathname : '/']}>
             {/* Render the links based on the nav arrays */}
             {routes.map((navLink) => menuItem(navLink, ''))}
+            {isTicket && privateRoutes.map((navLink) => menuItem(navLink, ''))}
           </Menu>
         </MenuHeight>
         <Flex vertical={collapsed} alignItems="center" gap="sm" justifyContent="space-between">

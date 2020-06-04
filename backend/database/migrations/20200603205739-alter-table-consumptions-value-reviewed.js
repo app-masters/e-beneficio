@@ -25,12 +25,11 @@ module.exports = {
     }
   },
 
-  down: async (queryInterface, Sequelize) => {
+  down: async (queryInterface) => {
     const transaction = await queryInterface.sequelize.transaction();
     try {
-      // SupCourses
-      await queryInterface.removeColumn('Consumptions', 'invalidValue');
-      await queryInterface.removeColumn('Consumptions', 'reviewedAt');
+      await queryInterface.removeColumn('Consumptions', 'invalidValue', { transaction });
+      await queryInterface.removeColumn('Consumptions', 'reviewedAt', { transaction });
       await transaction.commit();
     } catch (error) {
       console.error(error);

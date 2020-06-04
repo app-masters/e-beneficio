@@ -10,6 +10,7 @@ import { City } from '../schemas/cities';
 import { Benefit } from '../schemas/benefits';
 import { Dependent } from '../schemas/depedents';
 import { scrapeNFCeData } from '../utils/nfceScraper';
+import { SequelizeProduct } from '../schemas/products';
 
 /**
  * a
@@ -362,5 +363,79 @@ export const scrapeConsumption = async (consumption: Consumption, shouldThrow = 
       throw error;
     }
     logging.error('Failed to scrape nfce link data', error);
+  }
+};
+
+/**
+ * Verify a consumption to validate if all of its products are valid
+ *
+ * @param consumption Consumption with purchase data to be validated
+ */
+export const validateConsumption = async (consumption: Consumption) => {
+  try {
+    const { id: consumptionId, purchaseData } = consumption;
+
+    // If there is no purchase data, there is no data to work on
+    if (!purchaseData || !consumptionId) return;
+
+    // For each product in the purchase data, check if it exists in the database
+    const products = (
+      await Promise.all(
+        purchaseData.products.map(async (consumptionProduct) => {
+          if (!consumptionProduct.name || !consumptionProduct.totalValue) return null;
+          const existingProduct = await db.products.findOne({ where: { name: consumptionProduct.name } });
+
+          if (existingProduct) return { consumptionProduct, databaseProduct: existingProduct };
+
+          return {
+            consumptionProduct,
+            databaseProduct: await db.products.create({ name: consumptionProduct.name })
+          };
+        })
+      )
+    ).filter((product) => !!product?.databaseProduct) as {
+      consumptionProduct: { name: string; totalValue: number };
+      databaseProduct: SequelizeProduct;
+    }[];
+
+    // If an error occured during the produc scraping, the name of a product could be null
+    // throw an error informing the spraped object
+    if (purchaseData.products.length !== products.length) {
+      const error: Error & { consumption?: Consumption } = new Error(
+        'Consumption may have an invalid purchaseData field'
+      );
+      error.consumption = JSON.parse(JSON.stringify(consumption));
+      throw error;
+    }
+
+    // Check if all of the products is marked as valid
+    const consumptionStatus = products.reduce(
+      (status, product) => {
+        // Verify the current product validation status
+        const { isValid: validationStatus } = product.databaseProduct;
+        const isValid = validationStatus === true;
+        const isInvalid = validationStatus === false;
+        const isNull = validationStatus === null || validationStatus === undefined;
+
+        // Update the total based on its validation
+        const totalValid = status.totalValid + (isValid ? product.consumptionProduct.totalValue : 0);
+        const totalInvalid = status.totalInvalid + (isInvalid ? product.consumptionProduct.totalValue : 0);
+        const hasInvalid = status.hasInvalid || isInvalid;
+        const hasNull = status.hasNull || isNull;
+
+        return { hasInvalid, hasNull, totalValid, totalInvalid };
+      },
+      { hasInvalid: false, hasNull: false, totalValid: 0, totalInvalid: 0 }
+    );
+
+    // All the products must be validated before the consumption can be reviewed
+    if (consumptionStatus.hasNull) return;
+
+    consumption.reviewedAt = moment().toDate();
+    consumption.invalidValue = consumptionStatus.totalInvalid;
+
+    await db.consumptions.update(consumption, { where: { consumptionId } });
+  } catch (error) {
+    logging.critical('Failed to validate consumption', error);
   }
 };

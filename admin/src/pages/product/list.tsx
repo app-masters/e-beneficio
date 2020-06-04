@@ -1,18 +1,20 @@
-import { Button, Card, Table, Typography } from 'antd';
 import React from 'react';
+import { Modal, Button, Card, Table, Typography, Checkbox } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppState } from '../../redux/rootReducer';
 import { Product } from '../../interfaces/product';
-import { requestGetProduct, requestSaveProduct } from '../../redux/product/actions';
-import { ActionWrapper, PageContainer } from './styles';
+import { requestGetProduct, requestDeleteProduct } from '../../redux/product/actions';
+import { PageContainer, ActionWrapper } from './styles';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 
 /**
  * List component
  * @param props component props
  */
 export const ProductList: React.FC<{}> = () => {
-  const [data, setData] = React.useState<Product[]>();
   // Redux state
+  const loading = useSelector<AppState, boolean>((state) => state.productReducer.loading);
   const list = useSelector<AppState, Product[]>((state) => state.productReducer.list as Product[]);
   // Redux actions
   const dispatch = useDispatch();
@@ -20,66 +22,56 @@ export const ProductList: React.FC<{}> = () => {
     dispatch(requestGetProduct());
   }, [dispatch]);
 
-  React.useEffect(() => {
-    //When the request is too fast, the memory persist the buttons loading
-    //Use this to prevent bug
-    setData([]);
-    setTimeout(() => {
-      setData(list);
-    }, 1);
-  }, [list]);
-
   return (
     <PageContainer>
-      <Card title={<Typography.Title>{`Produtos`}</Typography.Title>}>
-        <Table rowKey="id" dataSource={data}>
+      <Card
+        title={<Typography.Title>{`Produtos`}</Typography.Title>}
+        extra={
+          <Link to={`/produtos/criar`}>
+            <Button type="primary">Criar</Button>
+          </Link>
+        }
+      >
+        <Table rowKey="id" dataSource={list}>
           <Table.Column title="Nome" dataIndex="name" />
           <Table.Column
+            title="Valido"
+            dataIndex="isValid"
+            render={(item: boolean) => {
+              return <Checkbox checked={item || false} />;
+            }}
+          />
+          <Table.Column
             render={(item: Product) => {
-              return <ProductAction key={item.id} item={item} />;
+              return (
+                <ActionWrapper>
+                  <Link to={`/produtos/${item.id}/editar`}>
+                    <Button>Editar</Button>
+                  </Link>
+                  <Button
+                    danger
+                    disabled={loading}
+                    onClick={() =>
+                      Modal.confirm({
+                        title: 'Você realmente quer deletar esse registro?',
+                        icon: <ExclamationCircleOutlined />,
+                        okText: 'Sim',
+                        okType: 'danger',
+                        cancelText: 'Não',
+                        onOk: () => {
+                          dispatch(requestDeleteProduct(item.id as number));
+                        }
+                      })
+                    }
+                  >
+                    Remover
+                  </Button>
+                </ActionWrapper>
+              );
             }}
           />
         </Table>
       </Card>
     </PageContainer>
-  );
-};
-
-/**
- * ProductAction component
- * @param props component props
- */
-export const ProductAction: React.FC<{ item: Product }> = ({ item }) => {
-  const [isLoading, setLoading] = React.useState<string>('');
-  // Redux actions
-  const dispatch = useDispatch();
-
-  /**
-   * Function to change the status of a product
-   */
-  const onValidateProduct = (item: Product, isValid: boolean) => () => {
-    setLoading(isValid ? 'valid' : 'invalid');
-    dispatch(requestSaveProduct(item, isValid));
-  };
-
-  return (
-    <ActionWrapper>
-      <Button
-        type="primary"
-        disabled={isLoading === 'invalid'}
-        onClick={onValidateProduct(item, true)}
-        loading={isLoading === 'valid'}
-      >
-        Válido
-      </Button>
-      <Button
-        danger
-        disabled={isLoading === 'valid'}
-        onClick={onValidateProduct(item, false)}
-        loading={isLoading === 'invalid'}
-      >
-        Inválido
-      </Button>
-    </ActionWrapper>
   );
 };
