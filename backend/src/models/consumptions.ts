@@ -1,4 +1,4 @@
-import Sequelize from 'sequelize';
+import Sequelize, { Op } from 'sequelize';
 import db from '../schemas';
 import { Consumption, SequelizeConsumption } from '../schemas/consumptions';
 import { PlaceStore } from '../schemas/placeStores';
@@ -352,7 +352,7 @@ export const scrapeConsumption = async (consumption: Consumption, shouldThrow = 
     await Promise.all(
       purchaseData.products.map(async ({ name }) => {
         if (!name) return;
-        const existProduct = await db.products.findOne({ where: { name } });
+        const existProduct = await db.products.findOne({ where: { name: { [Op.iLike]: name } } });
         if (!existProduct) {
           await db.products.create({ name });
         }
@@ -370,8 +370,9 @@ export const scrapeConsumption = async (consumption: Consumption, shouldThrow = 
  * Verify a consumption to validate if all of its products are valid
  *
  * @param consumption Consumption with purchase data to be validated
+ * @param shouldThrow Whether this function should throw an error or just log (used by conjobs)
  */
-export const validateConsumption = async (consumption: Consumption) => {
+export const validateConsumption = async (consumption: Consumption, shouldThrow = false) => {
   try {
     const { id: consumptionId, purchaseData } = consumption;
 
@@ -383,7 +384,9 @@ export const validateConsumption = async (consumption: Consumption) => {
       await Promise.all(
         purchaseData.products.map(async (consumptionProduct) => {
           if (!consumptionProduct.name || !consumptionProduct.totalValue) return null;
-          const existingProduct = await db.products.findOne({ where: { name: consumptionProduct.name } });
+          const existingProduct = await db.products.findOne({
+            where: { name: { [Op.iLike]: consumptionProduct.name } }
+          });
 
           if (existingProduct) return { consumptionProduct, databaseProduct: existingProduct };
 
@@ -434,8 +437,14 @@ export const validateConsumption = async (consumption: Consumption) => {
     consumption.reviewedAt = moment().toDate();
     consumption.invalidValue = consumptionStatus.totalInvalid;
 
-    await db.consumptions.update(consumption, { where: { consumptionId } });
+    await db.consumptions.update(
+      { reviewedAt: consumption.reviewedAt, invalidValue: consumption.invalidValue },
+      { where: { id: consumptionId } }
+    );
   } catch (error) {
+    if (shouldThrow) {
+      throw error;
+    }
     logging.critical('Failed to validate consumption', error);
   }
 };
