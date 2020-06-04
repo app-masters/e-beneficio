@@ -9,7 +9,9 @@ import yup from '../../utils/yup';
 import { Institution } from '../../interfaces/institution';
 
 const schema = yup.object().shape({
-  title: yup.string().label('Nome').required()
+  title: yup.string().label('Nome').required(),
+  address: yup.string().label('Endereço'),
+  district: yup.string().label('Distrito')
 });
 
 /**
@@ -30,7 +32,9 @@ export const InstitutionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
 
   const { handleSubmit, handleChange, values, getFieldMeta, submitForm, status, errors, touched } = useFormik({
     initialValues: institution || {
-      title: ''
+      title: '',
+      address: '',
+      district: ''
     },
     validationSchema: schema,
     onSubmit: (values, { setStatus }) => {
@@ -46,6 +50,8 @@ export const InstitutionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
   });
 
   const titleMeta = getFieldMeta('title');
+  const addressMeta = getFieldMeta('address');
+  const districtMeta = getFieldMeta('district');
 
   return (
     <Modal
@@ -65,6 +71,32 @@ export const InstitutionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
             help={!!titleMeta.error && !!titleMeta.touched ? titleMeta.error : undefined}
           >
             <Input id="title" name="title" onChange={handleChange} value={values.title} onPressEnter={submitForm} />
+          </Form.Item>
+          <Form.Item
+            label={'Distrito'}
+            validateStatus={!!districtMeta.error && !!districtMeta.touched ? 'error' : ''}
+            help={!!districtMeta.error && !!districtMeta.touched ? districtMeta.error : undefined}
+          >
+            <Input
+              id="district"
+              name="district"
+              onChange={handleChange}
+              value={values.district}
+              onPressEnter={submitForm}
+            />
+          </Form.Item>
+          <Form.Item
+            label={'Endereço'}
+            validateStatus={!!addressMeta.error && !!addressMeta.touched ? 'error' : ''}
+            help={!!addressMeta.error && !!addressMeta.touched ? addressMeta.error : undefined}
+          >
+            <Input
+              id="address"
+              name="address"
+              onChange={handleChange}
+              value={values.address}
+              onPressEnter={submitForm}
+            />
           </Form.Item>
         </Form>
       </form>

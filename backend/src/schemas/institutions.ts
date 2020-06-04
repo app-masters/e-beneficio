@@ -37,6 +37,14 @@ export const attributes = {
   title: {
     type: DataTypes.STRING,
     allowNull: false
+  },
+  address: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  district: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 };
 

@@ -33,6 +33,8 @@ export const InstitutionList: React.FC<{}> = () => {
       >
         <Table dataSource={list}>
           <Table.Column title="Nome" dataIndex="title" />
+          <Table.Column title="Distrito" dataIndex="district" />
+          <Table.Column title="Endereço" dataIndex="address" />
           <Table.Column
             title="Criado"
             dataIndex="createdAt"

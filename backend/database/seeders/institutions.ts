@@ -1,7 +1,10 @@
 import db from '../../src/schemas';
 import { Institution } from '../../src/schemas/institutions';
 
-const list = [{ title: 'Prefeitura' }, { title: 'Governo Estadual' }];
+const list = [
+  { title: 'Prefeitura', address: ' R. Furtado de Menezes', district: 'Vila Furtado de Menezes' },
+  { title: 'Governo Estadual', address: ' R. Furtado de Menezes', district: 'Vila Furtado de Menezes' }
+];
 
 /**
  * Seed the institutions table
