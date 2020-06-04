@@ -5,54 +5,63 @@ import { Op } from 'sequelize';
 const list = [
   {
     value: 29.87,
+    invalidValue: 0,
     nfce:
       'https://nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=31200519560168000260652020000215401387112952|2|1|1|038d7b68e58da7f62e8e70f94b093cf78baac165',
     proofImageUrl: 'https://nstecnologia.com.br/blog/wp-content/uploads/2017/08/image2017-8-7-11-8-37.png'
   },
   {
     value: 42.67,
+    invalidValue: 0,
     nfce:
       'https://nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=31200517745613002528650020000196491545274393|2|1|1|d4c70111d8aa395e85a13dcab5bcd4d05f4fc925',
     proofImageUrl: 'https://nstecnologia.com.br/blog/wp-content/uploads/2017/08/image2017-8-7-11-8-37.png'
   },
   {
     value: 17.97,
+    invalidValue: 0,
     nfce:
       'https://nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=31200517745613000908650030000582841783577460|2|1|1|b216ea61e1f6f458311ba2ec6fc05073ca8885fc',
     proofImageUrl: 'https://nstecnologia.com.br/blog/wp-content/uploads/2017/08/image2017-8-7-11-8-37.png'
   },
   {
     value: 28.4,
+    invalidValue: 0,
     nfce:
       'https://nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=31200517144841000507650510000233971387980247|2|1|1|2eb1a022335f3f27acf629816bc9150431dac90c',
     proofImageUrl: 'https://nstecnologia.com.br/blog/wp-content/uploads/2017/08/image2017-8-7-11-8-37.png'
   },
   {
     value: 92.55,
+    invalidValue: 0,
     nfce:
       'https://nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=31200503083231001176651070000059641802424994|2|1|1|5F114EE9DF02247F94F84D7B828C314293749828',
     proofImageUrl: 'https://nstecnologia.com.br/blog/wp-content/uploads/2017/08/image2017-8-7-11-8-37.png'
   },
   {
     value: 51.63,
+    invalidValue: 0,
     nfce:
       'https://nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=31200517745613002102650250000512331819114371|2|1|1|482c7d14ced393860992342a969f624fce98d5d7',
     proofImageUrl: 'https://nstecnologia.com.br/blog/wp-content/uploads/2017/08/image2017-8-7-11-8-37.png'
   },
   {
     value: 8.99,
+    invalidValue: 0,
     nfce:
       'https://nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=31200517745613002102650290000448711712971306|2|1|1|cf4303cd6386cbafdce876d1b1426de7da7610c7',
     proofImageUrl: 'https://nstecnologia.com.br/blog/wp-content/uploads/2017/08/image2017-8-7-11-8-37.png'
   },
   {
     value: 32.09,
+    invalidValue: 0,
     nfce:
       'https://nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=31200517144841000507650500000769549388061411|2|1|25|32.09|6257677857396e517438696d557553317871464f717542716655493d|1|c55e0bf01e87c4a4e57ddf4ff07b0a7634f37e6b',
     proofImageUrl: 'https://nstecnologia.com.br/blog/wp-content/uploads/2017/08/image2017-8-7-11-8-37.png'
   },
   {
     value: 49.32,
+    invalidValue: 0,
     nfce:
       'https://nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=31200517144841000507650500000769539388061406|2|1|25|49.32|7072515544434763434a44427a666277303033395035486c4565633d|1|f85a87ab427e94bebc5d10e1956f76e097ef2d13',
     proofImageUrl: 'https://nstecnologia.com.br/blog/wp-content/uploads/2017/08/image2017-8-7-11-8-37.png'

@@ -20,8 +20,10 @@ export interface Consumption {
   placeStoreId?: number | string;
   nfce?: string;
   value: number;
+  invalidValue: number;
   proofImageUrl?: string;
   purchaseData?: PurchaseData;
+  reviewedAt?: number | Date | null;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
@@ -64,6 +66,10 @@ export const attributes = {
     allowNull: true
   },
   value: {
+    type: DataTypes.FLOAT,
+    allowNull: false
+  },
+  invalidValue: {
     type: DataTypes.FLOAT,
     allowNull: false
   },
