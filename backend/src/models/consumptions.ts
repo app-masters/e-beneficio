@@ -9,6 +9,7 @@ import { Place } from '../schemas/places';
 import { City } from '../schemas/cities';
 import { Benefit } from '../schemas/benefits';
 import { Dependent } from '../schemas/depedents';
+import { scrapeNFCeData } from '../utils/nfceScraper';
 
 /**
  * a
@@ -327,4 +328,35 @@ export const getConsumptionDashboardInfo = async (cityId: NonNullable<City['id']
   ]);
 
   return dashboardReturn;
+};
+
+/**
+ * Scrape the consumption nfce page for details about the purchase
+ *
+ * @param consumption Consumption object with the nfce link
+ */
+export const scrapeConsumption = async (consumption: Consumption) => {
+  try {
+    const link = consumption.nfce;
+    if (!link || !consumption.id) return;
+
+    // Find the data avout the purchase in the Receita Federal site
+    const purchaseData = await scrapeNFCeData(link);
+
+    consumption.purchaseData = purchaseData;
+    await db.consumptions.update({ purchaseData }, { where: { id: consumption.id } });
+
+    // For each product in the purchase, check it exists and save it in the database
+    await Promise.all(
+      purchaseData.products.map(async ({ name }) => {
+        if (!name) return;
+        const existProduct = await db.products.findOne({ where: { name } });
+        if (!existProduct) {
+          await db.products.create({ name });
+        }
+      })
+    );
+  } catch (error) {
+    logging.error('Failed to scrape nfce link data', error);
+  }
 };
