@@ -55,11 +55,11 @@ export const BenefitList: React.FC<{}> = () => {
           {showProductList ? (
             <Table.Column
               title="Produtos"
-              dataIndex="products"
-              render={(data: Benefit['products']) =>
+              dataIndex="benefitProduct"
+              render={(data: Benefit['benefitProduct']) =>
                 data?.map((product) => (
-                  <div key={product.productId}>{`${product.amount}x ${
-                    productList.find((p) => p.id === product.productId)?.name
+                  <div key={product.productsId}>{`${product.amount}x ${
+                    productList.find((p) => p.id === product.productsId)?.name
                   }`}</div>
                 ))
               }

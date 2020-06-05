@@ -11,8 +11,9 @@ export interface Benefit {
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
-  products?: {
-    productId: number | string;
+  benefitProduct?: {
+    id: number | string;
+    productsId: number | string;
     amount: number;
   }[];
 }

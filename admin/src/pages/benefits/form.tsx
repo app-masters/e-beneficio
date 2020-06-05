@@ -27,7 +27,7 @@ const schema = yup.object().shape({
   month: yup.number().label('Mês').required(),
   year: yup.number().label('Ano').required(),
   value: !showProductList ? yup.string().label('Valor').required() : yup.string().label('Valor').nullable(),
-  products: showProductList
+  benefitProduct: showProductList
     ? yup
         .array()
         .test(
@@ -80,7 +80,7 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
       month: undefined,
       year: undefined,
       value: undefined,
-      products: undefined
+      benefitProduct: undefined
     },
     validationSchema: schema,
     onSubmit: (values, { setStatus }) => {
@@ -101,7 +101,7 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
   const yearMeta = getFieldMeta('year');
   const valueMeta = getFieldMeta('value');
   const institutionIdMeta = getFieldMeta('institutionId');
-  const productsMeta = getFieldMeta('products');
+  const productsMeta = getFieldMeta('benefitProduct');
 
   return (
     <Modal
@@ -227,9 +227,9 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
               <ProductSelector
                 validateStatus={!!productsMeta.error && !!productsMeta.touched ? 'error' : ''}
                 help={!!productsMeta.error && !!productsMeta.touched ? productsMeta.error : undefined}
-                value={values.products}
+                value={values.benefitProduct}
                 onChange={(value) => {
-                  setFieldValue('products', value);
+                  setFieldValue('benefitProduct', value);
                 }}
               />
             )}

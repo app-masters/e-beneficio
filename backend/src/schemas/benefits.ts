@@ -9,7 +9,7 @@ export interface Benefit {
   title: string;
   month: number;
   year: number;
-  products?: BenefitProduct[];
+  benefitProduct?: BenefitProduct[];
   value?: number;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
@@ -80,7 +80,9 @@ export const initBenefitSchema = (sequelize: Sequelize): SequelizeBenefitModel =
     });
     Schema.hasMany(models.benefitProducts, {
       foreignKey: 'benefitsId',
-      as: 'benefitProduct'
+      as: 'benefitProduct',
+      onDelete: 'CASCADE',
+      hooks: true
     });
   };
 

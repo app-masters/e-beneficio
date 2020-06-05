@@ -52,13 +52,17 @@ export const create = (values: Benefit | SequelizeBenefit): Promise<SequelizeBen
 export const createWithProduct = async (values: Benefit | SequelizeBenefit): Promise<SequelizeBenefit> => {
   const created = await db.benefits.create(values);
 
-  if (values.products && created) {
-    const productList = values.products.map((i) => {
+  if (values.benefitProduct && created) {
+    const productList = values.benefitProduct.map((i) => {
       i.benefitsId = created.id as number;
       return i;
     });
     db.benefitProducts.bulkCreate(productList);
   }
+
+  await created.reload({
+    include: [{ model: db.benefitProducts, as: 'benefitProduct', include: [{ model: db.products, as: 'products' }] }]
+  });
 
   return created;
 };
@@ -104,8 +108,8 @@ export const updateWithProduct = async (
     const [, [updated]] = await db.benefits.update(values, { where: { id }, returning: true });
     const updatedProducts = await db.benefitProducts.findAll({ where: { benefitsId: updated.id as number } });
 
-    if (values.products) {
-      const list = values.products.map((i) => {
+    if (values.benefitProduct) {
+      const list = values.benefitProduct.map((i) => {
         i.benefitsId = updated.id as number;
         return i;
       });
@@ -114,19 +118,27 @@ export const updateWithProduct = async (
       const productToRemove = updatedProducts.filter((a) => {
         const index = productToUpdate.find((f) => f.id === a.id);
         if (!index) return a;
+        return null;
       });
 
       await db.benefitProducts.bulkCreate(productToAdd);
 
       productToRemove.map(async (dt) => {
-        await db.benefitProducts.destroy({ where: { id: dt.id } });
+        if (dt.id) await db.benefitProducts.destroy({ where: { id: dt.id } });
       });
       productToUpdate.map(async (up) => {
-        await db.benefitProducts.update({ amount: up.amount }, { where: { id: up.id } });
+        if (up.id) await db.benefitProducts.update({ amount: up.amount }, { where: { id: up.id } });
       });
     }
   }
-  return null;
+
+  return await db.benefits.findOne({
+    where: { id },
+    include: [
+      { model: db.institutions, as: 'institution', where: { cityId } },
+      { model: db.benefitProducts, as: 'benefitProduct', include: [{ model: db.products, as: 'products' }] }
+    ]
+  });
 };
 
 /**
