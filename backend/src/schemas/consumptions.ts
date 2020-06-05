@@ -110,6 +110,10 @@ export const initConsumptionSchema = (sequelize: Sequelize): SequelizeConsumptio
       foreignKey: 'placeStoreId',
       as: 'placeStore'
     });
+    Schema.hasMany(models.consumptionProducts, {
+      foreignKey: 'consumptionsId',
+      as: 'consumptionProducts'
+    });
   };
 
   return Schema;
