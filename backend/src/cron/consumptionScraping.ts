@@ -3,11 +3,19 @@ import db from '../schemas';
 import { Op } from 'sequelize';
 import { scrapeConsumption } from '../models/consumptions';
 
+let cronjobRunning = false;
+
 /**
  * Selects the last 100 consumptions that have a nfce link and has not been
  * processed yet and scrape the site for the purchase data.
  */
 export const runConsumptionScrapingCron = async () => {
+  if (cronjobRunning) {
+    logging.critical('[cron] Consumptions Scraping: Cron job already running');
+    return;
+  }
+
+  cronjobRunning = true;
   logging.info('[cron] Consumptions Scraping: Cron job starting');
 
   try {
@@ -29,5 +37,7 @@ export const runConsumptionScrapingCron = async () => {
       );
   } catch (error) {
     logging.critical('[cron] Consumptions Scraping: Cron failed to run', error);
+  } finally {
+    cronjobRunning = false;
   }
 };

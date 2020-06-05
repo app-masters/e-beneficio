@@ -86,6 +86,22 @@ export const scrapeNFCeData = async (nfce: string): Promise<PurchaseData> => {
     return { place, totalValue, payment, products };
   });
 
+  // In some cases, the same order can have the same item multiple times, this
+  // can generate duplicated products in the database.
+  const productSet = new Set(result.products.map((product) => product.name));
+  result.products = Array.from(productSet).reduce(
+    (list, productName) => [
+      ...list,
+      {
+        name: productName,
+        totalValue: result.products
+          .filter((p) => p.name === productName)
+          .reduce((total, value) => total + (value.totalValue ? value.totalValue : 0), 0)
+      }
+    ],
+    [] as { name?: string; totalValue?: number }[]
+  );
+
   await browser.close();
   return result;
 };
