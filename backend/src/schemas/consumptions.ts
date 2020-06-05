@@ -1,4 +1,5 @@
 import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize';
+import { Product } from './products';
 
 export interface PurchaseData {
   place?: string;
@@ -20,6 +21,7 @@ export interface Consumption {
   placeStoreId?: number | string;
   nfce?: string;
   value?: number;
+  products: Product[];
   invalidValue?: number;
   proofImageUrl?: string;
   reviewedAt?: number | Date | null;

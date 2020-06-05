@@ -202,6 +202,28 @@ export const addConsumption = async (
 };
 
 /**
+ * Create a new consumption on the store
+ * @param values consumption object
+ * @param placeStoreId logged user place store ID
+ * @returns Promise<List of items>
+ */
+export const addConsumptionProduct = async (
+  values: Consumption,
+  placeStoreId?: NonNullable<PlaceStore['id']>
+): Promise<SequelizeConsumption> => {
+  const family = await db.families.findByPk(values.familyId);
+  if (!family) {
+    // Invalid family ID
+    throw { status: 422, message: 'Família não encontrada' };
+  }
+
+  const familyConsumptions = await db.consumptions.findAll({ where: { familyId: family.id as number } });
+
+  // Everything is ok, create it
+  return db.consumptions.create({ ...values, placeStoreId });
+};
+
+/**
  * Get report for consumptions on the place on the interval
  * @param minDate start of interval
  * @param maxDate end of interval

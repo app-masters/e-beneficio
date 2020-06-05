@@ -24,7 +24,11 @@ router.post('/', async (req, res) => {
         proofImageUrl = data.url;
       }
     }
-    const item = await consumptionModel.addConsumption({ ...req.body, proofImageUrl });
+    const isTicket = process.env.CONSUMPTION_TYPE === 'ticket';
+
+    let item;
+    if (isTicket) item = await consumptionModel.addConsumption({ ...req.body, proofImageUrl });
+    else item = await consumptionModel.addConsumptionProduct({ ...req.body, proofImageUrl });
 
     // Scrape the purchase data, but don't wait for it
     consumptionModel.scrapeConsumption(item);
