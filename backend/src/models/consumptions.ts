@@ -65,13 +65,16 @@ export const getFamilyDependentBalance = async (family: Family, availableBenefit
     const endYear = moment(dependent.deactivatedAt as Date).year();
 
     for (const benefit of availableBenefits) {
+      const benefitDate = moment(benefit.date);
       if (benefit.groupName !== family.groupName) continue; // Don't check if it's from another group
 
       // Check all the dates
-      const notInFuture = benefit.year < todayYear || (benefit.year === todayYear && benefit.month <= todayMonth);
-      const afterCreation = benefit.year > startYear || (benefit.year === startYear && benefit.month >= startMonth);
+      const notInFuture =
+        benefitDate.year() < todayYear || (benefitDate.year() === todayYear && benefitDate.month() + 1 <= todayMonth);
+      const afterCreation =
+        benefitDate.year() > startYear || (benefitDate.year() === startYear && benefitDate.month() + 1 >= startMonth);
       const beforeDeactivation = dependent.deactivatedAt
-        ? benefit.year < endYear || (benefit.year === endYear && benefit.month < endMonth)
+        ? benefitDate.year() < endYear || (benefitDate.year() === endYear && benefitDate.month() + 1 < endMonth)
         : true;
 
       if (notInFuture && afterCreation && beforeDeactivation) {
