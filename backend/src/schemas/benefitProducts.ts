@@ -49,7 +49,7 @@ export const attributes = {
   }
 };
 
-const tableName = 'Benefits';
+const tableName = 'BenefitProducts';
 
 /**
  * Sequelize model initializer function

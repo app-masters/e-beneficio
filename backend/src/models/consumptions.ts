@@ -20,9 +20,37 @@ export const getFamilyDependentBalanceProduct = async (family: Family) => {
   //Family groupName
   const familyBenefits = await db.benefits.findAll({ where: { groupName: family.groupName } });
   //Filter benefit by family date
-  const familyBenefitsFilterDate = familyBenefits.filter((benefit) => {
-    benefit.year >= moment(family.createdAt).year();
+  const familyBenefitsFilterDate = familyBenefits
+    .filter((benefit) => {
+      const isAfter = moment(benefit.date).isSameOrAfter(moment(family.createdAt || moment()));
+      let isBefore = true;
+      if (family.deactivatedAt) isBefore = moment(benefit.date).isBefore(moment(family.deactivatedAt));
+      return isAfter && isBefore ? benefit : null;
+    })
+    .filter((f) => f);
+  //Get all products by benefit
+  const benefitsIds = familyBenefitsFilterDate.map((item) => {
+    return item.id;
   });
+  const listOfProductsAvailable = await db.benefitProducts.findAll({
+    where: {
+      benefitsId: benefitsIds
+    }
+  });
+  //Get all family Consumptions
+  const familyConsumption = await db.consumptions.findAll({
+    where: { familyId: family.id }
+  });
+  //Get all Product used by family consumption
+  const consumptionIds = familyConsumption.map((item) => {
+    return item.id;
+  });
+  const productsFamilyConsumption = await db.consumptionProducts.findAll({
+    where: {
+      consumptionsId: consumptionIds
+    }
+  });
+  //Get difference between available products and consumed products
 
   return null;
 };
