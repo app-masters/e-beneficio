@@ -28,6 +28,8 @@ export const runConsumptionScrapingCron = async () => {
       order: [['id', 'ASC']]
     });
 
+    console.log(`[cron] Consumptions Scraping: Scrapping ${consumptions.length} items`);
+
     // Avoid a hundred chrome instances running at the same time, serialize the scraping
     await consumptions
       .map((consumption) => async () => await scrapeConsumption(consumption, true))
@@ -39,5 +41,6 @@ export const runConsumptionScrapingCron = async () => {
     logging.critical('[cron] Consumptions Scraping: Cron failed to run', error);
   } finally {
     cronjobRunning = false;
+    console.log(`[cron] Consumptions Scraping: Scrapping finished with success`);
   }
 };

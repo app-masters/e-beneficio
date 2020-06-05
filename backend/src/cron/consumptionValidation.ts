@@ -26,6 +26,8 @@ export const runConsumptionValidationCron = async () => {
       order: [['id', 'ASC']]
     });
 
+    console.log(`[cron] Consumptions Validation: Trying to validate ${consumptions.length} items`);
+
     // Avoid muiltiple promisses to affect the server response time, serialize the validation
     await consumptions
       .map((consumption) => async () => await validateConsumption(consumption, true))
@@ -37,5 +39,6 @@ export const runConsumptionValidationCron = async () => {
     logging.critical('[cron] Consumptions Validation: Cron failed to run', error);
   } finally {
     cronjobRunning = false;
+    console.log(`[cron] Consumptions Validation: Validation finished with success`);
   }
 };
