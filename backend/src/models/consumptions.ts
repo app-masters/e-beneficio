@@ -13,9 +13,24 @@ import { scrapeNFCeData } from '../utils/nfceScraper';
 import { SequelizeProduct } from '../schemas/products';
 
 /**
- * a
- * @param family a
- * @param availableBenefits a
+ * Get balance report by dependent when product
+ * @param family the family
+ */
+export const getFamilyDependentBalanceProduct = async (family: Family) => {
+  //Family groupName
+  const familyBenefits = await db.benefits.findAll({ where: { groupName: family.groupName } });
+  //Filter benefit by family date
+  const familyBenefitsFilterDate = familyBenefits.filter((benefit) => {
+    benefit.year >= moment(family.createdAt).year();
+  });
+
+  return null;
+};
+
+/**
+ * Get balance report by dependent
+ * @param family the family
+ * @param availableBenefits has benefis
  */
 export const getFamilyDependentBalance = async (family: Family, availableBenefits?: Benefit[]) => {
   if (!family.dependents || !family.consumptions) {
