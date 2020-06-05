@@ -9,6 +9,17 @@ export const PageContainer = styled.div`
   }
 `;
 
+export const FormImageContainer = styled.div`
+  min-height: 200px;
+  padding: ${(props) => props.theme.spacing.xs};
+  border: 1px dashed #33333350;
+  margin-top: 20px;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+`;
+
 export const FormContainer = styled.div`
   position: absolute;
   height: 100%;

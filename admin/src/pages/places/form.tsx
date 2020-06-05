@@ -23,7 +23,7 @@ export const PlaceForm: React.FC<RouteComponentProps<{ id: string }>> = (props) 
 
   // Redux state
   const place = useSelector<AppState, Place | undefined>(({ placeReducer }) =>
-    placeReducer.list.find((item) => item.id === Number(props.match.params.id))
+    placeReducer.list.find((item: Place) => item.id === Number(props.match.params.id))
   );
 
   const loading = useSelector<AppState, boolean>(({ placeReducer }) => placeReducer.loading);

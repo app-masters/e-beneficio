@@ -39,7 +39,7 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
 
   // Redux state
   const benefit = useSelector<AppState, Benefit | undefined>(({ benefitReducer }) =>
-    benefitReducer.list.find((item) => item.id === Number(props.match.params.id))
+    benefitReducer.list.find((item: Benefit) => item.id === Number(props.match.params.id))
   );
 
   const loading = useSelector<AppState, boolean>(({ benefitReducer }) => benefitReducer.loading);

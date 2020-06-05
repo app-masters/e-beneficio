@@ -8,7 +8,7 @@ export interface Benefit {
   title: string;
   month: number;
   year: number;
-  value: number;
+  value?: number;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
@@ -56,7 +56,7 @@ export const attributes = {
   },
   value: {
     type: DataTypes.FLOAT,
-    allowNull: false
+    allowNull: true
   }
 };
 

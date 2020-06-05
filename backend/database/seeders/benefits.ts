@@ -49,4 +49,4 @@ const seed = async () => {
   }
 };
 
-export default { seed };
+export default { seed, groupList: list };

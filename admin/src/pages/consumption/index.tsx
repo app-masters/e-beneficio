@@ -1,4 +1,4 @@
-import { CameraOutlined, QrcodeOutlined, WarningFilled } from '@ant-design/icons';
+import { CameraOutlined, QrcodeOutlined, WarningFilled, UploadOutlined } from '@ant-design/icons';
 import { Alert, Button, Card, Checkbox, Form, Input, InputNumber, Modal, Typography, Divider } from 'antd';
 import { useFormik } from 'formik';
 import React, { useEffect, useRef, useState } from 'react';
@@ -11,8 +11,10 @@ import { Family } from '../../interfaces/family';
 import { requestSaveConsumption } from '../../redux/consumption/actions';
 import { AppState } from '../../redux/rootReducer';
 import yup from '../../utils/yup';
-import { PageContainer } from './styles';
+import moment from 'moment';
+import { PageContainer, FormImageContainer } from './styles';
 import { ConsumptionFamilySearch } from '../../components/consumptionFamilySearch';
+import { CameraUpload } from './cameraUpload';
 
 const schema = yup.object().shape({
   nfce: yup.string().label('Nota fiscal eletrônica'),
@@ -48,6 +50,8 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
   const [permission, setPermission] = useState<string>('');
   const [showQRCodeModal, setShowQRCodeModal] = useState(false);
   const [showCameraModal, setShowCameraModal] = useState(false);
+  const [showCamera, setShowCamera] = useState(false);
+
   // Redux state
   const family = useSelector<AppState, Family | null | undefined>((state) => state.familiesReducer.familyItem);
 
@@ -74,6 +78,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
   } = useFormik({
     initialValues: {
       nfce: '',
+      invalidValue: 0,
       value: 0,
       proofImageUrl: '',
       nisCode: '',
@@ -91,8 +96,10 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
             {
               nfce: values.nfce,
               value: Number(values.value),
+              invalidValue: Number(values.value),
               proofImageUrl: values.proofImageUrl,
-              familyId: values.familyId
+              familyId: values.familyId,
+              reviewedAt: moment().toDate()
             },
             () => {
               Modal.success({ title: 'Consumo salvo com sucesso', onOk: () => history.push('/') });
@@ -105,6 +112,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
   });
 
   const valueMeta = getFieldMeta('value');
+  const invalidValueMeta = getFieldMeta('invalidValue');
   const imageMeta = getFieldMeta('proofImageUrl');
   const nfceMeta = getFieldMeta('nfce');
 
@@ -112,12 +120,12 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
   const acceptCheckField = getFieldProps('acceptCheck');
 
   const invalidConsumptionValue = !!(family && family.balance && values.value > 0 && values.value > family.balance);
+  const invalidValueConsumption = !!(values.value < values.invalidValue);
 
   return (
     <PageContainer>
       <Card title="Informar consumo">
-        {status && <Alert message="Erro no formulário" description={status} type="error" />}
-        <form onSubmit={handleSubmit}>
+        <form style={{ marginBottom: 20 }} onSubmit={handleSubmit}>
           <Form layout="vertical">
             <ConsumptionFamilySearch onFamilySelect={(id) => setFieldValue('familyId', id)} />
             {values.familyId && (
@@ -216,13 +224,43 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                     precision={2}
                     min={0}
                     // max={family?.balance}
+                    formatter={(value) => {
+                      if (value === '') return `R$ `;
+                      return value && Number(value) !== 0 && !Number.isNaN(Number(value)) ? `R$ ${value}` : '';
+                    }}
+                    parser={(value) => (value ? value.replace(/(R)|(\$)/g, '').trim() : '')}
+                  />
+                </Form.Item>
+                <Form.Item
+                  label="Valor total dos items inválidos"
+                  validateStatus={
+                    (!!invalidValueMeta.error && !!invalidValueMeta.touched) || invalidValueConsumption ? 'error' : ''
+                  }
+                  help={
+                    !!invalidValueMeta.error && !!invalidValueMeta.touched
+                      ? invalidValueMeta.error
+                      : invalidValueConsumption
+                      ? 'Valor maior que o valor da compra'
+                      : undefined
+                  }
+                >
+                  <InputNumber
+                    style={{ width: '100%' }}
+                    id="invalidValue"
+                    name="invalidValue"
+                    size="large"
+                    onChange={(value) => setFieldValue('invalidValue', value)}
+                    value={Number(values.invalidValue)}
+                    decimalSeparator=","
+                    step={0.01}
+                    min={0}
+                    precision={2}
                     formatter={(value) =>
                       value && Number(value) !== 0 && !Number.isNaN(Number(value)) ? `R$ ${value}` : ''
                     }
                     parser={(value) => (value ? value.replace(/(R)|(\$)/g, '').trim() : '')}
                   />
                 </Form.Item>
-
                 <Form.Item
                   validateStatus={!!imageMeta.error && !!imageMeta.touched ? 'error' : ''}
                   help={!!imageMeta.error && !!imageMeta.touched ? imageMeta.error : undefined}
@@ -237,10 +275,26 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                     {values.proofImageUrl ? 'Alterar foto dos comprovantes' : 'Adicionar foto dos comprovantes'}
                   </Button>
                   <Modal
-                    okText="Confirmar"
+                    okText={
+                      showCamera ? (
+                        <>
+                          <CameraOutlined style={{ marginRight: 10 }} />
+                          Tirar Foto
+                        </>
+                      ) : (
+                        'Confirmar'
+                      )
+                    }
                     cancelText="Cancelar"
-                    onCancel={() => setShowCameraModal(false)}
+                    onCancel={() => {
+                      setShowCameraModal(false);
+                      setShowCamera(false);
+                    }}
                     onOk={async () => {
+                      if (values.proofImageUrl) {
+                        setShowCameraModal(false);
+                        return;
+                      }
                       if (cameraRef && cameraRef.current) {
                         // weird ts error
                         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
@@ -252,12 +306,28 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                     }}
                     visible={showCameraModal}
                   >
-                    {showCameraModal && <Webcam audio={false} width="100%" ref={cameraRef} />}
-                    <Typography.Paragraph>
+                    <FormImageContainer>
+                      {showCamera ? (
+                        <Webcam audio={false} width="100%" ref={cameraRef} />
+                      ) : (
+                        <CameraUpload onSetImage={(image: string) => setFieldValue('proofImageUrl', image)} />
+                      )}
+                    </FormImageContainer>
+                    {showCamera ? (
+                      <Button onClick={() => setShowCamera(false)}>
+                        <UploadOutlined />
+                        Enviar arquivo
+                      </Button>
+                    ) : (
+                      <Button onClick={() => setShowCamera(true)}>
+                        <CameraOutlined />
+                        Usar camera
+                      </Button>
+                    )}
+                    <Typography.Paragraph style={{ marginTop: 10 }}>
                       Na foto, tentar mostrar:
                       <ul>
                         <li>Nota fiscal</li>
-                        <li>Documento do comprador</li>
                       </ul>
                       Tente manter a foto o mais nítida possível.
                     </Typography.Paragraph>
@@ -295,6 +365,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
             </Button>
           </Flex>
         </form>
+        {status && <Alert message="Erro no formulário" description={status} type="error" />}
       </Card>
     </PageContainer>
   );

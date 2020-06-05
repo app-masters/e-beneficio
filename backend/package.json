@@ -65,11 +65,13 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
+    "node-cron": "^2.0.3",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "pg": "^8.0.0",
     "pm2": "^4.2.3",
+    "puppeteer": "^3.3.0",
     "require-all": "3.0.0",
     "rollbar": "2.15.1",
     "sequelize": "^5.21.5",
@@ -77,6 +79,8 @@
     "string-similarity": "^4.0.1"
   },
   "devDependencies": {
+    "@types/node-cron": "^2.0.3",
+    "@types/puppeteer": "^3.0.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "6.10.1",
     "eslint-plugin-prettier": "3.1.3",
