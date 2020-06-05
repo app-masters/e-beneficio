@@ -27,7 +27,7 @@ router.get('/', (req, res) => res.send({ version: process.env.npm_package_versio
 // Sub-routers
 router.use('/auth', authRoutes);
 router.use('/health', healthRoutes);
-router.use('/public', publicRoutes);
+router.use('/public', requirePublicAuth, publicRoutes);
 router.use('/cities', jwtMiddleware, cityRoutes);
 router.use('/places', jwtMiddleware, placeRoutes);
 router.use('/place-stores', jwtMiddleware, placeStoreRoutes);

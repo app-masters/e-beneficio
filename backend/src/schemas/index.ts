@@ -10,9 +10,9 @@ import { initConsumptionSchema } from './consumptions';
 import { initDependentSchema } from './depedents';
 import { initProductSchema } from './products';
 import { initBenefitProductSchema } from './benefitProducts';
+import { initConsumptionProductsSchema } from './consumptionProducts';
 
 import * as config from '../../database/config';
-import { initConsumptionProductsSchema } from './ConsumptionProducts';
 
 const sequelize = new Sequelize(config as Options);
 
