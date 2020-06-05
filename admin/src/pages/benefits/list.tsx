@@ -5,10 +5,16 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Benefit } from '../../interfaces/benefit';
+import { Product } from '../../interfaces/product';
 import { requestDeleteBenefit, requestGetBenefit } from '../../redux/benefit/actions';
 import { AppState } from '../../redux/rootReducer';
 import { familyGroupList } from '../../utils/constraints';
 import { ActionWrapper, PageContainer } from './styles';
+import { env } from '../../env';
+import { requestGetProduct } from '../../redux/product/actions';
+
+const TYPE = env.REACT_APP_CONSUMPTION_TYPE as 'ticket' | 'product';
+const showProductList = TYPE === 'product';
 
 /**
  * List component
@@ -17,11 +23,15 @@ import { ActionWrapper, PageContainer } from './styles';
 export const BenefitList: React.FC<{}> = () => {
   // Redux state
   const list = useSelector<AppState, Benefit[]>((state) => state.benefitReducer.list as Benefit[]);
+  const productList = useSelector<AppState, Product[]>((state) => state.productReducer.list as Product[]);
+
   // Redux actions
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(requestGetBenefit());
+    dispatch(requestGetProduct());
   }, [dispatch]);
+
   return (
     <PageContainer>
       <Card
@@ -32,7 +42,7 @@ export const BenefitList: React.FC<{}> = () => {
           </Link>
         }
       >
-        <Table dataSource={list}>
+        <Table dataSource={list} rowKey="id">
           <Table.Column title="Nome" dataIndex="title" />
           <Table.Column
             title="Grupo"
@@ -41,11 +51,26 @@ export const BenefitList: React.FC<{}> = () => {
           />
           <Table.Column title="Mês" dataIndex="month" />
           <Table.Column title="Ano" dataIndex="year" />
-          <Table.Column
-            title="Valor por dependente"
-            dataIndex="value"
-            render={(data: Benefit['value']) => `R$ ${data}`}
-          />
+          {/* Show the product list column depending on the type of benefit */}
+          {showProductList ? (
+            <Table.Column
+              title="Produtos"
+              dataIndex="products"
+              render={(data: Benefit['products']) =>
+                data?.map((product) => (
+                  <div key={product.productId}>{`${product.amount}x ${
+                    productList.find((p) => p.id === product.productId)?.name
+                  }`}</div>
+                ))
+              }
+            />
+          ) : (
+            <Table.Column
+              title="Valor por dependente"
+              dataIndex="value"
+              render={(data: Benefit['value']) => `R$ ${data}`}
+            />
+          )}
           <Table.Column
             title="Criado"
             dataIndex="createdAt"
