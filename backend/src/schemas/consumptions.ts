@@ -19,8 +19,8 @@ export interface Consumption {
   familyId: number | string;
   placeStoreId?: number | string;
   nfce?: string;
-  value: number;
-  invalidValue: number;
+  value?: number;
+  invalidValue?: number;
   proofImageUrl?: string;
   reviewedAt?: number | Date | null;
   purchaseData?: PurchaseData;

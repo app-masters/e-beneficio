@@ -69,7 +69,7 @@ test(`[${testName}] Get balance report`, async () => {
   const reportFamily = report.find((item) => item.id === createdFamily.id);
   expect(reportFamily).toBeDefined();
   if (reportFamily) {
-    expect(reportFamily.balance).toBeGreaterThan(createdBenefit.value);
+    expect(reportFamily.balance).toBeGreaterThan(createdBenefit.value as number);
   }
 });
 

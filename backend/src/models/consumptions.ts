@@ -61,7 +61,7 @@ export const getFamilyDependentBalance = async (family: Family, availableBenefit
 
       if (notInFuture && afterCreation && beforeDeactivation) {
         // Valid benefit
-        balance += benefit.value;
+        balance += Number(benefit.value);
       }
     }
   }
@@ -72,7 +72,7 @@ export const getFamilyDependentBalance = async (family: Family, availableBenefit
   }
 
   // Calculating consumption
-  const consumption = family.consumptions.reduce((sum, item) => sum + item.value, 0);
+  const consumption = family.consumptions.reduce((sum, item) => sum + Number(item.value), 0);
   return balance - consumption;
 };
 
@@ -182,7 +182,7 @@ export const addConsumption = async (
   }
 
   // Checking everyting
-  if (values.value < 0) {
+  if (Number(values.value) < 0) {
     // Negative consumption
     throw { status: 422, message: 'Compra não pode ter valor negativo' };
   }
@@ -193,7 +193,7 @@ export const addConsumption = async (
   }
 
   const balance = await getFamilyDependentBalance(family);
-  if (balance < values.value) {
+  if (balance < Number(values.value)) {
     // Insuficient balance
     throw { status: 422, message: 'Saldo insuficiente' };
   }
