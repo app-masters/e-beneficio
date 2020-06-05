@@ -1,23 +1,13 @@
-import puppeteer from 'puppeteer';
 import { PurchaseData } from '../schemas/consumptions';
+import Axios from 'axios';
+import https from 'https';
+import cheerio from 'cheerio';
 
-/**
- * This line is needed to workaround the warning:
- *
- * MaxListenersExceededWarning: Possible EventEmitter memory leak detected.
- * 11 SIGTERM listeners added to [process].
- * Use emitter.setMaxListeners() to increase limit
- *
- * ```
- *   Every chrome instance adds a listener to the process's "exit" event to cleanup properly.
- *   12 chrome instances add 12 listeners, which yields the warning.
- * ```
- * See: https://github.com/puppeteer/puppeteer/issues/594
- */
-process.setMaxListeners(Infinity);
-
-// eslint-disable-next-line no-var
-var document: any;
+const axios = Axios.create({
+  httpsAgent: new https.Agent({
+    rejectUnauthorized: false
+  })
+});
 
 /**
  * Scrape the consumption data from the nfce.fazenda.mg.gov.br site
@@ -27,31 +17,54 @@ var document: any;
  * @returns A object containg the place, total value, payment and products.
  */
 export const scrapeNFCeData = async (nfce: string): Promise<PurchaseData> => {
-  const browser = await puppeteer.launch({ ignoreHTTPSErrors: true });
-  const page = await browser.newPage();
-  await page.goto(nfce);
-  const result = await page.evaluate(() => {
-    // Get the name of the store
-    const place: string | undefined =
-      document.querySelector('div#collapse4 > table > tbody > tr > td')?.innerText ||
-      document.querySelector('.text-center.text-uppercase > h4 > b')?.innerText.innerText;
+  // Request the Receita Federal site and process it with cheerio
+  const page = await axios.get(nfce);
+  const document = cheerio.load(page.data);
 
-    // Search for the total paid in the purchase
-    let totalValue: undefined | number;
-    document.querySelectorAll('div.row').forEach((node: any) => {
-      if (node.querySelector('div > strong')?.innerText === 'Valor total R$') {
-        totalValue = Number(node.querySelector('div:nth-child(2) > strong')?.innerText);
-      }
-    });
+  // Get the name of the store
+  const place = (document('div#collapse4 > table > tbody > tr > td').first().text().trim() ||
+    document('.text-center.text-uppercase > h4 > b').first().text().trim()) as string | undefined;
 
-    // Create a list of products with name and total value
-    const products: { name?: string; totalValue?: number }[] = [];
-    document.querySelectorAll('#myTable > tr').forEach((node: any) => {
-      const rawName = node.querySelector('td > h7')?.innerText as string | undefined;
-      const rawValue = node.querySelector('td:nth-child(4)')?.innerText as string | undefined;
+  // Search for the total paid in the purchase
+  let totalValue: undefined | number;
+  document('div.row').each((index, node) => {
+    if (document(node).find('div > strong').first().text().trim() === 'Valor total R$') {
+      totalValue = Number(document(node).find('div:nth-child(2) > strong').first().text().trim());
+    }
+  });
+
+  // Create a list of products with name and total value
+  let products: { name?: string; totalValue?: number }[] = [];
+  document('#myTable > tr').each((index, node) => {
+    const rawName = document(node).find('td > h7').first().text() as string | undefined;
+    const rawValue = document(node).find('td:nth-child(4)').first().text() as string | undefined;
+
+    const name = rawName ? rawName.trim() : undefined;
+    const totalValue = rawValue
+      ? Number(
+          rawValue
+            .substring(rawValue.lastIndexOf('$') + 1)
+            .replace(/,/g, '.')
+            .trim()
+        )
+      : undefined;
+    products.push({ name, totalValue });
+  });
+
+  // Create a list of payment with name and value
+  const payment: { name?: string; value?: number }[] = [];
+  const paymentRows = document('div.row');
+  paymentRows.each((index, node) => {
+    if (document(node).find('div > strong').first().text().trim() === 'Valor pago R$') {
+      const rawValue = document(node).find('div:nth-child(2) > strong').first().text().trim();
+      const rawName = document(paymentRows[index + 1])
+        .find('div:nth-child(2) > strong')
+        .first()
+        .text()
+        .trim();
 
       const name = rawName ? rawName.trim() : undefined;
-      const totalValue = rawValue
+      const value = rawValue
         ? Number(
             rawValue
               .substring(rawValue.lastIndexOf('$') + 1)
@@ -59,42 +72,19 @@ export const scrapeNFCeData = async (nfce: string): Promise<PurchaseData> => {
               .trim()
           )
         : undefined;
-      products.push({ name, totalValue });
-    });
-
-    // Create a list of payment with name and value
-    const payment: { name?: string; value?: number }[] = [];
-    const paymentRows = document.querySelectorAll('div.row');
-    paymentRows.forEach((node: any, index: number) => {
-      if (node.querySelector('div > strong')?.innerText === 'Valor pago R$') {
-        const rawValue = node.querySelector('div:nth-child(2) > strong')?.innerText;
-        const rawName = paymentRows[index + 1].querySelector('div:nth-child(2) > strong')?.innerText;
-
-        const name = rawName ? rawName.trim() : undefined;
-        const value = rawValue
-          ? Number(
-              rawValue
-                .substring(rawValue.lastIndexOf('$') + 1)
-                .replace(/,/g, '.')
-                .trim()
-            )
-          : undefined;
-        payment.push({ name, value });
-      }
-    });
-
-    return { place, totalValue, payment, products };
+      payment.push({ name, value });
+    }
   });
 
   // In some cases, the same order can have the same item multiple times, this
   // can generate duplicated products in the database.
-  const productSet = new Set(result.products.map((product) => product.name));
-  result.products = Array.from(productSet).reduce(
+  const productSet = new Set(products.map((product) => product.name));
+  products = Array.from(productSet).reduce(
     (list, productName) => [
       ...list,
       {
         name: productName,
-        totalValue: result.products
+        totalValue: products
           .filter((p) => p.name === productName)
           .reduce((total, value) => total + (value.totalValue ? value.totalValue : 0), 0)
       }
@@ -102,6 +92,5 @@ export const scrapeNFCeData = async (nfce: string): Promise<PurchaseData> => {
     [] as { name?: string; totalValue?: number }[]
   );
 
-  await browser.close();
-  return result;
+  return { place, totalValue, products, payment };
 };
