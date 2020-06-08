@@ -39,13 +39,7 @@ export default createReducer<ProductReducerState>(initialState, (builder) =>
     })
     .addCase(doGetProductValidateSuccess, (state, action) => {
       state.loading = false;
-      if (Array.isArray(action.payload)) {
-        // User got the list
-        state.listValidate = addToList(null, action.payload);
-      } else {
-        // User got a single item
-        state.listValidate = addToList(action.payload, state.list);
-      }
+      state.listValidate = action.payload;
     })
     .addCase(doGetProductValidateFailed, (state, action) => {
       state.loading = false;
@@ -58,13 +52,7 @@ export default createReducer<ProductReducerState>(initialState, (builder) =>
     })
     .addCase(doGetProductSuccess, (state, action) => {
       state.loading = false;
-      if (Array.isArray(action.payload)) {
-        // User got the list
-        state.list = addToList(null, action.payload);
-      } else {
-        // User got a single item
-        state.list = addToList(action.payload, state.list);
-      }
+      state.list = action.payload;
     })
     .addCase(doGetProductFailed, (state, action) => {
       state.loading = false;
@@ -77,7 +65,7 @@ export default createReducer<ProductReducerState>(initialState, (builder) =>
     })
     .addCase(doSaveProductSuccess, (state, action) => {
       state.loading = false;
-      state.list = addToList(action.payload, state.list);
+      state.list = addToList(action.payload, state.list).sort((a, b) => (a.name > b.name ? 1 : -1));
     })
     .addCase(doSaveProductValidSuccess, (state, action) => {
       state.loading = false;

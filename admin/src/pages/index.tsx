@@ -39,7 +39,7 @@ const PrivateTypeRoute = ({ component, ...rest }: any) => {
    * Function to redirect user
    */
   const routeComponent = (props: RouteProps) =>
-    isTicket ? React.createElement(component, props) : <Redirect to={{ pathname: '/' }} />;
+    !isTicket ? React.createElement(component, props) : <Redirect to={{ pathname: '/' }} />;
   return <Route {...rest} render={routeComponent} />;
 };
 
