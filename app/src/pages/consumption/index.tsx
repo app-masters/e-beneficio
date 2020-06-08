@@ -9,6 +9,7 @@ import Webcam from 'react-webcam';
 import { FamilySearch } from '../../components/familySearch';
 import { Flex } from '../../components/flex';
 import { Family, FamilyProductConsumption } from '../../interfaces/family';
+import { Consumption } from '../../interfaces/consumption';
 import { requestSaveConsumption, requestSaveConsumptionProduct } from '../../redux/consumption/actions';
 import { AppState } from '../../redux/rootReducer';
 import yup from '../../utils/yup';
@@ -43,11 +44,23 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
   const [currentFamily, setFamily] = React.useState<number | string>();
   const isTicket = process.env.REACT_APP_CONSUMPTION_TYPE === 'ticket';
   const family = useSelector<AppState, Family | null | undefined>((state) => state.familyReducer.item);
+
+  const consumption = useSelector<AppState, Consumption[]>((state) => state.consumptionReducer.registered);
+  const loading = useSelector<AppState, boolean>((state) => state.consumptionReducer.loading);
+
   return (
     <PageContainer>
       <Card title="Informar consumo">
         <FamilySearch onFamilySelect={(id) => setFamily(id)} />
-        {currentFamily && <>{isTicket ? <FormBalance family={family} /> : <ProductConsumption family={family} />}</>}
+        {currentFamily && (
+          <>
+            {isTicket ? (
+              <FormBalance family={family} loading={loading} />
+            ) : (
+              <ProductConsumption family={family} loading={loading} />
+            )}
+          </>
+        )}
       </Card>
     </PageContainer>
   );
@@ -57,7 +70,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
  * Balance form
  * @param props component props
  */
-const FormBalance: React.FC<{ family?: Family | null }> = ({ family }) => {
+const FormBalance: React.FC<{ family?: Family | null; loading?: boolean }> = ({ family }) => {
   const dispatch = useDispatch();
   const history = useHistory();
   const cameraRef = useRef(null);
@@ -90,7 +103,7 @@ const FormBalance: React.FC<{ family?: Family | null }> = ({ family }) => {
       value: 0,
       proofImageUrl: '',
       nisCode: '',
-      familyId: '',
+      familyId: family?.id,
       birthday: '',
       acceptCheck: false
     },
@@ -106,7 +119,7 @@ const FormBalance: React.FC<{ family?: Family | null }> = ({ family }) => {
               nfce: values.nfce,
               value: Number(values.value),
               proofImageUrl: values.proofImageUrl,
-              familyId: values.familyId
+              familyId: values.familyId as number
             },
             () => {
               Modal.success({ title: 'Consumo salvo com sucesso', onOk: () => history.push('/') });
@@ -275,10 +288,11 @@ const FormBalance: React.FC<{ family?: Family | null }> = ({ family }) => {
  * Product Consumption form
  * @param props component props
  */
-const ProductConsumption: React.FC<{ family?: Family | null }> = ({ family }) => {
+const ProductConsumption: React.FC<{ family?: Family | null; loading?: boolean }> = ({ family, loading }) => {
   const [dataSource, setDataSource] = React.useState<FamilyProductConsumption[]>(
     family?.balance as FamilyProductConsumption[]
   );
+
   const dispatch = useDispatch();
 
   /**
@@ -287,9 +301,11 @@ const ProductConsumption: React.FC<{ family?: Family | null }> = ({ family }) =>
   const onSubmitConsumption = () => {
     const consumption = {
       familyId: family?.id as number,
-      products: dataSource.map((item) => {
-        return { id: item.product.id as number, amount: item.consume as number };
-      })
+      products: dataSource
+        .map((item) => {
+          return { id: item.product.id as number, amount: item.consume as number };
+        })
+        .filter((f) => f.amount)
     };
     dispatch(requestSaveConsumptionProduct(consumption));
   };
@@ -330,7 +346,7 @@ const ProductConsumption: React.FC<{ family?: Family | null }> = ({ family }) =>
       <h2>Produtos</h2>
       <Table pagination={false} columns={columns} dataSource={dataSource} />
       <Flex style={{ marginTop: 25 }} alignItems="center" justifyContent="flex-end">
-        <Button onClick={onSubmitConsumption} htmlType="submit" type="primary">
+        <Button loading={loading} onClick={onSubmitConsumption} htmlType="submit" type="primary">
           Confirmar consumo
         </Button>
       </Flex>

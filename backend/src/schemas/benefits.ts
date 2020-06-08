@@ -13,6 +13,8 @@ export interface Benefit {
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
+  //Join
+  benefitProducts?: BenefitProduct[];
 }
 // Sequelize returns type
 export type SequelizeBenefit = Benefit & Model;

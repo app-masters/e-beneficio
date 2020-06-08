@@ -35,7 +35,7 @@ router.use('/users', jwtMiddleware, userRoutes);
 router.use('/institutions', jwtMiddleware, institutionRoutes);
 router.use('/benefits', jwtMiddleware, benefitRoutes);
 router.use('/families', jwtMiddleware, familyRoutes);
-router.use('/consumptions', jwtMiddleware, consumptionRoutes);
+router.use('/consumptions', consumptionRoutes);
 router.use('/dashboard', jwtMiddleware, dashboardRoutes);
 router.use('/products', jwtMiddleware, productsRoutes);
 router.use('/static', jwtMiddleware, express.static(`${path.dirname(__dirname)}/../database/storage`));
