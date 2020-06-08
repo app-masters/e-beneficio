@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { Col, Divider as AntdDivider } from 'antd';
 
 export const PageContainer = styled.div`
   padding: ${(props) => props.theme.spacing.md};
@@ -23,4 +24,12 @@ export const ActionWrapper = styled.div`
   > * {
     margin-left: ${(props) => props.theme.spacing.sm};
   }
+`;
+
+export const DividerColumn = styled(Col).attrs({ span: 1, style: { display: 'flex' } })`
+  justify-content: center;
+`;
+
+export const Divider = styled(AntdDivider).attrs({ type: 'vertical' })`
+  height: 100%;
 `;

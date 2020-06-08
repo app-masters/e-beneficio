@@ -12,6 +12,20 @@ export const getAll = (cityId: NonNullable<City['id']>): Promise<SequelizeBenefi
 };
 
 /**
+ * Get all items on the table without any filter
+ * @param cityId logged user city ID
+ * @returns Promise<List of items>
+ */
+export const getAllWithProduct = (cityId: NonNullable<City['id']>): Promise<any> => {
+  return db.benefits.findAll({
+    include: [
+      { model: db.institutions, as: 'institution', where: { cityId } },
+      { model: db.benefitProducts, as: 'benefitProduct', include: [{ model: db.products, as: 'products' }] }
+    ]
+  });
+};
+
+/**
  * Get a single item using the unique ID
  * @param id unique ID of the desired item
  * @param cityId logged user city ID
@@ -28,6 +42,29 @@ export const getById = (id: NonNullable<Benefit['id']>, cityId: NonNullable<City
  */
 export const create = (values: Benefit | SequelizeBenefit): Promise<SequelizeBenefit> => {
   return db.benefits.create(values);
+};
+
+/**
+ * Function to create a new row on the table using product
+ * @param values object with the new item data
+ * @returns Promise<Item>
+ */
+export const createWithProduct = async (values: Benefit | SequelizeBenefit): Promise<SequelizeBenefit> => {
+  const created = await db.benefits.create(values);
+
+  if (values.benefitProduct && created) {
+    const productList = values.benefitProduct.map((i) => {
+      i.benefitsId = created.id as number;
+      return i;
+    });
+    db.benefitProducts.bulkCreate(productList);
+  }
+
+  await created.reload({
+    include: [{ model: db.benefitProducts, as: 'benefitProduct', include: [{ model: db.products, as: 'products' }] }]
+  });
+
+  return created;
 };
 
 /**
@@ -50,6 +87,58 @@ export const updateById = async (
     return item;
   }
   return null;
+};
+
+/**
+ * Function to update a row on the table by the unique ID
+ * @param id unique ID of the desired item
+ * @param values object with the new data
+ * @param cityId logged user city ID
+ * @returns Promise<Item>
+ */
+export const updateWithProduct = async (
+  id: NonNullable<Benefit['id']>,
+  values: Benefit | SequelizeBenefit,
+  cityId: NonNullable<City['id']>
+): Promise<SequelizeBenefit | null> => {
+  // Trying to get item on the city
+  const cityItem = await getById(id, cityId);
+  if (cityItem) {
+    // The update return an array [count, item[]], so I'm destructuring to get the updated benefit
+    const [, [updated]] = await db.benefits.update(values, { where: { id }, returning: true });
+    const updatedProducts = await db.benefitProducts.findAll({ where: { benefitsId: updated.id as number } });
+
+    if (values.benefitProduct) {
+      const list = values.benefitProduct.map((i) => {
+        i.benefitsId = updated.id as number;
+        return i;
+      });
+      const productToUpdate = list.filter((f) => f.id);
+      const productToAdd = list.filter((f) => !f.id);
+      const productToRemove = updatedProducts.filter((a) => {
+        const index = productToUpdate.find((f) => f.id === a.id);
+        if (!index) return a;
+        return null;
+      });
+
+      await db.benefitProducts.bulkCreate(productToAdd);
+
+      productToRemove.map(async (dt) => {
+        if (dt.id) await db.benefitProducts.destroy({ where: { id: dt.id } });
+      });
+      productToUpdate.map(async (up) => {
+        if (up.id) await db.benefitProducts.update({ amount: up.amount }, { where: { id: up.id } });
+      });
+    }
+  }
+
+  return await db.benefits.findOne({
+    where: { id },
+    include: [
+      { model: db.institutions, as: 'institution', where: { cityId } },
+      { model: db.benefitProducts, as: 'benefitProduct', include: [{ model: db.products, as: 'products' }] }
+    ]
+  });
 };
 
 /**
