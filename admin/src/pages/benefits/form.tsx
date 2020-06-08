@@ -19,8 +19,7 @@ const schema = yup.object().shape({
   institutionId: yup.number().label('Instituição').required(),
   groupName: yup.string().label('Família').required(),
   title: yup.string().label('Nome').required(),
-  month: yup.number().label('Mês').required(),
-  year: yup.number().label('Ano').required(),
+  date: yup.date().label('Data').required(),
   value: yup.string().label('Valor').required()
 });
 
@@ -62,8 +61,7 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
       institutionId: !institutionLoading && institutionList && institutionList.length > 0 ? institutionList[0].id : 1,
       groupName: 'children',
       title: '',
-      month: undefined,
-      year: undefined,
+      date: undefined,
       value: undefined
     },
     validationSchema: schema,
@@ -81,10 +79,11 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
 
   const titleMeta = getFieldMeta('title');
   const groupMeta = getFieldMeta('groupName');
-  const monthMeta = getFieldMeta('month');
-  const yearMeta = getFieldMeta('year');
+  const dateMeta = getFieldMeta('year');
   const valueMeta = getFieldMeta('value');
   const institutionIdMeta = getFieldMeta('institutionId');
+
+  const monthFormat = 'MM/YYYY';
 
   return (
     <Modal
@@ -159,38 +158,22 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
             </Select>
           </Form.Item>
 
-          <Row gutter={[16, 16]}>
-            <Col span={12}>
-              <Form.Item
-                label={'Mês'}
-                validateStatus={!!monthMeta.error && !!monthMeta.touched ? 'error' : ''}
-                help={!!monthMeta.error && !!monthMeta.touched ? monthMeta.error : undefined}
-              >
-                <DatePicker.MonthPicker
-                  format={'MMMM'}
-                  locale={locale}
-                  style={{ width: '100%' }}
-                  defaultValue={values.month ? moment(values.month, 'MM') : undefined}
-                  onChange={(date) => setFieldValue('month', Number(date?.format('MM')))}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                label={'Ano'}
-                validateStatus={!!yearMeta.error && !!yearMeta.touched ? 'error' : ''}
-                help={!!yearMeta.error && !!yearMeta.touched ? yearMeta.error : undefined}
-              >
-                <DatePicker.YearPicker
-                  format={'YYYY'}
-                  locale={locale}
-                  style={{ width: '100%' }}
-                  defaultValue={values.year ? moment(values.year, 'YYYY') : undefined}
-                  onChange={(date) => setFieldValue('year', Number(date?.format('YYYY')))}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
+          <Form.Item
+            label={'Data'}
+            validateStatus={!!dateMeta.error && !!dateMeta.touched ? 'error' : ''}
+            help={!!dateMeta.error && !!dateMeta.touched ? dateMeta.error : undefined}
+          >
+            <DatePicker
+              locale={locale}
+              picker="month"
+              style={{ width: '100%' }}
+              format={monthFormat}
+              defaultValue={values.date ? moment(values.date) : undefined}
+              onChange={(date) => {
+                setFieldValue('date', date);
+              }}
+            />
+          </Form.Item>
 
           <Form.Item
             label="Valor por dependente"

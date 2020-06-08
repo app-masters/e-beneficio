@@ -39,8 +39,7 @@ export const BenefitList: React.FC<{}> = () => {
             dataIndex="groupName"
             render={(data: Benefit['groupName']) => familyGroupList[data]?.title || data}
           />
-          <Table.Column title="Mês" dataIndex="month" />
-          <Table.Column title="Ano" dataIndex="year" />
+          <Table.Column title="Data" dataIndex="date" render={(data) => moment(data).format('MM/YYYY')} />
           <Table.Column
             title="Valor por dependente"
             dataIndex="value"
