@@ -27,13 +27,15 @@ router.post('/', async (req, res) => {
     const isTicket = process.env.CONSUMPTION_TYPE === 'ticket';
 
     let item;
-    if (isTicket) item = await consumptionModel.addConsumption({ ...req.body, proofImageUrl });
-    else item = await consumptionModel.addConsumptionProduct({ ...req.body, proofImageUrl });
-
-    // Scrape the purchase data, but don't wait for it
-    consumptionModel.scrapeConsumption(item);
-
-    return res.send(item);
+    if (isTicket) {
+      item = await consumptionModel.addConsumption({ ...req.body, proofImageUrl });
+      // Scrape the purchase data, but don't wait for it
+      consumptionModel.scrapeConsumption(item);
+      return res.send(item);
+    } else {
+      item = await consumptionModel.addConsumptionProduct({ ...req.body });
+      return res.send(item);
+    }
   } catch (error) {
     logging.error(error);
     return res.status(error.status || 500).send(error.message);
