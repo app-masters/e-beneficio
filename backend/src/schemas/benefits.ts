@@ -6,8 +6,7 @@ export interface Benefit {
   institutionId: number | string;
   groupName: string;
   title: string;
-  month: number;
-  year: number;
+  date: Date;
   value?: number;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
@@ -46,12 +45,8 @@ export const attributes = {
     type: DataTypes.STRING,
     allowNull: false
   },
-  month: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
-  year: {
-    type: DataTypes.INTEGER,
+  date: {
+    type: DataTypes.DATE,
     allowNull: false
   },
   value: {

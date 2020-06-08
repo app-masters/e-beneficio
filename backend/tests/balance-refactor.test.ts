@@ -38,8 +38,7 @@ let createdFamily: Family;
 const benefit = {
   title: '[CAD25123] Auxilio merenda',
   groupName: getFamilyGroupByCode(0)?.key,
-  month: moment().month() + 1,
-  year: moment().year(),
+  date: moment().toDate(),
   value: 500,
   institutionId: 0
 } as Benefit;
