@@ -1,26 +1,24 @@
 import db from '../../src/schemas';
 import { Benefit } from '../../src/schemas/benefits';
+import moment from 'moment';
 
 const list = [
   {
     title: '[CAD25123] Auxilio municipal de alimentação',
     groupName: 'extreme-poverty',
-    month: 5,
-    year: 2020,
+    date: moment().startOf('month').month(4).year(2020).toDate(),
     value: 600
   },
   {
     title: '[CAD25123] Auxilio municipal de alimentação',
     groupName: 'poverty-line',
-    month: 5,
-    year: 2020,
+    date: moment().startOf('month').month(4).year(2020).toDate(),
     value: 400
   },
   {
     title: '[CAD25123] Auxilio municipal de alimentação',
     groupName: 'cad',
-    month: 5,
-    year: 2020,
+    date: moment().startOf('month').month(4).year(2020).toDate(),
     value: 300
   }
 ] as Benefit[];

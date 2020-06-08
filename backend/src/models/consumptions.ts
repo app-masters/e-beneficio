@@ -39,27 +39,22 @@ export const getFamilyDependentBalance = async (family: Family, availableBenefit
     });
   }
 
-  const todayMonth = moment().month() + 1;
-  const todayYear = moment().year();
+  const todayDate = moment();
 
   let balance = 0;
   for (const dependent of family.dependents as Dependent[]) {
-    const startMonth = moment(dependent.createdAt as Date).month() + 1;
-    const startYear = moment(dependent.createdAt as Date).year();
-    const endMonth = moment(dependent.deactivatedAt as Date).month() + 1;
-    const endYear = moment(dependent.deactivatedAt as Date).year();
+    const startDate = moment(dependent.createdAt as Date);
+    const endDate = moment(dependent.deactivatedAt as Date);
 
     for (const benefit of availableBenefits) {
-      const benefitDate = moment(benefit.date);
+      const benefitDate = moment(benefit.date as Date);
       if (benefit.groupName !== family.groupName) continue; // Don't check if it's from another group
 
       // Check all the dates
-      const notInFuture =
-        benefitDate.year() < todayYear || (benefitDate.year() === todayYear && benefitDate.month() + 1 <= todayMonth);
-      const afterCreation =
-        benefitDate.year() > startYear || (benefitDate.year() === startYear && benefitDate.month() + 1 >= startMonth);
+      const notInFuture = benefitDate.toDate() <= todayDate.endOf('month').toDate();
+      const afterCreation = benefitDate.toDate() >= startDate.startOf('month').toDate();
       const beforeDeactivation = dependent.deactivatedAt
-        ? benefitDate.year() < endYear || (benefitDate.year() === endYear && benefitDate.month() + 1 < endMonth)
+        ? benefitDate.toDate() <= endDate.endOf('month').toDate()
         : true;
 
       if (notInFuture && afterCreation && beforeDeactivation) {
@@ -111,26 +106,17 @@ export const getBalanceReport = async (cityId: NonNullable<City['id']>) => {
  */
 export const getFamilyBalance = async (family: Family): Promise<number> => {
   // Get all benefits from the family group
-
-  const familyStartMonth = moment(family.createdAt as Date).month() + 1;
-  const familyStartYear = moment(family.createdAt as Date).year();
-  const todayMonth = moment().month() + 1;
-  const todayYear = moment().year();
+  const familyStart = moment(family.createdAt as Date);
+  const todayDate = moment();
 
   const [benefit] = await db.benefits.findAll({
     where: {
       [Sequelize.Op.and]: [
         {
-          [Sequelize.Op.or]: [
-            { year: { [Sequelize.Op.gt]: familyStartYear } },
-            { year: familyStartYear, month: { [Sequelize.Op.gte]: familyStartMonth } }
-          ]
+          date: { [Sequelize.Op.gte]: familyStart.startOf('month').toDate() }
         },
         {
-          [Sequelize.Op.or]: [
-            { year: { [Sequelize.Op.lt]: todayYear } },
-            { year: todayYear, month: { [Sequelize.Op.lte]: todayMonth } }
-          ]
+          date: { [Sequelize.Op.lte]: todayDate.endOf('month').toDate() }
         },
         { groupName: family.groupName }
       ]
