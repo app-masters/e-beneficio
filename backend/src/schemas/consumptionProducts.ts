@@ -1,22 +1,20 @@
 import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize';
-import { Product } from './products';
 
 // Simple item type
-export interface BenefitProduct {
+export interface ConsumptionProducts {
   readonly id?: number | string;
   productsId: number | string;
-  benefitsId: number | string;
+  consumptionsId: number | string;
   amount: number;
-  products: Product | null;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
 }
 // Sequelize returns type
-export type SequelizeBenefitProduct = BenefitProduct & Model;
+export type SequelizeConsumptionProducts = ConsumptionProducts & Model;
 // Sequelize model type
-export type SequelizeBenefitProductModel = typeof Model & {
-  new (values?: object, options?: BuildOptions): SequelizeBenefitProduct;
+export type SequelizeConsumptionProductsModel = typeof Model & {
+  new (values?: object, options?: BuildOptions): SequelizeConsumptionProducts;
   associate: (models: { [key: string]: ModelCtor<Model> }) => void;
 };
 
@@ -37,10 +35,10 @@ export const attributes = {
     },
     allowNull: false
   },
-  benefitsId: {
+  consumptionsId: {
     type: DataTypes.INTEGER,
     references: {
-      model: 'Benefits',
+      model: 'Consumptions',
       id: 'id'
     },
     allowNull: false
@@ -51,15 +49,15 @@ export const attributes = {
   }
 };
 
-const tableName = 'BenefitProducts';
+const tableName = 'ConsumptionProducts';
 
 /**
  * Sequelize model initializer function
  * @param sequelize - Sequelize instance
  * @returns Schema - Sequelize model
  */
-export const initBenefitProductSchema = (sequelize: Sequelize): SequelizeBenefitProductModel => {
-  const Schema = sequelize.define(tableName, attributes, { timestamps: true }) as SequelizeBenefitProductModel;
+export const initConsumptionProductsSchema = (sequelize: Sequelize): SequelizeConsumptionProductsModel => {
+  const Schema = sequelize.define(tableName, attributes, { timestamps: true }) as SequelizeConsumptionProductsModel;
 
   Schema.associate = (models): void => {
     // Sequelize relations
@@ -68,9 +66,9 @@ export const initBenefitProductSchema = (sequelize: Sequelize): SequelizeBenefit
       as: 'products'
     });
     //
-    Schema.belongsTo(models.benefits, {
-      foreignKey: 'benefitsId',
-      as: 'benefits'
+    Schema.belongsTo(models.consumptions, {
+      foreignKey: 'consumptionsId',
+      as: 'consumptions'
     });
   };
 
