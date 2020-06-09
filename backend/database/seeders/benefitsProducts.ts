@@ -3,23 +3,23 @@ import { BenefitProduct } from '../../src/schemas/benefitProducts';
 
 const list = [
   {
-    productsId: 5,
-    benefitsId: 1,
+    productId: 5,
+    benefitId: 1,
     amount: 2
   },
   {
-    productsId: 6,
-    benefitsId: 2,
+    productId: 6,
+    benefitId: 2,
     amount: 2
   },
   {
-    productsId: 7,
-    benefitsId: 2,
+    productId: 7,
+    benefitId: 2,
     amount: 2
   },
   {
-    productsId: 8,
-    benefitsId: 2,
+    productId: 8,
+    benefitId: 2,
     amount: 2
   }
 ] as BenefitProduct[];

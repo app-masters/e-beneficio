@@ -26,7 +26,7 @@ const schema = yup.object().shape({
   title: yup.string().label('Nome').required(),
   date: yup.date().label('Data').required(),
   value: !showProductList ? yup.string().label('Valor').required() : yup.string().label('Valor').nullable(),
-  benefitProduct: showProductList
+  benefitProducts: showProductList
     ? yup
         .array()
         .test(
@@ -79,7 +79,7 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
       date: undefined,
       year: undefined,
       value: undefined,
-      benefitProduct: undefined
+      benefitProducts: undefined
     },
     validationSchema: schema,
     onSubmit: (values, { setStatus }) => {
@@ -99,7 +99,7 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
   const dateMeta = getFieldMeta('year');
   const valueMeta = getFieldMeta('value');
   const institutionIdMeta = getFieldMeta('institutionId');
-  const productsMeta = getFieldMeta('benefitProduct');
+  const productsMeta = getFieldMeta('benefitProducts');
 
   const monthFormat = 'MM/YYYY';
 
@@ -125,22 +125,22 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
               >
                 <Input id="title" name="title" onChange={handleChange} value={values.title} onPressEnter={submitForm} />
               </Form.Item>
-          <Form.Item
-            label={'Data'}
-            validateStatus={!!dateMeta.error && !!dateMeta.touched ? 'error' : ''}
-            help={!!dateMeta.error && !!dateMeta.touched ? dateMeta.error : undefined}
-          >
-            <DatePicker
-              locale={locale}
-              picker="month"
-              style={{ width: '100%' }}
-              format={monthFormat}
-              defaultValue={values.date ? moment(values.date) : undefined}
-              onChange={(date) => {
-                setFieldValue('date', date);
-              }}
-            />
-          </Form.Item>
+              <Form.Item
+                label={'Data'}
+                validateStatus={!!dateMeta.error && !!dateMeta.touched ? 'error' : ''}
+                help={!!dateMeta.error && !!dateMeta.touched ? dateMeta.error : undefined}
+              >
+                <DatePicker
+                  locale={locale}
+                  picker="month"
+                  style={{ width: '100%' }}
+                  format={monthFormat}
+                  defaultValue={values.date ? moment(values.date) : undefined}
+                  onChange={(date) => {
+                    setFieldValue('date', date);
+                  }}
+                />
+              </Form.Item>
 
               <Form.Item
                 label={'Instituição'}
@@ -210,9 +210,9 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
               <ProductSelector
                 validateStatus={!!productsMeta.error && !!productsMeta.touched ? 'error' : ''}
                 help={!!productsMeta.error && !!productsMeta.touched ? productsMeta.error : undefined}
-                value={values.benefitProduct}
+                value={values.benefitProducts}
                 onChange={(value) => {
-                  setFieldValue('benefitProduct', value);
+                  setFieldValue('benefitProducts', value);
                 }}
               />
             )}

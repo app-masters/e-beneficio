@@ -5,7 +5,6 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Benefit } from '../../interfaces/benefit';
-import { Product } from '../../interfaces/product';
 import { requestDeleteBenefit, requestGetBenefit } from '../../redux/benefit/actions';
 import { AppState } from '../../redux/rootReducer';
 import { familyGroupList } from '../../utils/constraints';
@@ -24,7 +23,6 @@ const showProductList = TYPE === 'product';
 export const BenefitList: React.FC<{}> = () => {
   // Redux state
   const list = useSelector<AppState, Benefit[]>((state) => state.benefitReducer.list as Benefit[]);
-  const productList = useSelector<AppState, Product[]>((state) => state.productReducer.list as Product[]);
 
   // Redux actions
   const dispatch = useDispatch();
@@ -52,7 +50,7 @@ export const BenefitList: React.FC<{}> = () => {
           />
           <Table.Column title="Data" dataIndex="date" render={(data) => moment(data).format('MM/YYYY')} />
           {/* Show the product list column depending on the type of benefit */}
-          {!showProductList &&  (
+          {!showProductList && (
             <Table.Column
               title="Valor por dependente"
               dataIndex="value"

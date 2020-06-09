@@ -7,14 +7,14 @@ const list = [
     title: '[CAD25123] Auxilio municipal de alimentação',
     groupName: 'extreme-poverty',
     date: moment().startOf('month').month(4).year(2020).toDate(),
-    institutionId: 1
+    institutionId: 1,
     value: 600
   },
   {
     title: '[CAD25123] Auxilio municipal de alimentação',
     groupName: 'poverty-line',
     date: moment().startOf('month').month(4).year(2020).toDate(),
-    institutionId: 1.
+    institutionId: 1,
     value: 400
   },
   {

@@ -1,6 +1,6 @@
 import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize';
 import { Product } from './products';
-import { ConsumptionProducts } from './ConsumptionProducts';
+import { ConsumptionProducts } from './consumptionProducts';
 
 export interface PurchaseData {
   place?: string;
@@ -31,7 +31,7 @@ export interface Consumption {
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
   //Join
-  products: (Product & { amount: number })[] | null;
+  products?: (Product & { amount: number })[] | null;
   consumptionProducts?: ConsumptionProducts[];
 }
 // Sequelize returns type

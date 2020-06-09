@@ -3,32 +3,32 @@ import { ConsumptionProducts } from '../../src/schemas/consumptionProducts';
 
 const list = [
   {
-    productsId: 1,
+    productId: 1,
     consumptionsId: 2,
     amount: 2
   },
   {
-    productsId: 2,
+    productId: 2,
     consumptionsId: 2,
     amount: 2
   },
   {
-    productsId: 2,
+    productId: 2,
     consumptionsId: 2,
     amount: 2
   },
   {
-    productsId: 2,
+    productId: 2,
     consumptionsId: 2,
     amount: 2
   },
   {
-    productsId: 1,
+    productId: 1,
     consumptionsId: 1,
     amount: 2
   },
   {
-    productsId: 2,
+    productId: 2,
     consumptionsId: 1,
     amount: 2
   }

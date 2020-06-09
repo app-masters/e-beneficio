@@ -75,7 +75,7 @@ test(`[${testName}] Get balance report`, async () => {
 test(`[${testName}] Consume all the balance`, async () => {
   const balance = await consumptionModel.getFamilyDependentBalance(createdFamily);
   const consumption: Consumption = {
-    value: balance,
+    value: balance as number,
     invalidValue: 0,
     familyId: createdFamily.id as number,
     nfce: new Date().getTime().toString(),

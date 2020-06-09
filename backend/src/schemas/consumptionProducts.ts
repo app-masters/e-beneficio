@@ -3,7 +3,7 @@ import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize'
 // Simple item type
 export interface ConsumptionProducts {
   readonly id?: number | string;
-  productsId: number | string;
+  productId: number | string;
   consumptionsId: number | string;
   amount: number;
   createdAt?: number | Date | null;
@@ -27,7 +27,7 @@ export const attributes = {
     primaryKey: true,
     autoIncrement: true
   },
-  productsId: {
+  productId: {
     type: DataTypes.INTEGER,
     references: {
       model: 'Products',
@@ -62,8 +62,8 @@ export const initConsumptionProductsSchema = (sequelize: Sequelize): SequelizeCo
   Schema.associate = (models): void => {
     // Sequelize relations
     Schema.belongsTo(models.products, {
-      foreignKey: 'productsId',
-      as: 'products'
+      foreignKey: 'productId',
+      as: 'product'
     });
     //
     Schema.belongsTo(models.consumptions, {

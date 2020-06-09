@@ -63,12 +63,12 @@ export const initProductSchema = (sequelize: Sequelize): SequelizeProductModel =
   Schema.associate = (models): void => {
     // Sequelize relations
     Schema.hasMany(models.consumptionProducts, {
-      foreignKey: 'productsId',
+      foreignKey: 'productId',
       as: 'consumptionProducts'
     });
     Schema.hasMany(models.benefitProducts, {
-      foreignKey: 'productsId',
-      as: 'benefitProduct'
+      foreignKey: 'productId',
+      as: 'benefitProducts'
     });
   };
 
