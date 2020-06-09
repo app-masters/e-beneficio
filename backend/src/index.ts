@@ -8,6 +8,7 @@ import path from 'path';
 
 import routes from './routes';
 import logging from './utils/logging';
+import { setupCronjobs } from './cron';
 
 require('dotenv').config();
 
@@ -54,6 +55,9 @@ const init = (listeningCallback: () => void, errorCallback: (error: Error) => vo
     server.listen(process.env.PORT);
     server.on('error', errorCallback);
     server.on('listening', listeningCallback);
+
+    //Setup the server cronjobs
+    setupCronjobs();
   } catch (e) {
     errorCallback(e);
   }

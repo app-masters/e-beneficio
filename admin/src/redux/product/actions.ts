@@ -99,7 +99,6 @@ export const requestSaveProduct = (
       if (response && response.data) {
         // Request finished
         if (type === 'validation') {
-          alert('ASd');
           dispatch(doSaveProductValidSuccess(response.data)); // Dispatch result
         } else dispatch(doSaveProductSuccess(response.data)); // Dispatch result
         if (onSuccess) onSuccess();

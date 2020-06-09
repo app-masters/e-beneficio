@@ -10,6 +10,7 @@ import consumptions from './consumptions';
 import dependents from './dependents';
 import products from './products';
 import consumptionProducts from './consumptionProducts';
+import benefitsProducts from './benefitsProducts';
 
 /**
  * Seed all tables
@@ -28,6 +29,7 @@ const seedAll = async () => {
     await consumptions.seed();
     await products.seed();
     await consumptionProducts.seed();
+    await benefitsProducts.seed();
   } else {
     // Production seed - one city and admin user
     await cities.seed();

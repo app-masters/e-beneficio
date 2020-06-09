@@ -68,5 +68,13 @@ export const initProductSchema = (sequelize: Sequelize): SequelizeProductModel =
     });
   };
 
+  Schema.associate = (models): void => {
+    // Sequelize relations
+    Schema.hasMany(models.benefitProducts, {
+      foreignKey: 'productsId',
+      as: 'benefitProduct'
+    });
+  };
+
   return Schema;
 };

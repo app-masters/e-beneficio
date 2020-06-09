@@ -81,7 +81,7 @@ export default createReducer<ProductReducerState>(initialState, (builder) =>
     })
     .addCase(doSaveProductValidSuccess, (state, action) => {
       state.loading = false;
-      state.listValidate = state.list.filter((item) => item.id !== action.payload.id);
+      state.listValidate = state.listValidate.filter((item) => item.id !== action.payload.id);
     })
     .addCase(doSaveProductFailed, (state, action) => {
       state.loading = false;
