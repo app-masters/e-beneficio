@@ -161,7 +161,7 @@ export const Sidebar: React.FC = () => {
           <Menu theme="light" mode="inline" defaultSelectedKeys={[location ? location.pathname : '/']}>
             {/* Render the links based on the nav arrays */}
             {routes.map((navLink) => menuItem(navLink, ''))}
-            {isTicket && privateRoutes.map((navLink) => menuItem(navLink, ''))}
+            {!isTicket && privateRoutes.map((navLink) => menuItem(navLink, ''))}
           </Menu>
         </MenuHeight>
         <Flex vertical={collapsed} alignItems="center" gap="sm" justifyContent="space-between">
