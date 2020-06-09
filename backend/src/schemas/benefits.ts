@@ -77,9 +77,6 @@ export const initBenefitSchema = (sequelize: Sequelize): SequelizeBenefitModel =
     });
     Schema.hasMany(models.benefitProducts, {
       foreignKey: 'benefitsId',
-      as: 'benefitProducts'
-    Schema.hasMany(models.benefitProducts, {
-      foreignKey: 'benefitsId',
       as: 'benefitProduct',
       onDelete: 'CASCADE',
       hooks: true

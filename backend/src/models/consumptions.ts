@@ -1,7 +1,6 @@
 import Sequelize, { Op } from 'sequelize';
 import db from '../schemas';
 import { Consumption, SequelizeConsumption } from '../schemas/consumptions';
-import { ConsumptionProducts } from '../schemas/consumptionProducts';
 import { PlaceStore } from '../schemas/placeStores';
 import { Family } from '../schemas/families';
 import moment from 'moment';
@@ -57,19 +56,27 @@ export const getFamilyDependentBalanceProduct = async (family: Family) => {
   });
   //Get difference between available products and consumed products
   const differenceProducts = listOfProductsAvailable.map((product) => {
-    const item = productsFamilyConsumption.find((f) => f.productsId === product.productsId);
-    let amountDifference = 0;
-    if (item) {
-      amountDifference = product.amount - item.amount;
+    const items = productsFamilyConsumption.filter((f) => f.productsId === product.productsId);
+    // const item = productsFamilyConsumption.find((f) => f.productsId === product.productsId);
+    let amount = 0;
+    if (items.length > 0)
+      amount = items
+        .map((item) => {
+          return item.amount;
+        })
+        .reduce((a, b) => a + b);
+    let amountDifference = product.amount;
+    if (amount) {
+      amountDifference = product.amount - amount;
       if (amountDifference < 0) {
         logging.critical('Family with negative amount', { family });
       }
     }
     return {
-      product: { id: product.id, name: product.products?.name },
+      product: { id: product.products?.id, name: product.products?.name },
       amountAvailable: amountDifference,
       amountGranted: product.amount,
-      amountConsumed: item ? item.amount : 0
+      amountConsumed: amount ? amount : 0
     };
   });
 
@@ -359,6 +366,7 @@ export const addConsumptionProduct = async (values: Consumption): Promise<Sequel
       if (consumptionProducts) {
         await db.consumptionProducts.bulkCreate(consumptionProducts);
       }
+      consumption.products = values.products;
       return consumption;
     });
     return newConsumption;

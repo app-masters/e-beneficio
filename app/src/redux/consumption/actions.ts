@@ -12,6 +12,40 @@ export const doSaveConsumptionFailed = createAction<Error | undefined>('consumpt
 /**
  * Save consumption Thunk action
  */
+export const requestSaveConsumptionProduct = (
+  item: Pick<Consumption, 'familyId' | 'products'>,
+  onSuccess?: () => void,
+  onFailure?: (error?: Error) => void
+): ThunkResult<void> => {
+  return async (dispatch) => {
+    try {
+      // Start request - starting loading state
+      dispatch(doSaveConsumption());
+
+      // Request
+      const response = await backend.post<Consumption>(`/consumptions`, item);
+
+      if (response && response.data) {
+        // Request finished
+        dispatch(doSaveConsumptionSuccess(response.data)); // Dispatch result
+        if (onSuccess) onSuccess();
+      } else {
+        // Request without response - probably won't happen, but cancel the request
+        dispatch(doSaveConsumptionFailed());
+        if (onFailure) onFailure();
+      }
+    } catch (error) {
+      // Request failed: dispatch error
+      logging.error(error);
+      dispatch(doSaveConsumptionFailed(error));
+      if (onFailure) onFailure(error);
+    }
+  };
+};
+
+/**
+ * Save consumption Thunk action
+ */
 export const requestSaveConsumption = (
   item: Pick<Consumption, 'familyId' | 'nfce' | 'proofImageUrl' | 'value'>,
   onSuccess?: () => void,

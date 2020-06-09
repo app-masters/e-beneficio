@@ -8,7 +8,6 @@ export interface BenefitProduct {
   productsId: number | string;
   benefitsId: number | string;
   amount: number;
-  products: Product | null;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
