@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Form, Input, Typography, Card, Descriptions, Row, Col } from 'antd';
+import { Form, Input, Typography, Descriptions, Row, Col, Alert } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { FamilyWrapper, InfoContainer } from './styles';
 import { AppState } from '../../redux/rootReducer';
 import { requestGetFamily } from '../../redux/families/actions';
 import { Family } from '../../interfaces/family';
 import moment from 'moment';
+import { formatMoney } from '../../utils/string';
 
 const { Text } = Typography;
 
@@ -25,7 +26,9 @@ export const FamilySearch: React.FC<ComponentProps> = () => {
   const [nis, setNis] = useState('');
   // Redux state
   const familyLoading = useSelector<AppState, boolean>((state) => state.familiesReducer.familyLoading);
-  const familyError = useSelector<AppState, Error | undefined>((state) => state.familiesReducer.familyError);
+  const familyError = useSelector<AppState, (Error & { status?: number }) | undefined>(
+    (state) => state.familiesReducer.familyError
+  );
   const family = useSelector<AppState, Family | null | undefined>((state) => state.familiesReducer.familyItem);
 
   // .env
@@ -54,11 +57,14 @@ export const FamilySearch: React.FC<ComponentProps> = () => {
 
       {familyError && !familyLoading && (
         <FamilyWrapper>
-          <Card>
-            <InfoContainer>
-              <Text>Não encontramos nenhuma família utilizando esse NIS.</Text>
-            </InfoContainer>
-          </Card>
+          <Alert
+            type={familyError.status === 404 ? 'info' : 'error'}
+            message={
+              <InfoContainer>
+                <Text>{familyError.message}</Text>
+              </InfoContainer>
+            }
+          />
         </FamilyWrapper>
       )}
 
@@ -72,9 +78,7 @@ export const FamilySearch: React.FC<ComponentProps> = () => {
                   {moment(family.responsibleBirthday).format('DD/MM/YYYY')}
                 </Descriptions.Item>
                 <Descriptions.Item label="Saldo disponível">
-                  <Typography.Paragraph strong>{`R$${(family.balance || 0)
-                    .toFixed(2)
-                    .replace('.', ',')}`}</Typography.Paragraph>
+                  <Typography.Paragraph strong>{`R$${formatMoney(family.balance || 0)}`}</Typography.Paragraph>
                 </Descriptions.Item>
                 <Descriptions.Item label="Endereço">{family.address}</Descriptions.Item>
                 <Descriptions.Item label="Telefone">{family.phone}</Descriptions.Item>

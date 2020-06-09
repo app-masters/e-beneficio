@@ -41,15 +41,10 @@ const routes: RouteItem[] = [
     icon: () => <BookOutlined />,
     name: 'Validar Produtos'
   },
-  // {
-  //   path: '/relatorios',
-  //   icon: () => <BarChartOutlined />,
-  //   name: 'Relatórios'
-  // },
   {
-    path: '/beneficios',
+    path: '/consumo',
     icon: () => <CarryOutOutlined />,
-    name: 'Beneficios'
+    name: 'Informar consumo'
   },
   {
     path: '/familias',
@@ -57,15 +52,25 @@ const routes: RouteItem[] = [
     name: 'Famílias'
   },
   {
+    path: '/beneficios',
+    icon: () => <CarryOutOutlined />,
+    name: 'Beneficios'
+  },
+  {
     path: '/usuarios',
     icon: () => <UserOutlined />,
     name: 'Usuários'
   },
   {
-    path: '/consumo',
-    icon: () => <CarryOutOutlined />,
-    name: 'Informar consumo'
-  },
+    path: '/instituicoes',
+    icon: () => <BankOutlined />,
+    name: 'Instituições'
+  }
+  // {
+  //   path: '/relatorios',
+  //   icon: () => <BarChartOutlined />,
+  //   name: 'Relatórios'
+  // },
   // {
   //   path: '/lojas',
   //   icon: () => <ShopOutlined />,
@@ -76,11 +81,6 @@ const routes: RouteItem[] = [
   //   icon: () => <SolutionOutlined />,
   //   name: 'Estabelecimentos'
   // },
-  {
-    path: '/instituicoes',
-    icon: () => <BankOutlined />,
-    name: 'Instituições'
-  }
 ];
 
 const privateRoutes: RouteItem[] = [
@@ -161,7 +161,7 @@ export const Sidebar: React.FC = () => {
           <Menu theme="light" mode="inline" defaultSelectedKeys={[location ? location.pathname : '/']}>
             {/* Render the links based on the nav arrays */}
             {routes.map((navLink) => menuItem(navLink, ''))}
-            {isTicket && privateRoutes.map((navLink) => menuItem(navLink, ''))}
+            {!isTicket && privateRoutes.map((navLink) => menuItem(navLink, ''))}
           </Menu>
         </MenuHeight>
         <Flex vertical={collapsed} alignItems="center" gap="sm" justifyContent="space-between">

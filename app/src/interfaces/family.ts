@@ -1,3 +1,11 @@
+export interface FamilyProductConsumption {
+  product: { id: number | string; name: string };
+  amountAvailable: number;
+  amountGranted: number;
+  amountConsumed: number;
+  consume?: number;
+}
+
 export interface Family {
   readonly id?: number | string;
   cityId: number | string;
@@ -11,5 +19,5 @@ export interface Family {
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
   // Extra data
-  balance: number;
+  balance: number | FamilyProductConsumption[];
 }
