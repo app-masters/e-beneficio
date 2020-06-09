@@ -63,7 +63,7 @@ export const updateById = async (
   const cityItem = getById(id, cityId);
   if (cityItem) {
     // The update return an array [count, item[]], so I'm destructuring to get the updated user
-    const [, [item]] = await db.users.update(values, { where: { id }, returning: true });
+    const [, [item]] = await db.users.update(values, { where: { id }, returning: true, individualHooks: true });
     return item;
   }
   return null;

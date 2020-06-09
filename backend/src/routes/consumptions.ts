@@ -24,12 +24,18 @@ router.post('/', async (req, res) => {
         proofImageUrl = data.url;
       }
     }
-    const item = await consumptionModel.addConsumption({ ...req.body, proofImageUrl });
+    const isTicket = process.env.CONSUMPTION_TYPE === 'ticket';
 
-    // Scrape the purchase data, but don't wait for it
-    consumptionModel.scrapeConsumption(item);
-
-    return res.send(item);
+    let item;
+    if (isTicket) {
+      item = await consumptionModel.addConsumption({ ...req.body, proofImageUrl });
+      // Scrape the purchase data, but don't wait for it
+      consumptionModel.scrapeConsumption(item);
+      return res.send(item);
+    } else {
+      item = await consumptionModel.addConsumptionProduct({ ...req.body });
+      return res.send(item);
+    }
   } catch (error) {
     logging.error(error);
     return res.status(error.status || 500).send(error.message);
