@@ -399,6 +399,56 @@ export const getDashboardInfo = async (cityId: NonNullable<City['id']>) => {
  * @param values object with the new item data
  * @returns Promise<Item>
  */
+export const createFamilyWithDependents = async (values: Family | SequelizeFamily): Promise<SequelizeFamily> => {
+  //verify if family exists
+  const family = await db.families.findOne({
+    where: Sequelize.or({ code: values.code }, { responsibleNis: values.responsibleNis })
+  });
+  if (family) {
+    throw { status: 400, message: 'Familia já cadastrada.' };
+  }
+  //verify if dependent exist
+  if (values.dependents) {
+    const dependentIds = values.dependents?.map((dep) => {
+      return dep.nis;
+    });
+    const dependents = await db.dependents.findAll({
+      where: {
+        nis: dependentIds
+      }
+    });
+    if (dependents.length > 0) {
+      const listOfNames = dependents.map((dep) => {
+        return dep.name;
+      });
+      throw {
+        status: 400,
+        message: `Dependente${listOfNames.length > 1 ? 's' : ''} ${listOfNames.toString()} já cadastrado${
+          listOfNames.length > 1 ? 's' : ''
+        }.`
+      };
+    }
+  }
+  return db.families.create(values).then(async (family) => {
+    if (values.dependents) {
+      const depedentsList = values.dependents?.map((dep) => {
+        dep.familyId = family.id as number;
+        return dep;
+      });
+      if (depedentsList && depedentsList?.length > 0) {
+        family.dependents = await db.dependents.bulkCreate(depedentsList as Dependent[]);
+      }
+    }
+
+    return family;
+  });
+};
+
+/**
+ * Function to create a new row on the table
+ * @param values object with the new item data
+ * @returns Promise<Item>
+ */
 export const create = (values: Family | SequelizeFamily): Promise<SequelizeFamily> => {
   return db.families.create(values);
 };
