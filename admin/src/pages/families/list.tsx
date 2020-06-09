@@ -111,12 +111,7 @@ export const FamiliesList: React.FC<{}> = () => {
     <PageContainer>
       <Row gutter={[16, 16]}>
         <Col span={24}>
-          <Typography.Title>{`Famílias`}</Typography.Title>
-        </Col>
-      </Row>
-      <Row gutter={[16, 16]}>
-        <Col span={24}>
-          <Card loading={dashboardLoading}>
+          <Card title={<Typography.Title>{`Famílias`}</Typography.Title>} loading={dashboardLoading}>
             <Row gutter={[16, 16]}>
               <Col span={8}>
                 <Statistic
