@@ -50,22 +50,9 @@ export const BenefitList: React.FC<{}> = () => {
             dataIndex="groupName"
             render={(data: Benefit['groupName']) => familyGroupList[data]?.title || data}
           />
-          <Table.Column title="Mês" dataIndex="month" />
-          <Table.Column title="Ano" dataIndex="year" />
+          <Table.Column title="Data" dataIndex="date" render={(data) => moment(data).format('MM/YYYY')} />
           {/* Show the product list column depending on the type of benefit */}
-          {showProductList ? (
-            <Table.Column
-              title="Produtos"
-              dataIndex="benefitProduct"
-              render={(data: Benefit['benefitProduct']) =>
-                data?.map((product) => (
-                  <div key={product.productsId}>{`${product.amount}x ${
-                    productList.find((p) => p.id === product.productsId)?.name
-                  }`}</div>
-                ))
-              }
-            />
-          ) : (
+          {!showProductList &&  (
             <Table.Column
               title="Valor por dependente"
               dataIndex="value"

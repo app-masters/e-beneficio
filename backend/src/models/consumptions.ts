@@ -120,7 +120,6 @@ export const getFamilyDependentBalanceTicket = async (family: Family, availableB
     for (const benefit of availableBenefits) {
       const benefitDate = moment(benefit.date as Date);
       if (benefit.groupName !== family.groupName) continue; // Don't check if it's from another group
-
       // Check all the dates
       const notInFuture = benefitDate.toDate() <= todayDate.endOf('month').toDate();
       const afterCreation = benefitDate.toDate() >= startDate.startOf('month').toDate();
