@@ -93,9 +93,6 @@ export const ConsumptionFamilySearch: React.FC<ComponentProps> = (props) => {
                   <Descriptions.Item label="Data de nascimento do responsável">
                     {moment(family.responsibleBirthday).format('DD/MM/YYYY')}
                   </Descriptions.Item>
-                  <Descriptions.Item label="Nome da mãe do responsável">
-                    {family.responsibleMotherName}
-                  </Descriptions.Item>
                 </Descriptions>
                 <FamilyActions>
                   <Flex alignItems="center" justifyContent="flex-end" gap>
@@ -117,7 +114,6 @@ export const ConsumptionFamilySearch: React.FC<ComponentProps> = (props) => {
             <Descriptions.Item label="Data de nascimento">
               {moment(family.responsibleBirthday).format('DD/MM/YYYY')}
             </Descriptions.Item>
-            <Descriptions.Item label="Nome da mãe">{family.responsibleMotherName}</Descriptions.Item>
             <Descriptions.Item label="Saldo disponível">
               <Typography.Paragraph strong>{`R$${(family.balance || 0)
                 .toFixed(2)

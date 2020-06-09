@@ -14,7 +14,7 @@ export const getAll = (): Promise<SequelizeProduct[]> => {
  * @returns Promise<List of items>
  */
 export const getAllUnset = (): Promise<SequelizeProduct[]> => {
-  return db.products.findAll({ where: { isValid: null } });
+  return db.products.findAll({ where: { isValid: null }, order: [['name', 'ASC']] });
 };
 
 /**

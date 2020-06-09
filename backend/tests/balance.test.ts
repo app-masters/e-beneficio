@@ -27,8 +27,7 @@ let createdFamily: Family;
 const benefit = {
   title: '[CAD25123] Auxilio municipal de alimentação',
   groupName: getFamilyGroupByCode(1)?.key,
-  month: moment().month() + 1,
-  year: moment().year(),
+  date: moment().toDate(),
   value: 500,
   institutionId: 0
 } as Benefit;
@@ -50,12 +49,12 @@ test(`[${testName}] Create mock data`, async () => {
 
 test(`[${testName}] Get family balance`, async () => {
   const balance = await consumptionModel.getFamilyBalance(createdFamily);
-  expect(balance).toBeGreaterThanOrEqual(benefit.value);
+  expect(balance).toBeGreaterThanOrEqual(benefit.value as number);
 });
 
 test(`[${testName}] Test correct benefit`, async () => {
   const balance = await consumptionModel.getFamilyBalance(createdFamily);
-  expect(balance).toBeGreaterThanOrEqual(benefit.value);
+  expect(balance).toBeGreaterThanOrEqual(benefit.value as number);
   const date = moment();
   await db.benefits.create({
     ...benefit,
@@ -63,12 +62,12 @@ test(`[${testName}] Test correct benefit`, async () => {
     year: date.year()
   });
   const newBalance = await consumptionModel.getFamilyBalance(createdFamily);
-  expect(newBalance).toBe(balance + benefit.value);
+  expect(newBalance).toBe(balance + Number(benefit.value));
 });
 
 test(`[${testName}] Test last month benefit`, async () => {
   const balance = await consumptionModel.getFamilyBalance(createdFamily);
-  expect(balance).toBeGreaterThanOrEqual(benefit.value);
+  expect(balance).toBeGreaterThanOrEqual(benefit.value as number);
   const date = moment().add(-1, 'month').startOf('month');
   await db.benefits.create({
     ...benefit,
@@ -81,7 +80,7 @@ test(`[${testName}] Test last month benefit`, async () => {
 
 test(`[${testName}] Test last year benefit`, async () => {
   const balance = await consumptionModel.getFamilyBalance(createdFamily);
-  expect(balance).toBeGreaterThanOrEqual(benefit.value);
+  expect(balance).toBeGreaterThanOrEqual(benefit.value as number);
   const date = moment().add(-1, 'year').startOf('month');
   await db.benefits.create({
     ...benefit,
@@ -94,7 +93,7 @@ test(`[${testName}] Test last year benefit`, async () => {
 
 test(`[${testName}] Test next month benefit`, async () => {
   const balance = await consumptionModel.getFamilyBalance(createdFamily);
-  expect(balance).toBeGreaterThanOrEqual(benefit.value);
+  expect(balance).toBeGreaterThanOrEqual(benefit.value as number);
   const date = moment().add(1, 'month').startOf('month');
   await db.benefits.create({
     ...benefit,
@@ -107,7 +106,7 @@ test(`[${testName}] Test next month benefit`, async () => {
 
 test(`[${testName}] Test next year benefit`, async () => {
   const balance = await consumptionModel.getFamilyBalance(createdFamily);
-  expect(balance).toBeGreaterThanOrEqual(benefit.value);
+  expect(balance).toBeGreaterThanOrEqual(benefit.value as number);
   const date = moment().add(1, 'year');
   await db.benefits.create({
     ...benefit,
