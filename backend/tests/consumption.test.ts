@@ -47,7 +47,7 @@ test(`[${testName}] Create mock data`, async () => {
 
 test(`[${testName}] Get family balance`, async () => {
   const balance = await consumptionModel.getFamilyBalance(createdFamily);
-  expect(balance).toBeGreaterThanOrEqual(benefit.value);
+  expect(balance).toBeGreaterThanOrEqual(benefit.value as number);
 });
 
 test(`[${testName}] Consume all the balance`, async () => {
