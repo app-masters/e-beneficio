@@ -19,8 +19,8 @@ export interface Consumption {
   familyId: number | string;
   placeStoreId?: number | string;
   nfce?: string;
-  value: number;
-  invalidValue: number;
+  value?: number;
+  invalidValue?: number;
   proofImageUrl?: string;
   reviewedAt?: number | Date | null;
   purchaseData?: PurchaseData;
@@ -107,6 +107,10 @@ export const initConsumptionSchema = (sequelize: Sequelize): SequelizeConsumptio
     Schema.belongsTo(models.placeStores, {
       foreignKey: 'placeStoreId',
       as: 'placeStore'
+    });
+    Schema.hasMany(models.consumptionProducts, {
+      foreignKey: 'consumptionsId',
+      as: 'consumptionProducts'
     });
   };
 

@@ -1,4 +1,4 @@
-import Sequelize from 'sequelize';
+import Sequelize, { Op } from 'sequelize';
 import db from '../schemas';
 import { Consumption, SequelizeConsumption } from '../schemas/consumptions';
 import { PlaceStore } from '../schemas/placeStores';
@@ -64,7 +64,7 @@ export const getFamilyDependentBalance = async (family: Family, availableBenefit
 
       if (notInFuture && afterCreation && beforeDeactivation) {
         // Valid benefit
-        balance += benefit.value;
+        balance += Number(benefit.value);
       }
     }
   }
@@ -75,7 +75,7 @@ export const getFamilyDependentBalance = async (family: Family, availableBenefit
   }
 
   // Calculating consumption
-  const consumption = family.consumptions.reduce((sum, item) => sum + item.value, 0);
+  const consumption = family.consumptions.reduce((sum, item) => sum + Number(item.value), 0);
   return balance - consumption;
 };
 
@@ -185,7 +185,7 @@ export const addConsumption = async (
   }
 
   // Checking everyting
-  if (values.value < 0) {
+  if (Number(values.value) < 0) {
     // Negative consumption
     throw { status: 422, message: 'Compra não pode ter valor negativo' };
   }
@@ -196,7 +196,7 @@ export const addConsumption = async (
   }
 
   const balance = await getFamilyDependentBalance(family);
-  if (balance < values.value) {
+  if (balance < Number(values.value)) {
     // Insuficient balance
     throw { status: 422, message: 'Saldo insuficiente' };
   }
@@ -338,8 +338,9 @@ export const getConsumptionDashboardInfo = async (cityId: NonNullable<City['id']
  * Scrape the consumption nfce page for details about the purchase
  *
  * @param consumption Consumption object with the nfce link
+ * @param shouldThrow Whether this function should throw an error or just log (used by conjobs)
  */
-export const scrapeConsumption = async (consumption: Consumption) => {
+export const scrapeConsumption = async (consumption: Consumption, shouldThrow = false) => {
   try {
     const link = consumption.nfce;
     if (!link || !consumption.id) return;
@@ -354,13 +355,16 @@ export const scrapeConsumption = async (consumption: Consumption) => {
     await Promise.all(
       purchaseData.products.map(async ({ name }) => {
         if (!name) return;
-        const existProduct = await db.products.findOne({ where: { name } });
+        const existProduct = await db.products.findOne({ where: { name: { [Op.iLike]: name } } });
         if (!existProduct) {
           await db.products.create({ name });
         }
       })
     );
   } catch (error) {
+    if (shouldThrow) {
+      throw error;
+    }
     logging.error('Failed to scrape nfce link data', error);
   }
 };
@@ -369,8 +373,9 @@ export const scrapeConsumption = async (consumption: Consumption) => {
  * Verify a consumption to validate if all of its products are valid
  *
  * @param consumption Consumption with purchase data to be validated
+ * @param shouldThrow Whether this function should throw an error or just log (used by conjobs)
  */
-export const validateConsumption = async (consumption: Consumption) => {
+export const validateConsumption = async (consumption: Consumption, shouldThrow = false) => {
   try {
     const { id: consumptionId, purchaseData } = consumption;
 
@@ -382,7 +387,9 @@ export const validateConsumption = async (consumption: Consumption) => {
       await Promise.all(
         purchaseData.products.map(async (consumptionProduct) => {
           if (!consumptionProduct.name || !consumptionProduct.totalValue) return null;
-          const existingProduct = await db.products.findOne({ where: { name: consumptionProduct.name } });
+          const existingProduct = await db.products.findOne({
+            where: { name: { [Op.iLike]: consumptionProduct.name } }
+          });
 
           if (existingProduct) return { consumptionProduct, databaseProduct: existingProduct };
 
@@ -433,8 +440,14 @@ export const validateConsumption = async (consumption: Consumption) => {
     consumption.reviewedAt = moment().toDate();
     consumption.invalidValue = consumptionStatus.totalInvalid;
 
-    await db.consumptions.update(consumption, { where: { consumptionId } });
+    await db.consumptions.update(
+      { reviewedAt: consumption.reviewedAt, invalidValue: consumption.invalidValue },
+      { where: { id: consumptionId } }
+    );
   } catch (error) {
+    if (shouldThrow) {
+      throw error;
+    }
     logging.critical('Failed to validate consumption', error);
   }
 };

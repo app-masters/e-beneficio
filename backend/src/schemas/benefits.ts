@@ -1,4 +1,5 @@
 import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize';
+import { BenefitProduct } from './benefitProducts';
 
 // Simple item type
 export interface Benefit {
@@ -7,6 +8,7 @@ export interface Benefit {
   groupName: string;
   title: string;
   date: Date;
+  products?: BenefitProduct[];
   value?: number;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
@@ -70,6 +72,10 @@ export const initBenefitSchema = (sequelize: Sequelize): SequelizeBenefitModel =
     Schema.belongsTo(models.institutions, {
       foreignKey: 'institutionId',
       as: 'institution'
+    });
+    Schema.hasMany(models.benefitProducts, {
+      foreignKey: 'benefitsId',
+      as: 'benefitProduct'
     });
   };
 
