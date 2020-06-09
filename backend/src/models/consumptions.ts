@@ -1,6 +1,7 @@
 import Sequelize, { Op } from 'sequelize';
 import db from '../schemas';
 import { Consumption, SequelizeConsumption } from '../schemas/consumptions';
+import { ConsumptionProducts } from '../schemas/consumptionProducts';
 import { PlaceStore } from '../schemas/placeStores';
 import { Family } from '../schemas/families';
 import moment from 'moment';
@@ -276,6 +277,95 @@ export const addConsumption = async (
   }
   // Everything is ok, create it
   return db.consumptions.create({ ...values, placeStoreId });
+};
+
+/**
+ * Create a new consumption on the store
+ * @param values consumption object
+ * @param placeStoreId logged user place store ID
+ * @returns Promise<List of items>
+ */
+export const addConsumptionProduct = async (values: Consumption): Promise<SequelizeConsumption> => {
+  const family = await db.families.findByPk(values.familyId);
+  if (!family) {
+    // Invalid family ID
+    throw { status: 422, message: 'Família não encontrada' };
+  }
+
+  //Get family benefit and its products.
+  const familyBenefit = await db.benefits.findAll({
+    where: { groupName: family.groupName }
+  });
+  //Get all products by benefit
+  const benefitsIds = familyBenefit.map((item) => {
+    return item.id;
+  });
+  const listOfProductsAvailable = await db.benefitProducts.findAll({
+    where: {
+      benefitsId: benefitsIds as number[]
+    },
+    include: [{ model: db.products, as: 'products' }]
+  });
+  //Get all family Consumptions
+  const familyConsumption = await db.consumptions.findAll({
+    where: { familyId: family.id as number }
+  });
+  //Get all Product used by family consumption
+  const consumptionIds = familyConsumption.map((item) => {
+    return item.id;
+  });
+  const productsFamilyConsumption = await db.consumptionProducts.findAll({
+    where: {
+      consumptionsId: consumptionIds as number[]
+    }
+  });
+  //Get difference between available products and consumed products
+  const differenceProducts = listOfProductsAvailable.map((product) => {
+    const items = productsFamilyConsumption.filter((f) => f.productsId === product.productsId);
+    let amount = 0;
+    if (items.length > 0)
+      amount = items
+        .map((item) => {
+          return item.amount;
+        })
+        .reduce((a, b) => a + b);
+    let amountDifference = product.amount;
+    if (amount) {
+      amountDifference = product.amount - amount;
+    }
+    return {
+      productId: product.productsId,
+      amountAvailable: amountDifference,
+      amountGranted: product.amount,
+      amountConsumed: amount ? amount : 0
+    };
+  });
+  //Compare differenceProducts with the new products
+  let canConsumeAll = true;
+  values.products?.map((product) => {
+    const prodDiff = differenceProducts.find((f) => f.productId === product.id);
+    if (!prodDiff) {
+      throw { status: 422, message: 'Produto não disponivel' };
+    } else {
+      if (prodDiff.amountAvailable < product.amount) canConsumeAll = false;
+    }
+  });
+  if (canConsumeAll) {
+    values.value = 0;
+    const newConsumption = await db.consumptions.create({ ...values }).then(async (consumption) => {
+      const consumptionProducts = values.products?.map((item) => {
+        return { productsId: item.id, consumptionsId: consumption.id, amount: item.amount };
+      });
+      if (consumptionProducts) {
+        await db.consumptionProducts.bulkCreate(consumptionProducts);
+      }
+      return consumption;
+    });
+    return newConsumption;
+  } else {
+    logging.critical('Family cannot consume', { family, values });
+    throw { status: 402, message: 'Não foi possível inserir consumo' };
+  }
 };
 
 /**

@@ -1,5 +1,6 @@
 import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize';
 import { Product } from './products';
+import { Benefit } from './benefits';
 
 // Simple item type
 export interface BenefitProduct {
@@ -11,6 +12,9 @@ export interface BenefitProduct {
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
+  //Join
+  products?: Product[];
+  benefits?: Benefit[];
 }
 // Sequelize returns type
 export type SequelizeBenefitProduct = BenefitProduct & Model;
