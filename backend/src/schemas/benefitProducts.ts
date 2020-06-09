@@ -3,8 +3,8 @@ import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize'
 // Simple item type
 export interface BenefitProduct {
   readonly id?: number | string;
-  productId: number | string;
-  benefitId: number | string;
+  productsId: number | string;
+  benefitsId: number | string;
   amount: number;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
@@ -49,7 +49,7 @@ export const attributes = {
   }
 };
 
-const tableName = 'Benefits';
+const tableName = 'BenefitProducts';
 
 /**
  * Sequelize model initializer function
