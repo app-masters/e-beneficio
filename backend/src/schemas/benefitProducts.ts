@@ -1,4 +1,5 @@
 import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize';
+import { Product } from './products';
 
 // Simple item type
 export interface BenefitProduct {
@@ -6,6 +7,7 @@ export interface BenefitProduct {
   productsId: number | string;
   benefitsId: number | string;
   amount: number;
+  products: Product | null;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;

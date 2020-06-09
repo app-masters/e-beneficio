@@ -67,7 +67,6 @@ export const initProductSchema = (sequelize: Sequelize): SequelizeProductModel =
       as: 'consumptionProducts'
     });
   };
-
   Schema.associate = (models): void => {
     // Sequelize relations
     Schema.hasMany(models.benefitProducts, {

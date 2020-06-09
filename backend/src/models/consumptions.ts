@@ -13,11 +13,74 @@ import { scrapeNFCeData } from '../utils/nfceScraper';
 import { SequelizeProduct } from '../schemas/products';
 
 /**
- * a
- * @param family a
- * @param availableBenefits a
+ * Get balance report by dependent when product
+ * @param family the family
  */
-export const getFamilyDependentBalance = async (family: Family, availableBenefits?: Benefit[]) => {
+export const getFamilyDependentBalanceProduct = async (family: Family) => {
+  //Family groupName
+  const familyBenefits = await db.benefits.findAll({ where: { groupName: family.groupName } });
+  //Filter benefit by family date
+  const familyBenefitsFilterDate = familyBenefits
+    .filter((benefit) => {
+      const isAfter = moment(benefit.date).isSameOrAfter(moment(family.createdAt || moment()));
+      let isBefore = true;
+      if (family.deactivatedAt) isBefore = moment(benefit.date).isBefore(moment(family.deactivatedAt));
+      return isAfter && isBefore ? benefit : null;
+    })
+    .filter((f) => f);
+  if (familyBenefitsFilterDate.length === 0) {
+    throw { status: 422, message: 'Nenhum benefício disponível' };
+  }
+  //Get all products by benefit
+  const benefitsIds = familyBenefitsFilterDate.map((item) => {
+    return item.id;
+  });
+  const listOfProductsAvailable = await db.benefitProducts.findAll({
+    where: {
+      benefitsId: benefitsIds as number[]
+    },
+    include: [{ model: db.products, as: 'products' }]
+  });
+  //Get all family Consumptions
+  const familyConsumption = await db.consumptions.findAll({
+    where: { familyId: family.id as number }
+  });
+  //Get all Product used by family consumption
+  const consumptionIds = familyConsumption.map((item) => {
+    return item.id;
+  });
+  const productsFamilyConsumption = await db.consumptionProducts.findAll({
+    where: {
+      consumptionsId: consumptionIds as number[]
+    }
+  });
+  //Get difference between available products and consumed products
+  const differenceProducts = listOfProductsAvailable.map((product) => {
+    const item = productsFamilyConsumption.find((f) => f.productsId === product.productsId);
+    let amountDifference = 0;
+    if (item) {
+      amountDifference = product.amount - item.amount;
+      if (amountDifference < 0) {
+        logging.critical('Family with negative amount', { family });
+      }
+    }
+    return {
+      product: { id: product.id, name: product.products?.name },
+      amountAvailable: amountDifference,
+      amountGranted: product.amount,
+      amountConsumed: item ? item.amount : 0
+    };
+  });
+
+  return differenceProducts;
+};
+
+/**
+ * Get balance report by dependent when ticket
+ * @param family the family
+ * @param availableBenefits has benefis
+ */
+export const getFamilyDependentBalanceTicket = async (family: Family, availableBenefits?: Benefit[]) => {
   if (!family.dependents || !family.consumptions) {
     // Be sure that everything necessesary is populated
     const populatedFamily = await db.families.findByPk(family.id, {
@@ -62,7 +125,7 @@ export const getFamilyDependentBalance = async (family: Family, availableBenefit
         ? benefitDate.year() < endYear || (benefitDate.year() === endYear && benefitDate.month() + 1 < endMonth)
         : true;
 
-      if (notInFuture && afterCreation && beforeDeactivation) {
+      if (benefit.value && notInFuture && afterCreation && beforeDeactivation) {
         // Valid benefit
         balance += Number(benefit.value);
       }
@@ -77,6 +140,17 @@ export const getFamilyDependentBalance = async (family: Family, availableBenefit
   // Calculating consumption
   const consumption = family.consumptions.reduce((sum, item) => sum + Number(item.value), 0);
   return balance - consumption;
+};
+
+/**
+ * Get balance report by dependent when product
+ * @param family the family
+ * @param availableBenefits benefit
+ */
+export const getFamilyDependentBalance = async (family: Family, availableBenefits?: Benefit[]) => {
+  const isTicket = process.env.CONSUMPTION_TYPE === 'ticket';
+  if (isTicket) return getFamilyDependentBalanceTicket(family, availableBenefits);
+  else return getFamilyDependentBalanceProduct(family);
 };
 
 /**
@@ -99,7 +173,7 @@ export const getBalanceReport = async (cityId: NonNullable<City['id']>) => {
   const balanceList: (Family & { balance: number })[] = [];
   for (const family of families) {
     const balance = await getFamilyDependentBalance(family, benefits);
-    balanceList.push({ ...(family.toJSON() as Family), balance });
+    balanceList.push({ ...(family.toJSON() as Family), balance: balance as number });
   }
 
   return balanceList;
