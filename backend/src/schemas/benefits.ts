@@ -7,8 +7,8 @@ export interface Benefit {
   institutionId: number | string;
   groupName: string;
   title: string;
-  month: number;
-  year: number;
+  benefitProduct?: BenefitProduct[];
+  date: Date;
   value?: number;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
@@ -49,12 +49,8 @@ export const attributes = {
     type: DataTypes.STRING,
     allowNull: false
   },
-  month: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
-  year: {
-    type: DataTypes.INTEGER,
+  date: {
+    type: DataTypes.DATE,
     allowNull: false
   },
   value: {
@@ -79,10 +75,14 @@ export const initBenefitSchema = (sequelize: Sequelize): SequelizeBenefitModel =
       foreignKey: 'institutionId',
       as: 'institution'
     });
-    //
     Schema.hasMany(models.benefitProducts, {
       foreignKey: 'benefitsId',
       as: 'benefitProducts'
+    Schema.hasMany(models.benefitProducts, {
+      foreignKey: 'benefitsId',
+      as: 'benefitProduct',
+      onDelete: 'CASCADE',
+      hooks: true
     });
   };
 

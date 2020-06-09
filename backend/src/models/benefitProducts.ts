@@ -15,6 +15,22 @@ export const getAll = (): Promise<SequelizeBenefitProduct[]> => {
 };
 
 /**
+ * Get all products associated to benefit
+ * @param benefitsId unique ID of the desired benefit
+ * @returns Promise<Item>
+ */
+export const getAllProductsByBenefitId = (
+  benefitsId: NonNullable<BenefitProduct['id']>
+): Promise<SequelizeBenefitProduct[]> => {
+  return db.benefitProducts.findAll({
+    where: {
+      benefitsId
+    },
+    include: [{ model: db.products, as: 'products' }]
+  });
+};
+
+/**
  * Get a single item using the unique ID
  * @param id unique ID of the desired item
  * @returns Promise<Item>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Input, Typography, Card, Descriptions, Row, Col } from 'antd';
+import { Form, Input, Typography, Descriptions, Row, Col, Alert } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { FamilyWrapper, InfoContainer } from './styles';
 import { AppState } from '../../redux/rootReducer';
@@ -25,7 +25,9 @@ export const FamilySearch: React.FC<ComponentProps> = () => {
   const [nis, setNis] = useState('');
   // Redux state
   const familyLoading = useSelector<AppState, boolean>((state) => state.familiesReducer.familyLoading);
-  const familyError = useSelector<AppState, Error | undefined>((state) => state.familiesReducer.familyError);
+  const familyError = useSelector<AppState, (Error & { status?: number }) | undefined>(
+    (state) => state.familiesReducer.familyError
+  );
   const family = useSelector<AppState, Family | null | undefined>((state) => state.familiesReducer.familyItem);
 
   // .env
@@ -54,11 +56,14 @@ export const FamilySearch: React.FC<ComponentProps> = () => {
 
       {familyError && !familyLoading && (
         <FamilyWrapper>
-          <Card>
-            <InfoContainer>
-              <Text>Não encontramos nenhuma família utilizando esse NIS.</Text>
-            </InfoContainer>
-          </Card>
+          <Alert
+            type={familyError.status === 404 ? 'info' : 'error'}
+            message={
+              <InfoContainer>
+                <Text>{familyError.message}</Text>
+              </InfoContainer>
+            }
+          />
         </FamilyWrapper>
       )}
 

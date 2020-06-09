@@ -27,8 +27,7 @@ let createdFamily: Family;
 const benefit = {
   title: '[CAD25123] Auxilio municipal de alimentação',
   groupName: getFamilyGroupByCode(1)?.key,
-  month: 5,
-  year: 2020,
+  date: moment().toDate(),
   value: 500,
   institutionId: 0
 } as Benefit;
@@ -55,6 +54,7 @@ test(`[${testName}] Consume all the balance`, async () => {
   let balance = await consumptionModel.getFamilyBalance(createdFamily);
   const consumption: Consumption = {
     value: balance,
+    invalidValue: 0,
     familyId: createdFamily.id as number,
     nfce: new Date().getTime().toString(),
     placeStoreId: placeStore.id as number
@@ -70,6 +70,7 @@ test(`[${testName}] Consume all the balance`, async () => {
 test(`[${testName}] Consume more than the balance`, async () => {
   const consumption: Consumption = {
     value: 100,
+    invalidValue: 0,
     familyId: createdFamily.id as number,
     nfce: new Date().getTime().toString(),
     placeStoreId: placeStore.id as number
