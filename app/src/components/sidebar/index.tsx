@@ -6,7 +6,8 @@ import {
   MenuUnfoldOutlined,
   HomeOutlined,
   UserOutlined,
-  ShopOutlined
+  ShopOutlined,
+  IdcardOutlined
 } from '@ant-design/icons';
 import { Button, Layout, Menu, Popover } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -87,6 +88,11 @@ export const Sidebar: React.FC = (props) => {
       path: '/',
       icon: () => <HomeOutlined />,
       name: 'Início'
+    },
+    {
+      path: '/familias',
+      icon: () => <IdcardOutlined />,
+      name: 'Famílias'
     },
     {
       path: '/consumo',

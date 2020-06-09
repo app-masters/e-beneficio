@@ -175,6 +175,13 @@ export const updateImportReport = (importReport: ImportReport, cityId: NonNullab
 
 /**
  * Get all items on the table without any filter
+ */
+export const getAll = async (): Promise<SequelizeFamily[]> => {
+  return await db.families.findAll();
+};
+
+/**
+ * Get all items on the table with filter
  * @param nis searched nis code
  * @param cityId logged user city ID`
  * @param populateDependents should the dependents be returned?
