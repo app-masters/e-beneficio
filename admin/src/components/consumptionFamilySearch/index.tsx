@@ -8,6 +8,7 @@ import { requestGetFamily } from '../../redux/families/actions';
 import { Family } from '../../interfaces/family';
 import moment from 'moment';
 import { env } from '../../env';
+import { formatMoney } from '../../utils/string';
 
 type ComponentProps = {
   onFamilySelect?: (id: Family['id']) => void;
@@ -132,9 +133,7 @@ export const ConsumptionFamilySearch: React.FC<ComponentProps> = (props) => {
               {moment(family.responsibleBirthday).format('DD/MM/YYYY')}
             </Descriptions.Item>
             <Descriptions.Item label="Saldo disponível">
-              <Typography.Paragraph strong>{`R$${(family.balance || 0)
-                .toFixed(2)
-                .replace('.', ',')}`}</Typography.Paragraph>
+              <Typography.Paragraph strong>{`R$${formatMoney(family.balance || 0)}`}</Typography.Paragraph>
             </Descriptions.Item>
           </Descriptions>
         </FamilyWrapper>

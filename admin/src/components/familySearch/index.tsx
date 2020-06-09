@@ -6,6 +6,7 @@ import { AppState } from '../../redux/rootReducer';
 import { requestGetFamily } from '../../redux/families/actions';
 import { Family } from '../../interfaces/family';
 import moment from 'moment';
+import { formatMoney } from '../../utils/string';
 
 const { Text } = Typography;
 
@@ -77,9 +78,7 @@ export const FamilySearch: React.FC<ComponentProps> = () => {
                   {moment(family.responsibleBirthday).format('DD/MM/YYYY')}
                 </Descriptions.Item>
                 <Descriptions.Item label="Saldo disponível">
-                  <Typography.Paragraph strong>{`R$${(family.balance || 0)
-                    .toFixed(2)
-                    .replace('.', ',')}`}</Typography.Paragraph>
+                  <Typography.Paragraph strong>{`R$${formatMoney(family.balance || 0)}`}</Typography.Paragraph>
                 </Descriptions.Item>
                 <Descriptions.Item label="Endereço">{family.address}</Descriptions.Item>
                 <Descriptions.Item label="Telefone">{family.phone}</Descriptions.Item>

@@ -10,6 +10,7 @@ import { requestDeleteBenefit, requestGetBenefit } from '../../redux/benefit/act
 import { AppState } from '../../redux/rootReducer';
 import { familyGroupList } from '../../utils/constraints';
 import { ActionWrapper, PageContainer } from './styles';
+import { formatMoney } from '../../utils/string';
 import { env } from '../../env';
 import { requestGetProduct } from '../../redux/product/actions';
 
@@ -68,7 +69,7 @@ export const BenefitList: React.FC<{}> = () => {
             <Table.Column
               title="Valor por dependente"
               dataIndex="value"
-              render={(data: Benefit['value']) => `R$ ${data}`}
+              render={(data: Benefit['value']) => `R$ ${formatMoney(data)}`}
             />
           )}
           <Table.Column

@@ -32,6 +32,7 @@ import { FamilySearch } from '../../components/familySearch';
 import { spacing } from '../../styles/theme';
 import { ImportReport } from '../../interfaces/family';
 import { backend } from '../../utils/networking';
+import { formatMoney } from '../../utils/string';
 
 const { Dragger } = Upload;
 
@@ -116,21 +117,21 @@ export const FamiliesList: React.FC<{}> = () => {
               <Col span={8}>
                 <Statistic
                   title={'Famílias beneficiadas este mês'}
-                  value={dashboardData?.familyCreatedMonthCount}
+                  value={formatMoney(dashboardData?.familyCreatedMonthCount, 0)}
                   groupSeparator={'.'}
                 />
               </Col>
               <Col span={8}>
                 <Statistic
                   title={'Dependentes beneficiados este mês'}
-                  value={dashboardData?.dependentCreatedMonthCount}
+                  value={formatMoney(dashboardData?.dependentCreatedMonthCount, 0)}
                   groupSeparator={'.'}
                 />
               </Col>
               <Col span={8}>
                 <Statistic
                   title={'Famílias desativadas este mês'}
-                  value={dashboardData?.familyDeactivatedMonthCount}
+                  value={formatMoney(dashboardData?.familyDeactivatedMonthCount, 0)}
                   groupSeparator={'.'}
                 />
               </Col>
@@ -138,19 +139,23 @@ export const FamiliesList: React.FC<{}> = () => {
 
             <Row gutter={[16, 16]}>
               <Col span={8}>
-                <Statistic title={'Famílias beneficiadas'} value={dashboardData?.familyCount} groupSeparator={'.'} />
+                <Statistic
+                  title={'Famílias beneficiadas'}
+                  value={formatMoney(dashboardData?.familyCount, 0)}
+                  groupSeparator={'.'}
+                />
               </Col>
               <Col span={8}>
                 <Statistic
                   title={'Dependentes beneficiados'}
-                  value={dashboardData?.dependentCount}
+                  value={formatMoney(dashboardData?.dependentCount, 0)}
                   groupSeparator={'.'}
                 />
               </Col>
               <Col span={8}>
                 <Statistic
                   title={'Famílias desativadas'}
-                  value={dashboardData?.familyDeactivatedCount}
+                  value={formatMoney(dashboardData?.familyDeactivatedCount, 0)}
                   groupSeparator={'.'}
                 />
               </Col>
