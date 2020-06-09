@@ -13,7 +13,7 @@ export const PriceStyle = {
 
 export const InfoContainer = styled.div`
   display: flex;
-  margin-top: ${(props) => props.theme.spacing.sm};
+  margin: ${(props) => props.theme.spacing.sm} 0;
   justify-content: center;
 `;
 
