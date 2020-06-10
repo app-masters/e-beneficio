@@ -6,12 +6,12 @@ import { logging } from '../../lib/logging';
 
 // Simple actions and types
 export const doGetProduct = createAction<void>('product/GET');
-export const doGetProductSuccess = createAction<Product | Product[]>('product/GET_SUCCESS');
+export const doGetProductSuccess = createAction<Product[]>('product/GET_SUCCESS');
 export const doGetProductFailed = createAction<Error | undefined>('product/GET_FAILED');
 
 // Simple actions and types
 export const doGetProductValidate = createAction<void>('product/GET_VALIDATE');
-export const doGetProductValidateSuccess = createAction<Product | Product[]>('product/GET_VALIDATE_SUCCESS');
+export const doGetProductValidateSuccess = createAction<Product[]>('product/GET_VALIDATE_SUCCESS');
 export const doGetProductValidateFailed = createAction<Error | undefined>('product/GET_VALIDATE_FAILED');
 
 export const doSaveProduct = createAction<void>('product/SAVE');
@@ -32,10 +32,11 @@ export const requestGetProduct = (): ThunkResult<void> => {
       // Start request - starting loading state
       dispatch(doGetProduct());
       // Request
-      const response = await backend.get<Product | Product[]>(`/products`);
+      const response = await backend.get<Product[]>(`/products`);
 
       if (response && response.data) {
         // Request finished
+        console.log(response.data);
         dispatch(doGetProductSuccess(response.data)); // Dispatch result
       } else {
         // Request without response - probably won't happen, but cancel the request
@@ -58,7 +59,7 @@ export const requestGetProductValidate = (): ThunkResult<void> => {
       // Start request - starting loading state
       dispatch(doGetProductValidate());
       // Request
-      const response = await backend.get<Product | Product[]>(`/products/validate`);
+      const response = await backend.get<Product[]>(`/products/validate`);
 
       if (response && response.data) {
         // Request finished

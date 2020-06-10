@@ -9,6 +9,12 @@ import { requestDeleteBenefit, requestGetBenefit } from '../../redux/benefit/act
 import { AppState } from '../../redux/rootReducer';
 import { familyGroupList } from '../../utils/constraints';
 import { ActionWrapper, PageContainer } from './styles';
+import { formatMoney } from '../../utils/string';
+import { env } from '../../env';
+import { requestGetProduct } from '../../redux/product/actions';
+
+const TYPE = env.REACT_APP_CONSUMPTION_TYPE as 'ticket' | 'product';
+const showProductList = TYPE === 'product';
 
 /**
  * List component
@@ -17,11 +23,14 @@ import { ActionWrapper, PageContainer } from './styles';
 export const BenefitList: React.FC<{}> = () => {
   // Redux state
   const list = useSelector<AppState, Benefit[]>((state) => state.benefitReducer.list as Benefit[]);
+
   // Redux actions
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(requestGetBenefit());
+    dispatch(requestGetProduct());
   }, [dispatch]);
+
   return (
     <PageContainer>
       <Card
@@ -32,20 +41,22 @@ export const BenefitList: React.FC<{}> = () => {
           </Link>
         }
       >
-        <Table dataSource={list}>
+        <Table dataSource={list} rowKey="id">
           <Table.Column title="Nome" dataIndex="title" />
           <Table.Column
             title="Grupo"
             dataIndex="groupName"
             render={(data: Benefit['groupName']) => familyGroupList[data]?.title || data}
           />
-          <Table.Column title="Mês" dataIndex="month" />
-          <Table.Column title="Ano" dataIndex="year" />
-          <Table.Column
-            title="Valor por dependente"
-            dataIndex="value"
-            render={(data: Benefit['value']) => `R$ ${data}`}
-          />
+          <Table.Column title="Data" dataIndex="date" render={(data) => moment(data).format('MM/YYYY')} />
+          {/* Show the product list column depending on the type of benefit */}
+          {!showProductList && (
+            <Table.Column
+              title="Valor por dependente"
+              dataIndex="value"
+              render={(data: Benefit['value']) => `R$ ${formatMoney(data)}`}
+            />
+          )}
           <Table.Column
             title="Criado"
             dataIndex="createdAt"

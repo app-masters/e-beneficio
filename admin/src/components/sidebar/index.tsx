@@ -49,21 +49,22 @@ const routes: RouteItem[] = [
     name: 'Validar Produtos',
     allowedRoles: consumptionType === 'product' ? ['admin'] : undefined
   },
-  // {
-  //   path: '/relatorios',
-  //   icon: () => <BarChartOutlined />,
-  //   name: 'Relatórios'
-  // },
   {
-    path: '/beneficios',
+    path: '/consumo',
     icon: () => <CarryOutOutlined />,
-    name: 'Beneficios',
-    allowedRoles: ['admin']
+    name: 'Informar consumo',
+    allowedRoles: ['admin', 'manager']
   },
   {
     path: '/familias',
     icon: () => <IdcardOutlined />,
     name: 'Famílias',
+    allowedRoles: ['admin']
+  },
+  {
+    path: '/beneficios',
+    icon: () => <CarryOutOutlined />,
+    name: 'Beneficios',
     allowedRoles: ['admin']
   },
   {
@@ -73,11 +74,16 @@ const routes: RouteItem[] = [
     allowedRoles: ['admin']
   },
   {
-    path: '/consumo',
-    icon: () => <CarryOutOutlined />,
-    name: 'Informar consumo',
+    path: '/instituicoes',
+    icon: () => <BankOutlined />,
+    name: 'Instituições',
     allowedRoles: ['admin']
-  },
+  }
+  // {
+  //   path: '/relatorios',
+  //   icon: () => <BarChartOutlined />,
+  //   name: 'Relatórios'
+  // },
   // {
   //   path: '/lojas',
   //   icon: () => <ShopOutlined />,
@@ -88,12 +94,6 @@ const routes: RouteItem[] = [
   //   icon: () => <SolutionOutlined />,
   //   name: 'Estabelecimentos'
   // },
-  {
-    path: '/instituicoes',
-    icon: () => <BankOutlined />,
-    name: 'Instituições',
-    allowedRoles: ['admin']
-  }
 ];
 
 const privateRoutes: RouteItem[] = [
@@ -181,7 +181,7 @@ export const Sidebar: React.FC = () => {
           <Menu theme="light" mode="inline" defaultSelectedKeys={[location ? location.pathname : '/']}>
             {/* Render the links based on the nav arrays */}
             {routes.map((navLink) => menuItem(navLink, '', role))}
-            {isTicket && privateRoutes.map((navLink) => menuItem(navLink, '', role))}
+            {!isTicket && privateRoutes.map((navLink) => menuItem(navLink, ''))}
           </Menu>
         </MenuHeight>
         <Flex vertical={collapsed} alignItems="center" gap="sm" justifyContent="space-between">

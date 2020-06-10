@@ -124,7 +124,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
 
   return (
     <PageContainer>
-      <Card title="Informar consumo">
+      <Card title={<Typography.Title>Informar consumo</Typography.Title>}>
         <form style={{ marginBottom: 20 }} onSubmit={handleSubmit}>
           <Form layout="vertical">
             <ConsumptionFamilySearch onFamilySelect={(id) => setFieldValue('familyId', id)} />

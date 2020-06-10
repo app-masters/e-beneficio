@@ -44,3 +44,9 @@ export const FamilyActions = styled.div`
     }
   }
 `;
+
+export const InfoContainer = styled.div`
+  display: flex;
+  margin: ${(props) => props.theme.spacing.sm} 0;
+  justify-content: center;
+`;

@@ -5,6 +5,7 @@ export interface Consumption {
   nfce: string;
   value: number;
   proofImageUrl?: string;
+  products?: { id: number | string; amount: number }[];
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
