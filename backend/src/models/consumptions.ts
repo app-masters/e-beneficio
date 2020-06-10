@@ -18,6 +18,7 @@ import { SequelizeProduct } from '../schemas/products';
  * @param availableBenefits a
  */
 export const getFamilyDependentBalance = async (family: Family, availableBenefits?: Benefit[]) => {
+  if (!family) return null;
   if (!family.dependents || !family.consumptions) {
     // Be sure that everything necessesary is populated
     const populatedFamily = await db.families.findByPk(family.id, {
@@ -96,7 +97,7 @@ export const getBalanceReport = async (cityId: NonNullable<City['id']>) => {
   const balanceList: (Family & { balance: number })[] = [];
   for (const family of families) {
     const balance = await getFamilyDependentBalance(family, benefits);
-    balanceList.push({ ...(family.toJSON() as Family), balance });
+    balanceList.push({ ...(family.toJSON() as Family), balance: balance || 0 });
   }
 
   return balanceList;
@@ -193,7 +194,7 @@ export const addConsumption = async (
   }
 
   const balance = await getFamilyDependentBalance(family);
-  if (balance < Number(values.value)) {
+  if (balance && balance < Number(values.value)) {
     // Insuficient balance
     throw { status: 422, message: 'Saldo insuficiente' };
   }
