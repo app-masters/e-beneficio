@@ -87,6 +87,10 @@ export const initPlaceStoreSchema = (sequelize: Sequelize): SequelizePlaceStoreM
       foreignKey: 'placeStoreId',
       as: 'consumptions'
     });
+    Schema.hasMany(models.families, {
+      foreignKey: 'placeStoreId',
+      as: 'families'
+    });
   };
 
   return Schema;

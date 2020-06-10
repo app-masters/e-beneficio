@@ -28,6 +28,8 @@ export interface Family {
   numberOfRooms?: number;
   haveSewage?: boolean;
   sewageComment?: string;
+  createdById?: number | string;
+  placeStoreId?: number | string;
   // Join
   dependents?: Dependent[];
   consumptions?: Consumption[];
@@ -128,6 +130,22 @@ export const attributes = {
   sewageComment: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+  placeStoreId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'PlaceStores',
+      id: 'id'
+    }
+  },
+  createdById: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'Users',
+      id: 'id'
+    }
   }
 };
 
@@ -157,6 +175,14 @@ export const initFamilySchema = (sequelize: Sequelize): SequelizeFamilyModel => 
     });
     Schema.hasMany(models.benefits, {
       foreignKey: 'groupName'
+    });
+    Schema.belongsTo(models.placeStores, {
+      foreignKey: 'placeStoreId',
+      as: 'placeStore'
+    });
+    Schema.belongsTo(models.users, {
+      foreignKey: 'createdById',
+      as: 'createdBy'
     });
   };
 
