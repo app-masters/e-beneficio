@@ -45,6 +45,22 @@ router.get('/dashboard', async (req, res) => {
 });
 
 /**
+ * List of families associated with a place
+ */
+router.get('/place', async (req, res) => {
+  try {
+    if (!req.user?.cityId) throw Error('User without selected city');
+    if (!req.user?.placeStoreId) throw Error('User without place store');
+    const data = await familyModel.findByPlaceStore(req.user.placeStoreId, req.user.cityId, true, true);
+
+    res.send(data);
+  } catch (error) {
+    logging.error(error);
+    res.status(500).send(error.message);
+  }
+});
+
+/**
  * Upload CSV file with family list
  */
 router.post('/file', async (req, res) => {
