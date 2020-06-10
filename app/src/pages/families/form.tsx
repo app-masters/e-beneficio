@@ -105,6 +105,36 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
   };
 
   /**
+   * Verify NIS duplicated
+   */
+  const verifyDependentNIS = (value: Dependent) => {
+    const verify = values.dependents.find((f: Dependent) => f.nis === value.nis);
+    if (verify) {
+      notification.warning({ message: 'NIS já cadastrado' });
+      return false;
+    }
+    return true;
+  };
+
+  /**
+   * Handle responsable
+   */
+  const responsibleDependent = (value: Dependent) => {
+    let list: Dependent[] = [...values.dependents];
+    const verifyIndex = list.findIndex((f) => f.nis === value.nis);
+    if (verifyIndex > -1) list = list.filter((f) => f.nis !== value.nis);
+    if (value.isResponsible) {
+      list = list.map((resp: Dependent) => {
+        return { ...resp, isResponsible: false };
+      });
+      list.unshift(value);
+    } else {
+      list.push(value);
+    }
+    return list;
+  };
+
+  /**
    * Helper function
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -346,7 +376,18 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
               ]}
             >
               <List.Item.Meta
-                title={`${item.name} - ${item.type === 'child' ? 'Criança' : 'Adulto'}`}
+                title={
+                  <>
+                    {item.isResponsible ? (
+                      <strong>
+                        {'Responsável familiar'} <br />
+                      </strong>
+                    ) : (
+                      ''
+                    )}
+                    {`${item.name} - ${item.type === 'child' ? 'Criança' : 'Adulto'}`}
+                  </>
+                }
                 description={
                   <Row gutter={[16, 16]}>
                     <Col span={24} md={12}>
@@ -354,25 +395,25 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
                       {(item.email || item.phone) && (
                         <>
                           <br />
-                          {`${item.email} - ${item.phone}`}
+                          {`${item.email || ''} - ${item.phone || ''}`}
                         </>
                       )}
                       {(item.cpf || item.rg) && (
                         <>
                           <br />
-                          {`CPF: ${item.cpf} - RG: ${item.rg}`}
+                          {`CPF: ${item.cpf || ''} - RG: ${item.rg || ''}`}
                         </>
                       )}
                       {item.schoolName && (
                         <>
                           <br />
-                          {`Escola: ${item.schoolName}`}
+                          {`Escola: ${item.schoolName || ''}`}
                         </>
                       )}
                     </Col>
                     {item.profession && (
                       <Col span={24} md={12}>
-                        {`Profissão: ${item.profession}`}
+                        {`Profissão: ${item.profession || ''}`}
                         <br />
                         {`Salário: ${item.salary ? 'R$ ' + formatMoney(item.salary) : 'Não informado'}`}
                       </Col>
@@ -396,17 +437,13 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
           type={modal.type}
           onClose={() => setModal({ open: false, type: '' })}
           onEdit={(value: Dependent) => {
-            const list: Dependent[] = [...values.dependents];
-            const index = list.findIndex((f: Dependent) => f.nis === value.nis);
-            if (index > -1) list[index] = value;
+            const list = responsibleDependent(value);
             setFieldValue('dependents', list);
             setModal({ open: false, type: '' });
           }}
           onCreate={(value: Dependent) => {
-            const verify = values.dependents.find((f: Dependent) => f.nis === value.nis);
-            if (verify) notification.warning({ message: 'NIS já cadastrado' });
-            else {
-              const list = [...values.dependents, value];
+            if (verifyDependentNIS(value)) {
+              const list = responsibleDependent(value);
               setFieldValue('dependents', list);
               setModal({ open: false, type: '' });
             }
