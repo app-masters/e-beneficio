@@ -3,8 +3,8 @@ import { useFormik } from 'formik';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
-import { Entity } from '../../interfaces/entity';
-import { requestSaveEntity } from '../../redux/entity/actions';
+import { Place } from '../../interfaces/place';
+import { requestSavePlace } from '../../redux/place/actions';
 import { AppState } from '../../redux/rootReducer';
 import yup from '../../utils/yup';
 
@@ -16,17 +16,17 @@ const schema = yup.object().shape({
  * Dashboard page component
  * @param props component props
  */
-export const EntityForm: React.FC<RouteComponentProps<{ id: string }>> = (props) => {
+export const PlaceForm: React.FC<RouteComponentProps<{ id: string }>> = (props) => {
   const history = useHistory();
   const isCreating = props.match.params.id === 'criar';
   const dispatch = useDispatch();
 
   // Redux state
-  const place = useSelector<AppState, Entity | undefined>(({ entityReducer }) =>
-    entityReducer.list.find((item: Entity) => item.id === Number(props.match.params.id))
+  const place = useSelector<AppState, Place | undefined>(({ placeReducer }) =>
+    placeReducer.list.find((item: Place) => item.id === Number(props.match.params.id))
   );
 
-  const loading = useSelector<AppState, boolean>(({ entityReducer }) => entityReducer.loading);
+  const loading = useSelector<AppState, boolean>(({ placeReducer }) => placeReducer.loading);
 
   const { handleSubmit, handleChange, values, getFieldMeta, submitForm, status, errors, touched } = useFormik({
     initialValues: place || {
@@ -36,7 +36,7 @@ export const EntityForm: React.FC<RouteComponentProps<{ id: string }>> = (props)
     onSubmit: (values, { setStatus }) => {
       setStatus();
       dispatch(
-        requestSaveEntity(
+        requestSavePlace(
           values,
           () => history.push('/entidades'),
           () => setStatus('Ocorreu um erro ao realizar a requisição.')

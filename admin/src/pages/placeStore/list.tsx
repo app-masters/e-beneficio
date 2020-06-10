@@ -3,31 +3,31 @@ import { Button, Card, Modal, Table, Typography, Spin } from 'antd';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Locality } from '../../interfaces/locality';
-import { requestDeleteLocality, requestGetLocality } from '../../redux/locality/actions';
+import { PlaceStore } from '../../interfaces/placeStore';
+import { requestDeletePlaceStore, requestGetPlaceStore } from '../../redux/placeStore/actions';
 import { AppState } from '../../redux/rootReducer';
 import { ActionWrapper, PageContainer } from './styles';
 import { formatCNPJ } from '../../utils/string';
-import { Entity } from '../../interfaces/entity';
-import { requestGetEntity } from '../../redux/entity/actions';
+import { Place } from '../../interfaces/place';
+import { requestGetPlace } from '../../redux/place/actions';
 
 /**
  * List component
  * @param props component props
  */
-export const LocalityList: React.FC<{}> = () => {
+export const PlaceStoreList: React.FC<{}> = () => {
   // Redux state
-  const list = useSelector<AppState, Locality[]>(({ localityReducer }) => localityReducer.list as Locality[]);
-  const entityLoading = useSelector<AppState, boolean>(({ entityReducer }) => entityReducer.loading);
-  const entityList = useSelector<AppState, Entity[]>(({ entityReducer }) => entityReducer.list);
+  const list = useSelector<AppState, PlaceStore[]>(({ placeStoreReducer }) => placeStoreReducer.list as PlaceStore[]);
+  const placeLoading = useSelector<AppState, boolean>(({ placeReducer }) => placeReducer.loading);
+  const placeList = useSelector<AppState, Place[]>(({ placeReducer }) => placeReducer.list);
   // Redux actions
   const dispatch = useDispatch();
   useEffect(() => {
-    if (!entityList || entityList.length <= 0) {
-      dispatch(requestGetEntity());
+    if (!placeList || placeList.length <= 0) {
+      dispatch(requestGetPlace());
     }
-    dispatch(requestGetLocality());
-  }, [dispatch, entityList]);
+    dispatch(requestGetPlaceStore());
+  }, [dispatch, placeList]);
   return (
     <PageContainer>
       <Card
@@ -42,19 +42,19 @@ export const LocalityList: React.FC<{}> = () => {
           <Table.Column
             title="Entidade"
             dataIndex="placeId"
-            render={(data: Locality['placeId']) =>
-              entityLoading || !entityList || entityList.length <= 0 ? (
+            render={(data: PlaceStore['placeId']) =>
+              placeLoading || !placeList || placeList.length <= 0 ? (
                 <Spin size="small" />
               ) : (
-                entityList.find((entity) => entity.id === data)?.title
+                placeList.find((entity) => entity.id === data)?.title
               )
             }
           />
           <Table.Column title="Loja" dataIndex="title" />
-          <Table.Column title="CNPJ" dataIndex="cnpj" render={(data: Locality['cnpj']) => formatCNPJ(data)} />
+          <Table.Column title="CNPJ" dataIndex="cnpj" render={(data: PlaceStore['cnpj']) => formatCNPJ(data)} />
           <Table.Column title="Endereço" dataIndex="address" />
           <Table.Column
-            render={(item: Locality) => {
+            render={(item: PlaceStore) => {
               return (
                 <ActionWrapper>
                   <Link to={`/localidades/${item.id}/editar`}>
@@ -72,7 +72,7 @@ export const LocalityList: React.FC<{}> = () => {
                         okType: 'danger',
                         cancelText: 'Não',
                         onOk: () => {
-                          dispatch(requestDeleteLocality(item.id as number));
+                          dispatch(requestDeletePlaceStore(item.id as number));
                         }
                       })
                     }

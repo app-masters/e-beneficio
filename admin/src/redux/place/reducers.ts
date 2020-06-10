@@ -1,20 +1,20 @@
 import { createReducer } from '@reduxjs/toolkit';
 import {
-  doGetLocality,
-  doGetLocalitySuccess,
-  doGetLocalityFailed,
-  doSaveLocality,
-  doSaveLocalitySuccess,
-  doSaveLocalityFailed,
-  doDeleteLocality,
-  doDeleteLocalitySuccess,
-  doDeleteLocalityFailed
+  doGetPlace,
+  doGetPlaceSuccess,
+  doGetPlaceFailed,
+  doSavePlace,
+  doSavePlaceSuccess,
+  doSavePlaceFailed,
+  doDeletePlace,
+  doDeletePlaceSuccess,
+  doDeletePlaceFailed
 } from './actions';
-import { Locality } from '../../interfaces/locality';
+import { Place } from '../../interfaces/place';
 import { addToList } from '../../utils/list';
 
-export interface LocalityReducerState {
-  list: Locality[];
+export interface PlaceReducerState {
+  list: Place[];
   loading: boolean;
   error?: Error;
 }
@@ -24,14 +24,14 @@ const initialState = {
   loading: false
 };
 
-export default createReducer<LocalityReducerState>(initialState, (builder) =>
+export default createReducer<PlaceReducerState>(initialState, (builder) =>
   builder
     // Get actions
-    .addCase(doGetLocality, (state) => {
+    .addCase(doGetPlace, (state) => {
       state.loading = true;
       state.error = undefined;
     })
-    .addCase(doGetLocalitySuccess, (state, action) => {
+    .addCase(doGetPlaceSuccess, (state, action) => {
       state.loading = false;
       if (Array.isArray(action.payload)) {
         // User got the list
@@ -41,33 +41,33 @@ export default createReducer<LocalityReducerState>(initialState, (builder) =>
         state.list = addToList(action.payload, state.list);
       }
     })
-    .addCase(doGetLocalityFailed, (state, action) => {
+    .addCase(doGetPlaceFailed, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     })
     // Save actions
-    .addCase(doSaveLocality, (state) => {
+    .addCase(doSavePlace, (state) => {
       state.loading = true;
       state.error = undefined;
     })
-    .addCase(doSaveLocalitySuccess, (state, action) => {
+    .addCase(doSavePlaceSuccess, (state, action) => {
       state.loading = false;
       state.list = addToList(action.payload, state.list);
     })
-    .addCase(doSaveLocalityFailed, (state, action) => {
+    .addCase(doSavePlaceFailed, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     })
     // Delete actions
-    .addCase(doDeleteLocality, (state) => {
+    .addCase(doDeletePlace, (state) => {
       state.loading = true;
       state.error = undefined;
     })
-    .addCase(doDeleteLocalitySuccess, (state, action) => {
+    .addCase(doDeletePlaceSuccess, (state, action) => {
       state.loading = false;
       state.list = state.list.filter((item) => item.id !== action.payload.id);
     })
-    .addCase(doDeleteLocalityFailed, (state, action) => {
+    .addCase(doDeletePlaceFailed, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     })

@@ -3,12 +3,12 @@ import { useFormik } from 'formik';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
-import { Locality } from '../../interfaces/locality';
+import { PlaceStore } from '../../interfaces/placeStore';
 import { AppState } from '../../redux/rootReducer';
 import yup from '../../utils/yup';
-import { requestGetEntity } from '../../redux/entity/actions';
-import { Entity } from '../../interfaces/entity';
-import { requestSaveLocality } from '../../redux/locality/actions';
+import { requestGetPlace } from '../../redux/place/actions';
+import { Place } from '../../interfaces/place';
+import { requestSavePlaceStore } from '../../redux/placeStore/actions';
 import { InputFormatter } from '../../components/inputFormatter';
 import { formatCNPJ } from '../../utils/string';
 
@@ -25,25 +25,25 @@ const schema = yup.object().shape({
  * Dashboard page component
  * @param props component props
  */
-export const LocalityForm: React.FC<RouteComponentProps<{ id: string }>> = (props) => {
+export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (props) => {
   const history = useHistory();
   const isCreating = props.match.params.id === 'criar';
 
   // Redux state
-  const locality = useSelector<AppState, Locality | undefined>(({ localityReducer }) =>
-    localityReducer.list.find((item: Locality) => item.id === Number(props.match.params.id))
+  const placeStore = useSelector<AppState, PlaceStore | undefined>(({ placeStoreReducer }) =>
+    placeStoreReducer.list.find((item: PlaceStore) => item.id === Number(props.match.params.id))
   );
-  const loading = useSelector<AppState, boolean>(({ localityReducer }) => localityReducer.loading);
-  const entityLoading = useSelector<AppState, boolean>(({ entityReducer }) => entityReducer.loading);
-  const entityList = useSelector<AppState, Entity[]>(({ entityReducer }) => entityReducer.list);
+  const loading = useSelector<AppState, boolean>(({ placeStoreReducer }) => placeStoreReducer.loading);
+  const placeLoading = useSelector<AppState, boolean>(({ placeReducer }) => placeReducer.loading);
+  const placeList = useSelector<AppState, Place[]>(({ placeReducer }) => placeReducer.list);
 
   // Redux actions
   const dispatch = useDispatch();
   useEffect(() => {
-    if (!entityList || entityList.length <= 0) {
-      dispatch(requestGetEntity());
+    if (!placeList || placeList.length <= 0) {
+      dispatch(requestGetPlace());
     }
-  }, [dispatch, entityList]);
+  }, [dispatch, placeList]);
 
   const {
     handleSubmit,
@@ -57,8 +57,8 @@ export const LocalityForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
     setFieldValue,
     setFieldTouched
   } = useFormik({
-    initialValues: locality || {
-      placeId: !entityLoading && entityList && entityList.length > 0 ? entityList[0].id : -1,
+    initialValues: placeStore || {
+      placeId: !placeLoading && placeList && placeList.length > 0 ? placeList[0].id : -1,
       title: '',
       cnpj: '',
       address: ''
@@ -67,7 +67,7 @@ export const LocalityForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
     onSubmit: (values, { setStatus }) => {
       setStatus();
       dispatch(
-        requestSaveLocality(
+        requestSavePlaceStore(
           values,
           () => history.push('/localidades'),
           () => setStatus('Ocorreu um erro ao realizar a requisição.')
@@ -107,11 +107,11 @@ export const LocalityForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
             help={!!placeIdMeta.error && !!placeIdMeta.touched ? placeIdMeta.error : undefined}
           >
             <Select
-              disabled={entityLoading}
+              disabled={placeLoading}
               defaultValue={values.placeId?.toString()}
               onSelect={(value) => setFieldValue('placeId', Number(value))}
               value={values.placeId?.toString() || undefined}
-              notFoundContent={entityLoading ? <Spin size="small" /> : null}
+              notFoundContent={placeLoading ? <Spin size="small" /> : null}
               onChange={(value: string) => {
                 setFieldValue('placeId', Number(value));
               }}
@@ -119,10 +119,10 @@ export const LocalityForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
                 setFieldTouched('placeId', true);
               }}
             >
-              {!entityLoading &&
-                entityList &&
-                entityList.length > 0 &&
-                entityList.map((entity) => (
+              {!placeLoading &&
+                placeList &&
+                placeList.length > 0 &&
+                placeList.map((entity) => (
                   <Option key={entity.title} value={entity.id?.toString() || '-1'}>
                     {entity.title}
                   </Option>

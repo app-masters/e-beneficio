@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Switch, Route, Redirect, RouteProps } from 'react-router-dom';
+import { BrowserRouter, Switch, Route as RouterRoute, Redirect, RouteProps } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { AppState } from '../redux/rootReducer';
 import { User } from '../interfaces/user';
@@ -8,14 +8,14 @@ import { AdminLayout } from '../components/adminLayout';
 // Pages
 import { LoginPage } from './login';
 import { DashboardPage } from './dashboard';
-import { EntityList } from './entities/list';
-import { EntityForm } from './entities/form';
+import { PlaceList } from './place/list';
+import { PlaceForm } from './place/form';
 import { useRefreshToken } from '../utils/auth';
 import { LogoutPage } from './logout';
 import { BenefitList } from './benefits/list';
 import { BenefitForm } from './benefits/form';
-import { LocalityList } from './locality/list';
-import { LocalityForm } from './locality/form';
+import { PlaceStoreList } from './placeStore/list';
+import { PlaceStoreForm } from './placeStore/form';
 import { UserList } from './user/list';
 import { UserForm } from './user/form';
 import { InstitutionForm } from './institutions/form';
@@ -27,6 +27,19 @@ import { ReportList } from './report';
 import { ProductValidationList } from './product/validationList';
 import { ProductList } from './product/list';
 import { ProductForm } from './product/form';
+import { Role } from '../utils/constraints';
+import { env } from '../env';
+
+/**
+ * Extend react-router-dom route to allow or deny users based on its role
+ */
+const Route: React.FC<RouteProps & { allowedRole?: Role | Role[] }> = ({ allowedRole, ...props }) => {
+  const user = useSelector<AppState, User | undefined>((state) => state.authReducer.user);
+  const allowedRoles = (allowedRole && !Array.isArray(allowedRole) ? [allowedRole] : allowedRole) as Role[] | undefined;
+  if ((allowedRoles && user && allowedRoles.indexOf(user.role as Role) === -1) || (allowedRoles && !user)) return null;
+
+  return <RouterRoute {...props} />;
+};
 
 /**
  * Router available only for when env is ticket
@@ -34,7 +47,7 @@ import { ProductForm } from './product/form';
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const PrivateTypeRoute = ({ component, ...rest }: any) => {
-  const isTicket = process.env.REACT_APP_CONSUMPTION_TYPE === 'ticket';
+  const isTicket = env.REACT_APP_CONSUMPTION_TYPE === 'ticket';
   /**
    * Function to redirect user
    */
@@ -56,30 +69,30 @@ const PrivateRouter: React.FC<{}> = () => {
         <Route path="/logout" component={LogoutPage} />
         {/* Product routes */}
         <Route path="/validar" component={ProductValidationList} />
-        <PrivateTypeRoute path="/produtos" component={ProductList} />
-        <PrivateTypeRoute path="/produtos/:id" component={ProductForm} />
+        <PrivateTypeRoute allowedRole="admin" path="/produtos" component={ProductList} />
+        <PrivateTypeRoute allowedRole="admin" path="/produtos/:id" component={ProductForm} />
         {/* Report routes */}
-        <Route path="/relatorios" component={ReportList} />
-        {/* entity routes */}
-        <PrivateTypeRoute path="/entidades" component={EntityList} />
-        <PrivateTypeRoute path="/entidades/:id" component={EntityForm} />
+        <Route allowedRole="admin" path="/relatorios" component={ReportList} />
+        {/* Place routes */}
+        <PrivateTypeRoute allowedRole="admin" path="/entidades" component={PlaceList} />
+        <PrivateTypeRoute allowedRole="admin" path="/entidades/:id" component={PlaceForm} />
         {/* Benefit routes */}
-        <Route path="/beneficios" component={BenefitList} />
-        <Route path="/beneficios/:id" component={BenefitForm} />
-        {/* locality routes */}
-        <PrivateTypeRoute path="/localidades" component={LocalityList} />
-        <PrivateTypeRoute path="/localidades/:id" component={LocalityForm} />
+        <Route allowedRole="admin" path="/beneficios" component={BenefitList} />
+        <Route allowedRole="admin" path="/beneficios/:id" component={BenefitForm} />
+        {/* PlaceStore routes */}
+        <PrivateTypeRoute allowedRole="admin" path="/localidades" component={PlaceStoreList} />
+        <PrivateTypeRoute allowedRole="admin" path="/localidades/:id" component={PlaceStoreForm} />
         {/* User routes */}
-        <Route path="/usuarios" component={UserList} />
-        <Route path="/usuarios/:id" component={UserForm} />
+        <Route allowedRole="admin" path="/usuarios" component={UserList} />
+        <Route allowedRole="admin" path="/usuarios/:id" component={UserForm} />
         {/* Institution routes */}
-        <Route path="/instituicoes" component={InstitutionList} />
-        <Route path="/instituicoes/:id" component={InstitutionForm} />
+        <Route allowedRole="admin" path="/instituicoes" component={InstitutionList} />
+        <Route allowedRole="admin" path="/instituicoes/:id" component={InstitutionForm} />
         {/* Institution routes */}
-        <Route path="/familias" component={FamiliesList} />
-        <Route path="/familias/:id" component={FamilyForm} />
+        <Route allowedRole="admin" path="/familias" component={FamiliesList} />
+        <Route allowedRole="admin" path="/familias/:id" component={FamilyForm} />
         {/* Consumptions routes */}
-        <Route path="/consumo" component={ConsumptionForm} />
+        <Route allowedRole="admin" path="/consumo" component={ConsumptionForm} />
         {/* Dashboard */}
         <Route path="/" component={DashboardPage} exact />
       </>
@@ -108,9 +121,5 @@ const PublicRouter: React.FC<{}> = () => {
 export const Router: React.FC<{}> = (props) => {
   const user = useSelector<AppState, User | undefined>((state) => state.authReducer.user);
 
-  return (
-    <BrowserRouter>
-      {user && user.role === 'admin' ? <PrivateRouter {...props} /> : <PublicRouter {...props} />}
-    </BrowserRouter>
-  );
+  return <BrowserRouter>{user ? <PrivateRouter {...props} /> : <PublicRouter {...props} />}</BrowserRouter>;
 };

@@ -4,8 +4,8 @@ import moment from 'moment';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Entity } from '../../interfaces/entity';
-import { requestDeleteEntity, requestGetEntity } from '../../redux/entity/actions';
+import { Place } from '../../interfaces/place';
+import { requestDeletePlace, requestGetPlace } from '../../redux/place/actions';
 import { AppState } from '../../redux/rootReducer';
 import { ActionWrapper, PageContainer } from './styles';
 
@@ -13,13 +13,13 @@ import { ActionWrapper, PageContainer } from './styles';
  * List component
  * @param props component props
  */
-export const EntityList: React.FC<{}> = () => {
+export const PlaceList: React.FC<{}> = () => {
   // Redux state
-  const list = useSelector<AppState, Entity[]>(({ entityReducer }) => entityReducer.list as Entity[]);
+  const list = useSelector<AppState, Place[]>(({ placeReducer }) => placeReducer.list as Place[]);
   // Redux actions
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(requestGetEntity());
+    dispatch(requestGetPlace());
   }, [dispatch]);
   return (
     <PageContainer>
@@ -36,10 +36,10 @@ export const EntityList: React.FC<{}> = () => {
           <Table.Column
             title="Criado"
             dataIndex="createdAt"
-            render={(data: Entity['createdAt']) => moment(data as Date).fromNow()}
+            render={(data: Place['createdAt']) => moment(data as Date).fromNow()}
           />
           <Table.Column
-            render={(item: Entity) => {
+            render={(item: Place) => {
               return (
                 <ActionWrapper>
                   <Link to={`/entidades/${item.id}/editar`}>
@@ -57,7 +57,7 @@ export const EntityList: React.FC<{}> = () => {
                         okType: 'danger',
                         cancelText: 'Não',
                         onOk: () => {
-                          dispatch(requestDeleteEntity(item.id as number));
+                          dispatch(requestDeletePlace(item.id as number));
                         }
                       })
                     }

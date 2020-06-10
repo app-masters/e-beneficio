@@ -4,11 +4,11 @@ import { Card, Spin, Typography, Form, Button, DatePicker, Select, Row, Col, Tab
 import { useFormik } from 'formik';
 import yup from '../../utils/yup';
 import { useDispatch, useSelector } from 'react-redux';
-import { requestGetEntity } from '../../redux/entity/actions';
+import { requestGetPlace } from '../../redux/place/actions';
 import { AppState } from '../../redux/rootReducer';
-import { Entity } from '../../interfaces/entity';
-import { requestGetLocality } from '../../redux/locality/actions';
-import { Locality } from '../../interfaces/locality';
+import { Place } from '../../interfaces/place';
+import { requestGetPlaceStore } from '../../redux/placeStore/actions';
+import { PlaceStore } from '../../interfaces/placeStore';
 import { requestGetConsumption } from '../../redux/report/actions';
 import { Report, ConsumptionPlace } from '../../interfaces/report';
 import moment from 'moment';
@@ -30,20 +30,20 @@ const { RangePicker } = DatePicker;
  */
 export const ReportList: React.FC<{}> = () => {
   // Redux state
-  const entityLoading = useSelector<AppState, boolean>(({ entityReducer }) => entityReducer.loading);
-  const entityList = useSelector<AppState, Entity[]>(({ entityReducer }) => entityReducer.list);
-  const localityLoading = useSelector<AppState, boolean>(({ localityReducer }) => localityReducer.loading);
-  const localityList = useSelector<AppState, Locality[]>(({ localityReducer }) => localityReducer.list);
+  const placeLoading = useSelector<AppState, boolean>(({ placeReducer }) => placeReducer.loading);
+  const placeList = useSelector<AppState, Place[]>(({ placeReducer }) => placeReducer.list);
+  const placeStoreLoading = useSelector<AppState, boolean>(({ placeStoreReducer }) => placeStoreReducer.loading);
+  const placeStoreList = useSelector<AppState, PlaceStore[]>(({ placeStoreReducer }) => placeStoreReducer.list);
   const reportLoading = useSelector<AppState, boolean>(({ reportReducer }) => reportReducer.loading);
   const reportData = useSelector<AppState, Report | undefined>(({ reportReducer }) => reportReducer.item);
 
   // Redux actions
   const dispatch = useDispatch();
   useEffect(() => {
-    if (!entityList || entityList.length <= 0) {
-      dispatch(requestGetEntity());
+    if (!placeList || placeList.length <= 0) {
+      dispatch(requestGetPlace());
     }
-  }, [dispatch, entityList]);
+  }, [dispatch, placeList]);
 
   const { handleSubmit, values, getFieldMeta, submitForm, setFieldValue, setFieldTouched } = useFormik({
     initialValues: {
@@ -92,16 +92,16 @@ export const ReportList: React.FC<{}> = () => {
                       onChange={(value: string) => {
                         setFieldValue('placeId', Number(value));
                         setFieldValue('placeStoreId', '');
-                        dispatch(requestGetLocality(Number(value)));
+                        dispatch(requestGetPlaceStore(Number(value)));
                       }}
                       onBlur={() => {
                         setFieldTouched('placeId', true);
                       }}
                     >
-                      {!entityLoading &&
-                        entityList &&
-                        entityList.length > 0 &&
-                        entityList.map((entity) => (
+                      {!placeLoading &&
+                        placeList &&
+                        placeList.length > 0 &&
+                        placeList.map((entity) => (
                           <Option key={entity.title} value={entity.id?.toString() || '-1'}>
                             {entity.title}
                           </Option>
@@ -130,10 +130,10 @@ export const ReportList: React.FC<{}> = () => {
                       }}
                     >
                       <Option value={'-1'}>{'  '}</Option>
-                      {!localityLoading &&
-                        localityList &&
-                        localityList.length > 0 &&
-                        localityList.map((locality) => (
+                      {!placeStoreLoading &&
+                        placeStoreList &&
+                        placeStoreList.length > 0 &&
+                        placeStoreList.map((locality) => (
                           <Option key={locality.title} value={locality.id?.toString() || '-1'}>
                             {locality.title}
                           </Option>
