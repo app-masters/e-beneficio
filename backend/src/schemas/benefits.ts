@@ -1,4 +1,5 @@
 import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize';
+import { BenefitProduct } from './benefitProducts';
 
 // Simple item type
 export interface Benefit {
@@ -6,12 +7,13 @@ export interface Benefit {
   institutionId: number | string;
   groupName: string;
   title: string;
-  month: number;
-  year: number;
+  date: Date;
   value?: number;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
+  //Join
+  benefitProducts?: BenefitProduct[];
 }
 // Sequelize returns type
 export type SequelizeBenefit = Benefit & Model;
@@ -46,12 +48,8 @@ export const attributes = {
     type: DataTypes.STRING,
     allowNull: false
   },
-  month: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
-  year: {
-    type: DataTypes.INTEGER,
+  date: {
+    type: DataTypes.DATE,
     allowNull: false
   },
   value: {
@@ -75,6 +73,12 @@ export const initBenefitSchema = (sequelize: Sequelize): SequelizeBenefitModel =
     Schema.belongsTo(models.institutions, {
       foreignKey: 'institutionId',
       as: 'institution'
+    });
+    Schema.hasMany(models.benefitProducts, {
+      foreignKey: 'benefitId',
+      as: 'benefitProducts',
+      onDelete: 'CASCADE',
+      hooks: true
     });
   };
 

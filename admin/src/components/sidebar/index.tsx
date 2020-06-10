@@ -51,21 +51,22 @@ const routes: RouteItem[] = [
     name: 'Validar Produtos',
     allowedRoles: consumptionType === 'product' ? ['admin'] : undefined
   },
-  // {
-  //   path: '/relatorios',
-  //   icon: () => <BarChartOutlined />,
-  //   name: 'Relatórios'
-  // },
   {
-    path: '/beneficios',
+    path: '/consumo',
     icon: () => <CarryOutOutlined />,
-    name: 'Beneficios',
-    allowedRoles: ['admin']
+    name: 'Informar consumo',
+    allowedRoles: ['admin', 'manager']
   },
   {
     path: '/familias',
     icon: () => <IdcardOutlined />,
     name: 'Famílias',
+    allowedRoles: ['admin']
+  },
+  {
+    path: '/beneficios',
+    icon: () => <CarryOutOutlined />,
+    name: 'Beneficios',
     allowedRoles: ['admin']
   },
   {
@@ -75,22 +76,26 @@ const routes: RouteItem[] = [
     allowedRoles: ['admin']
   },
   {
-    path: '/consumo',
-    icon: () => <CarryOutOutlined />,
-    name: 'Informar consumo',
-    allowedRoles: ['admin']
-  },
-  // {
-  //   path: '/lojas',
-  //   icon: () => <ShopOutlined />,
-  //   name: 'Lojas'
-  // },
-  {
     path: '/instituicoes',
     icon: () => <BankOutlined />,
     name: 'Instituições',
     allowedRoles: ['admin']
   }
+  // {
+  //   path: '/relatorios',
+  //   icon: () => <BarChartOutlined />,
+  //   name: 'Relatórios'
+  // },
+  // {
+  //   path: '/lojas',
+  //   icon: () => <ShopOutlined />,
+  //   name: 'Lojas'
+  // },
+  // {
+  //   path: '/estabelecimentos',
+  //   icon: () => <SolutionOutlined />,
+  //   name: 'Estabelecimentos'
+  // },
 ];
 
 const privateRoutes: RouteItem[] = [
