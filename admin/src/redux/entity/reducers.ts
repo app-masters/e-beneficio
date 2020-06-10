@@ -1,20 +1,20 @@
 import { createReducer } from '@reduxjs/toolkit';
 import {
-  doGetPlaceStore,
-  doGetPlaceStoreSuccess,
-  doGetPlaceStoreFailed,
-  doSavePlaceStore,
-  doSavePlaceStoreSuccess,
-  doSavePlaceStoreFailed,
-  doDeletePlaceStore,
-  doDeletePlaceStoreSuccess,
-  doDeletePlaceStoreFailed
+  doGetEntity,
+  doGetEntitySuccess,
+  doGetEntityFailed,
+  doSaveEntity,
+  doSaveEntitySuccess,
+  doSaveEntityFailed,
+  doDeleteEntity,
+  doDeleteEntitySuccess,
+  doDeleteEntityFailed
 } from './actions';
-import { PlaceStore } from '../../interfaces/placeStore';
+import { Entity } from '../../interfaces/entity';
 import { addToList } from '../../utils/list';
 
-export interface PlaceStoreReducerState {
-  list: PlaceStore[];
+export interface EntityReducerState {
+  list: Entity[];
   loading: boolean;
   error?: Error;
 }
@@ -24,14 +24,14 @@ const initialState = {
   loading: false
 };
 
-export default createReducer<PlaceStoreReducerState>(initialState, (builder) =>
+export default createReducer<EntityReducerState>(initialState, (builder) =>
   builder
     // Get actions
-    .addCase(doGetPlaceStore, (state) => {
+    .addCase(doGetEntity, (state) => {
       state.loading = true;
       state.error = undefined;
     })
-    .addCase(doGetPlaceStoreSuccess, (state, action) => {
+    .addCase(doGetEntitySuccess, (state, action) => {
       state.loading = false;
       if (Array.isArray(action.payload)) {
         // User got the list
@@ -41,33 +41,33 @@ export default createReducer<PlaceStoreReducerState>(initialState, (builder) =>
         state.list = addToList(action.payload, state.list);
       }
     })
-    .addCase(doGetPlaceStoreFailed, (state, action) => {
+    .addCase(doGetEntityFailed, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     })
     // Save actions
-    .addCase(doSavePlaceStore, (state) => {
+    .addCase(doSaveEntity, (state) => {
       state.loading = true;
       state.error = undefined;
     })
-    .addCase(doSavePlaceStoreSuccess, (state, action) => {
+    .addCase(doSaveEntitySuccess, (state, action) => {
       state.loading = false;
       state.list = addToList(action.payload, state.list);
     })
-    .addCase(doSavePlaceStoreFailed, (state, action) => {
+    .addCase(doSaveEntityFailed, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     })
     // Delete actions
-    .addCase(doDeletePlaceStore, (state) => {
+    .addCase(doDeleteEntity, (state) => {
       state.loading = true;
       state.error = undefined;
     })
-    .addCase(doDeletePlaceStoreSuccess, (state, action) => {
+    .addCase(doDeleteEntitySuccess, (state, action) => {
       state.loading = false;
       state.list = state.list.filter((item) => item.id !== action.payload.id);
     })
-    .addCase(doDeletePlaceStoreFailed, (state, action) => {
+    .addCase(doDeleteEntityFailed, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     })

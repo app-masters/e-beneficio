@@ -1,4 +1,4 @@
-import { PlaceStore } from './placeStore';
+import { Locality } from './locality';
 
 export interface Report {
   readonly id?: number | string;
@@ -12,5 +12,5 @@ export interface ConsumptionPlace {
   createdAt?: number | Date | null;
   placeStoreId: string;
   total: number;
-  placeStore: PlaceStore;
+  placeStore: Locality;
 }

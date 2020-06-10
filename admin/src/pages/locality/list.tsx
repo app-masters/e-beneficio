@@ -3,62 +3,61 @@ import { Button, Card, Modal, Table, Typography, Spin } from 'antd';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { PlaceStore } from '../../interfaces/placeStore';
-import { requestDeletePlaceStore, requestGetPlaceStore } from '../../redux/placeStore/actions';
+import { Locality } from '../../interfaces/locality';
+import { requestDeleteLocality, requestGetLocality } from '../../redux/locality/actions';
 import { AppState } from '../../redux/rootReducer';
 import { ActionWrapper, PageContainer } from './styles';
 import { formatCNPJ } from '../../utils/string';
-import { Place } from '../../interfaces/place';
-import { requestGetPlace } from '../../redux/place/actions';
+import { Entity } from '../../interfaces/entity';
+import { requestGetEntity } from '../../redux/entity/actions';
 
 /**
  * List component
  * @param props component props
  */
-export const PlaceStoreList: React.FC<{}> = () => {
+export const LocalityList: React.FC<{}> = () => {
   // Redux state
-  const list = useSelector<AppState, PlaceStore[]>((state) => state.placeStoreReducer.list as PlaceStore[]);
-  const placeLoading = useSelector<AppState, boolean>(({ placeReducer }) => placeReducer.loading);
-  const placeList = useSelector<AppState, Place[]>(({ placeReducer }) => placeReducer.list);
+  const list = useSelector<AppState, Locality[]>(({ localityReducer }) => localityReducer.list as Locality[]);
+  const entityLoading = useSelector<AppState, boolean>(({ entityReducer }) => entityReducer.loading);
+  const entityList = useSelector<AppState, Entity[]>(({ entityReducer }) => entityReducer.list);
   // Redux actions
   const dispatch = useDispatch();
   useEffect(() => {
-    if (!placeList || placeList.length <= 0) {
-      dispatch(requestGetPlace());
+    if (!entityList || entityList.length <= 0) {
+      dispatch(requestGetEntity());
     }
-
-    dispatch(requestGetPlaceStore());
-  }, [dispatch, placeList]);
+    dispatch(requestGetLocality());
+  }, [dispatch, entityList]);
   return (
     <PageContainer>
       <Card
-        title={<Typography.Title>{`Lojas`}</Typography.Title>}
+        title={<Typography.Title>{`Localidades`}</Typography.Title>}
         extra={
-          <Link to={`/lojas/criar`}>
+          <Link to={`/localidades/criar`}>
             <Button type="primary">Criar</Button>
           </Link>
         }
       >
         <Table dataSource={list}>
           <Table.Column
-            title="Estabelecimento"
+            title="Entidade"
             dataIndex="placeId"
-            render={(data: PlaceStore['placeId']) =>
-              placeLoading || !placeList || placeList.length <= 0 ? (
+            render={(data: Locality['placeId']) =>
+              entityLoading || !entityList || entityList.length <= 0 ? (
                 <Spin size="small" />
               ) : (
-                placeList.find((place) => place.id === data)?.title
+                entityList.find((entity) => entity.id === data)?.title
               )
             }
           />
           <Table.Column title="Loja" dataIndex="title" />
-          <Table.Column title="CNPJ" dataIndex="cnpj" render={(data: PlaceStore['cnpj']) => formatCNPJ(data)} />
+          <Table.Column title="CNPJ" dataIndex="cnpj" render={(data: Locality['cnpj']) => formatCNPJ(data)} />
           <Table.Column title="Endereço" dataIndex="address" />
           <Table.Column
-            render={(item: PlaceStore) => {
+            render={(item: Locality) => {
               return (
                 <ActionWrapper>
-                  <Link to={`/lojas/${item.id}/editar`}>
+                  <Link to={`/localidades/${item.id}/editar`}>
                     <Button>Editar</Button>
                   </Link>
                   {/* TODO: Add alert on delete */}
@@ -73,7 +72,7 @@ export const PlaceStoreList: React.FC<{}> = () => {
                         okType: 'danger',
                         cancelText: 'Não',
                         onOk: () => {
-                          dispatch(requestDeletePlaceStore(item.id as number));
+                          dispatch(requestDeleteLocality(item.id as number));
                         }
                       })
                     }

@@ -8,7 +8,9 @@ import {
   ShopOutlined,
   UserOutlined,
   HomeOutlined,
-  BookOutlined
+  BookOutlined,
+  ShoppingCartOutlined,
+  SolutionOutlined
 } from '@ant-design/icons';
 import { Button, Layout, Menu, Popover } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -71,11 +73,6 @@ const routes: RouteItem[] = [
   //   icon: () => <ShopOutlined />,
   //   name: 'Lojas'
   // },
-  // {
-  //   path: '/estabelecimentos',
-  //   icon: () => <SolutionOutlined />,
-  //   name: 'Estabelecimentos'
-  // },
   {
     path: '/instituicoes',
     icon: () => <BankOutlined />,
@@ -86,8 +83,18 @@ const routes: RouteItem[] = [
 const privateRoutes: RouteItem[] = [
   {
     path: '/produtos',
-    icon: () => <ShopOutlined />,
+    icon: () => <ShoppingCartOutlined />,
     name: 'Produtos'
+  },
+  {
+    path: '/localidades',
+    icon: () => <ShopOutlined />,
+    name: 'Localidades'
+  },
+  {
+    path: '/entidades',
+    icon: () => <SolutionOutlined />,
+    name: 'Entidades'
   }
 ];
 
@@ -161,7 +168,7 @@ export const Sidebar: React.FC = () => {
           <Menu theme="light" mode="inline" defaultSelectedKeys={[location ? location.pathname : '/']}>
             {/* Render the links based on the nav arrays */}
             {routes.map((navLink) => menuItem(navLink, ''))}
-            {isTicket && privateRoutes.map((navLink) => menuItem(navLink, ''))}
+            {!isTicket && privateRoutes.map((navLink) => menuItem(navLink, ''))}
           </Menu>
         </MenuHeight>
         <Flex vertical={collapsed} alignItems="center" gap="sm" justifyContent="space-between">

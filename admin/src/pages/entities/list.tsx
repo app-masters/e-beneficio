@@ -4,8 +4,8 @@ import moment from 'moment';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Place } from '../../interfaces/place';
-import { requestDeletePlace, requestGetPlace } from '../../redux/place/actions';
+import { Entity } from '../../interfaces/entity';
+import { requestDeleteEntity, requestGetEntity } from '../../redux/entity/actions';
 import { AppState } from '../../redux/rootReducer';
 import { ActionWrapper, PageContainer } from './styles';
 
@@ -13,20 +13,20 @@ import { ActionWrapper, PageContainer } from './styles';
  * List component
  * @param props component props
  */
-export const PlaceList: React.FC<{}> = () => {
+export const EntityList: React.FC<{}> = () => {
   // Redux state
-  const list = useSelector<AppState, Place[]>((state) => state.placeReducer.list as Place[]);
+  const list = useSelector<AppState, Entity[]>(({ entityReducer }) => entityReducer.list as Entity[]);
   // Redux actions
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(requestGetPlace());
+    dispatch(requestGetEntity());
   }, [dispatch]);
   return (
     <PageContainer>
       <Card
-        title={<Typography.Title>{`Estabelecimentos`}</Typography.Title>}
+        title={<Typography.Title>{`Entidades`}</Typography.Title>}
         extra={
-          <Link to={`/estabelecimentos/criar`}>
+          <Link to={`/entidades/criar`}>
             <Button type="primary">Criar</Button>
           </Link>
         }
@@ -36,13 +36,13 @@ export const PlaceList: React.FC<{}> = () => {
           <Table.Column
             title="Criado"
             dataIndex="createdAt"
-            render={(data: Place['createdAt']) => moment(data as Date).fromNow()}
+            render={(data: Entity['createdAt']) => moment(data as Date).fromNow()}
           />
           <Table.Column
-            render={(item: Place) => {
+            render={(item: Entity) => {
               return (
                 <ActionWrapper>
-                  <Link to={`/estabelecimentos/${item.id}/editar`}>
+                  <Link to={`/entidades/${item.id}/editar`}>
                     <Button>Editar</Button>
                   </Link>
                   {/* TODO: Add alert on delete */}
@@ -57,7 +57,7 @@ export const PlaceList: React.FC<{}> = () => {
                         okType: 'danger',
                         cancelText: 'Não',
                         onOk: () => {
-                          dispatch(requestDeletePlace(item.id as number));
+                          dispatch(requestDeleteEntity(item.id as number));
                         }
                       })
                     }

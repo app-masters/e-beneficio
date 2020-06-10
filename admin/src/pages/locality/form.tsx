@@ -3,12 +3,12 @@ import { useFormik } from 'formik';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
-import { PlaceStore } from '../../interfaces/placeStore';
+import { Locality } from '../../interfaces/locality';
 import { AppState } from '../../redux/rootReducer';
 import yup from '../../utils/yup';
-import { requestGetPlace } from '../../redux/place/actions';
-import { Place } from '../../interfaces/place';
-import { requestSavePlaceStore } from '../../redux/placeStore/actions';
+import { requestGetEntity } from '../../redux/entity/actions';
+import { Entity } from '../../interfaces/entity';
+import { requestSaveLocality } from '../../redux/locality/actions';
 import { InputFormatter } from '../../components/inputFormatter';
 import { formatCNPJ } from '../../utils/string';
 
@@ -16,7 +16,7 @@ const { Option } = Select;
 
 const schema = yup.object().shape({
   title: yup.string().label('Loja').required(),
-  placeId: yup.number().label('Estabelecimento').required(),
+  placeId: yup.number().label('Entidade').required(),
   cnpj: yup.string().label('CNPJ').required(),
   address: yup.string().label('Endereço').required()
 });
@@ -25,25 +25,25 @@ const schema = yup.object().shape({
  * Dashboard page component
  * @param props component props
  */
-export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (props) => {
+export const LocalityForm: React.FC<RouteComponentProps<{ id: string }>> = (props) => {
   const history = useHistory();
   const isCreating = props.match.params.id === 'criar';
 
   // Redux state
-  const placeStore = useSelector<AppState, PlaceStore | undefined>(({ placeStoreReducer }) =>
-    placeStoreReducer.list.find((item: PlaceStore) => item.id === Number(props.match.params.id))
+  const locality = useSelector<AppState, Locality | undefined>(({ localityReducer }) =>
+    localityReducer.list.find((item: Locality) => item.id === Number(props.match.params.id))
   );
-  const loading = useSelector<AppState, boolean>(({ placeStoreReducer }) => placeStoreReducer.loading);
-  const placeLoading = useSelector<AppState, boolean>(({ placeReducer }) => placeReducer.loading);
-  const placeList = useSelector<AppState, Place[]>(({ placeReducer }) => placeReducer.list);
+  const loading = useSelector<AppState, boolean>(({ localityReducer }) => localityReducer.loading);
+  const entityLoading = useSelector<AppState, boolean>(({ entityReducer }) => entityReducer.loading);
+  const entityList = useSelector<AppState, Entity[]>(({ entityReducer }) => entityReducer.list);
 
   // Redux actions
   const dispatch = useDispatch();
   useEffect(() => {
-    if (!placeList || placeList.length <= 0) {
-      dispatch(requestGetPlace());
+    if (!entityList || entityList.length <= 0) {
+      dispatch(requestGetEntity());
     }
-  }, [dispatch, placeList]);
+  }, [dispatch, entityList]);
 
   const {
     handleSubmit,
@@ -57,8 +57,8 @@ export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (pr
     setFieldValue,
     setFieldTouched
   } = useFormik({
-    initialValues: placeStore || {
-      placeId: !placeLoading && placeList && placeList.length > 0 ? placeList[0].id : -1,
+    initialValues: locality || {
+      placeId: !entityLoading && entityList && entityList.length > 0 ? entityList[0].id : -1,
       title: '',
       cnpj: '',
       address: ''
@@ -67,9 +67,9 @@ export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (pr
     onSubmit: (values, { setStatus }) => {
       setStatus();
       dispatch(
-        requestSavePlaceStore(
+        requestSaveLocality(
           values,
-          () => history.push('/lojas'),
+          () => history.push('/localidades'),
           () => setStatus('Ocorreu um erro ao realizar a requisição.')
         )
       );
@@ -85,7 +85,7 @@ export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (pr
     <Modal
       title={isCreating ? 'Criar' : 'Editar'}
       visible={true}
-      onCancel={() => history.push('/lojas')}
+      onCancel={() => history.push('/localidades')}
       onOk={submitForm}
       confirmLoading={loading}
       okType={errors && Object.keys(errors).length > 0 && touched ? 'danger' : 'primary'}
@@ -102,16 +102,16 @@ export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (pr
           </Form.Item>
 
           <Form.Item
-            label={'Estabelecimento'}
+            label={'Entidade'}
             validateStatus={!!placeIdMeta.error && !!placeIdMeta.touched ? 'error' : ''}
             help={!!placeIdMeta.error && !!placeIdMeta.touched ? placeIdMeta.error : undefined}
           >
             <Select
-              disabled={placeLoading}
+              disabled={entityLoading}
               defaultValue={values.placeId?.toString()}
               onSelect={(value) => setFieldValue('placeId', Number(value))}
               value={values.placeId?.toString() || undefined}
-              notFoundContent={placeLoading ? <Spin size="small" /> : null}
+              notFoundContent={entityLoading ? <Spin size="small" /> : null}
               onChange={(value: string) => {
                 setFieldValue('placeId', Number(value));
               }}
@@ -119,12 +119,12 @@ export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (pr
                 setFieldTouched('placeId', true);
               }}
             >
-              {!placeLoading &&
-                placeList &&
-                placeList.length > 0 &&
-                placeList.map((place) => (
-                  <Option key={place.title} value={place.id?.toString() || '-1'}>
-                    {place.title}
+              {!entityLoading &&
+                entityList &&
+                entityList.length > 0 &&
+                entityList.map((entity) => (
+                  <Option key={entity.title} value={entity.id?.toString() || '-1'}>
+                    {entity.title}
                   </Option>
                 ))}
             </Select>

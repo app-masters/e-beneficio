@@ -8,14 +8,14 @@ import { AdminLayout } from '../components/adminLayout';
 // Pages
 import { LoginPage } from './login';
 import { DashboardPage } from './dashboard';
-import { PlaceList } from './places/list';
-import { PlaceForm } from './places/form';
+import { EntityList } from './entities/list';
+import { EntityForm } from './entities/form';
 import { useRefreshToken } from '../utils/auth';
 import { LogoutPage } from './logout';
 import { BenefitList } from './benefits/list';
 import { BenefitForm } from './benefits/form';
-import { PlaceStoreList } from './placeStore/list';
-import { PlaceStoreForm } from './placeStore/form';
+import { LocalityList } from './locality/list';
+import { LocalityForm } from './locality/form';
 import { UserList } from './user/list';
 import { UserForm } from './user/form';
 import { InstitutionForm } from './institutions/form';
@@ -39,7 +39,7 @@ const PrivateTypeRoute = ({ component, ...rest }: any) => {
    * Function to redirect user
    */
   const routeComponent = (props: RouteProps) =>
-    isTicket ? React.createElement(component, props) : <Redirect to={{ pathname: '/' }} />;
+    !isTicket ? React.createElement(component, props) : <Redirect to={{ pathname: '/' }} />;
   return <Route {...rest} render={routeComponent} />;
 };
 
@@ -59,16 +59,16 @@ const PrivateRouter: React.FC<{}> = () => {
         <PrivateTypeRoute path="/produtos" component={ProductList} />
         <PrivateTypeRoute path="/produtos/:id" component={ProductForm} />
         {/* Report routes */}
-        <Route path="/estabelecimentos" component={PlaceList} />
-        {/* Place routes */}
         <Route path="/relatorios" component={ReportList} />
-        <Route path="/estabelecimentos/:id" component={PlaceForm} />
+        {/* entity routes */}
+        <PrivateTypeRoute path="/entidades" component={EntityList} />
+        <PrivateTypeRoute path="/entidades/:id" component={EntityForm} />
         {/* Benefit routes */}
         <Route path="/beneficios" component={BenefitList} />
         <Route path="/beneficios/:id" component={BenefitForm} />
-        {/* Store routes */}
-        <Route path="/lojas" component={PlaceStoreList} />
-        <Route path="/lojas/:id" component={PlaceStoreForm} />
+        {/* locality routes */}
+        <PrivateTypeRoute path="/localidades" component={LocalityList} />
+        <PrivateTypeRoute path="/localidades/:id" component={LocalityForm} />
         {/* User routes */}
         <Route path="/usuarios" component={UserList} />
         <Route path="/usuarios/:id" component={UserForm} />

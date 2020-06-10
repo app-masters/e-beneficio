@@ -2,10 +2,10 @@ import { combineReducers, AnyAction, CombinedState } from 'redux';
 
 // Reducers
 import authReducer, { AuthReducerState } from './auth/reducers';
-import placeReducer, { PlaceReducerState } from './place/reducers';
+import entityReducer, { EntityReducerState } from './entity/reducers';
 import benefitReducer, { BenefitReducerState } from './benefit/reducers';
 import institutionReducer, { InstitutionReducerState } from './institution/reducers';
-import placeStoreReducer, { PlaceStoreReducerState } from './placeStore/reducers';
+import localityReducer, { LocalityReducerState } from './locality/reducers';
 import userReducer, { UserReducerState } from './user/reducers';
 import familiesReducer, { FamilyReducerState } from './families/reducers';
 import reportReducer, { ReportReducerState } from './report/reducers';
@@ -15,10 +15,10 @@ import productReducer, { ProductReducerState } from './product/reducers';
 
 type TypeReducers = {
   authReducer: AuthReducerState;
-  placeReducer: PlaceReducerState;
+  entityReducer: EntityReducerState;
   benefitReducer: BenefitReducerState;
   institutionReducer: InstitutionReducerState;
-  placeStoreReducer: PlaceStoreReducerState;
+  localityReducer: LocalityReducerState;
   userReducer: UserReducerState;
   familiesReducer: FamilyReducerState;
   reportReducer: ReportReducerState;
@@ -29,10 +29,10 @@ type TypeReducers = {
 
 const appReducer = combineReducers({
   authReducer,
-  placeReducer,
+  entityReducer,
   benefitReducer,
   institutionReducer,
-  placeStoreReducer,
+  localityReducer,
   userReducer,
   familiesReducer,
   reportReducer,
