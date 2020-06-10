@@ -14,8 +14,12 @@ router.get('/', async (req, res) => {
     let item;
     if (req.query.nis) {
       item = await familyModel.findByNis(req.query.nis as string, req.user.cityId, true);
-      const balance = await consumptionModel.getFamilyDependentBalance(item);
-      res.send({ ...item.toJSON(), balance });
+      if (item) {
+        const balance = await consumptionModel.getFamilyDependentBalance(item);
+        res.send({ ...item.toJSON(), balance });
+      } else {
+        res.status(404).send('Not found');
+      }
     } else item = await familyModel.getAll();
     res.send(item);
   } catch (error) {

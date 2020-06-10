@@ -1,4 +1,11 @@
 import { Dependent } from './dependent';
+export interface FamilyProductConsumption {
+  product: { id: number | string; name: string };
+  amountAvailable: number;
+  amountGranted: number;
+  amountConsumed: number;
+  consume?: number;
+}
 
 export interface Family {
   readonly id?: number | string;
@@ -24,6 +31,6 @@ export interface Family {
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
   // Extra data
-  balance: number;
   dependents?: Dependent[];
+  balance: number | FamilyProductConsumption[];
 }

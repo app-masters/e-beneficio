@@ -284,7 +284,25 @@ export const requestGetFamily = (nis: string, cityId: string): ThunkResult<void>
       }
     } catch (error) {
       // Request failed: dispatch error
-      logging.error(error);
+      if (error.response) {
+        error.status = error.response.status;
+        switch (Number(error.response.status)) {
+          case 404:
+            error.message = 'Não encontramos nenhuma família utilizando esse NIS.';
+            break;
+          default:
+            logging.error(error);
+            error.message = 'Ocorreu uma falha inesperada e os programadores foram avisados.';
+            break;
+        }
+      } else if (error.message === 'Network Error' && !window.navigator.onLine) {
+        error.message =
+          'Ocorreu um erro ao conectar ao servidor. ' +
+          'Verifique se a conexão com a internet está funcionando corretamente.';
+      } else {
+        logging.error(error);
+        error.message = 'Ocorreu uma falha inesperada e os programadores foram avisados.';
+      }
       dispatch(doGetFamilyFailed(error));
     }
   };
