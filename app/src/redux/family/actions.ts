@@ -9,6 +9,10 @@ export const doGetFamily = createAction<void>('family/GET');
 export const doGetFamilySuccess = createAction<Family | Family[]>('family/GET_SUCCESS');
 export const doGetFamilyFailed = createAction<Error | undefined>('family/GET_FAILED');
 
+export const doSaveFamily = createAction<void>('family/SAVE');
+export const doSaveFamilySuccess = createAction<Family | Family[]>('family/SAVE_SUCCESS');
+export const doSaveFamilyFailed = createAction<Error | undefined>('family/SAVE_FAILED');
+
 /**
  * Get family Thunk action
  */
@@ -30,6 +34,40 @@ export const requestGetFamily = (nis: string): ThunkResult<void> => {
       // Request failed: dispatch error
       logging.error(error);
       dispatch(doGetFamilyFailed(error));
+    }
+  };
+};
+
+/**
+ * Save Family Thunk action
+ */
+export const requestSaveFamily = (
+  item: Family,
+  onSuccess?: () => void,
+  onFailure?: (error?: Error) => void
+): ThunkResult<void> => {
+  return async (dispatch) => {
+    try {
+      // Start request - starting loading state
+      dispatch(doSaveFamily());
+
+      const response = await backend.post<Family>(`/families`, { ...item });
+
+      if (response && response.data) {
+        // Request finished
+        dispatch(doSaveFamilySuccess(response.data)); // Dispatch result
+        if (onSuccess) onSuccess();
+      } else {
+        // Request without response - probably won't happen, but cancel the request
+        dispatch(doSaveFamilyFailed());
+        if (onFailure) onFailure();
+      }
+    } catch (error) {
+      // Request failed: dispatch error
+      logging.error(error);
+      error.message = error.response ? error.response.data : error.message;
+      dispatch(doSaveFamilyFailed(error));
+      if (onFailure) onFailure(error);
     }
   };
 };

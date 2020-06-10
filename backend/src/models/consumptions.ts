@@ -272,7 +272,7 @@ export const addConsumption = async (
   }
 
   const balance = await getFamilyDependentBalance(family);
-  if (balance < Number(values.value)) {
+  if (balance && balance < Number(values.value)) {
     // Insuficient balance
     throw { status: 422, message: 'Saldo insuficiente' };
   }

@@ -8,10 +8,10 @@ export interface Family {
   cityId: number | string;
   code: string;
   groupName: string;
-  responsibleName: string;
-  responsibleNis: string;
-  responsibleBirthday: Date;
-  responsibleMotherName: string;
+  responsibleName?: string;
+  responsibleNis?: string;
+  responsibleBirthday?: Date;
+  responsibleMotherName?: string;
   address?: string;
   phone?: string;
   phone2?: string;
@@ -69,19 +69,19 @@ export const attributes = {
   },
   responsibleName: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   },
   responsibleNis: {
     type: DataTypes.STRING(11),
-    allowNull: false
+    allowNull: true
   },
   responsibleBirthday: {
     type: DataTypes.DATE,
-    allowNull: false
+    allowNull: true
   },
   responsibleMotherName: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   },
   phone: {
     type: DataTypes.STRING,
