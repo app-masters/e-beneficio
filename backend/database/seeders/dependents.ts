@@ -26,7 +26,8 @@ const seed = async () => {
               .map(() => nisPattern[Math.floor(Math.random() * nisPattern.length)])
               .join(''),
             birthday: faker.date.past(10),
-            schoolName: faker.company.companyName()
+            schoolName: faker.company.companyName(),
+            isResponsible: i === 0
           });
         }
       }
