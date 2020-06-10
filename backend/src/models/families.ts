@@ -405,7 +405,7 @@ export const getDashboardInfo = async (cityId: NonNullable<City['id']>) => {
  * Function to create a new row on the table
  *
  * @param values object with the new item data
- * @param cityId
+ * @param cityId current city of user
  * @returns Promise<Item>
  */
 export const createFamilyWithDependents = async (
@@ -414,7 +414,7 @@ export const createFamilyWithDependents = async (
 ): Promise<SequelizeFamily> => {
   //verify if family exists
   const family = await db.families.findOne({
-    where: Sequelize.or({ code: values.code }, { responsibleNis: values.responsibleNis })
+    where: Sequelize.or({ code: values.code }, { responsibleNis: values.responsibleNis || null })
   });
   if (family) {
     throw { status: 400, message: 'Familia já cadastrada.' };
@@ -422,13 +422,13 @@ export const createFamilyWithDependents = async (
   //verify if dependent exist
   if (values.dependents) {
     const dependentNis = values.dependents?.map((dep) => {
-      return dep.nis;
+      return dep.nis || '';
     });
     const dependentRg = values.dependents?.map((dep) => {
-      return dep.rg;
+      return dep.rg || '';
     });
     const dependentCpf = values.dependents?.map((dep) => {
-      return dep.cpf;
+      return dep.cpf || '';
     });
     const dependents = await db.dependents.findAll({
       where: Sequelize.or(

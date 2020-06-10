@@ -35,31 +35,23 @@ import { AppState } from '../../redux/rootReducer';
 
 const schema = yup.object().shape({
   code: yup.string().label('Código').required(),
-  groupName: yup.string().label('Grupo familiar').required(),
-  responsibleName: yup.string().label('Nome do responsável').required(),
-  responsibleNis: yup.string().label('NIS do responsável').required(),
-  responsibleBirthday: yup.date().label('Nascimento do responsável').required(),
-  responsibleMotherName: yup.string().label('Nome da mãe do responsável').required()
+  groupName: yup.string().label('Grupo familiar').required()
 });
 
 const typeFamily = {
   code: '',
   cityId: 0,
   groupName: '',
-  responsibleName: '',
-  responsibleNis: '',
-  responsibleBirthday: undefined,
-  responsibleMotherName: '',
-  isRegisteredInPerson: false,
-  totalSalary: 0,
-  isOnAnotherProgram: false,
-  isOnGovernProgram: false,
-  address: '',
-  houseType: '',
-  numberOfRooms: 0,
-  haveSewage: false,
-  sewageComment: '',
-  balance: 0,
+  isRegisteredInPerson: undefined,
+  totalSalary: undefined,
+  isOnAnotherProgram: undefined,
+  isOnGovernProgram: undefined,
+  address: undefined,
+  houseType: undefined,
+  numberOfRooms: undefined,
+  haveSewage: undefined,
+  sewageComment: undefined,
+  balance: undefined,
   dependents: []
 };
 
@@ -67,7 +59,7 @@ const typeFamily = {
  * Families form component
  * @param props component props
  */
-export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (props) => {
+export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () => {
   const [modal, setModal] = React.useState<{
     item?: Dependent | null;
     open: boolean;
@@ -95,13 +87,13 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
     validationSchema: schema,
     onSubmit: (values, { setStatus }) => {
       setStatus();
-      const newFamily = { ...values, responsibleBirthday: moment(values.responsibleBirthday).toDate() };
+      const newFamily = { ...values, balance: 0 };
       dispatch(requestSaveFamily(newFamily as Family));
     }
   });
 
   const family = useSelector<AppState, Family | null | undefined>(({ familyReducer }) =>
-    familyReducer.list?.find((f: Family) => f.responsibleNis === values.responsibleNis)
+    familyReducer.list?.find((f: Family) => f.code === values?.code)
   );
 
   /**
@@ -115,22 +107,20 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
   /**
    * Helper function
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const helper = (type: FieldMetaProps<any>) => {
     return !!type.error && !!type.touched ? type.error : undefined;
   };
   /**
    * Validation function
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const validation = (type: FieldMetaProps<any>) => {
     return !!type.error && !!type.touched ? 'error' : '';
   };
 
   const codeMeta = getFieldMeta('code');
   const groupNameMeta = getFieldMeta('groupName');
-  const responsibleNameMeta = getFieldMeta('responsibleName');
-  const responsibleNisMeta = getFieldMeta('responsibleNis');
-  const responsibleBirthdayMeta = getFieldMeta('responsibleBirthday');
-  const responsibleMotherNameMeta = getFieldMeta('responsibleMotherName');
 
   const isRegisteredInPersonMeta = getFieldMeta('isRegisteredInPerson');
   const isRegisteredInPersonField = getFieldProps('isRegisteredInPerson');
@@ -154,7 +144,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
           {!error && family && family.id && (
             <Alert
               message="Familia salva"
-              description={'Os dados de familia foram salvas com sucesso!'}
+              description={'Os dados de familia foram salvos com sucesso!'}
               type="success"
               showIcon
             />
@@ -197,74 +187,6 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={24} md={8}>
-              <Form.Item
-                label={'Nome do responsável'}
-                validateStatus={validation(responsibleNameMeta)}
-                help={helper(responsibleNameMeta)}
-              >
-                <Input
-                  id="responsibleName"
-                  name="responsibleName"
-                  onChange={handleChange}
-                  value={values.responsibleName}
-                  onPressEnter={submitForm}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={[16, 16]}>
-            <Col span={24} md={8}>
-              <Form.Item
-                label={'NIS do responsável'}
-                validateStatus={validation(responsibleNisMeta)}
-                help={helper(responsibleNisMeta)}
-              >
-                <Input
-                  id="responsibleNis"
-                  name="responsibleNis"
-                  maxLength={11}
-                  onChange={handleChange}
-                  value={values.responsibleNis}
-                  onPressEnter={submitForm}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={24} md={8}>
-              <Form.Item
-                label={'Nascimento do responsável'}
-                validateStatus={validation(responsibleBirthdayMeta)}
-                help={helper(responsibleBirthdayMeta)}
-              >
-                <DatePicker
-                  name="responsibleBirthday"
-                  format={'DD/MM/YYYY'}
-                  style={{ width: '100%' }}
-                  defaultValue={values.responsibleBirthday ? moment(values.responsibleBirthday) : undefined}
-                  locale={locale}
-                  onChange={(date) => {
-                    setFieldValue('responsibleBirthday', date);
-                  }}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={24} md={8}>
-              <Form.Item
-                label={'Nome da mãe do responsável'}
-                validateStatus={validation(responsibleMotherNameMeta)}
-                help={helper(responsibleMotherNameMeta)}
-              >
-                <Input
-                  id="responsibleMotherName"
-                  name="responsibleMotherName"
-                  onChange={handleChange}
-                  value={values.responsibleMotherName}
-                  onPressEnter={submitForm}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={[16, 16]}>
             <Col span={24} md={8}>
               <Form.Item
                 label={'Salário total'}
@@ -327,23 +249,13 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
             </Col>
             <Col span={24} md={8}>
               <Form.Item label={'Tipo de Casa'} validateStatus={validation(houseTypeMeta)} help={helper(houseTypeMeta)}>
-                <Select
-                  defaultValue={values.houseType?.toString()}
-                  onSelect={(value) => setFieldValue('houseType', value)}
-                  value={values.houseType?.toString() || undefined}
-                  onChange={(value: string) => {
-                    setFieldValue('houseType', value);
-                  }}
-                  onBlur={() => {
-                    setFieldTouched('houseType', true);
-                  }}
-                >
-                  {Object.keys(familyGroupList).map((item) => (
-                    <Select.Option key={item} value={item}>
-                      {familyGroupList[item].title}
-                    </Select.Option>
-                  ))}
-                </Select>
+                <Input
+                  id="houseType"
+                  name="houseType"
+                  onChange={handleChange}
+                  value={values.houseType}
+                  onPressEnter={submitForm}
+                />
               </Form.Item>
             </Col>
             <Col span={24} md={8}>
@@ -394,10 +306,10 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
           style={{ padding: 0, paddingBottom: 20 }}
           extra={[
             <Button key={'adult'} onClick={() => setModal({ open: true, type: 'adult' })}>
-              Criar adulto
+              Adicionar adulto
             </Button>,
             <Button key={'child'} onClick={() => setModal({ open: true, type: 'child' })}>
-              Criar criança
+              Adicionar criança
             </Button>
           ]}
         />
@@ -562,12 +474,14 @@ export const DependentForm: React.FC<{
   /**
    * Helper function
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const helper = (type: FieldMetaProps<any>) => {
     return !!type.error && !!type.touched ? type.error : undefined;
   };
   /**
    * Validation function
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const validation = (type: FieldMetaProps<any>) => {
     return !!type.error && !!type.touched ? 'error' : '';
   };
