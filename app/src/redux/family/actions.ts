@@ -51,14 +51,8 @@ export const requestSaveFamily = (
       // Start request - starting loading state
       dispatch(doSaveFamily());
 
-      // Request
-      // let response;
-      // if (item.id) {
-      //   response = await backend.put<Family>(`/families/${item.id}`, { ...item });
-      // }
-      // else {
       const response = await backend.post<Family>(`/families`, { ...item });
-      // }
+
       if (response && response.data) {
         // Request finished
         dispatch(doSaveFamilySuccess(response.data)); // Dispatch result
@@ -71,6 +65,7 @@ export const requestSaveFamily = (
     } catch (error) {
       // Request failed: dispatch error
       logging.error(error);
+      error.message = error.response ? error.response.data : error.message;
       dispatch(doSaveFamilyFailed(error));
       if (onFailure) onFailure(error);
     }

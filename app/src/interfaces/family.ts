@@ -1,4 +1,4 @@
-import { Dependent } from './Dependent';
+import { Dependent } from './dependent';
 
 export interface Family {
   readonly id?: number | string;

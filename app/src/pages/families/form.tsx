@@ -15,7 +15,8 @@ import {
   Modal,
   InputNumber,
   notification,
-  Divider
+  Divider,
+  Alert
 } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
 import yup from '../../utils/yup';
@@ -25,11 +26,12 @@ import { formatPhone, formatRG, formatCPF, formatMoney } from '../../utils/strin
 import locale from 'antd/es/date-picker/locale/pt_BR';
 import moment from 'moment';
 import { PageContainer, ColCheckStyle, ActionWrapper } from './styles';
-import { Dependent } from '../../interfaces/Dependent';
+import { Dependent } from '../../interfaces/dependent';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { requestSaveFamily } from '../../redux/family/actions';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Family } from '../../interfaces/family';
+import { AppState } from '../../redux/rootReducer';
 
 const schema = yup.object().shape({
   code: yup.string().label('Código').required(),
@@ -46,7 +48,7 @@ const typeFamily = {
   groupName: '',
   responsibleName: '',
   responsibleNis: '',
-  responsibleBirthday: new Date() || undefined,
+  responsibleBirthday: undefined,
   responsibleMotherName: '',
   isRegisteredInPerson: false,
   totalSalary: 0,
@@ -77,6 +79,8 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
 
   const dispatch = useDispatch();
 
+  const loading = useSelector<AppState, boolean>(({ familyReducer }) => familyReducer.loading);
+  const error = useSelector<AppState, Error | undefined>(({ familyReducer }) => familyReducer.error);
   const {
     handleSubmit,
     handleChange,
@@ -94,10 +98,14 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
     validationSchema: schema,
     onSubmit: (values, { setStatus }) => {
       setStatus();
-      values.responsibleBirthday = moment(values.responsibleBirthday).toDate();
-      dispatch(requestSaveFamily(values as Family));
+      const newFamily = { ...values, responsibleBirthday: moment(values.responsibleBirthday).toDate() };
+      dispatch(requestSaveFamily(newFamily as Family));
     }
   });
+
+  const family = useSelector<AppState, Family | null | undefined>(({ familyReducer }) =>
+    familyReducer.list?.find((f: Family) => f.responsibleNis === values.responsibleNis)
+  );
 
   /**
    * Remove dependent form component
@@ -148,7 +156,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
     },
     {
       key: 'dependents',
-      tab: 'Dependentes'
+      tab: 'Membros'
     }
   ];
 
@@ -159,6 +167,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
       <Card
         tabList={tabListName}
         activeTabKey={currentTab}
+        loading={loading}
         onTabChange={(key) => {
           setTab(key);
         }}
@@ -166,6 +175,16 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
       >
         {currentTab === 'family' && (
           <Form layout="vertical">
+            {error && <Alert message="Ocorreu um erro" description={error.message} type="error" showIcon />}
+            {!error && family && family.id && (
+              <Alert
+                message="Familia salva"
+                description={'Os dados de familia foram salvas com sucesso!'}
+                type="success"
+                showIcon
+              />
+            )}
+
             <Row gutter={[16, 16]}>
               <Col span={24} md={6}>
                 <Form.Item label={'Código'} validateStatus={validation(codeMeta)} help={helper(codeMeta)}>
@@ -366,12 +385,13 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
                   validateStatus={validation(numberOfRoomsMeta)}
                   help={helper(numberOfRoomsMeta)}
                 >
-                  <Input
+                  <InputNumber
+                    style={{ width: '100%' }}
                     id="numberOfRooms"
                     name="numberOfRooms"
-                    onChange={handleChange}
+                    onChange={(value) => setFieldValue('numberOfRooms', value)}
                     value={values.numberOfRooms}
-                    onPressEnter={submitForm}
+                    min={0}
                   />
                 </Form.Item>
               </Col>
@@ -402,7 +422,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
             </Row>
             <Divider />
             <ActionWrapper>
-              <Button onClick={() => handleSubmit()} type={'primary'}>
+              <Button loading={loading} onClick={() => handleSubmit()} type={'primary'}>
                 Concluir
               </Button>
             </ActionWrapper>

@@ -403,10 +403,15 @@ export const getDashboardInfo = async (cityId: NonNullable<City['id']>) => {
 
 /**
  * Function to create a new row on the table
+ *
  * @param values object with the new item data
+ * @param cityId
  * @returns Promise<Item>
  */
-export const createFamilyWithDependents = async (values: Family | SequelizeFamily): Promise<SequelizeFamily> => {
+export const createFamilyWithDependents = async (
+  values: Family | SequelizeFamily,
+  cityId: string | number
+): Promise<SequelizeFamily> => {
   //verify if family exists
   const family = await db.families.findOne({
     where: Sequelize.or({ code: values.code }, { responsibleNis: values.responsibleNis })
@@ -450,7 +455,7 @@ export const createFamilyWithDependents = async (values: Family | SequelizeFamil
       };
     }
   }
-  return db.families.create(values).then(async (family) => {
+  return db.families.create({ ...values, cityId }).then(async (family) => {
     if (values.dependents) {
       const depedentsList = values.dependents?.map((dep) => {
         dep.familyId = family.id as number;

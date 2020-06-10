@@ -123,8 +123,8 @@ router.get('/import-status', async (req, res) => {
  */
 router.post('/', async (req, res) => {
   try {
-    // if (!req.user?.cityId) throw Error('User without selected city');
-    const item = await familyModel.createFamilyWithDependents(req.body);
+    if (!req.user?.cityId) throw Error('User without selected city');
+    const item = await familyModel.createFamilyWithDependents(req.body, req.user?.cityId);
     res.send(item);
   } catch (error) {
     logging.error(error);
