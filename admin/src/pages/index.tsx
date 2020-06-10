@@ -8,8 +8,8 @@ import { AdminLayout } from '../components/adminLayout';
 // Pages
 import { LoginPage } from './login';
 import { DashboardPage } from './dashboard';
-import { PlaceList } from './places/list';
-import { PlaceForm } from './places/form';
+import { PlaceList } from './place/list';
+import { PlaceForm } from './place/form';
 import { useRefreshToken } from '../utils/auth';
 import { LogoutPage } from './logout';
 import { BenefitList } from './benefits/list';
@@ -72,16 +72,16 @@ const PrivateRouter: React.FC<{}> = () => {
         <PrivateTypeRoute allowedRole="admin" path="/produtos" component={ProductList} />
         <PrivateTypeRoute allowedRole="admin" path="/produtos/:id" component={ProductForm} />
         {/* Report routes */}
-        <Route allowedRole="admin" path="/estabelecimentos" component={PlaceList} />
-        {/* Place routes */}
         <Route allowedRole="admin" path="/relatorios" component={ReportList} />
-        <Route allowedRole="admin" path="/estabelecimentos/:id" component={PlaceForm} />
+        {/* Place routes */}
+        <PrivateTypeRoute allowedRole="admin" path="/entidades" component={PlaceList} />
+        <PrivateTypeRoute allowedRole="admin" path="/entidades/:id" component={PlaceForm} />
         {/* Benefit routes */}
         <Route allowedRole="admin" path="/beneficios" component={BenefitList} />
         <Route allowedRole="admin" path="/beneficios/:id" component={BenefitForm} />
-        {/* Store routes */}
-        <Route allowedRole="admin" path="/lojas" component={PlaceStoreList} />
-        <Route allowedRole="admin" path="/lojas/:id" component={PlaceStoreForm} />
+        {/* PlaceStore routes */}
+        <PrivateTypeRoute allowedRole="admin" path="/localidades" component={PlaceStoreList} />
+        <PrivateTypeRoute allowedRole="admin" path="/localidades/:id" component={PlaceStoreForm} />
         {/* User routes */}
         <Route allowedRole="admin" path="/usuarios" component={UserList} />
         <Route allowedRole="admin" path="/usuarios/:id" component={UserForm} />

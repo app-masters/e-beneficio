@@ -3,6 +3,8 @@ import logging from '../utils/logging';
 import * as familyModel from '../models/families';
 import * as consumptionModel from '../models/consumptions';
 
+const type = process.env.CONSUMPTION_TYPE as 'ticket' | 'product';
+
 const router = express.Router({ mergeParams: true });
 
 /**
@@ -35,6 +37,22 @@ router.get('/dashboard', async (req, res) => {
   try {
     if (!req.user?.cityId) throw Error('User without selected city');
     const data = await familyModel.getDashboardInfo(req.user.cityId);
+    res.send(data);
+  } catch (error) {
+    logging.error(error);
+    res.status(500).send(error.message);
+  }
+});
+
+/**
+ * List of families associated with a place
+ */
+router.get('/place', async (req, res) => {
+  try {
+    if (!req.user?.cityId) throw Error('User without selected city');
+    if (!req.user?.placeStoreId) throw Error('User without place store');
+    const data = await familyModel.findByPlaceStore(req.user.placeStoreId, req.user.cityId, true, true);
+
     res.send(data);
   } catch (error) {
     logging.error(error);
@@ -128,6 +146,12 @@ router.get('/import-status', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     if (!req.user?.cityId) throw Error('User without selected city');
+    // If product type, add the user id and placeStoreId to family
+    if (type === 'product') {
+      if (!req.user.placeStoreId) throw Error('User without place store');
+      req.body.createdById = req.user.id;
+      req.body.placeStoreId = req.user.placeStoreId;
+    }
     const item = await familyModel.createFamilyWithDependents(req.body, req.user?.cityId);
     res.send(item);
   } catch (error) {

@@ -16,7 +16,7 @@ const { Option } = Select;
 
 const schema = yup.object().shape({
   title: yup.string().label('Loja').required(),
-  placeId: yup.number().label('Estabelecimento').required(),
+  placeId: yup.number().label('Entidade').required(),
   cnpj: yup.string().label('CNPJ').required(),
   address: yup.string().label('Endereço').required()
 });
@@ -69,7 +69,7 @@ export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (pr
       dispatch(
         requestSavePlaceStore(
           values,
-          () => history.push('/lojas'),
+          () => history.push('/localidades'),
           () => setStatus('Ocorreu um erro ao realizar a requisição.')
         )
       );
@@ -85,7 +85,7 @@ export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (pr
     <Modal
       title={isCreating ? 'Criar' : 'Editar'}
       visible={true}
-      onCancel={() => history.push('/lojas')}
+      onCancel={() => history.push('/localidades')}
       onOk={submitForm}
       confirmLoading={loading}
       okType={errors && Object.keys(errors).length > 0 && touched ? 'danger' : 'primary'}
@@ -102,7 +102,7 @@ export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (pr
           </Form.Item>
 
           <Form.Item
-            label={'Estabelecimento'}
+            label={'Entidade'}
             validateStatus={!!placeIdMeta.error && !!placeIdMeta.touched ? 'error' : ''}
             help={!!placeIdMeta.error && !!placeIdMeta.touched ? placeIdMeta.error : undefined}
           >
@@ -122,9 +122,9 @@ export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (pr
               {!placeLoading &&
                 placeList &&
                 placeList.length > 0 &&
-                placeList.map((place) => (
-                  <Option key={place.title} value={place.id?.toString() || '-1'}>
-                    {place.title}
+                placeList.map((entity) => (
+                  <Option key={entity.title} value={entity.id?.toString() || '-1'}>
+                    {entity.title}
                   </Option>
                 ))}
             </Select>

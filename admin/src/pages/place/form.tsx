@@ -38,7 +38,7 @@ export const PlaceForm: React.FC<RouteComponentProps<{ id: string }>> = (props) 
       dispatch(
         requestSavePlace(
           values,
-          () => history.push('/estabelecimentos'),
+          () => history.push('/entidades'),
           () => setStatus('Ocorreu um erro ao realizar a requisição.')
         )
       );
@@ -51,7 +51,7 @@ export const PlaceForm: React.FC<RouteComponentProps<{ id: string }>> = (props) 
     <Modal
       title={isCreating ? 'Criar' : 'Editar'}
       visible={true}
-      onCancel={() => history.push('/estabelecimentos')}
+      onCancel={() => history.push('/entidades')}
       onOk={submitForm}
       confirmLoading={loading}
       okType={errors && Object.keys(errors).length > 0 && touched ? 'danger' : 'primary'}
