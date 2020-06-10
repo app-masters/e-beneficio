@@ -409,6 +409,12 @@ export const createFamilyWithDependents = async (values: Family | SequelizeFamil
   }
   //verify if dependent exist
   if (values.dependents) {
+    const verifyResponsible = values.dependents?.filter((f) => f.isResponsible);
+    if (verifyResponsible.length > 1)
+      throw { status: 500, message: 'Somente um membro responsável por familia é permitido.' };
+    if (verifyResponsible.length === 0)
+      throw { status: 500, message: 'É necessário um membro responsável por familia.' };
+
     const dependentNis = values.dependents?.map((dep) => {
       return dep.nis;
     });
