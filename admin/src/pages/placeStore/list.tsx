@@ -17,7 +17,7 @@ import { requestGetPlace } from '../../redux/place/actions';
  */
 export const PlaceStoreList: React.FC<{}> = () => {
   // Redux state
-  const list = useSelector<AppState, PlaceStore[]>((state) => state.placeStoreReducer.list as PlaceStore[]);
+  const list = useSelector<AppState, PlaceStore[]>(({ placeStoreReducer }) => placeStoreReducer.list as PlaceStore[]);
   const placeLoading = useSelector<AppState, boolean>(({ placeReducer }) => placeReducer.loading);
   const placeList = useSelector<AppState, Place[]>(({ placeReducer }) => placeReducer.list);
   // Redux actions
@@ -26,28 +26,27 @@ export const PlaceStoreList: React.FC<{}> = () => {
     if (!placeList || placeList.length <= 0) {
       dispatch(requestGetPlace());
     }
-
     dispatch(requestGetPlaceStore());
   }, [dispatch, placeList]);
   return (
     <PageContainer>
       <Card
-        title={<Typography.Title>{`Lojas`}</Typography.Title>}
+        title={<Typography.Title>{`Localidades`}</Typography.Title>}
         extra={
-          <Link to={`/lojas/criar`}>
+          <Link to={`/localidades/criar`}>
             <Button type="primary">Criar</Button>
           </Link>
         }
       >
         <Table dataSource={list}>
           <Table.Column
-            title="Estabelecimento"
+            title="Entidade"
             dataIndex="placeId"
             render={(data: PlaceStore['placeId']) =>
               placeLoading || !placeList || placeList.length <= 0 ? (
                 <Spin size="small" />
               ) : (
-                placeList.find((place) => place.id === data)?.title
+                placeList.find((entity) => entity.id === data)?.title
               )
             }
           />
@@ -58,7 +57,7 @@ export const PlaceStoreList: React.FC<{}> = () => {
             render={(item: PlaceStore) => {
               return (
                 <ActionWrapper>
-                  <Link to={`/lojas/${item.id}/editar`}>
+                  <Link to={`/localidades/${item.id}/editar`}>
                     <Button>Editar</Button>
                   </Link>
                   {/* TODO: Add alert on delete */}
