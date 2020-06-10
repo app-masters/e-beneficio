@@ -53,7 +53,7 @@ const routes: RouteItem[] = [
     path: '/consumo',
     icon: () => <CarryOutOutlined />,
     name: 'Informar consumo',
-    allowedRoles: ['admin']
+    allowedRoles: ['admin', 'manager']
   },
   {
     path: '/familias',
@@ -64,7 +64,8 @@ const routes: RouteItem[] = [
   {
     path: '/beneficios',
     icon: () => <CarryOutOutlined />,
-    name: 'Beneficios'
+    name: 'Beneficios',
+    allowedRoles: ['admin']
   },
   {
     path: '/usuarios',
@@ -179,7 +180,7 @@ export const Sidebar: React.FC = () => {
         <MenuHeight>
           <Menu theme="light" mode="inline" defaultSelectedKeys={[location ? location.pathname : '/']}>
             {/* Render the links based on the nav arrays */}
-            {routes.map((navLink) => menuItem(navLink, ''))}
+            {routes.map((navLink) => menuItem(navLink, '', role))}
             {!isTicket && privateRoutes.map((navLink) => menuItem(navLink, ''))}
           </Menu>
         </MenuHeight>
