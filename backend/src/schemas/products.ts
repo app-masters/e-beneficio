@@ -60,7 +60,17 @@ export const initProductSchema = (sequelize: Sequelize): SequelizeProductModel =
   const Schema = sequelize.define(tableName, attributes, { timestamps: true }) as SequelizeProductModel;
 
   // Sequelize relations
-  // Schema.associate = (models): void => {};
+  Schema.associate = (models): void => {
+    // Sequelize relations
+    Schema.hasMany(models.consumptionProducts, {
+      foreignKey: 'productId',
+      as: 'consumptionProducts'
+    });
+    Schema.hasMany(models.benefitProducts, {
+      foreignKey: 'productId',
+      as: 'benefitProducts'
+    });
+  };
 
   return Schema;
 };

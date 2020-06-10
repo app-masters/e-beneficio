@@ -29,6 +29,7 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
   const family = useSelector<AppState, Family | null | undefined>((state) => state.familyReducer.item);
 
   const sameBirthday = moment(family?.responsibleBirthday).diff(moment(birthday, 'DD/MM/YYYY'), 'days') === 0;
+  const isTicket = process.env.REACT_APP_CONSUMPTION_TYPE === 'ticket';
 
   /**
    * Use callback on the change of the familyId
@@ -115,11 +116,13 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
               {moment(family.responsibleBirthday).format('DD/MM/YYYY')}
             </Descriptions.Item>
             <Descriptions.Item label="Nome da mãe">{family.responsibleMotherName}</Descriptions.Item>
-            <Descriptions.Item label="Saldo disponível">
-              <Typography.Paragraph strong>{`R$${(family.balance || 0)
-                .toFixed(2)
-                .replace('.', ',')}`}</Typography.Paragraph>
-            </Descriptions.Item>
+            {isTicket && (
+              <Descriptions.Item label="Saldo disponível">
+                <Typography.Paragraph strong>{`R$${(family.balance as number)
+                  .toFixed(2)
+                  .replace('.', ',')}`}</Typography.Paragraph>
+              </Descriptions.Item>
+            )}
           </Descriptions>
         </FamilyWrapper>
       )}

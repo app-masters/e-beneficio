@@ -15,10 +15,16 @@ const { Option } = Select;
 
 const schema = yup.object().shape({
   name: yup.string().label('Nome').required(),
-  password: yup.string().label('Senha').required(),
+  password: yup
+    .string()
+    .label('Senha')
+    .when('isCreating', (isCreating: boolean | null | undefined, schema: yup.StringSchema) =>
+      isCreating ? schema.required() : schema
+    ),
   cpf: yup.string().label('CPF').required(),
   email: yup.string().label('Email').required(),
-  role: yup.string().label('Cargo').required()
+  role: yup.string().label('Cargo').required(),
+  isCreating: yup.boolean().label('CriandoUsuario').nullable()
 });
 
 /**
@@ -57,10 +63,15 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
       cpf: '',
       email: '',
       role: 'admin',
-      active: false
+      active: false,
+      isCreating
     },
     validationSchema: schema,
-    onSubmit: (values, { setStatus }) => {
+    onSubmit: (formikValues, { setStatus }) => {
+      const values = { ...formikValues };
+      // Prevent sending an empty password when editing an already existing user
+      if (!isCreating && user && !values.password) values.password = user.password;
+
       setStatus();
       dispatch(
         requestSaveUser(
@@ -108,21 +119,19 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
             <Input id="email" name="email" onChange={handleChange} value={values.email} onPressEnter={submitForm} />
           </Form.Item>
 
-          {isCreating && (
-            <Form.Item
-              label={'Senha'}
-              validateStatus={!!passwordMeta.error && !!passwordMeta.touched ? 'error' : ''}
-              help={!!passwordMeta.error && !!passwordMeta.touched ? passwordMeta.error : undefined}
-            >
-              <Input
-                id="password"
-                name="password"
-                onChange={handleChange}
-                value={values.password}
-                onPressEnter={submitForm}
-              />
-            </Form.Item>
-          )}
+          <Form.Item
+            label={'Senha'}
+            validateStatus={!!passwordMeta.error && !!passwordMeta.touched ? 'error' : ''}
+            help={!!passwordMeta.error && !!passwordMeta.touched ? passwordMeta.error : undefined}
+          >
+            <Input
+              id="password"
+              name="password"
+              onChange={handleChange}
+              value={passwordMeta.touched ? values.password : undefined}
+              onPressEnter={submitForm}
+            />
+          </Form.Item>
 
           <Form.Item
             label={'CPF'}

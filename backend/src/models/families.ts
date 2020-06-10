@@ -410,26 +410,20 @@ export const createFamilyWithDependents = async (values: Family | SequelizeFamil
   }
   //verify if dependent exist
   if (values.dependents) {
-    const dependentNis: string[] = values.dependents?.map((dep) => {
-      return dep.nis;
+    const dependentNis = values.dependents?.map((dep) => {
+      return dep.nis as string;
     });
-    const dependentRg: string[] = values.dependents?.map((dep) => {
-      return dep.rg || '';
+    const dependentRg = values.dependents?.map((dep) => {
+      return dep.rg as string;
     });
-    const dependentCpf: string[] = values.dependents?.map((dep) => {
-      return dep.cpf || '';
+    const dependentCpf = values.dependents?.map((dep) => {
+      return dep.cpf as string;
     });
     const dependents = await db.dependents.findAll({
       where: Sequelize.or(
-        {
-          nis: dependentNis
-        },
-        {
-          rg: dependentRg
-        },
-        {
-          cpf: dependentCpf
-        }
+        { nis: { [Sequelize.Op.in]: dependentNis } },
+        { rg: { [Sequelize.Op.in]: dependentRg } },
+        { cpf: { [Sequelize.Op.in]: dependentCpf } }
       )
     });
     if (dependents.length > 0) {
