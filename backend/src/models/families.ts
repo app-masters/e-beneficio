@@ -447,10 +447,16 @@ export const createFamilyWithDependents = async (
     where: Sequelize.and({ code: values.code }, values.responsibleNis ? { responsibleNis: values.responsibleNis } : {})
   });
   if (family) {
-    throw { status: 400, message: 'Familia já cadastrada.' };
+    throw { status: 412, message: 'Familia já cadastrada.' };
   }
   //verify if dependent exist
   if (values.dependents) {
+    const verifyResponsible = values.dependents?.filter((f) => f.isResponsible);
+    if (verifyResponsible.length > 1)
+      throw { status: 412, message: 'Somente um membro responsável por familia é permitido.' };
+    if (verifyResponsible.length === 0)
+      throw { status: 412, message: 'É necessário um membro responsável por familia.' };
+
     const dependentNis = values.dependents?.map((dep) => {
       return dep.nis as string;
     });
@@ -472,7 +478,7 @@ export const createFamilyWithDependents = async (
         return dep.name;
       });
       throw {
-        status: 400,
+        status: 412,
         message: `Dependente${listOfNames.length > 1 ? 's' : ''} ${listOfNames.toString()} já cadastrado${
           listOfNames.length > 1 ? 's' : ''
         }.`
