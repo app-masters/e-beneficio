@@ -10,6 +10,7 @@ export interface Dependent {
   schoolName?: string;
   deactivatedAt?: number | Date | null;
   //New attributes
+  isResponsible?: boolean;
   rg?: string;
   cpf?: string;
   phone?: string;
@@ -98,6 +99,10 @@ export const attributes = {
   },
   email: {
     type: DataTypes.STRING,
+    allowNull: true
+  },
+  isResponsible: {
+    type: DataTypes.BOOLEAN,
     allowNull: true
   }
 };
