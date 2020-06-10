@@ -87,9 +87,6 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
     values,
     getFieldMeta,
     submitForm,
-    status,
-    errors,
-    touched,
     setFieldValue,
     setFieldTouched,
     getFieldProps
@@ -149,371 +146,337 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
   const haveSewageField = getFieldProps('haveSewage');
   const sewageCommentMeta = getFieldMeta('sewageComment');
 
-  const tabListName = [
-    {
-      key: 'family',
-      tab: 'Familia'
-    },
-    {
-      key: 'dependents',
-      tab: 'Membros'
-    }
-  ];
-
-  const [currentTab, setTab] = React.useState('family');
-
   return (
     <PageContainer>
-      <Card
-        tabList={tabListName}
-        activeTabKey={currentTab}
-        loading={loading}
-        onTabChange={(key) => {
-          setTab(key);
-        }}
-        title={<Typography.Title>Nova Familia</Typography.Title>}
-      >
-        {currentTab === 'family' && (
-          <Form layout="vertical">
-            {error && <Alert message="Ocorreu um erro" description={error.message} type="error" showIcon />}
-            {!error && family && family.id && (
-              <Alert
-                message="Familia salva"
-                description={'Os dados de familia foram salvas com sucesso!'}
-                type="success"
-                showIcon
-              />
-            )}
-
-            <Row gutter={[16, 16]}>
-              <Col span={24} md={6}>
-                <Form.Item label={'Código'} validateStatus={validation(codeMeta)} help={helper(codeMeta)}>
-                  <Input
-                    id="code"
-                    maxLength={11}
-                    name="code"
-                    onChange={handleChange}
-                    value={values.code}
-                    onPressEnter={submitForm}
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={24} md={6}>
-                <Form.Item
-                  label={'Grupo familiar'}
-                  validateStatus={validation(groupNameMeta)}
-                  help={helper(groupNameMeta)}
+      <Card loading={loading} title={<Typography.Title>Nova Familia</Typography.Title>}>
+        <Form layout="vertical">
+          {error && <Alert message="Ocorreu um erro" description={error.message} type="error" showIcon />}
+          {!error && family && family.id && (
+            <Alert
+              message="Familia salva"
+              description={'Os dados de familia foram salvas com sucesso!'}
+              type="success"
+              showIcon
+            />
+          )}
+          <Row gutter={[16, 16]}>
+            <Col span={24} md={8}>
+              <Form.Item label={'Código'} validateStatus={validation(codeMeta)} help={helper(codeMeta)}>
+                <Input
+                  id="code"
+                  maxLength={11}
+                  name="code"
+                  onChange={handleChange}
+                  value={values.code}
+                  onPressEnter={submitForm}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={24} md={8}>
+              <Form.Item
+                label={'Grupo familiar'}
+                validateStatus={validation(groupNameMeta)}
+                help={helper(groupNameMeta)}
+              >
+                <Select
+                  defaultValue={values.groupName?.toString()}
+                  onSelect={(value) => setFieldValue('groupName', value)}
+                  value={values.groupName?.toString() || undefined}
+                  onChange={(value: string) => {
+                    setFieldValue('groupName', value);
+                  }}
+                  onBlur={() => {
+                    setFieldTouched('groupName', true);
+                  }}
                 >
-                  <Select
-                    defaultValue={values.groupName?.toString()}
-                    onSelect={(value) => setFieldValue('groupName', value)}
-                    value={values.groupName?.toString() || undefined}
-                    onChange={(value: string) => {
-                      setFieldValue('groupName', value);
-                    }}
-                    onBlur={() => {
-                      setFieldTouched('groupName', true);
-                    }}
-                  >
-                    {Object.keys(familyGroupList).map((item) => (
-                      <Select.Option key={item} value={item}>
-                        {familyGroupList[item].title}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col span={24} md={6} style={ColCheckStyle}>
-                <Form.Item
-                  validateStatus={validation(isRegisteredInPersonMeta)}
-                  help={helper(isRegisteredInPersonMeta)}
+                  {Object.keys(familyGroupList).map((item) => (
+                    <Select.Option key={item} value={item}>
+                      {familyGroupList[item].title}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={24} md={8}>
+              <Form.Item
+                label={'Nome do responsável'}
+                validateStatus={validation(responsibleNameMeta)}
+                help={helper(responsibleNameMeta)}
+              >
+                <Input
+                  id="responsibleName"
+                  name="responsibleName"
+                  onChange={handleChange}
+                  value={values.responsibleName}
+                  onPressEnter={submitForm}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={[16, 16]}>
+            <Col span={24} md={8}>
+              <Form.Item
+                label={'NIS do responsável'}
+                validateStatus={validation(responsibleNisMeta)}
+                help={helper(responsibleNisMeta)}
+              >
+                <Input
+                  id="responsibleNis"
+                  name="responsibleNis"
+                  maxLength={11}
+                  onChange={handleChange}
+                  value={values.responsibleNis}
+                  onPressEnter={submitForm}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={24} md={8}>
+              <Form.Item
+                label={'Nascimento do responsável'}
+                validateStatus={validation(responsibleBirthdayMeta)}
+                help={helper(responsibleBirthdayMeta)}
+              >
+                <DatePicker
+                  name="responsibleBirthday"
+                  format={'DD/MM/YYYY'}
+                  style={{ width: '100%' }}
+                  defaultValue={values.responsibleBirthday ? moment(values.responsibleBirthday) : undefined}
+                  locale={locale}
+                  onChange={(date) => {
+                    setFieldValue('responsibleBirthday', date);
+                  }}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={24} md={8}>
+              <Form.Item
+                label={'Nome da mãe do responsável'}
+                validateStatus={validation(responsibleMotherNameMeta)}
+                help={helper(responsibleMotherNameMeta)}
+              >
+                <Input
+                  id="responsibleMotherName"
+                  name="responsibleMotherName"
+                  onChange={handleChange}
+                  value={values.responsibleMotherName}
+                  onPressEnter={submitForm}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={[16, 16]}>
+            <Col span={24} md={8}>
+              <Form.Item
+                label={'Salário total'}
+                validateStatus={validation(totalSalaryMeta)}
+                help={helper(totalSalaryMeta)}
+              >
+                <InputNumber
+                  style={{ width: '100%' }}
+                  id="totalSalary"
+                  name="totalSalary"
+                  onChange={(value) => setFieldValue('totalSalary', value)}
+                  value={Number(values.totalSalary)}
+                  decimalSeparator=","
+                  step={0.01}
+                  precision={2}
+                  min={0}
+                  formatter={(value) => {
+                    if (value === '') return `R$ `;
+                    return value && Number(value) !== 0 && !Number.isNaN(Number(value)) ? `R$ ${value}` : '';
+                  }}
+                  parser={(value) => (value ? value.replace(/(R)|(\$)/g, '').trim() : '')}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={[16, 16]}>
+            <Col span={24} md={8} style={ColCheckStyle}>
+              <Form.Item validateStatus={validation(isRegisteredInPersonMeta)} help={helper(isRegisteredInPersonMeta)}>
+                <Checkbox checked={values.isRegisteredInPerson} {...isRegisteredInPersonField}>
+                  Registrado pessoalmente
+                </Checkbox>
+              </Form.Item>
+            </Col>
+            <Col span={24} md={8} style={ColCheckStyle}>
+              <Form.Item validateStatus={validation(isOnGovernProgramMeta)} help={helper(isOnGovernProgramMeta)}>
+                <Checkbox checked={values.isOnGovernProgram} {...isOnGovernProgramField}>
+                  Pessoa em programa do governo
+                </Checkbox>
+              </Form.Item>
+            </Col>
+            <Col span={24} md={8} style={ColCheckStyle}>
+              <Form.Item validateStatus={validation(isOnAnotherProgramMeta)} help={helper(isOnAnotherProgramMeta)}>
+                <Checkbox checked={values.isOnAnotherProgram} {...isOnAnotherProgramField}>
+                  Pessoa em outro programa
+                </Checkbox>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={[16, 16]}>
+            <Col span={24} md={8}>
+              <Form.Item label={'Endereço'} validateStatus={validation(addressMeta)} help={helper(addressMeta)}>
+                <Input
+                  id="address"
+                  name="address"
+                  onChange={handleChange}
+                  value={values.address}
+                  onPressEnter={submitForm}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={24} md={8}>
+              <Form.Item label={'Tipo de Casa'} validateStatus={validation(houseTypeMeta)} help={helper(houseTypeMeta)}>
+                <Select
+                  defaultValue={values.houseType?.toString()}
+                  onSelect={(value) => setFieldValue('houseType', value)}
+                  value={values.houseType?.toString() || undefined}
+                  onChange={(value: string) => {
+                    setFieldValue('houseType', value);
+                  }}
+                  onBlur={() => {
+                    setFieldTouched('houseType', true);
+                  }}
                 >
-                  <Checkbox checked={values.isRegisteredInPerson} {...isRegisteredInPersonField}>
-                    Registrado pessoalmente
-                  </Checkbox>
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row gutter={[16, 16]}>
-              <Col span={24} md={6}>
-                <Form.Item
-                  label={'Nome do responsável'}
-                  validateStatus={validation(responsibleNameMeta)}
-                  help={helper(responsibleNameMeta)}
+                  {Object.keys(familyGroupList).map((item) => (
+                    <Select.Option key={item} value={item}>
+                      {familyGroupList[item].title}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={24} md={8}>
+              <Form.Item
+                label={'Quantidade de quartos'}
+                validateStatus={validation(numberOfRoomsMeta)}
+                help={helper(numberOfRoomsMeta)}
+              >
+                <InputNumber
+                  style={{ width: '100%' }}
+                  id="numberOfRooms"
+                  name="numberOfRooms"
+                  onChange={(value) => setFieldValue('numberOfRooms', value)}
+                  value={values.numberOfRooms}
+                  min={0}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={[16, 16]}>
+            <Col span={24} md={8} style={ColCheckStyle}>
+              <Form.Item validateStatus={validation(haveSewageMeta)} help={helper(haveSewageMeta)}>
+                <Checkbox checked={values.haveSewage} {...haveSewageField}>
+                  Possui esgoto
+                </Checkbox>
+              </Form.Item>
+            </Col>
+            <Col span={24} md={16}>
+              <Form.Item
+                label={'Comentário sobre esgoto'}
+                validateStatus={validation(sewageCommentMeta)}
+                help={helper(sewageCommentMeta)}
+              >
+                <Input
+                  id="sewageComment"
+                  name="sewageComment"
+                  onChange={handleChange}
+                  value={values.sewageComment}
+                  onPressEnter={submitForm}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Divider />
+        </Form>
+        <PageHeader
+          title={<Typography.Text>Membros</Typography.Text>}
+          style={{ padding: 0, paddingBottom: 20 }}
+          extra={[
+            <Button key={'adult'} onClick={() => setModal({ open: true, type: 'adult' })}>
+              Criar adulto
+            </Button>,
+            <Button key={'child'} onClick={() => setModal({ open: true, type: 'child' })}>
+              Criar criança
+            </Button>
+          ]}
+        />
+        <List
+          dataSource={values.dependents}
+          itemLayout="horizontal"
+          renderItem={(item: Dependent) => (
+            <List.Item
+              actions={[
+                <Button
+                  key={'edit'}
+                  onClick={() => {
+                    if (item.type) setModal({ open: true, type: item.type, item });
+                  }}
                 >
-                  <Input
-                    id="responsibleName"
-                    name="responsibleName"
-                    onChange={handleChange}
-                    value={values.responsibleName}
-                    onPressEnter={submitForm}
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={24} md={6}>
-                <Form.Item
-                  label={'NIS do responsável'}
-                  validateStatus={validation(responsibleNisMeta)}
-                  help={helper(responsibleNisMeta)}
-                >
-                  <Input
-                    id="responsibleNis"
-                    name="responsibleNis"
-                    maxLength={11}
-                    onChange={handleChange}
-                    value={values.responsibleNis}
-                    onPressEnter={submitForm}
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={24} md={6}>
-                <Form.Item
-                  label={'Nascimento do responsável'}
-                  validateStatus={validation(responsibleBirthdayMeta)}
-                  help={helper(responsibleBirthdayMeta)}
-                >
-                  <DatePicker
-                    name="responsibleBirthday"
-                    format={'DD/MM/YYYY'}
-                    style={{ width: '100%' }}
-                    defaultValue={values.responsibleBirthday ? moment(values.responsibleBirthday) : undefined}
-                    locale={locale}
-                    onChange={(date) => {
-                      setFieldValue('responsibleBirthday', date);
-                    }}
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row gutter={[16, 16]}>
-              <Col span={24} md={6}>
-                <Form.Item
-                  label={'Nome da mãe do responsável'}
-                  validateStatus={validation(responsibleMotherNameMeta)}
-                  help={helper(responsibleMotherNameMeta)}
-                >
-                  <Input
-                    id="responsibleMotherName"
-                    name="responsibleMotherName"
-                    onChange={handleChange}
-                    value={values.responsibleMotherName}
-                    onPressEnter={submitForm}
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={24} md={6}>
-                <Form.Item
-                  label={'Salário total'}
-                  validateStatus={validation(totalSalaryMeta)}
-                  help={helper(totalSalaryMeta)}
-                >
-                  <InputNumber
-                    style={{ width: '100%' }}
-                    id="totalSalary"
-                    name="totalSalary"
-                    onChange={(value) => setFieldValue('totalSalary', value)}
-                    value={Number(values.totalSalary)}
-                    decimalSeparator=","
-                    step={0.01}
-                    precision={2}
-                    min={0}
-                    formatter={(value) => {
-                      if (value === '') return `R$ `;
-                      return value && Number(value) !== 0 && !Number.isNaN(Number(value)) ? `R$ ${value}` : '';
-                    }}
-                    parser={(value) => (value ? value.replace(/(R)|(\$)/g, '').trim() : '')}
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row gutter={[16, 16]}>
-              <Col span={24} md={6} style={ColCheckStyle}>
-                <Form.Item validateStatus={validation(isOnGovernProgramMeta)} help={helper(isOnGovernProgramMeta)}>
-                  <Checkbox checked={values.isOnGovernProgram} {...isOnGovernProgramField}>
-                    Pessoa em programa do governo
-                  </Checkbox>
-                </Form.Item>
-              </Col>
-              <Col span={24} md={6} style={ColCheckStyle}>
-                <Form.Item validateStatus={validation(isOnAnotherProgramMeta)} help={helper(isOnAnotherProgramMeta)}>
-                  <Checkbox checked={values.isOnAnotherProgram} {...isOnAnotherProgramField}>
-                    Pessoa em outro programa
-                  </Checkbox>
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row gutter={[16, 16]}>
-              <Col span={24} md={6}>
-                <Form.Item label={'Endereço'} validateStatus={validation(addressMeta)} help={helper(addressMeta)}>
-                  <Input
-                    id="address"
-                    name="address"
-                    onChange={handleChange}
-                    value={values.address}
-                    onPressEnter={submitForm}
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={24} md={6}>
-                <Form.Item
-                  label={'Tipo de Casa'}
-                  validateStatus={validation(houseTypeMeta)}
-                  help={helper(houseTypeMeta)}
-                >
-                  <Select
-                    defaultValue={values.houseType?.toString()}
-                    onSelect={(value) => setFieldValue('houseType', value)}
-                    value={values.houseType?.toString() || undefined}
-                    onChange={(value: string) => {
-                      setFieldValue('houseType', value);
-                    }}
-                    onBlur={() => {
-                      setFieldTouched('houseType', true);
-                    }}
-                  >
-                    {Object.keys(familyGroupList).map((item) => (
-                      <Select.Option key={item} value={item}>
-                        {familyGroupList[item].title}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col span={24} md={6}>
-                <Form.Item
-                  label={'Quantidade de quartos'}
-                  validateStatus={validation(numberOfRoomsMeta)}
-                  help={helper(numberOfRoomsMeta)}
-                >
-                  <InputNumber
-                    style={{ width: '100%' }}
-                    id="numberOfRooms"
-                    name="numberOfRooms"
-                    onChange={(value) => setFieldValue('numberOfRooms', value)}
-                    value={values.numberOfRooms}
-                    min={0}
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row gutter={[16, 16]}>
-              <Col span={24} md={6} style={ColCheckStyle}>
-                <Form.Item validateStatus={validation(haveSewageMeta)} help={helper(haveSewageMeta)}>
-                  <Checkbox checked={values.haveSewage} {...haveSewageField}>
-                    Possui esgoto
-                  </Checkbox>
-                </Form.Item>
-              </Col>
-              <Col span={24} md={12}>
-                <Form.Item
-                  label={'Comentário sobre esgoto'}
-                  validateStatus={validation(sewageCommentMeta)}
-                  help={helper(sewageCommentMeta)}
-                >
-                  <Input
-                    id="sewageComment"
-                    name="sewageComment"
-                    onChange={handleChange}
-                    value={values.sewageComment}
-                    onPressEnter={submitForm}
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Divider />
-            <ActionWrapper>
-              <Button loading={loading} onClick={() => handleSubmit()} type={'primary'}>
-                Concluir
-              </Button>
-            </ActionWrapper>
-          </Form>
-        )}
-        {currentTab === 'dependents' && (
-          <>
-            <PageHeader
-              title={<Typography.Text>Dependentes</Typography.Text>}
-              style={{ padding: 0, paddingBottom: 20 }}
-              extra={[
-                <Button key={'adult'} onClick={() => setModal({ open: true, type: 'adult' })} type="primary">
-                  Criar adulto
+                  Editar
                 </Button>,
-                <Button key={'child'} onClick={() => setModal({ open: true, type: 'child' })} type="primary">
-                  Criar criança
+                <Button
+                  key={'remove'}
+                  danger
+                  onClick={() =>
+                    Modal.confirm({
+                      title: 'Você realmente quer deletar esse registro?',
+                      icon: <ExclamationCircleOutlined />,
+                      okText: 'Sim',
+                      okType: 'danger',
+                      cancelText: 'Não',
+                      onOk: () => removeDependent(item.nis)
+                    })
+                  }
+                >
+                  Remover
                 </Button>
               ]}
-            />
-            <List
-              dataSource={values.dependents}
-              itemLayout="horizontal"
-              renderItem={(item: Dependent) => (
-                <List.Item
-                  actions={[
-                    <Button
-                      key={'edit'}
-                      onClick={() => {
-                        if (item.type) setModal({ open: true, type: item.type, item });
-                      }}
-                    >
-                      Editar
-                    </Button>,
-                    <Button
-                      key={'remove'}
-                      danger
-                      onClick={() =>
-                        Modal.confirm({
-                          title: 'Você realmente quer deletar esse registro?',
-                          icon: <ExclamationCircleOutlined />,
-                          okText: 'Sim',
-                          okType: 'danger',
-                          cancelText: 'Não',
-                          onOk: () => removeDependent(item.nis)
-                        })
-                      }
-                    >
-                      Remover
-                    </Button>
-                  ]}
-                >
-                  <List.Item.Meta
-                    title={`${item.name} - ${item.type === 'child' ? 'Criança' : 'Adulto'}`}
-                    description={
-                      <Row gutter={[16, 16]}>
-                        <Col span={24} md={12}>
-                          {`NIS: ${item.nis}`}
-                          {(item.email || item.phone) && (
-                            <>
-                              <br />
-                              {`${item.email} - ${item.phone}`}
-                            </>
-                          )}
-                          {(item.cpf || item.rg) && (
-                            <>
-                              <br />
-                              {`CPF: ${item.cpf} - RG: ${item.rg}`}
-                            </>
-                          )}
-                          {item.schoolName && (
-                            <>
-                              <br />
-                              {`Escola: ${item.schoolName}`}
-                            </>
-                          )}
-                        </Col>
-                        {item.profession && (
-                          <Col span={24} md={12}>
-                            {`Profissão: ${item.profession}`}
-                            <br />
-                            {`Salário: ${item.salary ? 'R$ ' + formatMoney(item.salary) : 'Não informado'}`}
-                          </Col>
-                        )}
-                      </Row>
-                    }
-                  />
-                </List.Item>
-              )}
-            />
-          </>
-        )}
+            >
+              <List.Item.Meta
+                title={`${item.name} - ${item.type === 'child' ? 'Criança' : 'Adulto'}`}
+                description={
+                  <Row gutter={[16, 16]}>
+                    <Col span={24} md={12}>
+                      {`NIS: ${item.nis}`}
+                      {(item.email || item.phone) && (
+                        <>
+                          <br />
+                          {`${item.email} - ${item.phone}`}
+                        </>
+                      )}
+                      {(item.cpf || item.rg) && (
+                        <>
+                          <br />
+                          {`CPF: ${item.cpf} - RG: ${item.rg}`}
+                        </>
+                      )}
+                      {item.schoolName && (
+                        <>
+                          <br />
+                          {`Escola: ${item.schoolName}`}
+                        </>
+                      )}
+                    </Col>
+                    {item.profession && (
+                      <Col span={24} md={12}>
+                        {`Profissão: ${item.profession}`}
+                        <br />
+                        {`Salário: ${item.salary ? 'R$ ' + formatMoney(item.salary) : 'Não informado'}`}
+                      </Col>
+                    )}
+                  </Row>
+                }
+              />
+            </List.Item>
+          )}
+        />
+        <Divider />
+        <ActionWrapper>
+          <Button loading={loading} onClick={() => handleSubmit()} type={'primary'}>
+            Concluir
+          </Button>
+        </ActionWrapper>
       </Card>
       {modal.open && (
         <DependentForm
@@ -545,8 +508,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
 const schemaChild = yup.object().shape({
   nis: yup.string().label('Código').required(),
   name: yup.string().label('Nome').required(),
-  birthday: yup.date().label('Nascimento').required(),
-  schoolName: yup.string().label('Escola').required()
+  birthday: yup.date().label('Nascimento').required()
 });
 
 const schemaAdult = yup.object().shape({
@@ -612,7 +574,6 @@ export const DependentForm: React.FC<{
 
   const nameMeta = getFieldMeta('name');
   const nisMeta = getFieldMeta('nis');
-  const schoolNameMeta = getFieldMeta('schoolName');
   const birthdayMeta = getFieldMeta('birthday');
   const rgMeta = getFieldMeta('rg');
   const cpfMeta = getFieldMeta('cpf');
@@ -626,151 +587,133 @@ export const DependentForm: React.FC<{
   const emailMeta = getFieldMeta('email');
 
   return (
-    <>
-      <Modal
-        visible={true}
-        title={isCreating ? 'Criar' : 'Editar'}
-        onOk={submitForm}
-        onCancel={onClose}
-        okType={errors && Object.keys(errors).length > 0 && touched ? 'danger' : 'primary'}
-      >
-        <Form layout="vertical">
-          <Form.Item label={'Código'} validateStatus={validation(nisMeta)} help={helper(nisMeta)}>
-            <Input
-              id="nis"
-              disabled={!isCreating}
-              maxLength={11}
-              name="nis"
-              onChange={handleChange}
-              value={values.nis}
-              onPressEnter={submitForm}
-            />
-          </Form.Item>
-          <Form.Item label={'Nome'} validateStatus={validation(nameMeta)} help={helper(nameMeta)}>
-            <Input id="name" name="name" onChange={handleChange} value={values.name} onPressEnter={submitForm} />
-          </Form.Item>
-          <Form.Item label={'Nascimento'} validateStatus={validation(birthdayMeta)} help={helper(birthdayMeta)}>
-            <DatePicker
-              name="birthday"
-              format={'DD/MM/YYYY'}
-              defaultValue={values.birthday ? moment(values.birthday) : undefined}
-              locale={locale}
-              onChange={(date) => {
-                setFieldValue('birthday', date);
-              }}
-            />
-          </Form.Item>
-          <Form.Item
-            label={
-              <>
-                {`RG`}
-                {type === 'child' && <small>&nbsp; {`(opcional)`}</small>}
-              </>
-            }
-            validateStatus={validation(rgMeta)}
-            help={helper(rgMeta)}
-          >
-            <Input id="rg" name="rg" onChange={handleChange} value={formatRG(values.rg)} onPressEnter={submitForm} />
-          </Form.Item>
-          <Form.Item
-            label={
-              <>
-                {`CPF`}
-                {type === 'child' && <small>&nbsp; {`(opcional)`}</small>}
-              </>
-            }
-            validateStatus={validation(cpfMeta)}
-            help={helper(cpfMeta)}
-          >
-            <Input
-              id="cpf"
-              name="cpf"
-              onChange={handleChange}
-              value={formatCPF(values.cpf)}
-              onPressEnter={submitForm}
-            />
-          </Form.Item>
-          {type === 'child' ? (
-            <Form.Item label={'Escola'} validateStatus={validation(schoolNameMeta)} help={helper(schoolNameMeta)}>
+    <Modal
+      visible={true}
+      title={isCreating ? 'Criar' : 'Editar'}
+      onOk={submitForm}
+      onCancel={onClose}
+      okType={errors && Object.keys(errors).length > 0 && touched ? 'danger' : 'primary'}
+    >
+      <Form layout="vertical">
+        <Form.Item label={'Código'} validateStatus={validation(nisMeta)} help={helper(nisMeta)}>
+          <Input
+            id="nis"
+            disabled={!isCreating}
+            maxLength={11}
+            name="nis"
+            onChange={handleChange}
+            value={values.nis}
+            onPressEnter={submitForm}
+          />
+        </Form.Item>
+        <Form.Item label={'Nome'} validateStatus={validation(nameMeta)} help={helper(nameMeta)}>
+          <Input id="name" name="name" onChange={handleChange} value={values.name} onPressEnter={submitForm} />
+        </Form.Item>
+        <Form.Item label={'Nascimento'} validateStatus={validation(birthdayMeta)} help={helper(birthdayMeta)}>
+          <DatePicker
+            name="birthday"
+            format={'DD/MM/YYYY'}
+            defaultValue={values.birthday ? moment(values.birthday) : undefined}
+            locale={locale}
+            onChange={(date) => {
+              setFieldValue('birthday', date);
+            }}
+          />
+        </Form.Item>
+        <Form.Item
+          label={
+            <>
+              {`RG`}
+              {type === 'child' && <small>&nbsp; {`(opcional)`}</small>}
+            </>
+          }
+          validateStatus={validation(rgMeta)}
+          help={helper(rgMeta)}
+        >
+          <Input id="rg" name="rg" onChange={handleChange} value={formatRG(values.rg)} onPressEnter={submitForm} />
+        </Form.Item>
+        <Form.Item
+          label={
+            <>
+              {`CPF`}
+              {type === 'child' && <small>&nbsp; {`(opcional)`}</small>}
+            </>
+          }
+          validateStatus={validation(cpfMeta)}
+          help={helper(cpfMeta)}
+        >
+          <Input id="cpf" name="cpf" onChange={handleChange} value={formatCPF(values.cpf)} onPressEnter={submitForm} />
+        </Form.Item>
+        {type === 'adult' && (
+          <>
+            <Form.Item label={'Email'} validateStatus={validation(emailMeta)} help={helper(emailMeta)}>
+              <Input id="email" name="email" onChange={handleChange} value={values.email} onPressEnter={submitForm} />
+            </Form.Item>
+            <Form.Item label={'Telefone'} validateStatus={validation(phoneMeta)} help={helper(phoneMeta)}>
               <Input
-                id="schoolName"
-                name="schoolName"
+                id="phone"
+                name="phone"
                 onChange={handleChange}
-                value={values.schoolName}
+                value={formatPhone(values.phone)}
                 onPressEnter={submitForm}
               />
             </Form.Item>
-          ) : (
-            <>
-              <Form.Item label={'Email'} validateStatus={validation(emailMeta)} help={helper(emailMeta)}>
-                <Input id="email" name="email" onChange={handleChange} value={values.email} onPressEnter={submitForm} />
-              </Form.Item>
-              <Form.Item label={'Telefone'} validateStatus={validation(phoneMeta)} help={helper(phoneMeta)}>
-                <Input
-                  id="phone"
-                  name="phone"
-                  onChange={handleChange}
-                  value={formatPhone(values.phone)}
-                  onPressEnter={submitForm}
-                />
-              </Form.Item>
-              <Row gutter={[16, 16]}>
-                <Col span={24} md={12} style={ColCheckStyle}>
-                  <Form.Item
-                    style={{ marginBottom: 0 }}
-                    validateStatus={validation(isHiredMeta)}
-                    help={helper(isHiredMeta)}
-                  >
-                    <Checkbox checked={values.isHired} {...isHiredField}>
-                      Pessoa empregada
-                    </Checkbox>
-                  </Form.Item>
-                </Col>
-                <Col span={24} md={12} style={ColCheckStyle}>
-                  <Form.Item
-                    style={{ marginBottom: 0 }}
-                    validateStatus={validation(isFormalMeta)}
-                    help={helper(isFormalMeta)}
-                  >
-                    <Checkbox disabled={!values.isHired} checked={values.isFormal} {...isFormalField}>
-                      Emprego formal
-                    </Checkbox>
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Form.Item label={'Profissão'} validateStatus={validation(professionMeta)} help={helper(professionMeta)}>
-                <Input
-                  id="profession"
-                  name="profession"
-                  disabled={!values.isHired}
-                  onChange={handleChange}
-                  value={values.profession}
-                  onPressEnter={submitForm}
-                />
-              </Form.Item>
-              <Form.Item label={'Salário'} validateStatus={validation(salaryMeta)} help={helper(salaryMeta)}>
-                <InputNumber
-                  style={{ width: '100%' }}
-                  disabled={!values.isHired}
-                  id="salary"
-                  name="salary"
-                  onChange={(value) => setFieldValue('salary', value)}
-                  value={Number(values.salary)}
-                  decimalSeparator=","
-                  step={0.01}
-                  precision={2}
-                  min={0}
-                  formatter={(value) => {
-                    if (value === '') return `R$ `;
-                    return value && Number(value) !== 0 && !Number.isNaN(Number(value)) ? `R$ ${value}` : '';
-                  }}
-                  parser={(value) => (value ? value.replace(/(R)|(\$)/g, '').trim() : '')}
-                />
-              </Form.Item>
-            </>
-          )}
-        </Form>
-      </Modal>
-    </>
+            <Row gutter={[16, 16]}>
+              <Col span={24} md={12} style={ColCheckStyle}>
+                <Form.Item
+                  style={{ marginBottom: 0 }}
+                  validateStatus={validation(isHiredMeta)}
+                  help={helper(isHiredMeta)}
+                >
+                  <Checkbox checked={values.isHired} {...isHiredField}>
+                    Pessoa empregada
+                  </Checkbox>
+                </Form.Item>
+              </Col>
+              <Col span={24} md={12} style={ColCheckStyle}>
+                <Form.Item
+                  style={{ marginBottom: 0 }}
+                  validateStatus={validation(isFormalMeta)}
+                  help={helper(isFormalMeta)}
+                >
+                  <Checkbox disabled={!values.isHired} checked={values.isFormal} {...isFormalField}>
+                    Emprego formal
+                  </Checkbox>
+                </Form.Item>
+              </Col>
+            </Row>
+            <Form.Item label={'Profissão'} validateStatus={validation(professionMeta)} help={helper(professionMeta)}>
+              <Input
+                id="profession"
+                name="profession"
+                disabled={!values.isHired}
+                onChange={handleChange}
+                value={values.profession}
+                onPressEnter={submitForm}
+              />
+            </Form.Item>
+            <Form.Item label={'Salário'} validateStatus={validation(salaryMeta)} help={helper(salaryMeta)}>
+              <InputNumber
+                style={{ width: '100%' }}
+                disabled={!values.isHired}
+                id="salary"
+                name="salary"
+                onChange={(value) => setFieldValue('salary', value)}
+                value={Number(values.salary)}
+                decimalSeparator=","
+                step={0.01}
+                precision={2}
+                min={0}
+                formatter={(value) => {
+                  if (value === '') return `R$ `;
+                  return value && Number(value) !== 0 && !Number.isNaN(Number(value)) ? `R$ ${value}` : '';
+                }}
+                parser={(value) => (value ? value.replace(/(R)|(\$)/g, '').trim() : '')}
+              />
+            </Form.Item>
+          </>
+        )}
+      </Form>
+    </Modal>
   );
 };
