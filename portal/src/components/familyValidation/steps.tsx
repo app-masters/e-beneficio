@@ -182,7 +182,6 @@ export const StepSelectedFamily: React.FC<{ family?: Family | null }> = ({ famil
         <Descriptions.Item label="Data de nascimento">
           {family?.responsibleBirthday ? moment(family?.responsibleBirthday).format('DD/MM/YYYY') : ''}
         </Descriptions.Item>
-        <Descriptions.Item label="Nome da mãe">{family?.responsibleMotherName}</Descriptions.Item>
         <Descriptions.Item label="Saldo disponível">
           <Typography.Paragraph strong>{`R$${(family?.balance || 0)
             .toFixed(2)

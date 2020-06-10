@@ -1,4 +1,6 @@
 import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize';
+import { Product } from './products';
+import { Benefit } from './benefits';
 
 // Simple item type
 export interface BenefitProduct {
@@ -9,6 +11,9 @@ export interface BenefitProduct {
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
+  //Join
+  product?: Product;
+  benefit?: Benefit;
 }
 // Sequelize returns type
 export type SequelizeBenefitProduct = BenefitProduct & Model;
@@ -27,7 +32,7 @@ export const attributes = {
     primaryKey: true,
     autoIncrement: true
   },
-  productsId: {
+  productId: {
     type: DataTypes.INTEGER,
     references: {
       model: 'Products',
@@ -35,7 +40,7 @@ export const attributes = {
     },
     allowNull: false
   },
-  benefitsId: {
+  benefitId: {
     type: DataTypes.INTEGER,
     references: {
       model: 'Benefits',
@@ -49,7 +54,7 @@ export const attributes = {
   }
 };
 
-const tableName = 'Benefits';
+const tableName = 'BenefitProducts';
 
 /**
  * Sequelize model initializer function
@@ -62,13 +67,15 @@ export const initBenefitProductSchema = (sequelize: Sequelize): SequelizeBenefit
   Schema.associate = (models): void => {
     // Sequelize relations
     Schema.belongsTo(models.products, {
-      foreignKey: 'productsId',
-      as: 'products'
+      foreignKey: 'productId',
+      as: 'product'
     });
     //
     Schema.belongsTo(models.benefits, {
-      foreignKey: 'benefitsId',
-      as: 'benefits'
+      foreignKey: 'benefitId',
+      as: 'benefit',
+      onDelete: 'cascade',
+      hooks: true
     });
   };
 

@@ -12,9 +12,13 @@ router.get('/', async (req, res) => {
   try {
     if (!req.user?.cityId) throw Error('User without selected city');
     const item = await familyModel.findByNis(req.query.nis as string, req.user.cityId, true);
-    // const balance = await consumptionModel.getFamilyBalance(item);
-    const balance = await consumptionModel.getFamilyDependentBalance(item);
-    res.send({ ...item.toJSON(), balance });
+    if (item) {
+      // const balance = await consumptionModel.getFamilyBalance(item);
+      const balance = await consumptionModel.getFamilyDependentBalance(item);
+      res.send({ ...item.toJSON(), balance });
+    } else {
+      res.status(404).send('Not found');
+    }
   } catch (error) {
     logging.error(error);
     res.status(500).send(error.message);
@@ -121,7 +125,7 @@ router.get('/import-status', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     if (!req.user?.cityId) throw Error('User without selected city');
-    const item = await familyModel.create(req.body);
+    const item = await familyModel.createFamilyWithDependents(req.body);
     res.send(item);
   } catch (error) {
     logging.error(error);

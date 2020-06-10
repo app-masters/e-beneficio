@@ -8,13 +8,13 @@ import { runConsumptionValidationCron } from './consumptionValidation';
 export const setupCronjobs = () => {
   /**
    * Scrape the Receita Federal site for purchase data
-   * Runs every hour, at 01:10, 02:10, 03:10, etc...
+   * Runs every hour, at 03:00
    */
-  cron.schedule('10 * * * *', () => runConsumptionScrapingCron());
+  cron.schedule('0 3 * * *', () => runConsumptionScrapingCron());
 
   /**
-   * Validate all pensing consumptions
-   * Runs every day 2 am
+   * Validate all pending consumptions
+   * Runs every day 4 am
    */
-  cron.schedule('0 2 * * *', () => runConsumptionValidationCron());
+  cron.schedule('0 4 * * *', () => runConsumptionValidationCron());
 };

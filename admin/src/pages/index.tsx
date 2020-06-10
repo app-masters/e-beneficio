@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Switch, Route, Redirect, RouteProps } from 'react-router-dom';
+import { BrowserRouter, Switch, Route as RouterRoute, Redirect, RouteProps } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { AppState } from '../redux/rootReducer';
 import { User } from '../interfaces/user';
@@ -27,6 +27,19 @@ import { ReportList } from './report';
 import { ProductValidationList } from './product/validationList';
 import { ProductList } from './product/list';
 import { ProductForm } from './product/form';
+import { Role } from '../utils/constraints';
+import { env } from '../env';
+
+/**
+ * Extend react-router-dom route to allow or deny users based on its role
+ */
+const Route: React.FC<RouteProps & { allowedRole?: Role | Role[] }> = ({ allowedRole, ...props }) => {
+  const user = useSelector<AppState, User | undefined>((state) => state.authReducer.user);
+  const allowedRoles = (allowedRole && !Array.isArray(allowedRole) ? [allowedRole] : allowedRole) as Role[] | undefined;
+  if ((allowedRoles && user && allowedRoles.indexOf(user.role as Role) === -1) || (allowedRoles && !user)) return null;
+
+  return <RouterRoute {...props} />;
+};
 
 /**
  * Router available only for when env is ticket
@@ -34,12 +47,12 @@ import { ProductForm } from './product/form';
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const PrivateTypeRoute = ({ component, ...rest }: any) => {
-  const isTicket = process.env.REACT_APP_CONSUMPTION_TYPE === 'ticket';
+  const isTicket = env.REACT_APP_CONSUMPTION_TYPE === 'ticket';
   /**
    * Function to redirect user
    */
   const routeComponent = (props: RouteProps) =>
-    isTicket ? React.createElement(component, props) : <Redirect to={{ pathname: '/' }} />;
+    !isTicket ? React.createElement(component, props) : <Redirect to={{ pathname: '/' }} />;
   return <Route {...rest} render={routeComponent} />;
 };
 
@@ -56,30 +69,30 @@ const PrivateRouter: React.FC<{}> = () => {
         <Route path="/logout" component={LogoutPage} />
         {/* Product routes */}
         <Route path="/validar" component={ProductValidationList} />
-        <PrivateTypeRoute path="/produtos" component={ProductList} />
-        <PrivateTypeRoute path="/produtos/:id" component={ProductForm} />
+        <PrivateTypeRoute allowedRole="admin" path="/produtos" component={ProductList} />
+        <PrivateTypeRoute allowedRole="admin" path="/produtos/:id" component={ProductForm} />
         {/* Report routes */}
-        <Route path="/estabelecimentos" component={PlaceList} />
+        <Route allowedRole="admin" path="/estabelecimentos" component={PlaceList} />
         {/* Place routes */}
-        <Route path="/relatorios" component={ReportList} />
-        <Route path="/estabelecimentos/:id" component={PlaceForm} />
+        <Route allowedRole="admin" path="/relatorios" component={ReportList} />
+        <Route allowedRole="admin" path="/estabelecimentos/:id" component={PlaceForm} />
         {/* Benefit routes */}
-        <Route path="/beneficios" component={BenefitList} />
-        <Route path="/beneficios/:id" component={BenefitForm} />
+        <Route allowedRole="admin" path="/beneficios" component={BenefitList} />
+        <Route allowedRole="admin" path="/beneficios/:id" component={BenefitForm} />
         {/* Store routes */}
-        <Route path="/lojas" component={PlaceStoreList} />
-        <Route path="/lojas/:id" component={PlaceStoreForm} />
+        <Route allowedRole="admin" path="/lojas" component={PlaceStoreList} />
+        <Route allowedRole="admin" path="/lojas/:id" component={PlaceStoreForm} />
         {/* User routes */}
-        <Route path="/usuarios" component={UserList} />
-        <Route path="/usuarios/:id" component={UserForm} />
+        <Route allowedRole="admin" path="/usuarios" component={UserList} />
+        <Route allowedRole="admin" path="/usuarios/:id" component={UserForm} />
         {/* Institution routes */}
-        <Route path="/instituicoes" component={InstitutionList} />
-        <Route path="/instituicoes/:id" component={InstitutionForm} />
+        <Route allowedRole="admin" path="/instituicoes" component={InstitutionList} />
+        <Route allowedRole="admin" path="/instituicoes/:id" component={InstitutionForm} />
         {/* Institution routes */}
-        <Route path="/familias" component={FamiliesList} />
-        <Route path="/familias/:id" component={FamilyForm} />
+        <Route allowedRole="admin" path="/familias" component={FamiliesList} />
+        <Route allowedRole="admin" path="/familias/:id" component={FamilyForm} />
         {/* Consumptions routes */}
-        <Route path="/consumo" component={ConsumptionForm} />
+        <Route allowedRole="admin" path="/consumo" component={ConsumptionForm} />
         {/* Dashboard */}
         <Route path="/" component={DashboardPage} exact />
       </>
@@ -108,9 +121,5 @@ const PublicRouter: React.FC<{}> = () => {
 export const Router: React.FC<{}> = (props) => {
   const user = useSelector<AppState, User | undefined>((state) => state.authReducer.user);
 
-  return (
-    <BrowserRouter>
-      {user && user.role === 'admin' ? <PrivateRouter {...props} /> : <PublicRouter {...props} />}
-    </BrowserRouter>
-  );
+  return <BrowserRouter>{user ? <PrivateRouter {...props} /> : <PublicRouter {...props} />}</BrowserRouter>;
 };
