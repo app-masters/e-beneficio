@@ -230,6 +230,7 @@ export const certifyFamilyByCode = async (family: Family) => {
  * @param family Family Object
  */
 export const certifyFamilyByNis = async (family: Family) => {
+  if (!family.responsibleNis) throw { status: 500, message: 'Familia sem NIS de responsável' };
   const [createdFamily, created] = await db.families.findCreateFind({
     where: { responsibleNis: family.responsibleNis },
     defaults: family
@@ -402,7 +403,7 @@ export const getDashboardInfo = async (cityId: NonNullable<City['id']>) => {
 export const createFamilyWithDependents = async (values: Family | SequelizeFamily): Promise<SequelizeFamily> => {
   //verify if family exists
   const family = await db.families.findOne({
-    where: Sequelize.or({ code: values.code }, { responsibleNis: values.responsibleNis })
+    where: Sequelize.or({ code: values.code }, { responsibleNis: values.responsibleNis || null })
   });
   if (family) {
     throw { status: 400, message: 'Familia já cadastrada.' };
