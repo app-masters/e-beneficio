@@ -175,6 +175,13 @@ export const updateImportReport = (importReport: ImportReport, cityId: NonNullab
 
 /**
  * Get all items on the table without any filter
+ */
+export const getAll = async (): Promise<SequelizeFamily[]> => {
+  return await db.families.findAll();
+};
+
+/**
+ * Get all items on the table with filter
  * @param nis searched nis code
  * @param cityId logged user city ID`
  * @param populateDependents should the dependents be returned?
@@ -397,13 +404,18 @@ export const getDashboardInfo = async (cityId: NonNullable<City['id']>) => {
 
 /**
  * Function to create a new row on the table
+ *
  * @param values object with the new item data
+ * @param cityId current city of user
  * @returns Promise<Item>
  */
-export const createFamilyWithDependents = async (values: Family | SequelizeFamily): Promise<SequelizeFamily> => {
+export const createFamilyWithDependents = async (
+  values: Family | SequelizeFamily,
+  cityId: string | number
+): Promise<SequelizeFamily> => {
   //verify if family exists
   const family = await db.families.findOne({
-    where: Sequelize.or({ code: values.code }, { responsibleNis: values.responsibleNis || null })
+    where: Sequelize.and({ code: values.code }, values.responsibleNis ? { responsibleNis: values.responsibleNis } : {})
   });
   if (family) {
     throw { status: 400, message: 'Familia já cadastrada.' };
@@ -438,7 +450,7 @@ export const createFamilyWithDependents = async (values: Family | SequelizeFamil
       };
     }
   }
-  return db.families.create(values).then(async (family) => {
+  return db.families.create({ ...values, cityId }).then(async (family) => {
     if (values.dependents) {
       const depedentsList = values.dependents?.map((dep) => {
         dep.familyId = family.id as number;
