@@ -5,15 +5,15 @@ import { Benefit } from './benefits';
 // Simple item type
 export interface BenefitProduct {
   readonly id?: number | string;
-  productsId: number | string;
-  benefitsId: number | string;
+  productId: number | string;
+  benefitId: number | string;
   amount: number;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
   //Join
-  products?: Product[];
-  benefits?: Benefit[];
+  product?: Product;
+  benefit?: Benefit;
 }
 // Sequelize returns type
 export type SequelizeBenefitProduct = BenefitProduct & Model;
@@ -32,7 +32,7 @@ export const attributes = {
     primaryKey: true,
     autoIncrement: true
   },
-  productsId: {
+  productId: {
     type: DataTypes.INTEGER,
     references: {
       model: 'Products',
@@ -40,7 +40,7 @@ export const attributes = {
     },
     allowNull: false
   },
-  benefitsId: {
+  benefitId: {
     type: DataTypes.INTEGER,
     references: {
       model: 'Benefits',
@@ -67,13 +67,15 @@ export const initBenefitProductSchema = (sequelize: Sequelize): SequelizeBenefit
   Schema.associate = (models): void => {
     // Sequelize relations
     Schema.belongsTo(models.products, {
-      foreignKey: 'productsId',
-      as: 'products'
+      foreignKey: 'productId',
+      as: 'product'
     });
     //
     Schema.belongsTo(models.benefits, {
-      foreignKey: 'benefitsId',
-      as: 'benefits'
+      foreignKey: 'benefitId',
+      as: 'benefit',
+      onDelete: 'cascade',
+      hooks: true
     });
   };
 

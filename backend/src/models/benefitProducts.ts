@@ -8,25 +8,25 @@ import { BenefitProduct, SequelizeBenefitProduct } from '../schemas/benefitProdu
 export const getAll = (): Promise<SequelizeBenefitProduct[]> => {
   return db.benefitProducts.findAll({
     include: [
-      { model: db.products, as: 'products' },
-      { model: db.benefits, as: 'benefits' }
+      { model: db.products, as: 'product' },
+      { model: db.benefits, as: 'benefit' }
     ]
   });
 };
 
 /**
  * Get all products associated to benefit
- * @param benefitsId unique ID of the desired benefit
+ * @param benefitId unique ID of the desired benefit
  * @returns Promise<Item>
  */
 export const getAllProductsByBenefitId = (
-  benefitsId: NonNullable<BenefitProduct['id']>
+  benefitId: NonNullable<BenefitProduct['id']>
 ): Promise<SequelizeBenefitProduct[]> => {
   return db.benefitProducts.findAll({
     where: {
-      benefitsId
+      benefitId
     },
-    include: [{ model: db.products, as: 'products' }]
+    include: [{ model: db.products, as: 'product' }]
   });
 };
 
@@ -38,8 +38,8 @@ export const getAllProductsByBenefitId = (
 export const getById = (id: NonNullable<BenefitProduct['id']>): Promise<SequelizeBenefitProduct> => {
   return db.benefitProducts.findByPk(id, {
     include: [
-      { model: db.products, as: 'products' },
-      { model: db.benefits, as: 'benefits' }
+      { model: db.products, as: 'product' },
+      { model: db.benefits, as: 'benefit' }
     ]
   });
 };

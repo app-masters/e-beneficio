@@ -34,12 +34,12 @@ export const getFamilyDependentBalanceProduct = async (family: Family) => {
   //Get all products by benefit
   const benefitsIds = familyBenefitsFilterDate.map((item) => {
     return item.id;
-  });
+  }) as number[];
   const listOfProductsAvailable = await db.benefitProducts.findAll({
     where: {
-      benefitsId: benefitsIds as number[]
+      benefitId: { [Sequelize.Op.in]: benefitsIds }
     },
-    include: [{ model: db.products, as: 'products' }]
+    include: [{ model: db.products, as: 'product' }]
   });
   //Get all family Consumptions
   const familyConsumption = await db.consumptions.findAll({
@@ -56,8 +56,8 @@ export const getFamilyDependentBalanceProduct = async (family: Family) => {
   });
   //Get difference between available products and consumed products
   const differenceProducts = listOfProductsAvailable.map((product) => {
-    const items = productsFamilyConsumption.filter((f) => f.productsId === product.productsId);
-    // const item = productsFamilyConsumption.find((f) => f.productsId === product.productsId);
+    const items = productsFamilyConsumption.filter((f) => f.productId === product.productId);
+    // const item = productsFamilyConsumption.find((f) => f.productId === product.productId);
     let amount = 0;
     if (items.length > 0)
       amount = items
@@ -73,7 +73,7 @@ export const getFamilyDependentBalanceProduct = async (family: Family) => {
       }
     }
     return {
-      product: { id: product.products?.id, name: product.products?.name },
+      product: { id: product.product?.id, name: product.product?.name },
       amountAvailable: amountDifference,
       amountGranted: product.amount,
       amountConsumed: amount ? amount : 0
@@ -273,7 +273,6 @@ export const addConsumption = async (
 /**
  * Create a new consumption on the store
  * @param values consumption object
- * @param placeStoreId logged user place store ID
  * @returns Promise<List of items>
  */
 export const addConsumptionProduct = async (values: Consumption): Promise<SequelizeConsumption> => {
@@ -290,12 +289,12 @@ export const addConsumptionProduct = async (values: Consumption): Promise<Sequel
   //Get all products by benefit
   const benefitsIds = familyBenefit.map((item) => {
     return item.id;
-  });
+  }) as number[];
   const listOfProductsAvailable = await db.benefitProducts.findAll({
     where: {
-      benefitsId: benefitsIds as number[]
+      benefitId: { [Sequelize.Op.in]: benefitsIds }
     },
-    include: [{ model: db.products, as: 'products' }]
+    include: [{ model: db.products, as: 'product' }]
   });
   //Get all family Consumptions
   const familyConsumption = await db.consumptions.findAll({
@@ -312,7 +311,7 @@ export const addConsumptionProduct = async (values: Consumption): Promise<Sequel
   });
   //Get difference between available products and consumed products
   const differenceProducts = listOfProductsAvailable.map((product) => {
-    const items = productsFamilyConsumption.filter((f) => f.productsId === product.productsId);
+    const items = productsFamilyConsumption.filter((f) => f.productId === product.productId);
     let amount = 0;
     if (items.length > 0)
       amount = items
@@ -325,7 +324,7 @@ export const addConsumptionProduct = async (values: Consumption): Promise<Sequel
       amountDifference = product.amount - amount;
     }
     return {
-      productId: product.productsId,
+      productId: product.productId,
       amountAvailable: amountDifference,
       amountGranted: product.amount,
       amountConsumed: amount ? amount : 0
@@ -345,7 +344,7 @@ export const addConsumptionProduct = async (values: Consumption): Promise<Sequel
     values.value = 0;
     const newConsumption = await db.consumptions.create({ ...values }).then(async (consumption) => {
       const consumptionProducts = values.products?.map((item) => {
-        return { productsId: item.id, consumptionsId: consumption.id, amount: item.amount };
+        return { productId: item.id, consumptionsId: consumption.id, amount: item.amount };
       });
       if (consumptionProducts) {
         await db.consumptionProducts.bulkCreate(consumptionProducts);

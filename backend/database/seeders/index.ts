@@ -28,16 +28,8 @@ const seedAll = async () => {
     await dependents.seed();
     await consumptions.seed();
     await products.seed();
-<<<<<<< HEAD
-<<<<<<< HEAD
     await benefitsProducts.seed();
-=======
->>>>>>> 574fa759cd9f43d27b43f8080de6a700f1ba5e7a
     await consumptionProducts.seed();
-=======
-    await consumptionProducts.seed();
-    await benefitsProducts.seed();
->>>>>>> ac355571996e5250387ac0b5c46ee99a38166466
   } else {
     // Production seed - one city and admin user
     await cities.seed();

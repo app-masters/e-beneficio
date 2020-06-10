@@ -20,7 +20,7 @@ export const getAllWithProduct = (cityId: NonNullable<City['id']>): Promise<any>
   return db.benefits.findAll({
     include: [
       { model: db.institutions, as: 'institution', where: { cityId } },
-      { model: db.benefitProducts, as: 'benefitProduct', include: [{ model: db.products, as: 'products' }] }
+      { model: db.benefitProducts, as: 'benefitProducts', include: [{ model: db.products, as: 'product' }] }
     ]
   });
 };
@@ -52,16 +52,16 @@ export const create = (values: Benefit | SequelizeBenefit): Promise<SequelizeBen
 export const createWithProduct = async (values: Benefit | SequelizeBenefit): Promise<SequelizeBenefit> => {
   const created = await db.benefits.create(values);
 
-  if (values.benefitProduct && created) {
-    const productList = values.benefitProduct.map((i) => {
-      i.benefitsId = created.id as number;
+  if (values.benefitProducts && created) {
+    const productList = values.benefitProducts.map((i) => {
+      i.benefitId = created.id as number;
       return i;
     });
     db.benefitProducts.bulkCreate(productList);
   }
 
   await created.reload({
-    include: [{ model: db.benefitProducts, as: 'benefitProduct', include: [{ model: db.products, as: 'products' }] }]
+    include: [{ model: db.benefitProducts, as: 'benefitProducts', include: [{ model: db.products, as: 'product' }] }]
   });
 
   return created;
@@ -106,11 +106,11 @@ export const updateWithProduct = async (
   if (cityItem) {
     // The update return an array [count, item[]], so I'm destructuring to get the updated benefit
     const [, [updated]] = await db.benefits.update(values, { where: { id }, returning: true });
-    const updatedProducts = await db.benefitProducts.findAll({ where: { benefitsId: updated.id as number } });
+    const updatedProducts = await db.benefitProducts.findAll({ where: { benefitId: updated.id as number } });
 
-    if (values.benefitProduct) {
-      const list = values.benefitProduct.map((i) => {
-        i.benefitsId = updated.id as number;
+    if (values.benefitProducts) {
+      const list = values.benefitProducts.map((i) => {
+        i.benefitId = updated.id as number;
         return i;
       });
       const productToUpdate = list.filter((f) => f.id);
@@ -136,7 +136,7 @@ export const updateWithProduct = async (
     where: { id },
     include: [
       { model: db.institutions, as: 'institution', where: { cityId } },
-      { model: db.benefitProducts, as: 'benefitProduct', include: [{ model: db.products, as: 'products' }] }
+      { model: db.benefitProducts, as: 'benefitProducts', include: [{ model: db.products, as: 'product' }] }
     ]
   });
 };

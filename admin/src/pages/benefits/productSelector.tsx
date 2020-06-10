@@ -9,8 +9,8 @@ import { ResourceSelector, ResourceSelectorValueItem } from '../../components/re
 import { FormItemProps } from 'antd/lib/form';
 
 export interface ProductSelectorProps {
-  onChange?: (value: ResourceSelectorValueItem<'productsId'>[]) => void;
-  value?: ResourceSelectorValueItem<'productsId'>[];
+  onChange?: (value: ResourceSelectorValueItem<'productId'>[]) => void;
+  value?: ResourceSelectorValueItem<'productId'>[];
   validateStatus?: FormItemProps['validateStatus'];
   help?: FormItemProps['help'];
 }
@@ -32,7 +32,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = (props) => {
   const datasource = useMemo(
     () =>
       list.map((product) => ({
-        productsId: product.id || 0,
+        productId: product.id || 0,
         name: product.name,
         amount: 0
       })),
@@ -47,7 +47,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = (props) => {
       <Col span={11}>
         <Form.Item label={'Produtos'} validateStatus={props.validateStatus} help={props.help}>
           <ResourceSelector
-            idName="productsId"
+            idName="productId"
             datasource={datasource}
             value={props.value || []}
             onChange={props.onChange}
