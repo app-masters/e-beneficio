@@ -21,3 +21,5 @@ export const roleList = {
   manager: { title: 'Gerente' },
   financial: { title: 'Financeiro' }
 };
+
+export type Role = keyof typeof roleList;
