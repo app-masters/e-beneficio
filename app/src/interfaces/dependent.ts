@@ -7,6 +7,7 @@ export interface Dependent {
   schoolName?: string;
   deactivatedAt?: number | Date | null;
   //New attributes
+  isResponsible?: boolean;
   rg: string;
   cpf: string;
   phone: string;

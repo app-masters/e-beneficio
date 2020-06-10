@@ -9,7 +9,6 @@ import Webcam from 'react-webcam';
 import { FamilySearch } from '../../components/familySearch';
 import { Flex } from '../../components/flex';
 import { Family, FamilyProductConsumption } from '../../interfaces/family';
-import { Consumption } from '../../interfaces/consumption';
 import { requestSaveConsumption, requestSaveConsumptionProduct } from '../../redux/consumption/actions';
 import { AppState } from '../../redux/rootReducer';
 import yup from '../../utils/yup';
@@ -45,7 +44,6 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
   const isTicket = process.env.REACT_APP_CONSUMPTION_TYPE === 'ticket';
   const family = useSelector<AppState, Family | null | undefined>((state) => state.familyReducer.item);
 
-  const consumption = useSelector<AppState, Consumption[]>((state) => state.consumptionReducer.registered);
   const loading = useSelector<AppState, boolean>((state) => state.consumptionReducer.loading);
 
   return (

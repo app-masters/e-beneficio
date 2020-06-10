@@ -266,7 +266,7 @@ export const certifyFamilyByCode = async (family: Family) => {
  * @param family Family Object
  */
 export const certifyFamilyByNis = async (family: Family) => {
-  if (!family.responsibleNis) throw { status: 500, message: 'Familia sem NIS de responsável' };
+  if (!family.responsibleNis) throw { status: 412, message: 'Familia sem NIS de responsável' };
   const [createdFamily, created] = await db.families.findCreateFind({
     where: { responsibleNis: family.responsibleNis },
     defaults: family
