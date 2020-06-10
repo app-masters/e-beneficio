@@ -12,11 +12,21 @@ import { Dependent } from '../schemas/depedents';
 import { scrapeNFCeData } from '../utils/nfceScraper';
 import { SequelizeProduct } from '../schemas/products';
 
+export type ProductBalance = {
+  product: {
+    id?: number | string;
+    name?: string;
+  };
+  amountAvailable: number;
+  amountGranted: number;
+  amountConsumed: number;
+}[];
+
 /**
  * Get balance report by dependent when product
  * @param family the family
  */
-export const getFamilyDependentBalanceProduct = async (family: Family) => {
+export const getFamilyDependentBalanceProduct = async (family: Family): Promise<ProductBalance> => {
   //Family groupName
   const familyBenefits = await db.benefits.findAll({ where: { groupName: family.groupName } });
   //Filter benefit by family date
@@ -29,7 +39,7 @@ export const getFamilyDependentBalanceProduct = async (family: Family) => {
     })
     .filter((f) => f);
   if (familyBenefitsFilterDate.length === 0) {
-    throw { status: 422, message: 'Nenhum benefício disponível' };
+    return [];
   }
   //Get all products by benefit
   const benefitsIds = familyBenefitsFilterDate.map((item) => {

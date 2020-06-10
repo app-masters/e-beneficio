@@ -11,7 +11,7 @@ import moment from 'moment';
 import logging from '../utils/logging';
 import { compareNames } from '../utils/string';
 import { parseFamilyAndSislameItems, certifyDependentsByFamilyList } from './dependents';
-import { getFamilyDependentBalance } from './consumptions';
+import { getFamilyDependentBalance, ProductBalance } from './consumptions';
 
 import { FamilyItem, SislameItem, OriginalSislameItem, OriginalNurseryItem } from '../typings/filesItems';
 import { Family, SequelizeFamily } from '../schemas/families';
@@ -198,6 +198,35 @@ export const findByNis = async (
     family.setDataValue('school' as 'id', yongerDepedent.schoolName);
   }
   return family;
+};
+
+/**
+ * Get all items by the place store id
+ * @param placeStoreId searched place store id
+ * @param cityId logged user city ID`
+ * @param populateDependents should the dependents be returned?
+ * @param calculateBalance should family balance be calculated?
+ * @returns Promise<List of items>
+ */
+export const findByPlaceStore = async (
+  placeStoreId: NonNullable<Family['placeStoreId']>,
+  cityId: NonNullable<City['id']>,
+  populateDependents?: boolean,
+  calculateBalance?: boolean
+): Promise<(Family & { balance?: number | ProductBalance })[]> => {
+  const families: (SequelizeFamily & { balance?: number | ProductBalance })[] = await db.families.findAll({
+    where: { placeStoreId, cityId },
+    include: populateDependents ? [{ model: db.dependents, as: 'dependents' }] : undefined
+  });
+
+  const list = await Promise.all(
+    families.map(async (family) => ({
+      ...(family.toJSON() as Family),
+      balance: calculateBalance ? await getFamilyDependentBalance(family) : undefined
+    }))
+  );
+
+  return list;
 };
 
 type CSVReport = {
