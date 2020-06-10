@@ -32,7 +32,6 @@ export const FamiliesList: React.FC<{}> = () => {
         .sort((a, b) => a.responsibleName?.localeCompare(b.responsibleName || '') || 0),
     [list]
   );
-  console.log(dataSource);
 
   // Redux actions
   const dispatch = useDispatch();
