@@ -1,28 +1,36 @@
 import db from '../../src/schemas';
 import { Benefit } from '../../src/schemas/benefits';
 import moment from 'moment';
+import { getFamilyGroupByCode } from '../../src/utils/constraints';
 
 const list = [
   {
     title: '[CAD25123] Auxilio municipal de alimentação',
-    groupName: 'extreme-poverty',
-    date: moment().startOf('month').month(4).year(2020).toDate(),
+    groupName: getFamilyGroupByCode(3).key,
+    date: moment().startOf('month').toDate(),
     institutionId: 1,
-    value: 600
+    value: 1000
   },
   {
     title: '[CAD25123] Auxilio municipal de alimentação',
-    groupName: 'poverty-line',
-    date: moment().startOf('month').month(4).year(2020).toDate(),
+    groupName: getFamilyGroupByCode(1).key,
+    date: moment().startOf('month').toDate(),
     institutionId: 1,
-    value: 400
+    value: 2000
   },
   {
     title: '[CAD25123] Auxilio municipal de alimentação',
-    groupName: 'cad',
-    date: moment().startOf('month').month(4).year(2020).toDate(),
+    groupName: getFamilyGroupByCode(2).key,
+    date: moment().startOf('month').toDate(),
     institutionId: 1,
-    value: 300
+    value: 500
+  },
+  {
+    title: '[CAD25123] Auxilio municipal de merenda',
+    groupName: getFamilyGroupByCode(0).key,
+    date: moment().startOf('month').toDate(),
+    institutionId: 1,
+    value: 100
   }
 ] as Benefit[];
 
