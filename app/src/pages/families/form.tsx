@@ -434,16 +434,17 @@ const schemaAdult = yup.object().shape({
 const typeDependent = {
   nis: '',
   name: '',
-  schoolName: '',
-  birthday: '',
-  rg: '',
-  cpf: '',
-  phone: '',
-  profession: '',
-  isHired: false,
-  isFormal: false,
-  salary: 0,
-  email: '',
+  schoolName: undefined,
+  birthday: undefined,
+  rg: undefined,
+  cpf: undefined,
+  phone: undefined,
+  profession: undefined,
+  isHired: undefined,
+  isFormal: undefined,
+  isResponsible: undefined,
+  salary: undefined,
+  email: undefined,
   type: ''
 };
 
@@ -499,6 +500,8 @@ export const DependentForm: React.FC<{
   const isFormalField = getFieldProps('isFormal');
   const salaryMeta = getFieldMeta('salary');
   const emailMeta = getFieldMeta('email');
+  const isResponsibleMeta = getFieldMeta('isResponsible');
+  const isResponsibleField = getFieldProps('isResponsible');
 
   return (
     <Modal
@@ -509,6 +512,17 @@ export const DependentForm: React.FC<{
       okType={errors && Object.keys(errors).length > 0 && touched ? 'danger' : 'primary'}
     >
       <Form layout="vertical">
+        {type === 'adult' && (
+          <Form.Item
+            style={{ marginBottom: 0 }}
+            validateStatus={validation(isResponsibleMeta)}
+            help={helper(isResponsibleMeta)}
+          >
+            <Checkbox checked={values.isResponsible} {...isResponsibleField}>
+              É o responsável familiar
+            </Checkbox>
+          </Form.Item>
+        )}
         <Form.Item label={'Código'} validateStatus={validation(nisMeta)} help={helper(nisMeta)}>
           <Input
             id="nis"
