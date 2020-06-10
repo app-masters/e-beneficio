@@ -1,7 +1,6 @@
 import CryptoJS from 'crypto-js';
 import { NextFunction, Request, Response } from 'express';
 import logging from '../utils/logging';
-import moment from 'moment';
 
 type PublicAuth = {
   now: Date | string | number;
@@ -25,22 +24,11 @@ export const requirePublicAuth = async (req: Request, res: Response, next: NextF
     const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8)) as PublicAuth;
 
     // Validating data;
-    const { now, token } = decryptedData;
-    if (!now || !token) {
+    const { token } = decryptedData;
+    if (!token) {
       console.log(Object.keys(decryptedData));
       logging.critical('Request on public route using invalid object', decryptedData);
       return res.status(401).send('Unauthorized');
-    }
-
-    // Check if token is too old
-    const timeDiff = moment(now).diff(moment(), 'hours');
-    if (timeDiff > 6) {
-      logging.error('Request on public route took too long', decryptedData);
-      return res.status(401).send('Unauthorized');
-    }
-    const debugTimeDiff = moment(now).diff(moment(), 'minutes');
-    if (debugTimeDiff > 10) {
-      logging.log('Request took more than 10 minutes', { decryptedData, serverNow: moment().toISOString() });
     }
 
     // Check if token match

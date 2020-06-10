@@ -19,6 +19,15 @@ export interface Family {
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
+  //New attributes
+  isRegisteredInPerson?: boolean;
+  totalSalary?: number;
+  isOnAnotherProgram?: boolean;
+  isOnGovernProgram?: boolean;
+  houseType?: string;
+  numberOfRooms?: number;
+  haveSewage?: boolean;
+  sewageComment?: string;
   // Join
   dependents?: Dependent[];
   consumptions?: Consumption[];
@@ -86,6 +95,38 @@ export const attributes = {
   },
   deactivatedAt: {
     type: DataTypes.DATE,
+    allowNull: true
+  },
+  isRegisteredInPerson: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true
+  },
+  totalSalary: {
+    type: DataTypes.FLOAT,
+    allowNull: true
+  },
+  isOnAnotherProgram: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true
+  },
+  isOnGovernProgram: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true
+  },
+  houseType: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  numberOfRooms: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  haveSewage: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true
+  },
+  sewageComment: {
+    type: DataTypes.STRING,
     allowNull: true
   }
 };
