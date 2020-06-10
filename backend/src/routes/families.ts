@@ -3,6 +3,8 @@ import logging from '../utils/logging';
 import * as familyModel from '../models/families';
 import * as consumptionModel from '../models/consumptions';
 
+const type = process.env.CONSUMPTION_TYPE as 'ticket' | 'product';
+
 const router = express.Router({ mergeParams: true });
 
 /**
@@ -121,6 +123,13 @@ router.get('/import-status', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     if (!req.user?.cityId) throw Error('User without selected city');
+
+    // If product type, add the user id and placeStoreId to family
+    if (type === 'product') {
+      if (!req.user.placeStoreId) throw Error('User without place store');
+      req.body.createdById = req.user.id;
+      req.body.placeStoreId = req.user.placeStoreId;
+    }
     const item = await familyModel.createFamilyWithDependents(req.body);
     res.send(item);
   } catch (error) {
