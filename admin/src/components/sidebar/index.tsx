@@ -10,7 +10,8 @@ import {
   HomeOutlined,
   BookOutlined,
   ShoppingCartOutlined,
-  SolutionOutlined
+  SolutionOutlined,
+  TeamOutlined
 } from '@ant-design/icons';
 import { Button, Layout, Menu, Popover } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -27,7 +28,7 @@ import { env } from '../../env';
 const { Sider } = Layout;
 const { SubMenu } = Menu;
 
-const consumptionType = env.REACT_APP_CONSUMPTION_TYPE as 'ticked' | 'product';
+const CONSUMPTION_TYPE = env.REACT_APP_CONSUMPTION_TYPE as 'ticket' | 'product';
 
 interface RouteItem {
   group?: boolean;
@@ -49,7 +50,7 @@ const routes: RouteItem[] = [
     path: '/validar',
     icon: () => <BookOutlined />,
     name: 'Validar Produtos',
-    allowedRoles: consumptionType === 'product' ? ['admin'] : undefined
+    allowedRoles: CONSUMPTION_TYPE === 'product' ? ['admin'] : undefined
   },
   {
     path: '/consumo',
@@ -81,24 +82,9 @@ const routes: RouteItem[] = [
     name: 'Instituições',
     allowedRoles: ['admin']
   }
-  // {
-  //   path: '/relatorios',
-  //   icon: () => <BarChartOutlined />,
-  //   name: 'Relatórios'
-  // },
-  // {
-  //   path: '/lojas',
-  //   icon: () => <ShopOutlined />,
-  //   name: 'Lojas'
-  // },
-  // {
-  //   path: '/estabelecimentos',
-  //   icon: () => <SolutionOutlined />,
-  //   name: 'Estabelecimentos'
-  // },
 ];
 
-const privateRoutes: RouteItem[] = [
+const productRoutes: RouteItem[] = [
   {
     path: '/produtos',
     icon: () => <ShoppingCartOutlined />,
@@ -113,6 +99,11 @@ const privateRoutes: RouteItem[] = [
     path: '/entidades',
     icon: () => <SolutionOutlined />,
     name: 'Entidades'
+  },
+  {
+    path: '/grupos',
+    icon: () => <TeamOutlined />,
+    name: 'Grupos'
   }
 ];
 
@@ -169,8 +160,6 @@ export const Sidebar: React.FC = () => {
   const user = useSelector<AppState, User | undefined>((state) => state.authReducer.user);
   const role = user?.role as Role | undefined;
 
-  const isTicket = env.REACT_APP_CONSUMPTION_TYPE === 'ticket';
-
   // The collapse state for the sidebar
   const [collapsed, setCollapsed] = useState(
     Boolean(localStorage.getItem(localStorageConstraints.SIDEBAR_COLLAPSED)) || false
@@ -193,7 +182,7 @@ export const Sidebar: React.FC = () => {
           <Menu theme="light" mode="inline" defaultSelectedKeys={[location ? location.pathname : '/']}>
             {/* Render the links based on the nav arrays */}
             {routes.map((navLink) => menuItem(navLink, '', role))}
-            {!isTicket && privateRoutes.map((navLink) => menuItem(navLink, '', role))}
+            {CONSUMPTION_TYPE === 'product' && productRoutes.map((navLink) => menuItem(navLink, '', role))}
           </Menu>
         </MenuHeight>
         <Flex vertical={collapsed} alignItems="center" gap="sm" justifyContent="space-between">

@@ -27,6 +27,9 @@ import { ReportList } from './report';
 import { ProductValidationList } from './product/validationList';
 import { ProductList } from './product/list';
 import { ProductForm } from './product/form';
+import { GroupList } from './groups/list';
+import { GroupForm } from './groups/form';
+
 import { Role } from '../utils/constraints';
 import { env } from '../env';
 
@@ -41,18 +44,19 @@ const Route: React.FC<RouteProps & { allowedRole?: Role | Role[] }> = ({ allowed
   return <RouterRoute {...props} />;
 };
 
+const CONSUMPTION_TYPE = env.REACT_APP_CONSUMPTION_TYPE as 'ticket' | 'product';
+
 /**
- * Router available only for when env is ticket
+ * Router available only for product
  * @param props component props
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const PrivateTypeRoute = ({ component, ...rest }: any) => {
-  const isTicket = env.REACT_APP_CONSUMPTION_TYPE === 'ticket';
   /**
    * Function to redirect user
    */
   const routeComponent = (props: RouteProps) =>
-    !isTicket ? React.createElement(component, props) : <Redirect to={{ pathname: '/' }} />;
+    CONSUMPTION_TYPE === 'product' ? React.createElement(component, props) : <Redirect to={{ pathname: '/' }} />;
   return <Route {...rest} render={routeComponent} />;
 };
 
@@ -76,6 +80,9 @@ const PrivateRouter: React.FC<{}> = () => {
         {/* Place routes */}
         <PrivateTypeRoute allowedRole="admin" path="/entidades" component={PlaceList} />
         <PrivateTypeRoute allowedRole="admin" path="/entidades/:id" component={PlaceForm} />
+        {/* Group routes */}
+        <PrivateTypeRoute allowedRole="admin" path="/grupos" component={GroupList} />
+        <PrivateTypeRoute allowedRole="admin" path="/grupos/:id" component={GroupForm} />
         {/* Benefit routes */}
         <Route allowedRole="admin" path="/beneficios" component={BenefitList} />
         <Route allowedRole="admin" path="/beneficios/:id" component={BenefitForm} />
