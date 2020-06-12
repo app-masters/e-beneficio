@@ -7,6 +7,10 @@ import { requestSaveInstitution } from '../../redux/institution/actions';
 import { AppState } from '../../redux/rootReducer';
 import yup from '../../utils/yup';
 import { Institution } from '../../interfaces/institution';
+import { env } from '../../env';
+
+// Application consumption type
+const consumptionType = env.REACT_APP_CONSUMPTION_TYPE as 'ticket' | 'product';
 
 const schema = yup.object().shape({
   title: yup.string().label('Nome').required()
@@ -20,6 +24,8 @@ export const InstitutionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
   const history = useHistory();
   const isCreating = props.match.params.id === 'criar';
   const dispatch = useDispatch();
+
+  const path = consumptionType !== 'product' ? 'instituicoes' : 'origem-do-beneficio';
 
   // Redux state
   const institution = useSelector<AppState, Institution | undefined>(({ institutionReducer }) =>
@@ -38,7 +44,7 @@ export const InstitutionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
       dispatch(
         requestSaveInstitution(
           values,
-          () => history.push('/instituicoes'),
+          () => history.push(`/${path}`),
           () => setStatus('Ocorreu um erro ao realizar a requisição.')
         )
       );
@@ -51,7 +57,7 @@ export const InstitutionForm: React.FC<RouteComponentProps<{ id: string }>> = (p
     <Modal
       title={isCreating ? 'Criar' : 'Editar'}
       visible={true}
-      onCancel={() => history.push('/instituicoes')}
+      onCancel={() => history.push(`/${path}`)}
       onOk={submitForm}
       confirmLoading={loading}
       okType={errors && Object.keys(errors).length > 0 && touched ? 'danger' : 'primary'}

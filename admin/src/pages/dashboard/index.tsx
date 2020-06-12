@@ -7,6 +7,10 @@ import { requestGetDashboard } from '../../redux/dashboard/actions';
 import { AppState } from '../../redux/rootReducer';
 import { PageContainer } from './styles';
 import { formatMoney } from '../../utils/string';
+import { env } from '../../env';
+
+// Application consumption type
+const consumptionType = env.REACT_APP_CONSUMPTION_TYPE as 'ticket' | 'product';
 
 /**
  * Dashboard page component
@@ -35,8 +39,14 @@ export const DashboardPage: React.FC<{}> = () => {
               value={formatMoney(dashboard?.todayFamilies, 0)}
               suffix={dashboard?.todayFamilies === 1 ? 'família auxiliada' : 'famílias auxiliadas'}
             />
-            <Divider />
-            <Typography.Text type="secondary">R$ {formatMoney(dashboard?.todayConsumption)} em consumo</Typography.Text>
+            {consumptionType !== 'product' && (
+              <>
+                <Divider />
+                <Typography.Text type="secondary">
+                  R$ {formatMoney(dashboard?.todayConsumption)} em consumo
+                </Typography.Text>
+              </>
+            )}
           </Card>
         </Col>
         <Col span={24} md={8}>
@@ -46,8 +56,14 @@ export const DashboardPage: React.FC<{}> = () => {
               value={formatMoney(dashboard?.weekFamilies, 0)}
               suffix={dashboard?.weekFamilies === 1 ? 'família auxiliada' : 'famílias auxiliadas'}
             />
-            <Divider />
-            <Typography.Text type="secondary">R$ {formatMoney(dashboard?.weekConsumption)} em consumo</Typography.Text>
+            {consumptionType !== 'product' && (
+              <>
+                <Divider />
+                <Typography.Text type="secondary">
+                  R$ {formatMoney(dashboard?.weekConsumption)} em consumo
+                </Typography.Text>
+              </>
+            )}
           </Card>
         </Col>
         <Col span={24} md={8}>
@@ -57,8 +73,14 @@ export const DashboardPage: React.FC<{}> = () => {
               value={formatMoney(dashboard?.monthFamilies, 0)}
               suffix={dashboard?.monthFamilies === 1 ? 'família auxiliada' : 'famílias auxiliadas'}
             />
-            <Divider />
-            <Typography.Text type="secondary">R$ {formatMoney(dashboard?.monthConsumption)} em consumo</Typography.Text>
+            {consumptionType !== 'product' && (
+              <>
+                <Divider />
+                <Typography.Text type="secondary">
+                  R$ {formatMoney(dashboard?.monthConsumption)} em consumo
+                </Typography.Text>
+              </>
+            )}
           </Card>
         </Col>
       </Row>
