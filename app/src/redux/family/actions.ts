@@ -71,3 +71,28 @@ export const requestSaveFamily = (
     }
   };
 };
+
+/**
+ * Get family Thunk action
+ */
+export const requestGetPlaceFamilies = (): ThunkResult<void> => {
+  return async (dispatch) => {
+    try {
+      // Start request - starting loading state
+      dispatch(doGetFamily());
+      // Request
+      const response = await backend.get<Family>(`/families/place`);
+      if (response && response.data) {
+        // Request finished
+        dispatch(doGetFamilySuccess(response.data)); // Dispatch result
+      } else {
+        // Request finished, but no item was found
+        dispatch(doGetFamilyFailed());
+      }
+    } catch (error) {
+      // Request failed: dispatch error
+      logging.error(error);
+      dispatch(doGetFamilyFailed(error));
+    }
+  };
+};

@@ -11,8 +11,8 @@ import { Family } from '../../interfaces/family';
 import { addToList } from '../../utils/list';
 
 export interface FamilyReducerState {
-  item?: Family | null;
-  list: Family[];
+  item?: Family; // Family | null | undefined
+  list?: Family[];
   loading: boolean;
   error?: Error;
 }
@@ -28,10 +28,12 @@ export default createReducer<FamilyReducerState>(initialState, {
     state.loading = true;
     state.error = undefined;
     state.item = undefined;
+    state.list = undefined;
   },
   [doGetFamilySuccess.toString()]: (state, action) => {
     state.loading = false;
-    state.item = action.payload;
+    state.item = !Array.isArray(action.payload) ? action.payload : undefined;
+    state.list = Array.isArray(action.payload) ? action.payload : undefined;
   },
   [doGetFamilyFailed.toString()]: (state, action) => {
     state.loading = false;
@@ -45,10 +47,11 @@ export default createReducer<FamilyReducerState>(initialState, {
   },
   [doSaveFamilySuccess.toString()]: (state, action) => {
     state.loading = false;
-    state.list = addToList(action.payload, state.list);
+    state.list = state.list ? addToList(action.payload, state.list) : undefined;
   },
   [doSaveFamilyFailed.toString()]: (state, action) => {
     state.loading = false;
     state.error = action.payload;
+    state.list = undefined;
   }
 });
