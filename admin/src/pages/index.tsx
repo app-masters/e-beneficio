@@ -27,6 +27,9 @@ import { ReportList } from './report';
 import { ProductValidationList } from './product/validationList';
 import { ProductList } from './product/list';
 import { ProductForm } from './product/form';
+import { GroupList } from './groups/list';
+import { GroupForm } from './groups/form';
+
 import { Role } from '../utils/constraints';
 import { env } from '../env';
 
@@ -52,6 +55,8 @@ const Route: React.FC<RouteProps> = ({ allowedRole, specificToType, ...props }) 
   return <RouterRoute {...props} />;
 };
 
+const CONSUMPTION_TYPE = env.REACT_APP_CONSUMPTION_TYPE as 'ticket' | 'product';
+
 /**
  * Router available only for logged users
  * @param props component props
@@ -72,6 +77,9 @@ const PrivateRouter: React.FC<{}> = () => {
         {/* Place routes */}
         <Route path="/entidades" component={PlaceList} allowedRole="admin" specificToType="product" />
         <Route path="/entidades/:id" component={PlaceForm} allowedRole="admin" specificToType="product" />
+        {/* Group routes */}
+        <Route path="/grupos" component={GroupList} allowedRole="admin" specificToType="product" />
+        <Route path="/grupos/:id" component={GroupForm} allowedRole="admin" specificToType="product" />
         {/* Benefit routes */}
         <Route path="/beneficios" component={BenefitList} allowedRole="admin" />
         <Route path="/beneficios/:id" component={BenefitForm} allowedRole="admin" />
