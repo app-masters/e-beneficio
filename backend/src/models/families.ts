@@ -220,9 +220,16 @@ export const findByCode = async (
   const [family] = await db.families.findAll({
     where: { code: code, cityId },
     limit: 1,
-    include: [{ model: db.dependents, as: 'dependents', where: { isResponsible: true } }]
+    include: [{ model: db.dependents, as: 'dependents' }]
   });
 
+  if (family && family.dependents) {
+    const responsible = family.dependents?.find((f) => f.isResponsible);
+    if (!responsible) throw { status: 409, message: 'Familia sem responsável.' };
+    else family.dependents = [responsible];
+  } else {
+    throw { status: 409, message: 'Familia não encontrada.' };
+  }
   return family;
 };
 

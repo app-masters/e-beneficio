@@ -54,8 +54,13 @@ router.get('/dashboard', async (req, res) => {
 router.get('/place', async (req, res) => {
   try {
     if (!req.user?.cityId) throw Error('User without selected city');
-    if (!req.user?.placeStoreId) throw Error('User without place store');
-    const data = await familyModel.findByPlaceStore(req.user.placeStoreId, req.user.cityId, true, true);
+    if (!req.user?.placeStoreId && !req.query.placeStoreId) throw Error('User without place store');
+    const data = await familyModel.findByPlaceStore(
+      req.user.placeStoreId || Number(req.query.placeStoreId),
+      req.user.cityId,
+      true,
+      true
+    );
 
     res.send(data);
   } catch (error) {

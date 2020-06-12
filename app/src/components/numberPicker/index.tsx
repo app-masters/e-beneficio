@@ -21,7 +21,7 @@ export const NumberPicker: React.FC<NumberPickerProps> = ({ maxValue, value, onC
         else onChange(value);
       }
     },
-    [onChange]
+    [onChange, maxValue]
   );
 
   return (

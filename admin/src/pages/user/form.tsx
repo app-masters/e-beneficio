@@ -7,9 +7,11 @@ import { InputFormatter } from '../../components/inputFormatter';
 import { User } from '../../interfaces/user';
 import { AppState } from '../../redux/rootReducer';
 import { requestSaveUser } from '../../redux/user/actions';
+import { requestGetPlaceStore } from '../../redux/placeStore/actions';
 import { formatCPF } from '../../utils/string';
 import yup from '../../utils/yup';
 import { roleList } from './../../utils/constraints';
+import { PlaceStore } from '../../interfaces/placeStore';
 
 const { Option } = Select;
 
@@ -24,6 +26,12 @@ const schema = yup.object().shape({
   cpf: yup.string().label('CPF').required(),
   email: yup.string().label('Email').required(),
   role: yup.string().label('Cargo').required(),
+  placeStoreId: yup
+    .string()
+    .label('Localidade')
+    .when('role', (role: string | undefined, schema: yup.StringSchema) =>
+      role !== 'admin' ? schema.required() : schema
+    ),
   isCreating: yup.boolean().label('CriandoUsuario').nullable()
 });
 
@@ -35,7 +43,10 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
   const history = useHistory();
   const isCreating = props.match.params.id === 'criar';
 
+  const CONSUMPTION_TYPE = process.env.REACT_APP_CONSUMPTION_TYPE || 'ticket';
+
   // Redux state
+  const placeStore = useSelector<AppState, PlaceStore[]>(({ placeStoreReducer }) => placeStoreReducer.list);
   const user = useSelector<AppState, User | undefined>(({ userReducer }) =>
     userReducer.list.find((item: User) => item.id === Number(props.match.params.id))
   );
@@ -43,6 +54,10 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
 
   // Redux actions
   const dispatch = useDispatch();
+
+  React.useEffect(() => {
+    dispatch(requestGetPlaceStore());
+  }, [dispatch]);
 
   const {
     handleSubmit,
@@ -63,6 +78,7 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
       cpf: '',
       email: '',
       role: 'admin',
+      placeStoreId: undefined,
       active: false,
       isCreating
     },
@@ -88,6 +104,7 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
   const cpfMeta = getFieldMeta('cpf');
   const emailMeta = getFieldMeta('email');
   const roleMeta = getFieldMeta('role');
+  const placeStoreIdMeta = getFieldMeta('placeStoreId');
   const activeMeta = getFieldMeta('active');
   const activeField = getFieldProps('active');
 
@@ -172,6 +189,34 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
               ))}
             </Select>
           </Form.Item>
+
+          {CONSUMPTION_TYPE === 'product' && values.role !== 'admin' && (
+            <Form.Item
+              label={'Localidade'}
+              validateStatus={!!placeStoreIdMeta.error && !!placeStoreIdMeta.touched ? 'error' : ''}
+              help={!!placeStoreIdMeta.error && !!placeStoreIdMeta.touched ? placeStoreIdMeta.error : undefined}
+            >
+              <Select
+                defaultValue={values.placeStoreId}
+                onSelect={(value) => setFieldValue('placeStoreId', value)}
+                value={values.placeStoreId || undefined}
+                onChange={(value) => {
+                  setFieldValue('placeStoreId', value);
+                }}
+                onBlur={() => {
+                  setFieldTouched('placeStoreId', true);
+                }}
+              >
+                {placeStore &&
+                  placeStore.length > 0 &&
+                  placeStore.map((pStore) => (
+                    <Option key={pStore.id} value={Number(pStore.id)}>
+                      {pStore.title}
+                    </Option>
+                  ))}
+              </Select>
+            </Form.Item>
+          )}
 
           <Form.Item
             validateStatus={!!activeMeta.error && !!activeMeta.touched ? 'error' : ''}

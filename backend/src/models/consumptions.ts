@@ -159,8 +159,8 @@ export const getFamilyDependentBalanceTicket = async (family: Family, availableB
  * @param availableBenefits benefit
  */
 export const getFamilyDependentBalance = async (family: Family, availableBenefits?: Benefit[]) => {
-  const isTicket = process.env.CONSUMPTION_TYPE === 'ticket';
-  if (isTicket) return getFamilyDependentBalanceTicket(family, availableBenefits);
+  const CONSUMPTION_TYPE = process.env.CONSUMPTION_TYPE as 'ticket' | 'product';
+  if (CONSUMPTION_TYPE === 'ticket') return getFamilyDependentBalanceTicket(family, availableBenefits);
   else return getFamilyDependentBalanceProduct(family);
 };
 
