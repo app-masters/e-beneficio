@@ -42,7 +42,7 @@ export const requestGetFamily = (code: string): ThunkResult<void> => {
  * Save Family Thunk action
  */
 export const requestSaveFamily = (
-  item: Family,
+  item: Pick<Family, 'code' | 'id'>,
   onSuccess?: () => void,
   onFailure?: (error?: Error) => void
 ): ThunkResult<void> => {
@@ -51,7 +51,13 @@ export const requestSaveFamily = (
       // Start request - starting loading state
       dispatch(doSaveFamily());
 
-      const response = await backend.post<Family>(`/families`, { ...item });
+      // Request
+      let response;
+      if (item.id) {
+        response = await backend.put<Family>(`/families/${item.id}`, { ...item });
+      } else {
+        response = await backend.post<Family>(`/families`, { ...item });
+      }
 
       if (response && response.data) {
         // Request finished

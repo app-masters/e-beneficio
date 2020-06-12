@@ -543,7 +543,35 @@ export const updateById = async (
   if (cityItem) {
     // The update return an array [count, item[]], so I'm destructuring to get the updated benefit
     const [, [item]] = await db.families.update(values, { where: { id }, returning: true });
-    return item;
+
+    if (values.dependents) {
+      const depIds = values.dependents.map((dep: Dependent) => {
+        return dep.id;
+      });
+      const familyDependents = await db.dependents.findAll({ where: { familyId: values.id as number } });
+      const dependentsToAdd = values.dependents
+        .filter((f) => !f.id)
+        .map((dep) => {
+          return { ...dep, familyId: values.id };
+        });
+      const dependentsToUpdate = values.dependents.filter((f) => f.id);
+      const dependentsToRemove = familyDependents.filter((f) => !depIds.includes(f.id));
+
+      await db.dependents.bulkCreate(dependentsToAdd);
+
+      dependentsToUpdate.map(async (up) => {
+        if (up.id) await db.dependents.update({ ...up }, { where: { id: up.id } });
+      });
+
+      dependentsToRemove.map(async (dt) => {
+        if (dt.id) await db.dependents.destroy({ where: { id: dt.id } });
+      });
+    }
+
+    return await db.families.findOne({
+      where: { id: values.id as number },
+      include: [{ model: db.dependents, as: 'dependents', where: { familyId: values.id as number } }]
+    });
   }
   return null;
 };

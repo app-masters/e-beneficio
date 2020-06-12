@@ -59,7 +59,7 @@ const typeFamily = {
  * Families form component
  * @param props component props
  */
-export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () => {
+export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (props) => {
   const [modal, setModal] = React.useState<{
     item?: Dependent | null;
     open: boolean;
@@ -70,6 +70,13 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
   });
 
   const dispatch = useDispatch();
+
+  const family = useSelector<AppState, Family | null | undefined>(({ familyReducer }) =>
+    familyReducer.list?.find((f: Family) => f.id === Number(props.match.params.id))
+  );
+
+  const teste = useSelector<AppState, Family[] | undefined>(({ familyReducer }) => familyReducer.list as Family[]);
+  console.log(teste);
 
   const loading = useSelector<AppState, boolean>(({ familyReducer }) => familyReducer.loading);
   const error = useSelector<AppState, Error | undefined>(({ familyReducer }) => familyReducer.error);
@@ -83,7 +90,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
     setFieldTouched,
     getFieldProps
   } = useFormik({
-    initialValues: typeFamily,
+    initialValues: family || typeFamily,
     validationSchema: schema,
     onSubmit: (values, { setStatus }) => {
       setStatus();
@@ -92,15 +99,11 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
     }
   });
 
-  const family = useSelector<AppState, Family | null | undefined>(({ familyReducer }) =>
-    familyReducer.list?.find((f: Family) => f.code === values?.code)
-  );
-
   /**
    * Remove dependent form component
    */
   const removeDependent = (nis: string) => {
-    const list = values.dependents.filter((f: Dependent) => f.nis !== nis);
+    const list = values.dependents?.filter((f: Dependent) => f.nis !== nis);
     setFieldValue('dependents', list);
   };
 
@@ -108,7 +111,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
    * Verify NIS duplicated
    */
   const verifyDependentNIS = (value: Dependent) => {
-    const verify = values.dependents.find((f: Dependent) => f.nis === value.nis);
+    const verify = values.dependents?.find((f: Dependent) => f.nis === value.nis);
     if (verify) {
       notification.warning({ message: 'NIS já cadastrado' });
       return false;
@@ -120,7 +123,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
    * Handle responsable
    */
   const responsibleDependent = (value: Dependent) => {
-    let list: Dependent[] = [...values.dependents];
+    let list: Dependent[] = values.dependents ? [...values.dependents] : [];
     const verifyIndex = list.findIndex((f) => f.nis === value.nis);
     if (verifyIndex > -1) list = list.filter((f) => f.nis !== value.nis);
     if (value.isResponsible) {
@@ -171,14 +174,14 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
       <Card loading={loading} title={<Typography.Title>Nova Familia</Typography.Title>}>
         <Form layout="vertical">
           {error && <Alert message="Ocorreu um erro" description={error.message} type="error" showIcon />}
-          {!error && family && family.id && (
+          {/* {!error && family && family.id && (
             <Alert
               message="Familia salva"
               description={'Os dados de familia foram salvos com sucesso!'}
               type="success"
               showIcon
             />
-          )}
+          )} */}
           <Row gutter={[16, 16]}>
             <Col span={24} md={8}>
               <Form.Item label={'Código'} validateStatus={validation(codeMeta)} help={helper(codeMeta)}>
@@ -352,7 +355,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
                 <Button
                   key={'edit'}
                   onClick={() => {
-                    if (item.type) setModal({ open: true, type: item.type, item });
+                    setModal({ open: true, type: item.isHired === null ? 'child' : 'adult', item });
                   }}
                 >
                   Editar
@@ -385,7 +388,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
                     ) : (
                       ''
                     )}
-                    {`${item.name} - ${item.type === 'child' ? 'Criança' : 'Adulto'}`}
+                    {`${item.name} - ${item.isHired === null || item.isHired === undefined ? 'Criança' : 'Adulto'}`}
                   </>
                 }
                 description={
@@ -499,7 +502,12 @@ export const DependentForm: React.FC<{
   const isCreating = !!!item;
 
   const { handleChange, values, errors, touched, getFieldMeta, submitForm, setFieldValue, getFieldProps } = useFormik({
-    initialValues: item ? item : typeDependent,
+    initialValues: item
+      ? item
+      : {
+          ...typeDependent,
+          isHired: type === 'adult' ? false : undefined
+        },
     validationSchema: type === 'child' ? schemaChild : schemaAdult,
     onSubmit: (values, { setStatus }) => {
       setStatus();
@@ -525,7 +533,6 @@ export const DependentForm: React.FC<{
   };
 
   const nameMeta = getFieldMeta('name');
-  const nisMeta = getFieldMeta('nis');
   const birthdayMeta = getFieldMeta('birthday');
   const rgMeta = getFieldMeta('rg');
   const cpfMeta = getFieldMeta('cpf');
@@ -560,17 +567,6 @@ export const DependentForm: React.FC<{
             </Checkbox>
           </Form.Item>
         )}
-        <Form.Item label={'Código'} validateStatus={validation(nisMeta)} help={helper(nisMeta)}>
-          <Input
-            id="nis"
-            disabled={!isCreating}
-            maxLength={11}
-            name="nis"
-            onChange={handleChange}
-            value={values.nis}
-            onPressEnter={submitForm}
-          />
-        </Form.Item>
         <Form.Item label={'Nome'} validateStatus={validation(nameMeta)} help={helper(nameMeta)}>
           <Input id="name" name="name" onChange={handleChange} value={values.name} onPressEnter={submitForm} />
         </Form.Item>
@@ -635,47 +631,53 @@ export const DependentForm: React.FC<{
                   </Checkbox>
                 </Form.Item>
               </Col>
-              <Col span={24} md={12} style={ColCheckStyle}>
-                <Form.Item
-                  style={{ marginBottom: 0 }}
-                  validateStatus={validation(isFormalMeta)}
-                  help={helper(isFormalMeta)}
-                >
-                  <Checkbox disabled={!values.isHired} checked={values.isFormal} {...isFormalField}>
-                    Emprego formal
-                  </Checkbox>
-                </Form.Item>
-              </Col>
+              {values.isHired && (
+                <Col span={24} md={12} style={ColCheckStyle}>
+                  <Form.Item
+                    style={{ marginBottom: 0 }}
+                    validateStatus={validation(isFormalMeta)}
+                    help={helper(isFormalMeta)}
+                  >
+                    <Checkbox checked={values.isFormal} {...isFormalField}>
+                      Emprego formal
+                    </Checkbox>
+                  </Form.Item>
+                </Col>
+              )}
             </Row>
-            <Form.Item label={'Profissão'} validateStatus={validation(professionMeta)} help={helper(professionMeta)}>
-              <Input
-                id="profession"
-                name="profession"
-                disabled={!values.isHired}
-                onChange={handleChange}
-                value={values.profession}
-                onPressEnter={submitForm}
-              />
-            </Form.Item>
-            <Form.Item label={'Salário'} validateStatus={validation(salaryMeta)} help={helper(salaryMeta)}>
-              <InputNumber
-                style={{ width: '100%' }}
-                disabled={!values.isHired}
-                id="salary"
-                name="salary"
-                onChange={(value) => setFieldValue('salary', value)}
-                value={Number(values.salary)}
-                decimalSeparator=","
-                step={0.01}
-                precision={2}
-                min={0}
-                formatter={(value) => {
-                  if (value === '') return `R$ `;
-                  return value && Number(value) !== 0 && !Number.isNaN(Number(value)) ? `R$ ${value}` : '';
-                }}
-                parser={(value) => (value ? value.replace(/(R)|(\$)/g, '').trim() : '')}
-              />
-            </Form.Item>
+            {values.isHired && (
+              <Form.Item label={'Profissão'} validateStatus={validation(professionMeta)} help={helper(professionMeta)}>
+                <Input
+                  id="profession"
+                  name="profession"
+                  disabled={!values.isHired}
+                  onChange={handleChange}
+                  value={values.profession}
+                  onPressEnter={submitForm}
+                />
+              </Form.Item>
+            )}
+            {values.isHired && (
+              <Form.Item label={'Salário'} validateStatus={validation(salaryMeta)} help={helper(salaryMeta)}>
+                <InputNumber
+                  style={{ width: '100%' }}
+                  disabled={!values.isHired}
+                  id="salary"
+                  name="salary"
+                  onChange={(value) => setFieldValue('salary', value)}
+                  value={Number(values.salary)}
+                  decimalSeparator=","
+                  step={0.01}
+                  precision={2}
+                  min={0}
+                  formatter={(value) => {
+                    if (value === '') return `R$ `;
+                    return value && Number(value) !== 0 && !Number.isNaN(Number(value)) ? `R$ ${value}` : '';
+                  }}
+                  parser={(value) => (value ? value.replace(/(R)|(\$)/g, '').trim() : '')}
+                />
+              </Form.Item>
+            )}
           </>
         )}
       </Form>
