@@ -333,7 +333,7 @@ export const importFamilyFromCSVFile = async (
               // Converting CSV format to DB format
               const family = {
                 code: json.d['cod_familiar_fam'],
-                groupName: group.key,
+                groupId: group.id,
                 responsibleName: json['nom_pessoa'],
                 responsibleBirthday: moment(json['dta_nasc_pessoa'], 'DD/MM/YYYY').toDate(),
                 responsibleNis: json['num_nis_pessoa_atual'],
@@ -569,7 +569,7 @@ export const parseFamilyItem = (
     responsibleBirthday: moment(family['DTNASCTIT'], 'DD/MM/YYYY').toDate(),
     responsibleMotherName: '',
     code: '',
-    groupName: getFamilyGroupByCode(0).key,
+    groupId: getFamilyGroupByCode(0).id,
     cityId,
     phone: extra?.phone,
     phone2: extra?.phone2,

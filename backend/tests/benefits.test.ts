@@ -13,7 +13,7 @@ const testName = 'benefits';
 
 const benefit = {
   institutionId: 1,
-  groupName: 'BenefitTest',
+  groupId: 'BenefitTest',
   title: 'BenefitTest 1',
   date: moment('05/05/2020', 'DD/MM/YYYY').toDate()
 } as Benefit;
@@ -21,7 +21,7 @@ let createdBenefit: Benefit | null;
 
 const family = {
   code: Math.floor(Math.random() * 10000000).toString(),
-  groupName: getFamilyGroupByCode(1)?.key,
+  groupId: getFamilyGroupByCode(1)?.id,
   responsibleName: 'Family After',
   responsibleBirthday: moment('01/01/1980', 'DD/MM/YYYY').toDate(),
   responsibleNis: Math.floor(Math.random() * 10000000000).toString(),

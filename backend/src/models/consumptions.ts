@@ -27,8 +27,8 @@ export type ProductBalance = {
  * @param family the family
  */
 export const getFamilyDependentBalanceProduct = async (family: Family): Promise<ProductBalance> => {
-  //Family groupName
-  const familyBenefits = await db.benefits.findAll({ where: { groupName: family.groupName } });
+  //Family groupId
+  const familyBenefits = await db.benefits.findAll({ where: { groupId: family.groupId } });
   //Filter benefit by family date
   const familyBenefitsFilterDate = familyBenefits
     .filter((benefit) => {
@@ -115,7 +115,7 @@ export const getFamilyDependentBalanceTicket = async (family: Family, availableB
   if (!availableBenefits) {
     // Populating benefits if it's not available
     availableBenefits = await db.benefits.findAll({
-      where: { groupName: family.groupName },
+      where: { groupId: family.groupId },
       include: [{ model: db.institutions, as: 'institution', where: { cityId: family.cityId } }]
     });
   }
@@ -129,7 +129,7 @@ export const getFamilyDependentBalanceTicket = async (family: Family, availableB
 
     for (const benefit of availableBenefits) {
       const benefitDate = moment(benefit.date as Date);
-      if (benefit.groupName !== family.groupName) continue; // Don't check if it's from another group
+      if (benefit.groupId !== family.groupId) continue; // Don't check if it's from another group
       // Check all the dates
       const notInFuture = benefitDate.toDate() <= todayDate.endOf('month').toDate();
       const afterCreation = benefitDate.toDate() >= startDate.startOf('month').toDate();
@@ -208,12 +208,12 @@ export const getFamilyBalance = async (family: Family): Promise<number> => {
         {
           date: { [Sequelize.Op.lte]: todayDate.endOf('month').toDate() }
         },
-        { groupName: family.groupName }
+        { groupId: family.groupId }
       ]
     },
-    attributes: ['groupName', [Sequelize.fn('sum', Sequelize.col('value')), 'total']],
+    attributes: ['groupId', [Sequelize.fn('sum', Sequelize.col('value')), 'total']],
     include: [{ model: db.institutions, as: 'institution', where: { cityId: family.cityId }, attributes: [] }],
-    group: ['Benefits.groupName']
+    group: ['Benefits.groupId']
   });
 
   // Get all consumptions already made
@@ -294,7 +294,7 @@ export const addConsumptionProduct = async (values: Consumption): Promise<Sequel
 
   //Get family benefit and its products.
   const familyBenefit = await db.benefits.findAll({
-    where: { groupName: family.groupName }
+    where: { groupId: family.groupId }
   });
   //Get all products by benefit
   const benefitsIds = familyBenefit.map((item) => {

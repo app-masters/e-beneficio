@@ -1,4 +1,5 @@
 import db from '../../src/schemas';
+import { Group } from '../../src/schemas/groups';
 
 const list = [
   { title: 'Bolsa família com filho na escola pública' },
@@ -19,7 +20,12 @@ const seed = async () => {
       return item;
     });
     if (itemsToCreate.length > 0) {
-      await db.groups.bulkCreate(itemsToCreate);
+      await itemsToCreate
+        .map((item) => () => db.groups.create(item))
+        .reduce(
+          (promise, fn) => promise.then((result) => fn().then(Array.prototype.concat.bind(result))),
+          Promise.resolve([] as Group[])
+        );
     }
     console.log(`[seed] Groups: Seeded successfully - ${itemsToCreate.length} new created`);
   } else {
