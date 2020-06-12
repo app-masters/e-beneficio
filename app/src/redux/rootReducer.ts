@@ -9,6 +9,7 @@ import placeStoreReducer, { PlaceStoreReducerState } from './placeStore/reducers
 import placeReducer, { PlaceReducerState } from './place/reducers';
 import dashboardReducer, { DashboardReducerState } from './dashboard/reducers';
 import reportReducer, { ReportReducerState } from './report/reducers';
+import groupReducer, { GroupReducerState } from './group/reducers';
 
 type TypeReducers = {
   authReducer: AuthReducerState;
@@ -19,6 +20,7 @@ type TypeReducers = {
   placeReducer: PlaceReducerState;
   dashboardReducer: DashboardReducerState;
   reportReducer: ReportReducerState;
+  groupReducer: GroupReducerState;
 };
 
 const appReducer = combineReducers({
@@ -29,7 +31,8 @@ const appReducer = combineReducers({
   placeStoreReducer,
   placeReducer,
   dashboardReducer,
-  reportReducer
+  reportReducer,
+  groupReducer
 });
 
 /**

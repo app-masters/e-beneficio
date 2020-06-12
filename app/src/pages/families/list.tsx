@@ -11,6 +11,7 @@ import { requestGetPlaceFamilies } from '../../redux/family/actions';
 
 import { ActionWrapper, PageContainer } from './styles';
 import { Dependent } from '../../interfaces/dependent';
+import { Group } from '../../interfaces/group';
 
 /**
  * FamiliesList page component
@@ -59,12 +60,7 @@ export const FamiliesList: React.FC<{}> = () => {
             }
           />
           <Table.Column title="Código" dataIndex="code" width="20%" />
-          <Table.Column
-            title="Grupo familiar"
-            dataIndex="groupName"
-            render={(groupName: Family['groupName']) => familyGroupList && familyGroupList[groupName]?.title}
-            width="20%"
-          />
+          <Table.Column title="Grupo familiar" dataIndex="groupName" width="20%" />
           <Table.Column
             title="Número de Dependentes"
             render={(family: Family) => family.dependents?.length || 0}

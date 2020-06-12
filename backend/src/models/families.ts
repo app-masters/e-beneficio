@@ -249,7 +249,8 @@ export const findByPlaceStore = async (
 ): Promise<(Family & { balance?: number | ProductBalance })[]> => {
   const families: (SequelizeFamily & { balance?: number | ProductBalance })[] = await db.families.findAll({
     where: { placeStoreId, cityId },
-    include: populateDependents ? [{ model: db.dependents, as: 'dependents' }] : undefined
+    include: populateDependents ? [{ model: db.dependents, as: 'dependents' }] : undefined,
+    order: [[{ model: db.dependents, as: 'dependents' }, 'isResponsible', 'desc']]
   });
 
   const list = await Promise.all(
@@ -483,9 +484,9 @@ export const createFamilyWithDependents = async (
     if (verifyResponsible.length === 0)
       throw { status: 412, message: 'É necessário um membro responsável por familia.' };
 
-    const dependentNis = values.dependents?.map((dep) => {
-      return dep.nis as string;
-    });
+    // const dependentNis = values.dependents?.map((dep) => {
+    //   return dep.nis as string;
+    // });
     const dependentRg = values.dependents?.map((dep) => {
       return dep.rg as string;
     });
@@ -494,7 +495,7 @@ export const createFamilyWithDependents = async (
     });
     const dependents = await db.dependents.findAll({
       where: Sequelize.or(
-        { nis: { [Sequelize.Op.in]: dependentNis } },
+        // { nis: { [Sequelize.Op.in]: dependentNis } },
         { rg: { [Sequelize.Op.in]: dependentRg } },
         { cpf: { [Sequelize.Op.in]: dependentCpf } }
       )
