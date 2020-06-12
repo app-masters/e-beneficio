@@ -16,6 +16,7 @@ export interface Family {
   responsibleNis?: string;
   responsibleBirthday?: Date;
   responsibleMotherName?: string;
+  deactivatedAt?: number | Date | null;
   //New attributes
   isRegisteredInPerson?: boolean;
   totalSalary?: number;

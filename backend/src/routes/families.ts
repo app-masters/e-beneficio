@@ -172,6 +172,20 @@ router.post('/', async (req, res) => {
 /**
  * Sub-route to PUT an existing item
  */
+router.put('/:id/deactivate', async (req, res) => {
+  try {
+    if (!req.user?.cityId) throw Error('User without selected city');
+    const item = await familyModel.deactivateFamilyAndDependentsById(req.params.id);
+    res.send(item);
+  } catch (error) {
+    logging.error(error);
+    res.status(500).send(error.message);
+  }
+});
+
+/**
+ * Sub-route to PUT an existing item
+ */
 router.put('/:id', async (req, res) => {
   try {
     if (!req.user?.cityId) throw Error('User without selected city');

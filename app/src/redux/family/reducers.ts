@@ -6,7 +6,10 @@ import {
   doGetFamilyFailed,
   doSaveFamily,
   doSaveFamilySuccess,
-  doSaveFamilyFailed
+  doSaveFamilyFailed,
+  doDeactivateFamily,
+  doDeactivateFamilySuccess,
+  doDeactivateFamilyFailed
 } from './actions';
 import { Family } from '../../interfaces/family';
 import { addToList } from '../../utils/list';
@@ -60,5 +63,27 @@ export default createReducer<FamilyReducerState>(initialState, {
     state.loading = false;
     state.error = action.payload;
     state.list = undefined;
+  },
+  // Deactivte actions
+  [doDeactivateFamily.toString()]: (state) => {
+    state.loading = true;
+    state.error = undefined;
+    state.item = undefined;
+  },
+  [doDeactivateFamilySuccess.toString()]: (state, action) => {
+    state.loading = false;
+    state.list = state.list
+      ? addToList(
+          action.payload,
+          state.list.filter((f) => f.id !== action.payload.id)
+        )
+      : undefined;
+    state.item = undefined;
+  },
+  [doDeactivateFamilyFailed.toString()]: (state, action) => {
+    state.loading = false;
+    state.error = action.payload;
+    state.list = undefined;
+    state.item = undefined;
   }
 });

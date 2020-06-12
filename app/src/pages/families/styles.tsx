@@ -14,6 +14,9 @@ export const ActionWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
   align-items: flex-end;
+  > * {
+    margin-left: ${(props) => props.theme.spacing.sm};
+  }
 `;
 
 export const ColCheckStyle = {
