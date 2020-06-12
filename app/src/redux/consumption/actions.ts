@@ -5,9 +5,19 @@ import { Consumption } from '../../interfaces/consumption';
 import { logging } from '../../lib/logging';
 
 // Simple actions and types
+export const doClearConsumption = createAction<void>('consumption/CLEAR');
 export const doSaveConsumption = createAction<void>('consumption/SAVE');
 export const doSaveConsumptionSuccess = createAction<Consumption>('consumption/SAVE_SUCCESS');
 export const doSaveConsumptionFailed = createAction<Error | undefined>('consumption/SAVE_FAILED');
+
+/**
+ * Save consumption Thunk action
+ */
+export const requestClearConsumptionProduct = (): ThunkResult<void> => {
+  return async (dispatch) => {
+    dispatch(doClearConsumption());
+  };
+};
 
 /**
  * Save consumption Thunk action

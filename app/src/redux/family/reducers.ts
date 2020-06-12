@@ -1,5 +1,6 @@
 import { createReducer } from '@reduxjs/toolkit';
 import {
+  doClearFamily,
   doGetFamily,
   doGetFamilySuccess,
   doGetFamilyFailed,
@@ -23,6 +24,12 @@ const initialState = {
 };
 
 export default createReducer<FamilyReducerState>(initialState, {
+  [doClearFamily.toString()]: (state) => {
+    state.loading = false;
+    state.error = undefined;
+    state.item = undefined;
+    state.list = undefined;
+  },
   // Get actions
   [doGetFamily.toString()]: (state) => {
     state.loading = true;

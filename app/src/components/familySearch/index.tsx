@@ -23,13 +23,15 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
   // Local state
   const [nis, setNis] = useState('');
   const [familyId, setFamilyId] = useState<Family['id']>();
-  const [birthday, setBirthday] = useState('');
   // Redux state
-  const familyLoading = useSelector<AppState, boolean>((state) => state.familyReducer.loading);
-  const family = useSelector<AppState, Family | null | undefined>((state) => state.familyReducer.item);
+  const familyLoading = useSelector<AppState, boolean>(({ familyReducer }) => familyReducer.loading);
+  const family = useSelector<AppState, Family | null | undefined>(({ familyReducer }) => familyReducer.item);
+  const error = useSelector<AppState, Error | undefined>(({ familyReducer }) => familyReducer.error);
 
-  const sameBirthday = moment(family?.responsibleBirthday).diff(moment(birthday, 'DD/MM/YYYY'), 'days') === 0;
-  const isTicket = process.env.REACT_APP_CONSUMPTION_TYPE === 'ticket';
+  const familyDependent = React.useMemo(() => {
+    if (family?.dependents && family?.dependents.length > 0) return family?.dependents[0];
+    else return null;
+  }, [family]);
 
   /**
    * Use callback on the change of the familyId
@@ -44,8 +46,9 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
 
   return (
     <>
+      {error && <Alert message="Ocorreu um erro" description={error.message} type="error" showIcon />}
       <Form layout="vertical">
-        <Form.Item label="Código NIS do responsável">
+        <Form.Item label="Código da família">
           <Input.Search
             loading={familyLoading}
             enterButton
@@ -54,30 +57,25 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
             maxLength={11}
             onPressEnter={() => {
               changeFamilyId(undefined);
-              setBirthday('');
               dispatch(requestGetFamily(nis));
             }}
             onSearch={(value) => {
               changeFamilyId(undefined);
-              setBirthday('');
               dispatch(requestGetFamily(value));
             }}
           />
         </Form.Item>
       </Form>
-      {!familyId && !familyLoading && family && (
+      {!familyId && !familyLoading && family && familyDependent && (
         <FamilyWrapper>
           <Alert
             type="info"
             message={
               <div>
                 <Descriptions layout="vertical" size="small" title="Família encontrada" colon={false} bordered>
-                  <Descriptions.Item label="Nome do responsável">{family.responsibleName}</Descriptions.Item>
+                  <Descriptions.Item label="Nome do responsável">{familyDependent.name}</Descriptions.Item>
                   <Descriptions.Item label="Data de nascimento do responsável">
-                    {moment(family.responsibleBirthday).format('DD/MM/YYYY')}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Nome da mãe do responsável">
-                    {family.responsibleMotherName}
+                    {moment(familyDependent.birthday).format('DD/MM/YYYY')}
                   </Descriptions.Item>
                 </Descriptions>
                 <FamilyActions>
@@ -93,21 +91,13 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
           />
         </FamilyWrapper>
       )}
-      {familyId && !familyLoading && family && (
+      {familyId && !familyLoading && family && familyDependent && (
         <FamilyWrapper>
           <Descriptions bordered size="small" title="Família Selecionada" layout="vertical">
-            <Descriptions.Item label="Nome do responsável">{family.responsibleName}</Descriptions.Item>
+            <Descriptions.Item label="Nome do responsável">{familyDependent.name}</Descriptions.Item>
             <Descriptions.Item label="Data de nascimento">
-              {moment(family.responsibleBirthday).format('DD/MM/YYYY')}
+              {moment(familyDependent?.birthday).format('DD/MM/YYYY')}
             </Descriptions.Item>
-            <Descriptions.Item label="Nome da mãe">{family.responsibleMotherName}</Descriptions.Item>
-            {isTicket && (
-              <Descriptions.Item label="Saldo disponível">
-                <Typography.Paragraph strong>{`R$${(family.balance as number)
-                  .toFixed(2)
-                  .replace('.', ',')}`}</Typography.Paragraph>
-              </Descriptions.Item>
-            )}
           </Descriptions>
         </FamilyWrapper>
       )}

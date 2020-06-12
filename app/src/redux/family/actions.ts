@@ -5,6 +5,7 @@ import { Family } from '../../interfaces/family';
 import { logging } from '../../lib/logging';
 
 // Simple actions and types
+export const doClearFamily = createAction<void>('family/CLEAR');
 export const doGetFamily = createAction<void>('family/GET');
 export const doGetFamilySuccess = createAction<Family | Family[]>('family/GET_SUCCESS');
 export const doGetFamilyFailed = createAction<Error | undefined>('family/GET_FAILED');
@@ -12,6 +13,15 @@ export const doGetFamilyFailed = createAction<Error | undefined>('family/GET_FAI
 export const doSaveFamily = createAction<void>('family/SAVE');
 export const doSaveFamilySuccess = createAction<Family | Family[]>('family/SAVE_SUCCESS');
 export const doSaveFamilyFailed = createAction<Error | undefined>('family/SAVE_FAILED');
+
+/**
+ * Get family Thunk action
+ */
+export const requestClearFamily = (): ThunkResult<void> => {
+  return async (dispatch) => {
+    dispatch(doClearFamily());
+  };
+};
 
 /**
  * Get family Thunk action
@@ -33,6 +43,7 @@ export const requestGetFamily = (code: string): ThunkResult<void> => {
     } catch (error) {
       // Request failed: dispatch error
       logging.error(error);
+      error.message = error.response ? error.response.data : error.message;
       dispatch(doGetFamilyFailed(error));
     }
   };
