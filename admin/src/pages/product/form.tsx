@@ -7,6 +7,10 @@ import { useFormik } from 'formik';
 import { Form, Modal, Alert, Input, Checkbox } from 'antd';
 import yup from '../../utils/yup';
 import { requestSaveProduct } from '../../redux/product/actions';
+import { env } from '../../env';
+
+// Application consumption type
+const consumptionType = env.REACT_APP_CONSUMPTION_TYPE as 'ticket' | 'product';
 
 const schema = yup.object().shape({
   name: yup.string().label('Nome').required()
@@ -81,11 +85,13 @@ export const ProductForm: React.FC<RouteComponentProps<{ id: string }>> = (props
           >
             <Input id="name" name="name" onChange={handleChange} value={values.name} onPressEnter={submitForm} />
           </Form.Item>
-          <Form.Item label={''}>
-            <Checkbox name={'isvalid'} checked={values.isValid || false} {...isValidField}>
-              Válido
-            </Checkbox>
-          </Form.Item>
+          {consumptionType !== 'product' && (
+            <Form.Item label={''}>
+              <Checkbox checked={values.isValid || false} {...isValidField}>
+                Válido
+              </Checkbox>
+            </Form.Item>
+          )}
         </Form>
       </form>
     </Modal>

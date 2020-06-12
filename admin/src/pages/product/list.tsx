@@ -7,6 +7,10 @@ import { requestGetProduct, requestDeleteProduct } from '../../redux/product/act
 import { PageContainer, ActionWrapper } from './styles';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
+import { env } from '../../env';
+
+// Application consumption type
+const consumptionType = env.REACT_APP_CONSUMPTION_TYPE as 'ticket' | 'product';
 
 /**
  * List component
@@ -34,13 +38,15 @@ export const ProductList: React.FC<{}> = () => {
       >
         <Table rowKey="id" dataSource={list}>
           <Table.Column title="Nome" dataIndex="name" />
-          <Table.Column
-            title="Valido"
-            dataIndex="isValid"
-            render={(item: boolean) => {
-              return <Checkbox checked={item || false} />;
-            }}
-          />
+          {consumptionType !== 'product' && (
+            <Table.Column
+              title="Valido"
+              dataIndex="isValid"
+              render={(item: boolean) => {
+                return <Checkbox checked={item || false} />;
+              }}
+            />
+          )}
           <Table.Column
             render={(item: Product) => {
               return (
