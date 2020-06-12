@@ -1,20 +1,23 @@
-import faker from 'faker/locale/pt_BR';
 import db from '../../src/schemas';
-import { Group } from '../../src/schemas/groups';
 
-const GROUPS_COUNT = 5;
+const list = [
+  { title: 'Bolsa família com filho na escola pública' },
+  { title: 'Extrema pobreza' },
+  { title: 'Linha da pobreza' },
+  { title: 'Perfil CAD único' }
+];
 
 /**
  * Seed the groups table
  */
 const seed = async () => {
   const alreadyCreated = await db.groups.findAll();
-  if (alreadyCreated.length < GROUPS_COUNT) {
-    const itemsToCreate = Array(GROUPS_COUNT - alreadyCreated.length)
-      .fill({})
-      .map(() => ({
-        title: faker.commerce.department()
-      })) as Group[];
+  if (alreadyCreated.length < list.length) {
+    const itemsToCreate = list.filter((item) => {
+      const created = alreadyCreated.find((dbItem) => dbItem.title === item.title);
+      if (created) return null; // Item is already created, don't create it again
+      return item;
+    });
     if (itemsToCreate.length > 0) {
       await db.groups.bulkCreate(itemsToCreate);
     }
