@@ -11,6 +11,7 @@ import { initDependentSchema } from './depedents';
 import { initProductSchema } from './products';
 import { initBenefitProductSchema } from './benefitProducts';
 import { initConsumptionProductsSchema } from './consumptionProducts';
+import { initGroupSchema } from './groups';
 
 import * as config from '../../database/config';
 
@@ -29,7 +30,8 @@ const db = {
   dependents: initDependentSchema(sequelize),
   products: initProductSchema(sequelize),
   benefitProducts: initBenefitProductSchema(sequelize),
-  consumptionProducts: initConsumptionProductsSchema(sequelize)
+  consumptionProducts: initConsumptionProductsSchema(sequelize),
+  groups: initGroupSchema(sequelize)
 };
 
 // Creating DB relations
