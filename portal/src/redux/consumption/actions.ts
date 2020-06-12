@@ -51,6 +51,7 @@ export const requestSaveConsumption = (
     } catch (error) {
       // Request failed: dispatch error
       logging.error(error);
+      error.message = error.response ? error.response.data : error.message;
       dispatch(doSaveConsumptionFailed(error));
       if (onFailure) onFailure(error);
 

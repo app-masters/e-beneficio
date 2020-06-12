@@ -130,6 +130,7 @@ const schema = yup.object().shape({
  */
 export const StepWithQRCode: React.FC<{ onBack: () => void; onFinish: () => void }> = ({ onBack, onFinish }) => {
   const family = useSelector<AppState, Family | null | undefined>((state) => state.familyReducer.item);
+  const consumptionError = useSelector<AppState, Error | undefined>((state) => state.consumptionReducer.error);
   const loading = useSelector<AppState, boolean>((state) => state.consumptionReducer.loading);
   const [showQRModal, setQRModal] = React.useState<boolean>(false);
 
@@ -175,7 +176,13 @@ export const StepWithQRCode: React.FC<{ onBack: () => void; onFinish: () => void
   const invalidConsumptionValue = !!(family && Number(values.value) > 0 && Number(values.value) > family.balance);
   return (
     <Form layout="vertical" onSubmitCapture={handleSubmit}>
-      {status && <Alert message="Erro no formulário" description={status} type="error" />}
+      {status && (
+        <Alert
+          message="Erro no formulário"
+          description={consumptionError ? consumptionError.message : status}
+          type="error"
+        />
+      )}
       <Form.Item>
         <Typography.Text style={PriceLabelStyle}>{'Saldo disponível: '}</Typography.Text>
         <Typography.Text style={PriceStyle}>{`R$${(family?.balance || 0)
