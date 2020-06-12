@@ -16,17 +16,21 @@ router.get('/', async (req, res) => {
     let item;
     if (req.query.nis) {
       item = await familyModel.findByNis(req.query.nis as string, req.user.cityId, true);
-      if (item) {
-        const balance = await consumptionModel.getFamilyDependentBalance(item);
-        res.send({ ...item.toJSON(), balance });
-      } else {
-        res.status(404).send('Not found');
-      }
-    } else item = await familyModel.getAll();
-    res.send(item);
+    } else if (req.query.code) {
+      item = await familyModel.findByCode(req.query.code as string, req.user.cityId);
+    } else {
+      const list = await familyModel.getAll();
+      return res.send(list);
+    }
+    if (item) {
+      const balance = await consumptionModel.getFamilyDependentBalance(item);
+      return res.send({ ...item.toJSON(), balance });
+    } else {
+      return res.status(404).send('Not found');
+    }
   } catch (error) {
     logging.error(error);
-    res.status(500).send(error.message);
+    return res.status(500).send(error.message);
   }
 });
 
@@ -50,8 +54,13 @@ router.get('/dashboard', async (req, res) => {
 router.get('/place', async (req, res) => {
   try {
     if (!req.user?.cityId) throw Error('User without selected city');
-    if (!req.user?.placeStoreId) throw Error('User without place store');
-    const data = await familyModel.findByPlaceStore(req.user.placeStoreId, req.user.cityId, true, true);
+    if (!req.user?.placeStoreId && !req.query.placeStoreId) throw Error('User without place store');
+    const data = await familyModel.findByPlaceStore(
+      req.user.placeStoreId || Number(req.query.placeStoreId),
+      req.user.cityId,
+      true,
+      true
+    );
 
     res.send(data);
   } catch (error) {

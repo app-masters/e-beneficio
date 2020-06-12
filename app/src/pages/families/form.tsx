@@ -32,9 +32,10 @@ import { requestSaveFamily } from '../../redux/family/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { Family } from '../../interfaces/family';
 import { AppState } from '../../redux/rootReducer';
+import { Flex } from '../../components/flex';
 
 const schema = yup.object().shape({
-  code: yup.string().label('Código').required(),
+  code: yup.string().label('Código'),
   groupName: yup.string().label('Grupo familiar').required()
 });
 
@@ -149,7 +150,6 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
     return !!type.error && !!type.touched ? 'error' : '';
   };
 
-  const codeMeta = getFieldMeta('code');
   const groupNameMeta = getFieldMeta('groupName');
 
   const isRegisteredInPersonMeta = getFieldMeta('isRegisteredInPerson');
@@ -181,18 +181,6 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
           )}
           <Row gutter={[16, 16]}>
             <Col span={24} md={8}>
-              <Form.Item label={'Código'} validateStatus={validation(codeMeta)} help={helper(codeMeta)}>
-                <Input
-                  id="code"
-                  maxLength={11}
-                  name="code"
-                  onChange={handleChange}
-                  value={values.code}
-                  onPressEnter={submitForm}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={24} md={8}>
               <Form.Item
                 label={'Grupo familiar'}
                 validateStatus={validation(groupNameMeta)}
@@ -217,9 +205,72 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
                 </Select>
               </Form.Item>
             </Col>
+            <Col span={24} md={8} style={ColCheckStyle}>
+              <Flex alignItems="flex-end" justifyContent="center" style={{ width: '100%', height: '100%' }}>
+                <Form.Item validateStatus={validation(isOnGovernProgramMeta)} help={helper(isOnGovernProgramMeta)}>
+                  <Checkbox checked={values.isOnGovernProgram} {...isOnGovernProgramField}>
+                    Família registrada no Bolsa Família
+                  </Checkbox>
+                </Form.Item>
+              </Flex>
+            </Col>
+            <Col span={24} md={8} style={ColCheckStyle}>
+              <Flex alignItems="flex-end" justifyContent="center" style={{ width: '100%', height: '100%' }}>
+                <Form.Item validateStatus={validation(isOnAnotherProgramMeta)} help={helper(isOnAnotherProgramMeta)}>
+                  <Checkbox checked={values.isOnAnotherProgram} {...isOnAnotherProgramField}>
+                    Família registrada em outro programa
+                  </Checkbox>
+                </Form.Item>
+              </Flex>
+            </Col>
+          </Row>
+          <Row gutter={[16, 16]}>
+            <Col span={24} md={16}>
+              <Form.Item label={'Endereço'} validateStatus={validation(addressMeta)} help={helper(addressMeta)}>
+                <Input
+                  id="address"
+                  name="address"
+                  onChange={handleChange}
+                  value={values.address}
+                  onPressEnter={submitForm}
+                />
+              </Form.Item>
+            </Col>
             <Col span={24} md={8}>
               <Form.Item
-                label={'Salário total'}
+                label={'Quantidade de quartos'}
+                validateStatus={validation(numberOfRoomsMeta)}
+                help={helper(numberOfRoomsMeta)}
+              >
+                <InputNumber
+                  style={{ width: '100%' }}
+                  id="numberOfRooms"
+                  name="numberOfRooms"
+                  onChange={(value) => setFieldValue('numberOfRooms', value)}
+                  value={values.numberOfRooms}
+                  min={0}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={24} md={8}>
+              <Form.Item
+                label={'Tipo de Casa'}
+                validateStatus={validation(houseTypeMeta)}
+                help={helper(houseTypeMeta)}
+                extra="Prédio, casa de alvenaria, casa madeira, outros..."
+              >
+                <Input
+                  id="houseType"
+                  name="houseType"
+                  onChange={handleChange}
+                  value={values.houseType}
+                  onPressEnter={submitForm}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={24} md={8}>
+              <Form.Item
+                label={'Renda familiar total'}
                 validateStatus={validation(totalSalaryMeta)}
                 help={helper(totalSalaryMeta)}
               >
@@ -241,79 +292,16 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
                 />
               </Form.Item>
             </Col>
-          </Row>
-          <Row gutter={[16, 16]}>
             <Col span={24} md={8} style={ColCheckStyle}>
-              <Form.Item validateStatus={validation(isRegisteredInPersonMeta)} help={helper(isRegisteredInPersonMeta)}>
-                <Checkbox checked={values.isRegisteredInPerson} {...isRegisteredInPersonField}>
-                  Registrado pessoalmente
-                </Checkbox>
-              </Form.Item>
+              <Flex alignItems="center" justifyContent="center" style={{ width: '100%', height: '100%' }}>
+                <Form.Item validateStatus={validation(haveSewageMeta)} help={helper(haveSewageMeta)}>
+                  <Checkbox checked={values.haveSewage} {...haveSewageField}>
+                    Possui esgoto
+                  </Checkbox>
+                </Form.Item>
+              </Flex>
             </Col>
-            <Col span={24} md={8} style={ColCheckStyle}>
-              <Form.Item validateStatus={validation(isOnGovernProgramMeta)} help={helper(isOnGovernProgramMeta)}>
-                <Checkbox checked={values.isOnGovernProgram} {...isOnGovernProgramField}>
-                  Pessoa em programa do governo
-                </Checkbox>
-              </Form.Item>
-            </Col>
-            <Col span={24} md={8} style={ColCheckStyle}>
-              <Form.Item validateStatus={validation(isOnAnotherProgramMeta)} help={helper(isOnAnotherProgramMeta)}>
-                <Checkbox checked={values.isOnAnotherProgram} {...isOnAnotherProgramField}>
-                  Pessoa em outro programa
-                </Checkbox>
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={[16, 16]}>
-            <Col span={24} md={8}>
-              <Form.Item label={'Endereço'} validateStatus={validation(addressMeta)} help={helper(addressMeta)}>
-                <Input
-                  id="address"
-                  name="address"
-                  onChange={handleChange}
-                  value={values.address}
-                  onPressEnter={submitForm}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={24} md={8}>
-              <Form.Item label={'Tipo de Casa'} validateStatus={validation(houseTypeMeta)} help={helper(houseTypeMeta)}>
-                <Input
-                  id="houseType"
-                  name="houseType"
-                  onChange={handleChange}
-                  value={values.houseType}
-                  onPressEnter={submitForm}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={24} md={8}>
-              <Form.Item
-                label={'Quantidade de quartos'}
-                validateStatus={validation(numberOfRoomsMeta)}
-                help={helper(numberOfRoomsMeta)}
-              >
-                <InputNumber
-                  style={{ width: '100%' }}
-                  id="numberOfRooms"
-                  name="numberOfRooms"
-                  onChange={(value) => setFieldValue('numberOfRooms', value)}
-                  value={values.numberOfRooms}
-                  min={0}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={[16, 16]}>
-            <Col span={24} md={8} style={ColCheckStyle}>
-              <Form.Item validateStatus={validation(haveSewageMeta)} help={helper(haveSewageMeta)}>
-                <Checkbox checked={values.haveSewage} {...haveSewageField}>
-                  Possui esgoto
-                </Checkbox>
-              </Form.Item>
-            </Col>
-            <Col span={24} md={16}>
+            <Col span={24} md={24}>
               <Form.Item
                 label={'Comentário sobre esgoto'}
                 validateStatus={validation(sewageCommentMeta)}
@@ -326,6 +314,15 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
                   value={values.sewageComment}
                   onPressEnter={submitForm}
                 />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={24} md={24} style={ColCheckStyle}>
+              <Form.Item validateStatus={validation(isRegisteredInPersonMeta)} help={helper(isRegisteredInPersonMeta)}>
+                <Checkbox checked={values.isRegisteredInPerson} {...isRegisteredInPersonField}>
+                  Registrado pessoalmente
+                </Checkbox>
               </Form.Item>
             </Col>
           </Row>

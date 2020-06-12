@@ -28,7 +28,7 @@ import { env } from '../../env';
 const { Sider } = Layout;
 const { SubMenu } = Menu;
 
-const CONSUMPTION_TYPE = env.REACT_APP_CONSUMPTION_TYPE as 'ticket' | 'product';
+const consumptionType = env.REACT_APP_CONSUMPTION_TYPE as 'ticket' | 'product';
 
 interface RouteItem {
   group?: boolean;
@@ -38,6 +38,7 @@ interface RouteItem {
   children?: RouteItem[];
   disabled?: boolean;
   allowedRoles?: Role[];
+  specificToType?: 'ticket' | 'product';
 }
 
 const routes: RouteItem[] = [
@@ -50,7 +51,7 @@ const routes: RouteItem[] = [
     path: '/validar',
     icon: () => <BookOutlined />,
     name: 'Validar Produtos',
-    allowedRoles: CONSUMPTION_TYPE === 'product' ? ['admin'] : undefined
+    specificToType: 'ticket'
   },
   {
     path: '/consumo',
@@ -62,7 +63,8 @@ const routes: RouteItem[] = [
     path: '/familias',
     icon: () => <IdcardOutlined />,
     name: 'Famílias',
-    allowedRoles: ['admin']
+    allowedRoles: ['admin'],
+    specificToType: 'ticket'
   },
   {
     path: '/beneficios',
@@ -76,34 +78,41 @@ const routes: RouteItem[] = [
     name: 'Usuários',
     allowedRoles: ['admin']
   },
+
+  // Items only shown in the `ticket` consumption type
   {
     path: '/instituicoes',
     icon: () => <BankOutlined />,
     name: 'Instituições',
-    allowedRoles: ['admin']
-  }
-];
+    allowedRoles: ['admin'],
+    specificToType: 'ticket'
+  },
 
-const productRoutes: RouteItem[] = [
+  // Items only shown in the `product` consumption type
+  {
+    path: '/origem-do-beneficio',
+    icon: () => <BankOutlined />,
+    name: 'Origem do benefício',
+    allowedRoles: ['admin'],
+    specificToType: 'product'
+  },
   {
     path: '/produtos',
     icon: () => <ShoppingCartOutlined />,
-    name: 'Produtos'
+    name: 'Produtos',
+    specificToType: 'product'
   },
   {
     path: '/localidades',
     icon: () => <ShopOutlined />,
-    name: 'Localidades'
+    name: 'Localidades',
+    specificToType: 'product'
   },
   {
     path: '/entidades',
     icon: () => <SolutionOutlined />,
-    name: 'Entidades'
-  },
-  {
-    path: '/grupos',
-    icon: () => <TeamOutlined />,
-    name: 'Grupos'
+    name: 'Entidades',
+    specificToType: 'product'
   }
 ];
 
@@ -116,6 +125,9 @@ const menuItem = (item: RouteItem, parentPath: string, userRole?: Role) => {
   const key = `${parentPath}${item.path}`;
   const maxLength = 30;
   const name = item.name.length > maxLength ? `${item.name.slice(0, maxLength - 3)}...` : item.name;
+
+  // Only show the menu item if the current consumption type matches the item
+  if (item.specificToType && consumptionType !== item.specificToType) return null;
 
   // Only show the menu item if the user is allowed to see it
   if ((item.allowedRoles && userRole && item.allowedRoles.indexOf(userRole) === -1) || (item.allowedRoles && !userRole))
@@ -182,7 +194,6 @@ export const Sidebar: React.FC = () => {
           <Menu theme="light" mode="inline" defaultSelectedKeys={[location ? location.pathname : '/']}>
             {/* Render the links based on the nav arrays */}
             {routes.map((navLink) => menuItem(navLink, '', role))}
-            {CONSUMPTION_TYPE === 'product' && productRoutes.map((navLink) => menuItem(navLink, '', role))}
           </Menu>
         </MenuHeight>
         <Flex vertical={collapsed} alignItems="center" gap="sm" justifyContent="space-between">

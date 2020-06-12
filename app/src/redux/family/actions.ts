@@ -5,6 +5,7 @@ import { Family } from '../../interfaces/family';
 import { logging } from '../../lib/logging';
 
 // Simple actions and types
+export const doClearFamily = createAction<void>('family/CLEAR');
 export const doGetFamily = createAction<void>('family/GET');
 export const doGetFamilySuccess = createAction<Family | Family[]>('family/GET_SUCCESS');
 export const doGetFamilyFailed = createAction<Error | undefined>('family/GET_FAILED');
@@ -16,13 +17,22 @@ export const doSaveFamilyFailed = createAction<Error | undefined>('family/SAVE_F
 /**
  * Get family Thunk action
  */
-export const requestGetFamily = (nis: string): ThunkResult<void> => {
+export const requestClearFamily = (): ThunkResult<void> => {
+  return async (dispatch) => {
+    dispatch(doClearFamily());
+  };
+};
+
+/**
+ * Get family Thunk action
+ */
+export const requestGetFamily = (code: string): ThunkResult<void> => {
   return async (dispatch) => {
     try {
       // Start request - starting loading state
       dispatch(doGetFamily());
       // Request
-      const response = await backend.get<Family>(`/families`, { params: { nis } });
+      const response = await backend.get<Family>(`/families`, { params: { code } });
       if (response && response.data) {
         // Request finished
         dispatch(doGetFamilySuccess(response.data)); // Dispatch result
@@ -33,6 +43,7 @@ export const requestGetFamily = (nis: string): ThunkResult<void> => {
     } catch (error) {
       // Request failed: dispatch error
       logging.error(error);
+      error.message = error.response ? error.response.data : error.message;
       dispatch(doGetFamilyFailed(error));
     }
   };

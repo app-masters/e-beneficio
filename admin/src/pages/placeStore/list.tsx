@@ -50,8 +50,12 @@ export const PlaceStoreList: React.FC<{}> = () => {
               )
             }
           />
-          <Table.Column title="Loja" dataIndex="title" />
-          <Table.Column title="CNPJ" dataIndex="cnpj" render={(data: PlaceStore['cnpj']) => formatCNPJ(data)} />
+          <Table.Column title="Nome" dataIndex="title" />
+          <Table.Column
+            title="CNPJ"
+            dataIndex="cnpj"
+            render={(data: PlaceStore['cnpj']) => (data !== '' ? formatCNPJ(data) : 'Não informado')}
+          />
           <Table.Column title="Endereço" dataIndex="address" />
           <Table.Column
             render={(item: PlaceStore) => {
