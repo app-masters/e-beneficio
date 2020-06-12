@@ -16,17 +16,21 @@ router.get('/', async (req, res) => {
     let item;
     if (req.query.nis) {
       item = await familyModel.findByNis(req.query.nis as string, req.user.cityId, true);
-      if (item) {
-        const balance = await consumptionModel.getFamilyDependentBalance(item);
-        res.send({ ...item.toJSON(), balance });
-      } else {
-        res.status(404).send('Not found');
-      }
-    } else item = await familyModel.getAll();
-    res.send(item);
+    } else if (req.query.code) {
+      item = await familyModel.findByCode(req.query.code as string, req.user.cityId);
+    } else {
+      const list = await familyModel.getAll();
+      return res.send(list);
+    }
+    if (item) {
+      const balance = await consumptionModel.getFamilyDependentBalance(item);
+      return res.send({ ...item.toJSON(), balance });
+    } else {
+      return res.status(404).send('Not found');
+    }
   } catch (error) {
     logging.error(error);
-    res.status(500).send(error.message);
+    return res.status(500).send(error.message);
   }
 });
 

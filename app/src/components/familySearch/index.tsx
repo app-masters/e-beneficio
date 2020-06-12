@@ -64,23 +64,8 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
             }}
           />
         </Form.Item>
-        {family && (
-          <Form.Item
-            label="Aniversário do responsável"
-            validateStatus={birthday.length > 9 && !sameBirthday ? 'error' : ''}
-            help={birthday.length > 9 && !sameBirthday ? 'Aniversário incorreto' : ''}
-          >
-            <Input
-              style={{ width: '100%' }}
-              id="birthday"
-              name="birthday"
-              onChange={(event) => setBirthday(event.target.value)}
-              placeholder="DD/MM/YYYY"
-            />
-          </Form.Item>
-        )}
       </Form>
-      {!familyId && !familyLoading && family && sameBirthday && (
+      {!familyId && !familyLoading && family && (
         <FamilyWrapper>
           <Alert
             type="info"

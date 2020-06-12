@@ -16,13 +16,13 @@ export const doSaveFamilyFailed = createAction<Error | undefined>('family/SAVE_F
 /**
  * Get family Thunk action
  */
-export const requestGetFamily = (nis: string): ThunkResult<void> => {
+export const requestGetFamily = (code: string): ThunkResult<void> => {
   return async (dispatch) => {
     try {
       // Start request - starting loading state
       dispatch(doGetFamily());
       // Request
-      const response = await backend.get<Family>(`/families`, { params: { nis } });
+      const response = await backend.get<Family>(`/families`, { params: { code } });
       if (response && response.data) {
         // Request finished
         dispatch(doGetFamilySuccess(response.data)); // Dispatch result
