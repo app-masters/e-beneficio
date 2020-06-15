@@ -19,32 +19,38 @@ import {
   Alert
 } from 'antd';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
-import yup from '../../utils/yup';
+import yup from '../../../utils/yup';
 import { useFormik } from 'formik';
-import { formatPhone, formatRG, formatCPF, formatMoney } from '../../utils/string';
+import { formatPhone, formatRG, formatCPF, formatMoney } from '../../../utils/string';
 import locale from 'antd/es/date-picker/locale/pt_BR';
 import moment from 'moment';
 import { PageContainer, ColCheckStyle, ActionWrapper } from './styles';
-import { Dependent } from '../../interfaces/dependent';
+import { Dependent } from '../../../interfaces/dependent';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { requestSaveFamily } from '../../redux/family/actions';
+// import { requestSaveFamily } from '../../../redux/family/actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { Family } from '../../interfaces/family';
-import { AppState } from '../../redux/rootReducer';
-import { Flex } from '../../components/flex';
-import { formHelper, formValidation } from '../../utils/constraints';
-import { requestGetGroup } from '../../redux/group/actions';
-import { Group } from '../../interfaces/group';
+import { Family } from '../../../interfaces/family';
+import { AppState } from '../../../redux/rootReducer';
+import { Flex } from '../../../components/flex';
+import { formHelper, formValidation } from '../../../utils/constraints';
+import { requestGetPlaceStore } from '../../../redux/placeStore/actions';
+import { PlaceStore } from '../../../interfaces/placeStore';
+import { requestSaveFamily } from '../../../redux/families/actions';
+import { Group } from '../../../interfaces/group';
+import { requestGetGroup } from '../../../redux/group/actions';
+// import { requestGetGroup } from '../../../redux/group/actions';
+// import { Group } from '../../../interfaces/group';
 
 const schema = yup.object().shape({
-  code: yup.string().label('Código'),
-  groupName: yup.string().label('Grupo familiar').required()
+  groupName: yup.string().label('Grupo familiar').required(),
+  placeStoreId: yup.string().label('Localidade').required()
 });
 
 const typeFamily = {
   code: '',
   cityId: 0,
   groupName: '',
+  placeStoreId: '',
   isRegisteredInPerson: undefined,
   totalSalary: undefined,
   isOnAnotherProgram: undefined,
@@ -63,6 +69,7 @@ const typeFamily = {
  * @param props component props
  */
 export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (props) => {
+  const isCreating = props.match.params.id === 'criar';
   const [modal, setModal] = React.useState<{
     item?: Dependent | null;
     open: boolean;
@@ -75,18 +82,35 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const groups = useSelector<AppState, Group[]>(({ groupReducer }) => groupReducer.list as Group[]);
+  const family = useSelector<AppState, Family | null | undefined>(({ familiesReducer }) =>
+    familiesReducer.list?.find((f: Family) => f.id === Number(props.match.params.id))
+  );
 
-  const family = useSelector<AppState, Family | null | undefined>(({ familyReducer }) =>
-    familyReducer.list?.find((f: Family) => f.id === Number(props.match.params.id))
+  const placeStore = useSelector<AppState, PlaceStore[]>(
+    ({ placeStoreReducer }) => placeStoreReducer.list as PlaceStore[]
   );
 
   React.useEffect(() => {
     dispatch(requestGetGroup());
   }, [dispatch]);
 
-  const loading = useSelector<AppState, boolean>(({ familyReducer }) => familyReducer.loading);
-  const error = useSelector<AppState, Error | undefined>(({ familyReducer }) => familyReducer.error);
+  React.useEffect(() => {
+    if (placeStore.length === 0) dispatch(requestGetPlaceStore());
+  }, [placeStore, dispatch]);
+
+  React.useEffect(() => {
+    if (!isCreating && !family) {
+      history.push('/familias');
+    }
+  }, [isCreating, history, family]);
+
+  const loading = useSelector<AppState, boolean>(({ familiesReducer }) => familiesReducer.familyLoading);
+  const error = useSelector<AppState, Error | string | undefined>(
+    ({ familiesReducer }) => familiesReducer.familySaveError
+  );
+
+  const groups = useSelector<AppState, Group[]>(({ groupReducer }) => groupReducer.list as Group[]);
+
   const {
     handleSubmit,
     handleChange,
@@ -106,7 +130,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
         balance: 0,
         dependents: values.dependents
           ? (values.dependents as Dependent[]).map((item) => {
-              return { ...item, nis: null };
+              return { ...item, nis: undefined };
             })
           : undefined
       };
@@ -114,9 +138,9 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
         requestSaveFamily(
           newFamily as Family,
           () => {
-            Modal.success({ title: 'Familia salva com sucesso', onOk: () => history.push('/familias') });
+            Modal.success({ title: 'Família salva com sucesso', onOk: () => history.push('/familias') });
           },
-          () => setStatus('Ocorreu um erro ao salvar a familia.')
+          () => setStatus('Ocorreu um erro ao salvar a família.')
         )
       );
     }
@@ -137,8 +161,8 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
    */
   const responsibleDependent = (value: Dependent) => {
     let list: Dependent[] = values.dependents ? [...values.dependents] : [];
-    const verifyIndex = list.findIndex((f) => f.nis === value.nis);
-    if (verifyIndex > -1) list = list.filter((f) => f.nis !== value.nis);
+    const verifyIndex = list.findIndex((f) => f.nis === value.nis || f.id === value.id);
+    if (verifyIndex > -1) list = list.filter((f) => f.nis !== value.nis || f.id === value.id);
     if (value.isResponsible) {
       list = list.map((resp: Dependent) => {
         return { ...resp, isResponsible: false };
@@ -151,6 +175,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
   };
 
   const groupNameMeta = getFieldMeta('groupName');
+  const placeStoreIdMeta = getFieldMeta('placeStoreId');
 
   const isRegisteredInPersonMeta = getFieldMeta('isRegisteredInPerson');
   const isRegisteredInPersonField = getFieldProps('isRegisteredInPerson');
@@ -168,19 +193,39 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
 
   return (
     <PageContainer>
-      <Card loading={loading} title={<Typography.Title>Nova Familia</Typography.Title>}>
+      <Card
+        loading={loading}
+        title={<Typography.Title>{`${isCreating ? 'Nova' : 'Editar'} Família`}</Typography.Title>}
+      >
         <Form layout="vertical">
-          {error && <Alert message="Ocorreu um erro" description={error.message} type="error" showIcon />}
-          {/* {!error && family && family.id && (
-            <Alert
-              message="Familia salva"
-              description={'Os dados de familia foram salvos com sucesso!'}
-              type="success"
-              showIcon
-            />
-          )} */}
+          {error && <Alert message="Ocorreu um erro" description={(error as Error).message} type="error" showIcon />}
           <Row gutter={[16, 16]}>
-            <Col span={24} md={8}>
+            <Col span={24} md={6}>
+              <Form.Item
+                label={'Localidade'}
+                validateStatus={formValidation(placeStoreIdMeta)}
+                help={formHelper(placeStoreIdMeta)}
+              >
+                <Select
+                  defaultValue={values.placeStoreId?.toString()}
+                  onSelect={(value) => setFieldValue('placeStoreId', value)}
+                  value={values.placeStoreId?.toString() || undefined}
+                  onChange={(value: string) => {
+                    setFieldValue('placeStoreId', value);
+                  }}
+                  onBlur={() => {
+                    setFieldTouched('placeStoreId', true);
+                  }}
+                >
+                  {placeStore.map((placeStore) => (
+                    <Select.Option key={placeStore.id} value={Number(placeStore.id).toString()}>
+                      {placeStore.title}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={24} md={6}>
               <Form.Item
                 label={'Grupo familiar'}
                 validateStatus={formValidation(groupNameMeta)}
@@ -205,7 +250,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={24} md={8} style={ColCheckStyle}>
+            <Col span={24} md={6} style={ColCheckStyle}>
               <Flex alignItems="flex-end" justifyContent="center" style={{ width: '100%', height: '100%' }}>
                 <Form.Item
                   validateStatus={formValidation(isOnGovernProgramMeta)}
@@ -217,7 +262,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
                 </Form.Item>
               </Flex>
             </Col>
-            <Col span={24} md={8} style={ColCheckStyle}>
+            <Col span={24} md={6} style={ColCheckStyle}>
               <Flex alignItems="flex-end" justifyContent="center" style={{ width: '100%', height: '100%' }}>
                 <Form.Item
                   validateStatus={formValidation(isOnAnotherProgramMeta)}
@@ -402,7 +447,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
                 description={
                   <Row gutter={[16, 16]}>
                     <Col span={24} md={12}>
-                      {(item.email || item.phone) && <>{`${item.email || ''} - ${item.phone || ''}`}</>}
+                      {(item.email || item.phone) && <>{`${item.email || ''} - ${formatPhone(item.phone) || ''}`}</>}
                       {(item.cpf || item.rg) && (
                         <>
                           <br />
@@ -447,13 +492,11 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
             setModal({ open: false, type: '' });
           }}
           onCreate={(value: Dependent) => {
-            if (verifyDependentNIS(value)) {
-              //Generate random NIS.
-              value.nis = Math.random().toString(36).substr(0, 10);
-              const list = responsibleDependent(value);
-              setFieldValue('dependents', list);
-              setModal({ open: false, type: '' });
-            }
+            //Generate random NIS.
+            value.nis = Math.random().toString(36).substr(0, 10);
+            const list = responsibleDependent(value);
+            setFieldValue('dependents', list);
+            setModal({ open: false, type: '' });
           }}
         />
       )}

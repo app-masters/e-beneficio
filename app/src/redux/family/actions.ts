@@ -14,6 +14,10 @@ export const doSaveFamily = createAction<void>('family/SAVE');
 export const doSaveFamilySuccess = createAction<Family | Family[]>('family/SAVE_SUCCESS');
 export const doSaveFamilyFailed = createAction<Error | undefined>('family/SAVE_FAILED');
 
+export const doDeactivateFamily = createAction<void>('family/DEACTIVATE');
+export const doDeactivateFamilySuccess = createAction<Family | Family[]>('family/DEACTIVATE_SUCCESS');
+export const doDeactivateFamilyFailed = createAction<Error | undefined>('family/DEACTIVATE_FAILED');
+
 /**
  * Get family Thunk action
  */
@@ -53,7 +57,7 @@ export const requestGetFamily = (code: string): ThunkResult<void> => {
  * Save Family Thunk action
  */
 export const requestSaveFamily = (
-  item: Family,
+  item: Pick<Family, 'code' | 'id'>,
   onSuccess?: () => void,
   onFailure?: (error?: Error) => void
 ): ThunkResult<void> => {
@@ -62,7 +66,13 @@ export const requestSaveFamily = (
       // Start request - starting loading state
       dispatch(doSaveFamily());
 
-      const response = await backend.post<Family>(`/families`, { ...item });
+      // Request
+      let response;
+      if (item.id) {
+        response = await backend.put<Family>(`/families/${item.id}`, { ...item });
+      } else {
+        response = await backend.post<Family>(`/families`, { ...item });
+      }
 
       if (response && response.data) {
         // Request finished
@@ -104,6 +114,31 @@ export const requestGetPlaceFamilies = (): ThunkResult<void> => {
       // Request failed: dispatch error
       logging.error(error);
       dispatch(doGetFamilyFailed(error));
+    }
+  };
+};
+
+/**
+ * Deactivate family Thunk action
+ */
+export const requestDeactivateFamily = (id: NonNullable<Family['id']>): ThunkResult<void> => {
+  return async (dispatch) => {
+    try {
+      // Start request - starting loading state
+      dispatch(doDeactivateFamily());
+      // Request
+      const response = await backend.put<Family>(`/families/${id}/deactivate`);
+      if (response && response.data) {
+        // Request finished
+        dispatch(doDeactivateFamilySuccess(response.data)); // Dispatch result
+      } else {
+        // Request finished, but no item was found
+        dispatch(doDeactivateFamilyFailed());
+      }
+    } catch (error) {
+      // Request failed: dispatch error
+      logging.error(error);
+      dispatch(doDeactivateFamilyFailed(error));
     }
   };
 };

@@ -43,7 +43,7 @@ const { Dragger } = Upload;
 export const FamiliesList: React.FC<{}> = () => {
   const dispatch = useDispatch();
   const loading = useSelector<AppState, boolean>(({ familiesReducer }) => familiesReducer.loading);
-  const error = useSelector<AppState, string | undefined>(({ familiesReducer }) => familiesReducer.error);
+  const error = useSelector<AppState, Error | string | undefined>(({ familiesReducer }) => familiesReducer.error);
 
   const importReport = useSelector<AppState, ImportReport | undefined>(
     ({ familiesReducer }) => familiesReducer.importReport

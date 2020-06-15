@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import media from '../../styles/media';
+import media from '../../../styles/media';
 
 export const PageContainer = styled.div`
   padding: ${(props) => props.theme.spacing.sm};
@@ -14,9 +14,6 @@ export const ActionWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
   align-items: flex-end;
-  > * {
-    margin-left: ${(props) => props.theme.spacing.sm};
-  }
 `;
 
 export const ColCheckStyle = {

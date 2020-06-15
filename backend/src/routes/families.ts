@@ -157,11 +157,25 @@ router.post('/', async (req, res) => {
     if (!req.user?.cityId) throw Error('User without selected city');
     // If product type, add the user id and placeStoreId to family
     if (type === 'product') {
-      if (!req.user.placeStoreId) throw Error('User without place store');
+      if (!req.user.placeStoreId && !req.body.placeStoreId) throw Error('User without place store');
       req.body.createdById = req.user.id;
-      req.body.placeStoreId = req.user.placeStoreId;
+      req.body.placeStoreId = req.user.placeStoreId ? req.user.placeStoreId : req.body.placeStoreId;
     }
     const item = await familyModel.createFamilyWithDependents(req.body, req.user?.cityId);
+    res.send(item);
+  } catch (error) {
+    logging.error(error);
+    res.status(500).send(error.message);
+  }
+});
+
+/**
+ * Sub-route to PUT an existing item
+ */
+router.put('/:id/deactivate', async (req, res) => {
+  try {
+    if (!req.user?.cityId) throw Error('User without selected city');
+    const item = await familyModel.deactivateFamilyAndDependentsById(req.params.id);
     res.send(item);
   } catch (error) {
     logging.error(error);

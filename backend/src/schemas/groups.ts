@@ -54,8 +54,16 @@ export const initGroupSchema = (sequelize: Sequelize): SequelizeGroupModel => {
   const Schema = sequelize.define(tableName, attributes, { timestamps: true }) as SequelizeGroupModel;
 
   // Sequelize relations
-  Schema.associate = (): void => {
+  Schema.associate = (models): void => {
     // Sequelize relations
+    Schema.hasMany(models.families, {
+      foreignKey: 'groupId',
+      as: 'families'
+    });
+    Schema.hasMany(models.benefits, {
+      foreignKey: 'groupId',
+      as: 'benefits'
+    });
   };
 
   return Schema;

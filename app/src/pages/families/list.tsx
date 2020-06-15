@@ -1,16 +1,18 @@
 import React, { useEffect, useMemo } from 'react';
-import { Button, Card, Table, Typography } from 'antd';
+import { Button, Card, Table, Typography, Modal } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import { familyGroupList } from '../../utils/constraints';
-import { User } from '../../interfaces/user';
 import { Family } from '../../interfaces/family';
 import { AppState } from '../../redux/rootReducer';
-import { requestGetPlaceFamilies } from '../../redux/family/actions';
+import { requestGetPlaceFamilies, requestDeactivateFamily } from '../../redux/family/actions';
 
 import { ActionWrapper, PageContainer } from './styles';
 import { Dependent } from '../../interfaces/dependent';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import moment from 'moment';
+import { Group } from '../../interfaces/group';
 
 /**
  * FamiliesList page component
@@ -19,7 +21,7 @@ import { Dependent } from '../../interfaces/dependent';
 export const FamiliesList: React.FC<{}> = () => {
   // Redux state
   const list = useSelector<AppState, Family[]>((state) => state.familyReducer.list as Family[]);
-  // const familiesLoading = useSelector<AppState, boolean>((state) => state.familyReducer.loading);
+  const familiesLoading = useSelector<AppState, boolean>((state) => state.familyReducer.loading);
   // const familiesError = useSelector<AppState, Error | undefined>((state) => state.familyReducer.error);
 
   const dataSource = useMemo(
@@ -50,34 +52,62 @@ export const FamiliesList: React.FC<{}> = () => {
           </Link>
         }
       >
-        <Table dataSource={dataSource} rowKey="id">
+        <Table loading={loading} dataSource={dataSource} rowKey="id">
           <Table.Column
             title="Nome do Responsável"
-            width="30%"
+            width="18%"
             render={(family: Family & { responsibleDependent?: Dependent }) =>
               family.responsibleDependent?.name || family.responsibleDependent
             }
           />
-          <Table.Column title="Código" dataIndex="code" width="20%" />
+          <Table.Column title="Código" dataIndex="code" width="18%" />
           <Table.Column
             title="Grupo familiar"
             dataIndex="groupName"
             render={(groupName: Family['groupName']) => familyGroupList && familyGroupList[groupName]?.title}
-            width="20%"
+            width="18%"
           />
           <Table.Column
             title="Número de Dependentes"
             render={(family: Family) => family.dependents?.length || 0}
-            width="20%"
+            width="18%"
+          />
+          <Table.Column
+            title="Desativado"
+            dataIndex="deactivatedAt"
+            render={(deactivatedAt: Family['deactivatedAt']) =>
+              deactivatedAt && moment(deactivatedAt as Date).fromNow()
+            }
+            width="18"
           />
           <Table.Column
             width="10%"
-            render={(item: User) => {
+            render={(item: Family) => {
               return (
                 <ActionWrapper>
                   <Link to={`/familias/${item.id}/editar`}>
                     <Button>Editar</Button>
                   </Link>
+                  {!item.deactivatedAt && (
+                    <Button
+                      danger
+                      disabled={familiesLoading}
+                      onClick={() =>
+                        Modal.confirm({
+                          title: 'Você realmente quer desativar esse registro?',
+                          icon: <ExclamationCircleOutlined />,
+                          okText: 'Sim',
+                          okType: 'danger',
+                          cancelText: 'Não',
+                          onOk: () => {
+                            dispatch(requestDeactivateFamily(item.id as number));
+                          }
+                        })
+                      }
+                    >
+                      Desativar
+                    </Button>
+                  )}
                 </ActionWrapper>
               );
             }}
