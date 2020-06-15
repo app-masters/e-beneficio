@@ -14,7 +14,6 @@ import {
   PageHeader,
   Modal,
   InputNumber,
-  notification,
   Divider,
   Alert
 } from 'antd';

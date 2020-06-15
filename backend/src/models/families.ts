@@ -553,7 +553,7 @@ export const updateById = async (
   const cityItem = await db.families.findByPk(id);
   if (cityItem) {
     // The update return an array [count, item[]], so I'm destructuring to get the updated benefit
-    const [, [item]] = await db.families.update(values, { where: { id }, returning: true });
+    await db.families.update(values, { where: { id } });
 
     if (type === 'product') {
       if (values.dependents) {

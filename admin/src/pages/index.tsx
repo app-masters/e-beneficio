@@ -57,8 +57,6 @@ const Route: React.FC<RouteProps> = ({ allowedRole, specificToType, ...props }) 
   return <RouterRoute {...props} />;
 };
 
-const CONSUMPTION_TYPE = env.REACT_APP_CONSUMPTION_TYPE as 'ticket' | 'product';
-
 /**
  * Router available only for logged users
  * @param props component props

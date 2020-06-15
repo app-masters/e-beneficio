@@ -10,8 +10,7 @@ import {
   HomeOutlined,
   BookOutlined,
   ShoppingCartOutlined,
-  SolutionOutlined,
-  TeamOutlined
+  SolutionOutlined
 } from '@ant-design/icons';
 import { Button, Layout, Menu, Popover } from 'antd';
 import React, { useEffect, useState } from 'react';

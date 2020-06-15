@@ -31,7 +31,6 @@ import {
 } from './actions';
 import { DashboardFamily } from '../../interfaces/dashboardFamily';
 import { Family, ImportReport } from '../../interfaces/family';
-import { addToList } from '../../utils/list';
 
 export interface FamilyReducerState {
   list: Family[];
