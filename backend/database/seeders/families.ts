@@ -1,17 +1,14 @@
 import db from '../../src/schemas';
 import { Family } from '../../src/schemas/families';
-import benefits from './benefits';
 import moment from 'moment';
 import faker from 'faker/locale/pt_BR';
 
 const FAMILIES_COUNT = 10;
 
-const benefitsGroupList = benefits.groupList;
-
 const list = [
   {
     code: '1234',
-    groupName: 'cad',
+    groupId: 4,
     responsibleName: 'JOÃO FERNANDO BARAKY',
     responsibleBirthday: moment('20/12/1991', 'DD/MM/YYYY').toDate(),
     responsibleNis: '1234',
@@ -19,7 +16,7 @@ const list = [
   },
   {
     code: '10000000',
-    groupName: 'extreme-poverty',
+    groupId: 2,
     responsibleName: 'JOSÉ ALMEIDA DA SILVA',
     responsibleBirthday: moment('01/01/1988', 'DD/MM/YYYY').toDate(),
     responsibleNis: '10000000000',
@@ -27,7 +24,7 @@ const list = [
   },
   {
     code: '20000000',
-    groupName: 'poverty-line',
+    groupId: 3,
     responsibleName: 'MARIA ARAÚJO',
     responsibleBirthday: moment('06/07/1979', 'DD/MM/YYYY').toDate(),
     responsibleNis: '20000000000',
@@ -35,7 +32,7 @@ const list = [
   },
   {
     code: '30000000',
-    groupName: 'cad',
+    groupId: 1,
     responsibleName: 'TEREZA DE JESUS',
     responsibleBirthday: moment('01/10/1978', 'DD/MM/YYYY').toDate(),
     responsibleNis: '30000000000',
@@ -51,6 +48,7 @@ const seed = async () => {
 
   if (alreadyCreated.length < FAMILIES_COUNT) {
     const cities = await db.cities.findAll();
+    const groups = await db.groups.findAll();
 
     // First create prefefined families on the list
     const itemsToCreate = list
@@ -68,7 +66,7 @@ const seed = async () => {
         .fill({})
         .map((_, index) => ({
           code: String(alreadyCreatedCount + index).padEnd(8, '0'),
-          groupName: benefitsGroupList[Math.floor(Math.random() * benefitsGroupList.length)].groupName,
+          groupId: groups[Math.floor(Math.random() * groups.length)].id,
           responsibleName: `${faker.name.firstName()} ${faker.name.lastName()} ${faker.name.lastName()}`.toLocaleUpperCase(),
           responsibleBirthday: faker.date.between('1960-01-01', '1991-12-31'),
           responsibleNis: String(alreadyCreatedCount + index).padEnd(11, '0'),

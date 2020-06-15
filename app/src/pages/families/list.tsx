@@ -12,6 +12,7 @@ import { ActionWrapper, PageContainer } from './styles';
 import { Dependent } from '../../interfaces/dependent';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
+import { Group } from '../../interfaces/group';
 
 /**
  * FamiliesList page component
@@ -51,7 +52,7 @@ export const FamiliesList: React.FC<{}> = () => {
           </Link>
         }
       >
-        <Table dataSource={dataSource} rowKey="id">
+        <Table loading={loading} dataSource={dataSource} rowKey="id">
           <Table.Column
             title="Nome do Responsável"
             width="18%"

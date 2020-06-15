@@ -6,28 +6,28 @@ import { getFamilyGroupByCode } from '../../src/utils/constraints';
 const list = [
   {
     title: '[CAD25123] Auxilio municipal de alimentação',
-    groupName: getFamilyGroupByCode(3).key,
+    groupId: getFamilyGroupByCode(3).id,
     date: moment().startOf('month').toDate(),
     institutionId: 1,
     value: 1000
   },
   {
     title: '[CAD25123] Auxilio municipal de alimentação',
-    groupName: getFamilyGroupByCode(1).key,
+    groupId: getFamilyGroupByCode(1).id,
     date: moment().startOf('month').toDate(),
     institutionId: 1,
     value: 2000
   },
   {
     title: '[CAD25123] Auxilio municipal de alimentação',
-    groupName: getFamilyGroupByCode(2).key,
+    groupId: getFamilyGroupByCode(2).id,
     date: moment().startOf('month').toDate(),
     institutionId: 1,
     value: 500
   },
   {
     title: '[CAD25123] Auxilio municipal de merenda',
-    groupName: getFamilyGroupByCode(0).key,
+    groupId: getFamilyGroupByCode(0).id,
     date: moment().startOf('month').toDate(),
     institutionId: 1,
     value: 100
