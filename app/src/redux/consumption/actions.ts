@@ -23,7 +23,7 @@ export const requestClearConsumptionProduct = (): ThunkResult<void> => {
  * Save consumption Thunk action
  */
 export const requestSaveConsumptionProduct = (
-  item: Pick<Consumption, 'familyId' | 'products'>,
+  item: Pick<Consumption, 'familyId' | 'products' | 'proofImageUrl'>,
   onSuccess?: () => void,
   onFailure?: (error?: Error) => void
 ): ThunkResult<void> => {
@@ -32,8 +32,24 @@ export const requestSaveConsumptionProduct = (
       // Start request - starting loading state
       dispatch(doSaveConsumption());
 
+      const file = item.proofImageUrl
+        ? await fetch(item.proofImageUrl)
+            .then((res) => res.blob())
+            .then((blob) => {
+              const file = new File([blob], 'File name', { type: 'image/png' });
+              return file;
+            })
+        : undefined;
+
+      const data = new FormData();
+      data.append('familyId', item.familyId.toString());
+      data.append('products', JSON.stringify(item.products));
+      if (item.proofImageUrl && file) data.append('image', file);
+
       // Request
-      const response = await backend.post<Consumption>(`/consumptions`, item);
+      const response = await backend.post<Consumption>(`/consumptions`, data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
 
       if (response && response.data) {
         // Request finished

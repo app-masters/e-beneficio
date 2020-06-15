@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Card, Typography, Table, Modal } from 'antd';
+import { Button, Card, Typography, Table, Modal, Divider, notification } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
 import { FamilySearch } from '../../components/familySearch';
@@ -7,10 +7,13 @@ import { Flex } from '../../components/flex';
 import { Family, FamilyProductConsumption } from '../../interfaces/family';
 import { requestSaveConsumptionProduct, requestClearConsumptionProduct } from '../../redux/consumption/actions';
 import { AppState } from '../../redux/rootReducer';
-import { PageContainer } from './styles';
+import { PageContainer, FormImageContainer } from './styles';
 import { NumberPicker } from '../../components/numberPicker';
 import { Consumption } from '../../interfaces/consumption';
 import { requestClearFamily } from '../../redux/family/actions';
+import { UploadOutlined, CameraOutlined, WarningFilled } from '@ant-design/icons';
+import { CameraUpload } from './cameraUpload';
+import Webcam from 'react-webcam';
 
 /**
  * Dashboard page component
@@ -56,18 +59,44 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
  * @param props component props
  */
 const ProductConsumption: React.FC<{ family?: Family | null; loading?: boolean }> = ({ family, loading }) => {
+  const cameraRef = React.useRef(null);
+  const [permission, setPermission] = React.useState<string>('');
+  const [consumerInfo, setConsumerInfo] = React.useState<{ image: string; error: boolean }>({
+    image: '',
+    error: false
+  });
+  const [showCameraModal, setShowCameraModal] = React.useState(false);
+  const [showCamera, setShowCamera] = React.useState(false);
   const [dataSource, setDataSource] = React.useState<FamilyProductConsumption[]>(
     family?.balance as FamilyProductConsumption[]
   );
 
   const dispatch = useDispatch();
 
+  //Request for permission to use camera.
+  React.useEffect(() => {
+    navigator.permissions
+      .query({ name: 'camera' })
+      .then((value) => {
+        setPermission(value.state);
+      })
+      .catch((err) => console.log(err));
+  }, []);
+
   /**
    * Function to change the consumed value
    */
   const onSubmitConsumption = () => {
+    setConsumerInfo({ ...consumerInfo, error: false });
+    if (!consumerInfo.image) {
+      window.scrollTo(0, 0);
+      notification.warning({ message: 'É necessário o envio de uma foto do consumidor' });
+      setConsumerInfo({ ...consumerInfo, error: true });
+      return;
+    }
     const consumption = {
       familyId: family?.id as number,
+      proofImageUrl: consumerInfo.image,
       products: dataSource
         .map((item) => {
           return { id: item.product.id as number, amount: item.consume as number };
@@ -110,6 +139,95 @@ const ProductConsumption: React.FC<{ family?: Family | null; loading?: boolean }
 
   return (
     <div>
+      <Button
+        danger={consumerInfo.error}
+        size="large"
+        icon={<CameraOutlined />}
+        onClick={() => setShowCameraModal(true)}
+      >
+        {consumerInfo.image ? 'Alterar foto do consumidor' : 'Adicionar foto do consumidor'}
+      </Button>
+      <Modal
+        okText={
+          showCamera ? (
+            <>
+              <CameraOutlined style={{ marginRight: 10 }} />
+              Tirar Foto
+            </>
+          ) : (
+            'Confirmar'
+          )
+        }
+        cancelText="Cancelar"
+        onCancel={() => {
+          setShowCameraModal(false);
+          setShowCamera(false);
+        }}
+        onOk={async () => {
+          if (consumerInfo.image) {
+            setShowCameraModal(false);
+            return;
+          }
+          if (cameraRef && cameraRef.current) {
+            // weird ts error
+            // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+            // @ts-ignore
+            const image = cameraRef.current.getScreenshot();
+            setShowCameraModal(false);
+            setConsumerInfo({ error: false, image });
+          }
+        }}
+        visible={showCameraModal}
+      >
+        <FormImageContainer>
+          {permission === 'denied' ? (
+            <>
+              <Typography.Title level={3}>{' Acesso não permitido a câmera.'}</Typography.Title>
+              <Divider />
+              <Typography.Paragraph>Para continuar é necessário acesso a câmera do aparelho.</Typography.Paragraph>
+              <Typography>
+                <ul>
+                  <li>
+                    Clique no ícone <WarningFilled /> próximo ao endereço do site.
+                  </li>
+                  <li>
+                    Acesse <span style={{ color: 'blue' }}>Configurações do site</span>
+                  </li>
+                  <li>
+                    Clique em <span style={{ color: 'blue' }}>Acessar sua câmera</span> e permita o acesso.
+                  </li>
+                  <li>Clique em Fechar e em seguida clique no botão de leitura novamente.</li>
+                </ul>
+              </Typography>
+            </>
+          ) : showCamera ? (
+            <Webcam audio={false} width="100%" ref={cameraRef} />
+          ) : (
+            <CameraUpload onSetImage={(image: string) => setConsumerInfo({ error: false, image })} />
+          )}
+        </FormImageContainer>
+        {showCamera ? (
+          <Button onClick={() => setShowCamera(false)}>
+            <UploadOutlined />
+            Enviar arquivo
+          </Button>
+        ) : (
+          <Button onClick={() => setShowCamera(true)}>
+            <CameraOutlined />
+            Usar camera
+          </Button>
+        )}
+        <Typography.Paragraph style={{ marginTop: 10 }}>
+          Na foto, mostrar:
+          <ul>
+            <li>Rosto da pessoa que está realizando a compra.</li>
+          </ul>
+          Foque o rosto da pessoa em um local com bastante iluminação.
+          <br />
+          Tente manter a foto o mais nítida possível.
+        </Typography.Paragraph>
+      </Modal>
+      <Divider />
       <h2>Produtos</h2>
       <Table pagination={false} columns={columns} dataSource={dataSource || []} />
       <Flex style={{ marginTop: 25 }} alignItems="center" justifyContent="flex-end">
