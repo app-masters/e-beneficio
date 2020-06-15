@@ -14,6 +14,19 @@ export const formatPhone = (v?: string | null): string => {
 };
 
 /**
+ * Mask and format RG string
+ */
+export const formatRG = (v?: string | null): string => {
+  if (!v) return '';
+  // Remove anything that is not a number
+  v = v.replace(/\D/g, '').substr(0, 9);
+  v = v.replace(/^(\d{2})(\d)/, '$1.$2');
+  v = v.replace(/^(\d{2}.\d{3})(\d)/, '$1.$2');
+  v = v.replace(/^(\d{2}.\d{3}.\d{3})(\d{1,2})/, '$1-$2');
+  return v;
+};
+
+/**
  * Mask and format color string
  */
 export const formatColor = (v?: string | null): string => {
