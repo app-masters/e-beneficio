@@ -77,7 +77,7 @@ const seed = async () => {
         })) as Family[])
     );
     if (itemsToCreate.length > 0) {
-      await db.families.bulkCreate(itemsToCreate);
+      await db.families.bulkCreate(itemsToCreate, { individualHooks: true });
     }
     console.log(`[seed] Families: Seeded successfully - ${itemsToCreate.length} new created`);
   } else {

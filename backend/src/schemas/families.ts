@@ -1,4 +1,5 @@
-import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize';
+import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor, CreateOptions } from 'sequelize';
+import Hashids from 'hashids';
 import { Dependent } from './depedents';
 import { Consumption } from './consumptions';
 
@@ -149,6 +150,22 @@ export const attributes = {
   }
 };
 
+// Intance of the hash generator that will be used to encode the family id
+const hashids = new Hashids('', 6, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890', '');
+/**
+ * After the creation of the family, use its id to generate an code
+ *
+ * @param family The created family
+ * @param options Sequelize create options
+ */
+const afterCreate = async (family: SequelizeFamily, options: CreateOptions) => {
+  // If the family doesn't have an option, hash one from its id
+  if (!family.code) {
+    family.code = hashids.encode(Number(family.id));
+    await family.update({ code: family.code }, options);
+  }
+};
+
 const tableName = 'Families';
 
 /**
@@ -158,6 +175,8 @@ const tableName = 'Families';
  */
 export const initFamilySchema = (sequelize: Sequelize): SequelizeFamilyModel => {
   const Schema = sequelize.define(tableName, attributes, { timestamps: true }) as SequelizeFamilyModel;
+
+  Schema.addHook('afterCreate', afterCreate);
 
   Schema.associate = (models): void => {
     // Sequelize relations
