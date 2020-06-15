@@ -584,6 +584,37 @@ export const updateById = async (
   return null;
 };
 
+/**
+ * Function to deactivate a row on the table by the unique ID
+ * @param id unique ID of the desired item
+ * @returns Promise<Item>
+ */
+export const deactivateFamilyAndDependentsById = async (
+  id: NonNullable<Family['id']>
+): Promise<SequelizeFamily | null> => {
+  // Trying to get item on the city
+  const cityItem: (SequelizeFamily & { balance?: number | ProductBalance }) | null = await db.families.findByPk(id, {
+    include: [{ model: db.dependents, as: 'dependents' }]
+  });
+  if (cityItem) {
+    // If it have dependents, deactvate all of then
+    if (cityItem.dependents) {
+      await Promise.all(
+        cityItem.dependents.map((dependent) =>
+          db.dependents.update({ deactivatedAt: moment().toDate() }, { where: { id: dependent.id || 0 } })
+        )
+      );
+    }
+    await db.families.update({ deactivatedAt: moment().toDate() }, { where: { id } });
+
+    cityItem.reload({ include: [{ model: db.dependents, as: 'dependents' }] });
+    cityItem.balance = await getFamilyDependentBalance(cityItem);
+
+    return cityItem;
+  }
+  return null;
+};
+
 // Official Sislame file
 const keys = {
   dependentName: 'NOME DO ALUNO',
