@@ -56,7 +56,7 @@ export const FamiliesList: React.FC<{}> = () => {
           <>
             <Select
               style={{ width: 200 }}
-              defaultValue={placeStore[0].id?.toString()}
+              defaultValue={placeStore[0].id?.toString() || undefined}
               value={selectedPlaceStore}
               onSelect={(value) => {
                 setPlaceStore(value);

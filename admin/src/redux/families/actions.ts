@@ -377,6 +377,7 @@ export const requestSaveFamily = (
     } catch (error) {
       // Request failed: dispatch error
       logging.error(error);
+      error.message = error.response ? error.response.data : error.message;
       dispatch(doSaveFamilyFailed(error));
       if (onFailure) onFailure(error);
     }

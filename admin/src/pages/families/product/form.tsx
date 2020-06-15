@@ -36,6 +36,8 @@ import { formHelper, formValidation } from '../../../utils/constraints';
 import { requestGetPlaceStore } from '../../../redux/placeStore/actions';
 import { PlaceStore } from '../../../interfaces/placeStore';
 import { requestSaveFamily } from '../../../redux/families/actions';
+import { Group } from '../../../interfaces/group';
+import { requestGetGroup } from '../../../redux/group/actions';
 // import { requestGetGroup } from '../../../redux/group/actions';
 // import { Group } from '../../../interfaces/group';
 
@@ -67,6 +69,7 @@ const typeFamily = {
  * @param props component props
  */
 export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (props) => {
+  const isCreating = props.match.params.id === 'criar';
   const [modal, setModal] = React.useState<{
     item?: Dependent | null;
     open: boolean;
@@ -79,8 +82,6 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
   const history = useHistory();
   const dispatch = useDispatch();
 
-  // const groups = useSelector<AppState, Group[]>(({ groupReducer }) => groupReducer.list as Group[]);
-
   const family = useSelector<AppState, Family | null | undefined>(({ familiesReducer }) =>
     familiesReducer.list?.find((f: Family) => f.id === Number(props.match.params.id))
   );
@@ -90,11 +91,26 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
   );
 
   React.useEffect(() => {
+    dispatch(requestGetGroup());
+  }, [dispatch]);
+
+  React.useEffect(() => {
     if (placeStore.length === 0) dispatch(requestGetPlaceStore());
   }, [placeStore, dispatch]);
 
-  const loading = useSelector<AppState, boolean>(({ familiesReducer }) => familiesReducer.loading);
-  const error = useSelector<AppState, Error | string | undefined>(({ familiesReducer }) => familiesReducer.error);
+  React.useEffect(() => {
+    if (!isCreating && !family) {
+      history.push('/familias');
+    }
+  }, [isCreating, history, family]);
+
+  const loading = useSelector<AppState, boolean>(({ familiesReducer }) => familiesReducer.familyLoading);
+  const error = useSelector<AppState, Error | string | undefined>(
+    ({ familiesReducer }) => familiesReducer.familySaveError
+  );
+
+  const groups = useSelector<AppState, Group[]>(({ groupReducer }) => groupReducer.list as Group[]);
+
   const {
     handleSubmit,
     handleChange,
@@ -177,7 +193,10 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
 
   return (
     <PageContainer>
-      <Card loading={loading} title={<Typography.Title>Nova Família</Typography.Title>}>
+      <Card
+        loading={loading}
+        title={<Typography.Title>{`${isCreating ? 'Nova' : 'Editar'} Família`}</Typography.Title>}
+      >
         <Form layout="vertical">
           {error && <Alert message="Ocorreu um erro" description={(error as Error).message} type="error" showIcon />}
           <Row gutter={[16, 16]}>
@@ -223,11 +242,11 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
                     setFieldTouched('groupName', true);
                   }}
                 >
-                  {/* {groups.map((item: Group) => (
+                  {groups.map((item: Group) => (
                     <Select.Option key={item.id} value={item.title as string}>
                       {item.title}
                     </Select.Option>
-                  ))} */}
+                  ))}
                 </Select>
               </Form.Item>
             </Col>
@@ -428,7 +447,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
                 description={
                   <Row gutter={[16, 16]}>
                     <Col span={24} md={12}>
-                      {(item.email || item.phone) && <>{`${item.email || ''} - ${item.phone || ''}`}</>}
+                      {(item.email || item.phone) && <>{`${item.email || ''} - ${formatPhone(item.phone) || ''}`}</>}
                       {(item.cpf || item.rg) && (
                         <>
                           <br />

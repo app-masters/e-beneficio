@@ -11,6 +11,7 @@ import { requestGetPlaceFamilies } from '../../redux/family/actions';
 
 import { ActionWrapper, PageContainer } from './styles';
 import { Dependent } from '../../interfaces/dependent';
+import { Group } from '../../interfaces/group';
 
 /**
  * FamiliesList page component
@@ -18,8 +19,8 @@ import { Dependent } from '../../interfaces/dependent';
  */
 export const FamiliesList: React.FC<{}> = () => {
   // Redux state
-  const list = useSelector<AppState, Family[]>((state) => state.familyReducer.list as Family[]);
-  // const familiesLoading = useSelector<AppState, boolean>((state) => state.familyReducer.loading);
+  const list = useSelector<AppState, Family[]>(({ familyReducer }) => familyReducer.list as Family[]);
+  const loading = useSelector<AppState, boolean>(({ familyReducer }) => familyReducer.loading);
   // const familiesError = useSelector<AppState, Error | undefined>((state) => state.familyReducer.error);
 
   const dataSource = useMemo(
@@ -50,7 +51,7 @@ export const FamiliesList: React.FC<{}> = () => {
           </Link>
         }
       >
-        <Table dataSource={dataSource} rowKey="id">
+        <Table loading={loading} dataSource={dataSource} rowKey="id">
           <Table.Column
             title="Nome do Responsável"
             width="30%"
@@ -59,12 +60,7 @@ export const FamiliesList: React.FC<{}> = () => {
             }
           />
           <Table.Column title="Código" dataIndex="code" width="20%" />
-          <Table.Column
-            title="Grupo familiar"
-            dataIndex="groupName"
-            render={(groupName: Family['groupName']) => familyGroupList && familyGroupList[groupName]?.title}
-            width="20%"
-          />
+          <Table.Column title="Grupo familiar" dataIndex="groupName" width="20%" />
           <Table.Column
             title="Número de Dependentes"
             render={(family: Family) => family.dependents?.length || 0}
