@@ -28,8 +28,9 @@ export const doGetDashboardFamily = createAction<void>('dashboardFamily/GET');
 export const doGetDashboardFamilySuccess = createAction<DashboardFamily>('dashboardFamily/GET_SUCCESS');
 export const doGetDashboardFamilyFailed = createAction<Error | undefined>('dashboardFamily/GET_FAILED');
 
+export const doClearFamily = createAction<void>('family/CLEAR');
 export const doGetFamily = createAction<void>('family/GET');
-export const doGetFamilySuccess = createAction<Family>('family/GET_SUCCESS');
+export const doGetFamilySuccess = createAction<Family | Family[]>('family/GET_SUCCESS');
 export const doGetFamilyFailed = createAction<Error | undefined>('family/GET_FAILED');
 
 export const doSaveFamily = createAction<void>('family/SAVE');
@@ -43,6 +44,15 @@ export const doDeleteFamilyFailed = createAction<Error | undefined>('family/DELE
 export const doGetFileFamily = createAction<void>('families/GET');
 export const doGetFileFamilySuccess = createAction<File | null>('families/GET_SUCCESS');
 export const doGetFileFamilyFailed = createAction<Error | undefined>('families/GET_FAILED');
+
+/**
+ * Get family Thunk action
+ */
+export const requestClearFamily = (): ThunkResult<void> => {
+  return async (dispatch) => {
+    dispatch(doClearFamily());
+  };
+};
 
 /**
  * Get current import report Thunk action
@@ -268,13 +278,38 @@ export const requestGetDashboardFamily = (): ThunkResult<void> => {
 /**
  * Get family Thunk action
  */
+export const requestGetPlaceFamilies = (placeStoreId: string | number): ThunkResult<void> => {
+  return async (dispatch) => {
+    try {
+      // Start request - starting loading state
+      dispatch(doGetFamily());
+      // Request
+      const response = await backend.get<Family>(`/families/place?placeStoreId=${placeStoreId}`);
+      if (response && response.data) {
+        // Request finished
+        dispatch(doGetFamilySuccess(response.data)); // Dispatch result
+      } else {
+        // Request finished, but no item was found
+        dispatch(doGetFamilyFailed());
+      }
+    } catch (error) {
+      // Request failed: dispatch error
+      logging.error(error);
+      dispatch(doGetFamilyFailed(error));
+    }
+  };
+};
+
+/**
+ * Get family Thunk action
+ */
 export const requestGetFamily = (nis: string, cityId: string): ThunkResult<void> => {
   return async (dispatch) => {
     try {
       // Start request - starting loading state
       dispatch(doGetFamily());
       // Request
-      const response = await backend.get<Family>(`/families`, { params: { nis, cityId } });
+      const response = await backend.get<Family | Family[]>(`/families`, { params: { nis, cityId } });
       if (response && response.data) {
         // Request finished
         dispatch(doGetFamilySuccess(response.data)); // Dispatch result

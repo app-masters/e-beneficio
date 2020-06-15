@@ -18,31 +18,37 @@ import {
   Divider,
   Alert
 } from 'antd';
-import { RouteComponentProps } from 'react-router-dom';
-import yup from '../../utils/yup';
-import { useFormik, FieldMetaProps } from 'formik';
-import { familyGroupList } from '../../utils/constraints';
-import { formatPhone, formatRG, formatCPF, formatMoney } from '../../utils/string';
+import { RouteComponentProps, useHistory } from 'react-router-dom';
+import yup from '../../../utils/yup';
+import { useFormik } from 'formik';
+import { formatPhone, formatRG, formatCPF, formatMoney } from '../../../utils/string';
 import locale from 'antd/es/date-picker/locale/pt_BR';
 import moment from 'moment';
 import { PageContainer, ColCheckStyle, ActionWrapper } from './styles';
-import { Dependent } from '../../interfaces/dependent';
+import { Dependent } from '../../../interfaces/dependent';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { requestSaveFamily } from '../../redux/family/actions';
+// import { requestSaveFamily } from '../../../redux/family/actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { Family } from '../../interfaces/family';
-import { AppState } from '../../redux/rootReducer';
-import { Flex } from '../../components/flex';
+import { Family } from '../../../interfaces/family';
+import { AppState } from '../../../redux/rootReducer';
+import { Flex } from '../../../components/flex';
+import { formHelper, formValidation } from '../../../utils/constraints';
+import { requestGetPlaceStore } from '../../../redux/placeStore/actions';
+import { PlaceStore } from '../../../interfaces/placeStore';
+import { requestSaveFamily } from '../../../redux/families/actions';
+// import { requestGetGroup } from '../../../redux/group/actions';
+// import { Group } from '../../../interfaces/group';
 
 const schema = yup.object().shape({
-  code: yup.string().label('Código'),
-  groupName: yup.string().label('Grupo familiar').required()
+  groupName: yup.string().label('Grupo familiar').required(),
+  placeStoreId: yup.string().label('Localidade').required()
 });
 
 const typeFamily = {
   code: '',
   cityId: 0,
   groupName: '',
+  placeStoreId: '',
   isRegisteredInPerson: undefined,
   totalSalary: undefined,
   isOnAnotherProgram: undefined,
@@ -60,7 +66,7 @@ const typeFamily = {
  * Families form component
  * @param props component props
  */
-export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () => {
+export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (props) => {
   const [modal, setModal] = React.useState<{
     item?: Dependent | null;
     open: boolean;
@@ -70,10 +76,25 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
     type: ''
   });
 
+  const history = useHistory();
   const dispatch = useDispatch();
 
-  const loading = useSelector<AppState, boolean>(({ familyReducer }) => familyReducer.loading);
-  const error = useSelector<AppState, Error | undefined>(({ familyReducer }) => familyReducer.error);
+  // const groups = useSelector<AppState, Group[]>(({ groupReducer }) => groupReducer.list as Group[]);
+
+  const family = useSelector<AppState, Family | null | undefined>(({ familiesReducer }) =>
+    familiesReducer.list?.find((f: Family) => f.id === Number(props.match.params.id))
+  );
+
+  const placeStore = useSelector<AppState, PlaceStore[]>(
+    ({ placeStoreReducer }) => placeStoreReducer.list as PlaceStore[]
+  );
+
+  React.useEffect(() => {
+    if (placeStore.length === 0) dispatch(requestGetPlaceStore());
+  }, [placeStore, dispatch]);
+
+  const loading = useSelector<AppState, boolean>(({ familiesReducer }) => familiesReducer.loading);
+  const error = useSelector<AppState, Error | string | undefined>(({ familiesReducer }) => familiesReducer.error);
   const {
     handleSubmit,
     handleChange,
@@ -84,18 +105,30 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
     setFieldTouched,
     getFieldProps
   } = useFormik({
-    initialValues: typeFamily,
+    initialValues: family || typeFamily,
     validationSchema: schema,
     onSubmit: (values, { setStatus }) => {
       setStatus();
-      const newFamily = { ...values, balance: 0 };
-      dispatch(requestSaveFamily(newFamily as Family));
+      const newFamily = {
+        ...values,
+        balance: 0,
+        dependents: values.dependents
+          ? (values.dependents as Dependent[]).map((item) => {
+              return { ...item, nis: undefined };
+            })
+          : undefined
+      };
+      dispatch(
+        requestSaveFamily(
+          newFamily as Family,
+          () => {
+            Modal.success({ title: 'Família salva com sucesso', onOk: () => history.push('/familias') });
+          },
+          () => setStatus('Ocorreu um erro ao salvar a família.')
+        )
+      );
     }
   });
-
-  const family = useSelector<AppState, Family | null | undefined>(({ familyReducer }) =>
-    familyReducer.list?.find((f: Family) => f.code === values?.code)
-  );
 
   /**
    * Remove dependent form component
@@ -111,9 +144,9 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
    * Handle responsable
    */
   const responsibleDependent = (value: Dependent) => {
-    let list: Dependent[] = [...values.dependents];
-    const verifyIndex = list.findIndex((f) => f.nis === value.nis);
-    if (verifyIndex > -1) list = list.filter((f) => f.nis !== value.nis);
+    let list: Dependent[] = values.dependents ? [...values.dependents] : [];
+    const verifyIndex = list.findIndex((f) => f.nis === value.nis || f.id === value.id);
+    if (verifyIndex > -1) list = list.filter((f) => f.nis !== value.nis || f.id === value.id);
     if (value.isResponsible) {
       list = list.map((resp: Dependent) => {
         return { ...resp, isResponsible: false };
@@ -125,22 +158,8 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
     return list;
   };
 
-  /**
-   * Helper function
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const helper = (type: FieldMetaProps<any>) => {
-    return !!type.error && !!type.touched ? type.error : undefined;
-  };
-  /**
-   * Validation function
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const validation = (type: FieldMetaProps<any>) => {
-    return !!type.error && !!type.touched ? 'error' : '';
-  };
-
   const groupNameMeta = getFieldMeta('groupName');
+  const placeStoreIdMeta = getFieldMeta('placeStoreId');
 
   const isRegisteredInPersonMeta = getFieldMeta('isRegisteredInPerson');
   const isRegisteredInPersonField = getFieldProps('isRegisteredInPerson');
@@ -158,23 +177,40 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
 
   return (
     <PageContainer>
-      <Card loading={loading} title={<Typography.Title>Nova Familia</Typography.Title>}>
+      <Card loading={loading} title={<Typography.Title>Nova Família</Typography.Title>}>
         <Form layout="vertical">
-          {error && <Alert message="Ocorreu um erro" description={error.message} type="error" showIcon />}
-          {!error && family && family.id && (
-            <Alert
-              message="Familia salva"
-              description={'Os dados de familia foram salvos com sucesso!'}
-              type="success"
-              showIcon
-            />
-          )}
+          {error && <Alert message="Ocorreu um erro" description={(error as Error).message} type="error" showIcon />}
           <Row gutter={[16, 16]}>
-            <Col span={24} md={8}>
+            <Col span={24} md={6}>
+              <Form.Item
+                label={'Localidade'}
+                validateStatus={formValidation(placeStoreIdMeta)}
+                help={formHelper(placeStoreIdMeta)}
+              >
+                <Select
+                  defaultValue={values.placeStoreId?.toString()}
+                  onSelect={(value) => setFieldValue('placeStoreId', value)}
+                  value={values.placeStoreId?.toString() || undefined}
+                  onChange={(value: string) => {
+                    setFieldValue('placeStoreId', value);
+                  }}
+                  onBlur={() => {
+                    setFieldTouched('placeStoreId', true);
+                  }}
+                >
+                  {placeStore.map((placeStore) => (
+                    <Select.Option key={placeStore.id} value={Number(placeStore.id).toString()}>
+                      {placeStore.title}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={24} md={6}>
               <Form.Item
                 label={'Grupo familiar'}
-                validateStatus={validation(groupNameMeta)}
-                help={helper(groupNameMeta)}
+                validateStatus={formValidation(groupNameMeta)}
+                help={formHelper(groupNameMeta)}
               >
                 <Select
                   defaultValue={values.groupName?.toString()}
@@ -187,26 +223,32 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
                     setFieldTouched('groupName', true);
                   }}
                 >
-                  {Object.keys(familyGroupList).map((item) => (
-                    <Select.Option key={item} value={item}>
-                      {familyGroupList[item].title}
+                  {/* {groups.map((item: Group) => (
+                    <Select.Option key={item.id} value={item.title as string}>
+                      {item.title}
                     </Select.Option>
-                  ))}
+                  ))} */}
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={24} md={8} style={ColCheckStyle}>
+            <Col span={24} md={6} style={ColCheckStyle}>
               <Flex alignItems="flex-end" justifyContent="center" style={{ width: '100%', height: '100%' }}>
-                <Form.Item validateStatus={validation(isOnGovernProgramMeta)} help={helper(isOnGovernProgramMeta)}>
+                <Form.Item
+                  validateStatus={formValidation(isOnGovernProgramMeta)}
+                  help={formHelper(isOnGovernProgramMeta)}
+                >
                   <Checkbox checked={values.isOnGovernProgram} {...isOnGovernProgramField}>
                     Família registrada no Bolsa Família
                   </Checkbox>
                 </Form.Item>
               </Flex>
             </Col>
-            <Col span={24} md={8} style={ColCheckStyle}>
+            <Col span={24} md={6} style={ColCheckStyle}>
               <Flex alignItems="flex-end" justifyContent="center" style={{ width: '100%', height: '100%' }}>
-                <Form.Item validateStatus={validation(isOnAnotherProgramMeta)} help={helper(isOnAnotherProgramMeta)}>
+                <Form.Item
+                  validateStatus={formValidation(isOnAnotherProgramMeta)}
+                  help={formHelper(isOnAnotherProgramMeta)}
+                >
                   <Checkbox checked={values.isOnAnotherProgram} {...isOnAnotherProgramField}>
                     Família registrada em outro programa
                   </Checkbox>
@@ -216,7 +258,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
           </Row>
           <Row gutter={[16, 16]}>
             <Col span={24} md={16}>
-              <Form.Item label={'Endereço'} validateStatus={validation(addressMeta)} help={helper(addressMeta)}>
+              <Form.Item label={'Endereço'} validateStatus={formValidation(addressMeta)} help={formHelper(addressMeta)}>
                 <Input
                   id="address"
                   name="address"
@@ -229,8 +271,8 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
             <Col span={24} md={8}>
               <Form.Item
                 label={'Quantidade de quartos'}
-                validateStatus={validation(numberOfRoomsMeta)}
-                help={helper(numberOfRoomsMeta)}
+                validateStatus={formValidation(numberOfRoomsMeta)}
+                help={formHelper(numberOfRoomsMeta)}
               >
                 <InputNumber
                   style={{ width: '100%' }}
@@ -245,8 +287,8 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
             <Col span={24} md={8}>
               <Form.Item
                 label={'Tipo de Casa'}
-                validateStatus={validation(houseTypeMeta)}
-                help={helper(houseTypeMeta)}
+                validateStatus={formValidation(houseTypeMeta)}
+                help={formHelper(houseTypeMeta)}
                 extra="Prédio, casa de alvenaria, casa madeira, outros..."
               >
                 <Input
@@ -261,8 +303,8 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
             <Col span={24} md={8}>
               <Form.Item
                 label={'Renda familiar total'}
-                validateStatus={validation(totalSalaryMeta)}
-                help={helper(totalSalaryMeta)}
+                validateStatus={formValidation(totalSalaryMeta)}
+                help={formHelper(totalSalaryMeta)}
               >
                 <InputNumber
                   style={{ width: '100%' }}
@@ -284,7 +326,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
             </Col>
             <Col span={24} md={8} style={ColCheckStyle}>
               <Flex alignItems="center" justifyContent="center" style={{ width: '100%', height: '100%' }}>
-                <Form.Item validateStatus={validation(haveSewageMeta)} help={helper(haveSewageMeta)}>
+                <Form.Item validateStatus={formValidation(haveSewageMeta)} help={formHelper(haveSewageMeta)}>
                   <Checkbox checked={values.haveSewage} {...haveSewageField}>
                     Possui esgoto
                   </Checkbox>
@@ -294,8 +336,8 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
             <Col span={24} md={24}>
               <Form.Item
                 label={'Comentário sobre esgoto'}
-                validateStatus={validation(sewageCommentMeta)}
-                help={helper(sewageCommentMeta)}
+                validateStatus={formValidation(sewageCommentMeta)}
+                help={formHelper(sewageCommentMeta)}
               >
                 <Input
                   id="sewageComment"
@@ -309,7 +351,10 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
           </Row>
           <Row>
             <Col span={24} md={24} style={ColCheckStyle}>
-              <Form.Item validateStatus={validation(isRegisteredInPersonMeta)} help={helper(isRegisteredInPersonMeta)}>
+              <Form.Item
+                validateStatus={formValidation(isRegisteredInPersonMeta)}
+                help={formHelper(isRegisteredInPersonMeta)}
+              >
                 <Checkbox checked={values.isRegisteredInPerson} {...isRegisteredInPersonField}>
                   Registrado pessoalmente
                 </Checkbox>
@@ -333,13 +378,18 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
         <List
           dataSource={values.dependents}
           itemLayout="horizontal"
+          locale={{ emptyText: 'Nenhum membro cadastrado' }}
           renderItem={(item: Dependent) => (
             <List.Item
               actions={[
                 <Button
                   key={'edit'}
                   onClick={() => {
-                    if (item.type) setModal({ open: true, type: item.type, item });
+                    setModal({
+                      open: true,
+                      type: item.isHired === null || item.isHired === undefined ? 'child' : 'adult',
+                      item
+                    });
                   }}
                 >
                   Editar
@@ -372,19 +422,13 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
                     ) : (
                       ''
                     )}
-                    {`${item.name} - ${item.type === 'child' ? 'Criança' : 'Adulto'}`}
+                    {`${item.name} - ${item.isHired === null || item.isHired === undefined ? 'Criança' : 'Adulto'}`}
                   </>
                 }
                 description={
                   <Row gutter={[16, 16]}>
                     <Col span={24} md={12}>
-                      {`NIS: ${item.nis}`}
-                      {(item.email || item.phone) && (
-                        <>
-                          <br />
-                          {`${item.email || ''} - ${item.phone || ''}`}
-                        </>
-                      )}
+                      {(item.email || item.phone) && <>{`${item.email || ''} - ${item.phone || ''}`}</>}
                       {(item.cpf || item.rg) && (
                         <>
                           <br />
@@ -429,11 +473,11 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
             setModal({ open: false, type: '' });
           }}
           onCreate={(value: Dependent) => {
-            if (verifyDependentNIS(value)) {
-              const list = responsibleDependent(value);
-              setFieldValue('dependents', list);
-              setModal({ open: false, type: '' });
-            }
+            //Generate random NIS.
+            value.nis = Math.random().toString(36).substr(0, 10);
+            const list = responsibleDependent(value);
+            setFieldValue('dependents', list);
+            setModal({ open: false, type: '' });
           }}
         />
       )}
@@ -442,13 +486,11 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = () =>
 };
 
 const schemaChild = yup.object().shape({
-  nis: yup.string().label('Código').required(),
   name: yup.string().label('Nome').required(),
   birthday: yup.date().label('Nascimento').required()
 });
 
 const schemaAdult = yup.object().shape({
-  nis: yup.string().label('Código').required(),
   name: yup.string().label('Nome').required(),
   birthday: yup.date().label('Nascimento').required(),
   rg: yup.string().label('RG').required(),
@@ -456,7 +498,6 @@ const schemaAdult = yup.object().shape({
 });
 
 const typeDependent = {
-  nis: '',
   name: '',
   schoolName: undefined,
   birthday: undefined,
@@ -486,7 +527,12 @@ export const DependentForm: React.FC<{
   const isCreating = !!!item;
 
   const { handleChange, values, errors, touched, getFieldMeta, submitForm, setFieldValue, getFieldProps } = useFormik({
-    initialValues: item ? item : typeDependent,
+    initialValues: item
+      ? item
+      : {
+          ...typeDependent,
+          isHired: type === 'adult' ? false : undefined
+        },
     validationSchema: type === 'child' ? schemaChild : schemaAdult,
     onSubmit: (values, { setStatus }) => {
       setStatus();
@@ -496,23 +542,7 @@ export const DependentForm: React.FC<{
     }
   });
 
-  /**
-   * Helper function
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const helper = (type: FieldMetaProps<any>) => {
-    return !!type.error && !!type.touched ? type.error : undefined;
-  };
-  /**
-   * Validation function
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const validation = (type: FieldMetaProps<any>) => {
-    return !!type.error && !!type.touched ? 'error' : '';
-  };
-
   const nameMeta = getFieldMeta('name');
-  const nisMeta = getFieldMeta('nis');
   const birthdayMeta = getFieldMeta('birthday');
   const rgMeta = getFieldMeta('rg');
   const cpfMeta = getFieldMeta('cpf');
@@ -539,29 +569,18 @@ export const DependentForm: React.FC<{
         {type === 'adult' && (
           <Form.Item
             style={{ marginBottom: 0 }}
-            validateStatus={validation(isResponsibleMeta)}
-            help={helper(isResponsibleMeta)}
+            validateStatus={formValidation(isResponsibleMeta)}
+            help={formHelper(isResponsibleMeta)}
           >
             <Checkbox checked={values.isResponsible} {...isResponsibleField}>
               É o responsável familiar
             </Checkbox>
           </Form.Item>
         )}
-        <Form.Item label={'Código'} validateStatus={validation(nisMeta)} help={helper(nisMeta)}>
-          <Input
-            id="nis"
-            disabled={!isCreating}
-            maxLength={11}
-            name="nis"
-            onChange={handleChange}
-            value={values.nis}
-            onPressEnter={submitForm}
-          />
-        </Form.Item>
-        <Form.Item label={'Nome'} validateStatus={validation(nameMeta)} help={helper(nameMeta)}>
+        <Form.Item label={'Nome'} validateStatus={formValidation(nameMeta)} help={formHelper(nameMeta)}>
           <Input id="name" name="name" onChange={handleChange} value={values.name} onPressEnter={submitForm} />
         </Form.Item>
-        <Form.Item label={'Nascimento'} validateStatus={validation(birthdayMeta)} help={helper(birthdayMeta)}>
+        <Form.Item label={'Nascimento'} validateStatus={formValidation(birthdayMeta)} help={formHelper(birthdayMeta)}>
           <DatePicker
             name="birthday"
             format={'DD/MM/YYYY'}
@@ -579,8 +598,8 @@ export const DependentForm: React.FC<{
               {type === 'child' && <small>&nbsp; {`(opcional)`}</small>}
             </>
           }
-          validateStatus={validation(rgMeta)}
-          help={helper(rgMeta)}
+          validateStatus={formValidation(rgMeta)}
+          help={formHelper(rgMeta)}
         >
           <Input id="rg" name="rg" onChange={handleChange} value={formatRG(values.rg)} onPressEnter={submitForm} />
         </Form.Item>
@@ -591,17 +610,17 @@ export const DependentForm: React.FC<{
               {type === 'child' && <small>&nbsp; {`(opcional)`}</small>}
             </>
           }
-          validateStatus={validation(cpfMeta)}
-          help={helper(cpfMeta)}
+          validateStatus={formValidation(cpfMeta)}
+          help={formHelper(cpfMeta)}
         >
           <Input id="cpf" name="cpf" onChange={handleChange} value={formatCPF(values.cpf)} onPressEnter={submitForm} />
         </Form.Item>
         {type === 'adult' && (
           <>
-            <Form.Item label={'Email'} validateStatus={validation(emailMeta)} help={helper(emailMeta)}>
+            <Form.Item label={'Email'} validateStatus={formValidation(emailMeta)} help={formHelper(emailMeta)}>
               <Input id="email" name="email" onChange={handleChange} value={values.email} onPressEnter={submitForm} />
             </Form.Item>
-            <Form.Item label={'Telefone'} validateStatus={validation(phoneMeta)} help={helper(phoneMeta)}>
+            <Form.Item label={'Telefone'} validateStatus={formValidation(phoneMeta)} help={formHelper(phoneMeta)}>
               <Input
                 id="phone"
                 name="phone"
@@ -614,55 +633,65 @@ export const DependentForm: React.FC<{
               <Col span={24} md={12} style={ColCheckStyle}>
                 <Form.Item
                   style={{ marginBottom: 0 }}
-                  validateStatus={validation(isHiredMeta)}
-                  help={helper(isHiredMeta)}
+                  validateStatus={formValidation(isHiredMeta)}
+                  help={formHelper(isHiredMeta)}
                 >
                   <Checkbox checked={values.isHired} {...isHiredField}>
                     Pessoa empregada
                   </Checkbox>
                 </Form.Item>
               </Col>
-              <Col span={24} md={12} style={ColCheckStyle}>
-                <Form.Item
-                  style={{ marginBottom: 0 }}
-                  validateStatus={validation(isFormalMeta)}
-                  help={helper(isFormalMeta)}
-                >
-                  <Checkbox disabled={!values.isHired} checked={values.isFormal} {...isFormalField}>
-                    Emprego formal
-                  </Checkbox>
-                </Form.Item>
-              </Col>
+              {values.isHired && (
+                <Col span={24} md={12} style={ColCheckStyle}>
+                  <Form.Item
+                    style={{ marginBottom: 0 }}
+                    validateStatus={formValidation(isFormalMeta)}
+                    help={formHelper(isFormalMeta)}
+                  >
+                    <Checkbox checked={values.isFormal} {...isFormalField}>
+                      Emprego formal
+                    </Checkbox>
+                  </Form.Item>
+                </Col>
+              )}
             </Row>
-            <Form.Item label={'Profissão'} validateStatus={validation(professionMeta)} help={helper(professionMeta)}>
-              <Input
-                id="profession"
-                name="profession"
-                disabled={!values.isHired}
-                onChange={handleChange}
-                value={values.profession}
-                onPressEnter={submitForm}
-              />
-            </Form.Item>
-            <Form.Item label={'Salário'} validateStatus={validation(salaryMeta)} help={helper(salaryMeta)}>
-              <InputNumber
-                style={{ width: '100%' }}
-                disabled={!values.isHired}
-                id="salary"
-                name="salary"
-                onChange={(value) => setFieldValue('salary', value)}
-                value={Number(values.salary)}
-                decimalSeparator=","
-                step={0.01}
-                precision={2}
-                min={0}
-                formatter={(value) => {
-                  if (value === '') return `R$ `;
-                  return value && Number(value) !== 0 && !Number.isNaN(Number(value)) ? `R$ ${value}` : '';
-                }}
-                parser={(value) => (value ? value.replace(/(R)|(\$)/g, '').trim() : '')}
-              />
-            </Form.Item>
+            {values.isHired && (
+              <Form.Item
+                label={'Profissão'}
+                validateStatus={formValidation(professionMeta)}
+                help={formHelper(professionMeta)}
+              >
+                <Input
+                  id="profession"
+                  name="profession"
+                  disabled={!values.isHired}
+                  onChange={handleChange}
+                  value={values.profession}
+                  onPressEnter={submitForm}
+                />
+              </Form.Item>
+            )}
+            {values.isHired && (
+              <Form.Item label={'Salário'} validateStatus={formValidation(salaryMeta)} help={formHelper(salaryMeta)}>
+                <InputNumber
+                  style={{ width: '100%' }}
+                  disabled={!values.isHired}
+                  id="salary"
+                  name="salary"
+                  onChange={(value) => setFieldValue('salary', value)}
+                  value={Number(values.salary)}
+                  decimalSeparator=","
+                  step={0.01}
+                  precision={2}
+                  min={0}
+                  formatter={(value) => {
+                    if (value === '') return `R$ `;
+                    return value && Number(value) !== 0 && !Number.isNaN(Number(value)) ? `R$ ${value}` : '';
+                  }}
+                  parser={(value) => (value ? value.replace(/(R)|(\$)/g, '').trim() : '')}
+                />
+              </Form.Item>
+            )}
           </>
         )}
       </Form>
