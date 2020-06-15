@@ -10,7 +10,8 @@ import {
   HomeOutlined,
   BookOutlined,
   ShoppingCartOutlined,
-  SolutionOutlined
+  SolutionOutlined,
+  TeamOutlined
 } from '@ant-design/icons';
 import { Button, Layout, Menu, Popover } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -113,21 +114,6 @@ const routes: RouteItem[] = [
     name: 'Entidades',
     specificToType: 'product'
   }
-  // {
-  //   path: '/relatorios',
-  //   icon: () => <BarChartOutlined />,
-  //   name: 'Relatórios'
-  // },
-  // {
-  //   path: '/lojas',
-  //   icon: () => <ShopOutlined />,
-  //   name: 'Lojas'
-  // },
-  // {
-  //   path: '/estabelecimentos',
-  //   icon: () => <SolutionOutlined />,
-  //   name: 'Estabelecimentos'
-  // },
 ];
 
 /**

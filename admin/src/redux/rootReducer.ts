@@ -12,6 +12,7 @@ import reportReducer, { ReportReducerState } from './report/reducers';
 import dashboardReducer, { DashboardReducerState } from './dashboard/reducers';
 import consumptionReducer, { ConsumptionReducerState } from './consumption/reducers';
 import productReducer, { ProductReducerState } from './product/reducers';
+import groupReducer, { GroupReducerState } from './group/reducers';
 
 type TypeReducers = {
   authReducer: AuthReducerState;
@@ -25,6 +26,7 @@ type TypeReducers = {
   dashboardReducer: DashboardReducerState;
   consumptionReducer: ConsumptionReducerState;
   productReducer: ProductReducerState;
+  groupReducer: GroupReducerState;
 };
 
 const appReducer = combineReducers({
@@ -38,7 +40,8 @@ const appReducer = combineReducers({
   reportReducer,
   dashboardReducer,
   consumptionReducer,
-  productReducer
+  productReducer,
+  groupReducer
 });
 
 /**
