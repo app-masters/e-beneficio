@@ -5,7 +5,7 @@ import { BenefitProduct } from './benefitProducts';
 export interface Benefit {
   readonly id?: number | string;
   institutionId: number | string;
-  groupName: string;
+  groupId: number | string;
   title: string;
   date: Date;
   value?: number;
@@ -40,9 +40,13 @@ export const attributes = {
     },
     allowNull: false
   },
-  groupName: {
-    type: DataTypes.STRING,
-    allowNull: false
+  groupId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'Groups',
+      id: 'id'
+    }
   },
   title: {
     type: DataTypes.STRING,
@@ -79,6 +83,10 @@ export const initBenefitSchema = (sequelize: Sequelize): SequelizeBenefitModel =
       as: 'benefitProducts',
       onDelete: 'CASCADE',
       hooks: true
+    });
+    Schema.belongsTo(models.groups, {
+      foreignKey: 'groupId',
+      as: 'group'
     });
   };
 

@@ -26,7 +26,7 @@ let createdDependent: Dependent;
 
 const family = {
   code: Math.floor(Math.random() * 10000000).toString(),
-  groupName: getFamilyGroupByCode(1)?.key,
+  groupId: getFamilyGroupByCode(1)?.id,
   responsibleName: 'TEREZA DE JESUS',
   responsibleBirthday: moment('01/01/1980', 'DD/MM/YYYY').toDate(),
   responsibleNis: Math.floor(Math.random() * 10000000000).toString(),
@@ -37,7 +37,7 @@ let createdFamily: Family;
 
 const benefit = {
   title: '[CAD25123] Auxilio merenda',
-  groupName: getFamilyGroupByCode(0)?.key,
+  groupId: getFamilyGroupByCode(0)?.id,
   date: moment().toDate(),
   value: 500,
   institutionId: 0

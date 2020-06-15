@@ -7,7 +7,7 @@ export interface Family {
   readonly id?: number | string;
   cityId: number | string;
   code: string;
-  groupName: string;
+  groupId: number | string;
   responsibleName?: string;
   responsibleNis?: string;
   responsibleBirthday?: Date;
@@ -63,9 +63,13 @@ export const attributes = {
     type: DataTypes.STRING(11),
     allowNull: false
   },
-  groupName: {
-    type: DataTypes.STRING,
-    allowNull: false
+  groupId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'Groups',
+      id: 'id'
+    }
   },
   responsibleName: {
     type: DataTypes.STRING,
@@ -173,9 +177,6 @@ export const initFamilySchema = (sequelize: Sequelize): SequelizeFamilyModel => 
       foreignKey: 'familyId',
       as: 'dependents'
     });
-    Schema.hasMany(models.benefits, {
-      foreignKey: 'groupName'
-    });
     Schema.belongsTo(models.placeStores, {
       foreignKey: 'placeStoreId',
       as: 'placeStore'
@@ -183,6 +184,10 @@ export const initFamilySchema = (sequelize: Sequelize): SequelizeFamilyModel => 
     Schema.belongsTo(models.users, {
       foreignKey: 'createdById',
       as: 'createdBy'
+    });
+    Schema.belongsTo(models.groups, {
+      foreignKey: 'groupId',
+      as: 'group'
     });
   };
 
