@@ -5,7 +5,7 @@ export interface Dependent {
   readonly id?: number | string;
   familyId: number | string;
   name: string;
-  nis: string;
+  nis?: string;
   birthday: Date | string;
   schoolName?: string;
   deactivatedAt?: number | Date | null;
@@ -55,7 +55,7 @@ export const attributes = {
   },
   nis: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   },
   birthday: {
     type: DataTypes.DATE,

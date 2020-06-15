@@ -249,7 +249,8 @@ export const findByPlaceStore = async (
 ): Promise<(Family & { balance?: number | ProductBalance })[]> => {
   const families: (SequelizeFamily & { balance?: number | ProductBalance })[] = await db.families.findAll({
     where: { placeStoreId, cityId },
-    include: populateDependents ? [{ model: db.dependents, as: 'dependents' }] : undefined
+    include: populateDependents ? [{ model: db.dependents, as: 'dependents' }] : undefined,
+    order: [[{ model: db.dependents, as: 'dependents' }, 'isResponsible', 'desc']]
   });
 
   const list = await Promise.all(
@@ -483,9 +484,9 @@ export const createFamilyWithDependents = async (
     if (verifyResponsible.length === 0)
       throw { status: 412, message: 'É necessário um membro responsável por familia.' };
 
-    const dependentNis = values.dependents?.map((dep) => {
-      return dep.nis as string;
-    });
+    // const dependentNis = values.dependents?.map((dep) => {
+    //   return dep.nis as string;
+    // });
     const dependentRg = values.dependents?.map((dep) => {
       return dep.rg as string;
     });
@@ -494,7 +495,7 @@ export const createFamilyWithDependents = async (
     });
     const dependents = await db.dependents.findAll({
       where: Sequelize.or(
-        { nis: { [Sequelize.Op.in]: dependentNis } },
+        // { nis: { [Sequelize.Op.in]: dependentNis } },
         { rg: { [Sequelize.Op.in]: dependentRg } },
         { cpf: { [Sequelize.Op.in]: dependentCpf } }
       )
@@ -550,7 +551,35 @@ export const updateById = async (
   if (cityItem) {
     // The update return an array [count, item[]], so I'm destructuring to get the updated benefit
     const [, [item]] = await db.families.update(values, { where: { id }, returning: true });
-    return item;
+
+    if (values.dependents) {
+      const depIds = values.dependents.map((dep: Dependent) => {
+        return dep.id;
+      });
+      const familyDependents = await db.dependents.findAll({ where: { familyId: values.id as number } });
+      const dependentsToAdd = values.dependents
+        .filter((f) => !f.id)
+        .map((dep) => {
+          return { ...dep, familyId: values.id };
+        });
+      const dependentsToUpdate = values.dependents.filter((f) => f.id);
+      const dependentsToRemove = familyDependents.filter((f) => !depIds.includes(f.id));
+
+      await db.dependents.bulkCreate(dependentsToAdd);
+
+      dependentsToUpdate.map(async (up) => {
+        if (up.id) await db.dependents.update({ ...up }, { where: { id: up.id } });
+      });
+
+      dependentsToRemove.map(async (dt) => {
+        if (dt.id) await db.dependents.destroy({ where: { id: dt.id } });
+      });
+    }
+
+    return await db.families.findOne({
+      where: { id: values.id as number },
+      include: [{ model: db.dependents, as: 'dependents', where: { familyId: values.id as number } }]
+    });
   }
   return null;
 };
