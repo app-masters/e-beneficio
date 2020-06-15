@@ -10,6 +10,7 @@ const list = [
     code: '1234',
     groupId: 4,
     responsibleName: 'JOÃO FERNANDO BARAKY',
+    createdAt: moment().subtract(1, 'months').toDate(),
     responsibleBirthday: moment('20/12/1991', 'DD/MM/YYYY').toDate(),
     responsibleNis: '1234',
     responsibleMotherName: 'HILDA LÚCIA BARAKY'
@@ -18,6 +19,7 @@ const list = [
     code: '10000000',
     groupId: 2,
     responsibleName: 'JOSÉ ALMEIDA DA SILVA',
+    createdAt: moment().subtract(1, 'months').toDate(),
     responsibleBirthday: moment('01/01/1988', 'DD/MM/YYYY').toDate(),
     responsibleNis: '10000000000',
     responsibleMotherName: 'MARIA RITA DA SILVA'
@@ -26,6 +28,7 @@ const list = [
     code: '20000000',
     groupId: 3,
     responsibleName: 'MARIA ARAÚJO',
+    createdAt: moment().subtract(1, 'months').toDate(),
     responsibleBirthday: moment('06/07/1979', 'DD/MM/YYYY').toDate(),
     responsibleNis: '20000000000',
     responsibleMotherName: 'MARIA RITA DA SILVA'
@@ -34,6 +37,7 @@ const list = [
     code: '30000000',
     groupId: 1,
     responsibleName: 'TEREZA DE JESUS',
+    createdAt: moment().subtract(1, 'months').toDate(),
     responsibleBirthday: moment('01/10/1978', 'DD/MM/YYYY').toDate(),
     responsibleNis: '30000000000',
     responsibleMotherName: 'MARIA RITA DA SILVA'
@@ -66,6 +70,7 @@ const seed = async () => {
         .fill({})
         .map((_, index) => ({
           code: String(alreadyCreatedCount + index).padEnd(8, '0'),
+          createdAt: moment().subtract(1, 'months').toDate(),
           groupId: groups[Math.floor(Math.random() * groups.length)].id,
           responsibleName: `${faker.name.firstName()} ${faker.name.lastName()} ${faker.name.lastName()}`.toLocaleUpperCase(),
           responsibleBirthday: faker.date.between('1960-01-01', '1991-12-31'),
