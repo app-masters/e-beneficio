@@ -36,14 +36,13 @@ import { requestGetGroup } from '../../redux/group/actions';
 import { Group } from '../../interfaces/group';
 
 const schema = yup.object().shape({
-  code: yup.string().label('Código'),
-  groupName: yup.string().label('Grupo familiar').required()
+  groupId: yup.string().label('Grupo familiar').required()
 });
 
 const typeFamily = {
   code: '',
   cityId: 0,
-  groupName: '',
+  groupId: '',
   isRegisteredInPerson: undefined,
   totalSalary: undefined,
   isOnAnotherProgram: undefined,
@@ -62,6 +61,7 @@ const typeFamily = {
  * @param props component props
  */
 export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (props) => {
+  const isCreating = props.match.params.id === 'criar';
   const [modal, setModal] = React.useState<{
     item?: Dependent | null;
     open: boolean;
@@ -81,8 +81,8 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
   );
 
   React.useEffect(() => {
-    dispatch(requestGetGroup());
-  }, [dispatch]);
+    if (groups.length === 0) dispatch(requestGetGroup());
+  }, [groups, dispatch]);
 
   const loading = useSelector<AppState, boolean>(({ familyReducer }) => familyReducer.loading);
   const error = useSelector<AppState, Error | undefined>(({ familyReducer }) => familyReducer.error);
@@ -113,7 +113,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
         requestSaveFamily(
           newFamily as Family,
           () => {
-            Modal.success({ title: 'Familia salva com sucesso', onOk: () => history.push('/familias') });
+            Modal.success({ title: 'Família salva com sucesso', onOk: () => history.push('/familias') });
           },
           () => setStatus('Ocorreu um erro ao salvar a familia.')
         )
@@ -173,7 +173,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
     return list;
   };
 
-  const groupNameMeta = getFieldMeta('groupName');
+  const groupIdMeta = getFieldMeta('groupId');
 
   const isRegisteredInPersonMeta = getFieldMeta('isRegisteredInPerson');
   const isRegisteredInPersonField = getFieldProps('isRegisteredInPerson');
@@ -191,37 +191,32 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
 
   return (
     <PageContainer>
-      <Card loading={loading} title={<Typography.Title>Nova Familia</Typography.Title>}>
-        <Form layout="vertical">
+      <Card
+        loading={loading}
+        title={<Typography.Title>{`${isCreating ? 'Nova' : 'Editar'} Família`}</Typography.Title>}
+      >
+        <Form onSubmitCapture={handleSubmit} layout="vertical">
           {error && <Alert message="Ocorreu um erro" description={error.message} type="error" showIcon />}
-          {/* {!error && family && family.id && (
-            <Alert
-              message="Familia salva"
-              description={'Os dados de familia foram salvos com sucesso!'}
-              type="success"
-              showIcon
-            />
-          )} */}
           <Row gutter={[16, 16]}>
             <Col span={24} md={8}>
               <Form.Item
                 label={'Grupo familiar'}
-                validateStatus={formValidation(groupNameMeta)}
-                help={formHelper(groupNameMeta)}
+                validateStatus={formValidation(groupIdMeta)}
+                help={formHelper(groupIdMeta)}
               >
                 <Select
-                  defaultValue={values.groupName?.toString()}
-                  onSelect={(value) => setFieldValue('groupName', value)}
-                  value={values.groupName?.toString() || undefined}
+                  defaultValue={values.groupId?.toString()}
+                  onSelect={(value) => setFieldValue('groupId', value)}
+                  value={values.groupId?.toString() || undefined}
                   onChange={(value: string) => {
-                    setFieldValue('groupName', value);
+                    setFieldValue('groupId', value);
                   }}
                   onBlur={() => {
-                    setFieldTouched('groupName', true);
+                    setFieldTouched('groupId', true);
                   }}
                 >
                   {groups.map((item: Group) => (
-                    <Select.Option key={item.id} value={item.title as string}>
+                    <Select.Option key={item.id} value={Number(item.id).toString()}>
                       {item.title}
                     </Select.Option>
                   ))}
@@ -359,105 +354,97 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
             </Col>
           </Row>
           <Divider />
-        </Form>
-        <PageHeader
-          title={<Typography.Text>Membros</Typography.Text>}
-          style={{ padding: 0, paddingBottom: 20 }}
-          extra={[
-            <Button key={'adult'} onClick={() => setModal({ open: true, type: 'adult' })}>
-              Adicionar adulto
-            </Button>,
-            <Button key={'child'} onClick={() => setModal({ open: true, type: 'child' })}>
-              Adicionar criança
-            </Button>
-          ]}
-        />
-        <List
-          dataSource={values.dependents}
-          itemLayout="horizontal"
-          locale={{ emptyText: 'Nenhum membro cadastrado' }}
-          renderItem={(item: Dependent) => (
-            <List.Item
-              actions={[
-                <Button
-                  key={'edit'}
-                  onClick={() => {
-                    setModal({
-                      open: true,
-                      type: item.isHired === null || item.isHired === undefined ? 'child' : 'adult',
-                      item
-                    });
-                  }}
-                >
-                  Editar
-                </Button>,
-                <Button
-                  key={'remove'}
-                  danger
-                  onClick={() =>
-                    Modal.confirm({
-                      title: 'Você realmente quer deletar esse registro?',
-                      icon: <ExclamationCircleOutlined />,
-                      okText: 'Sim',
-                      okType: 'danger',
-                      cancelText: 'Não',
-                      onOk: () => removeDependent(item.nis, item.id)
-                    })
+          <PageHeader
+            title={<Typography.Text>Membros</Typography.Text>}
+            style={{ padding: 0, paddingBottom: 20 }}
+            extra={[
+              <Button key={'adult'} onClick={() => setModal({ open: true, type: 'adult' })}>
+                Adicionar adulto
+              </Button>,
+              <Button key={'child'} onClick={() => setModal({ open: true, type: 'child' })}>
+                Adicionar criança
+              </Button>
+            ]}
+          />
+          <List
+            dataSource={values.dependents}
+            itemLayout="horizontal"
+            locale={{ emptyText: 'Nenhum membro cadastrado' }}
+            renderItem={(item: Dependent) => (
+              <List.Item
+                actions={[
+                  <Button
+                    key={'edit'}
+                    onClick={() => {
+                      setModal({
+                        open: true,
+                        type: item.isHired === null || item.isHired === undefined ? 'child' : 'adult',
+                        item
+                      });
+                    }}
+                  >
+                    Editar
+                  </Button>,
+                  <Button
+                    key={'remove'}
+                    danger
+                    onClick={() =>
+                      Modal.confirm({
+                        title: 'Você realmente quer deletar esse registro?',
+                        icon: <ExclamationCircleOutlined />,
+                        okText: 'Sim',
+                        okType: 'danger',
+                        cancelText: 'Não',
+                        onOk: () => removeDependent(item.nis, item.id)
+                      })
+                    }
+                  >
+                    Remover
+                  </Button>
+                ]}
+                style={{ paddingBottom: 0 }}
+              >
+                <List.Item.Meta
+                  title={
+                    <>
+                      {item.isResponsible ? (
+                        <strong>
+                          {'Responsável familiar'} <br />
+                        </strong>
+                      ) : (
+                        ''
+                      )}
+                      {`${item.name} - ${item.isHired === null || item.isHired === undefined ? 'Criança' : 'Adulto'}`}
+                    </>
                   }
-                >
-                  Remover
-                </Button>
-              ]}
-            >
-              <List.Item.Meta
-                title={
-                  <>
-                    {item.isResponsible ? (
-                      <strong>
-                        {'Responsável familiar'} <br />
-                      </strong>
-                    ) : (
-                      ''
-                    )}
-                    {`${item.name} - ${item.isHired === null || item.isHired === undefined ? 'Criança' : 'Adulto'}`}
-                  </>
-                }
-                description={
-                  <Row gutter={[16, 16]}>
-                    <Col span={24} md={12}>
-                      {(item.email || item.phone) && <>{`${item.email || ''} - ${item.phone || ''}`}</>}
-                      {(item.cpf || item.rg) && (
-                        <>
-                          <br />
-                          {`CPF: ${item.cpf || ''} - RG: ${item.rg || ''}`}
-                        </>
-                      )}
-                      {item.schoolName && (
-                        <>
-                          <br />
-                          {`Escola: ${item.schoolName || ''}`}
-                        </>
-                      )}
-                    </Col>
-                    {item.profession && (
+                  description={
+                    <Row gutter={[16, 16]}>
                       <Col span={24} md={12}>
-                        {`Profissão: ${item.profession || ''}`}
-                        <br />
-                        {`Salário: ${item.salary ? 'R$ ' + formatMoney(item.salary) : 'Não informado'}`}
+                        <Row>
+                          {(item.email || item.phone) && `${item.email || ''} - ${formatPhone(item.phone) || ''}`}
+                        </Row>
+                        <Row>{(item.cpf || item.rg) && `CPF: ${item.cpf || ''} - RG: ${item.rg || ''}`}</Row>
+                        <Row>{item.schoolName && `Escola: ${item.schoolName || ''}`}</Row>
                       </Col>
-                    )}
-                  </Row>
-                }
-              />
-            </List.Item>
-          )}
-        />
-        <Divider />
-        <ActionWrapper>
-          <Button loading={loading} onClick={() => handleSubmit()} type={'primary'}>
-            Concluir
-          </Button>
-        </ActionWrapper>
+                      {item.profession && (
+                        <Col span={24} md={12}>
+                          <Row>{`Profissão: ${item.profession || ''}`}</Row>
+                          <Row>{`Salário: ${item.salary ? 'R$ ' + formatMoney(item.salary) : 'Não informado'}`}</Row>
+                        </Col>
+                      )}
+                    </Row>
+                  }
+                />
+              </List.Item>
+            )}
+          />
+          <Divider />
+          <ActionWrapper>
+            <Button htmlType={'submit'} loading={loading} type={'primary'}>
+              Concluir
+            </Button>
+          </ActionWrapper>
+        </Form>
       </Card>
       {modal.open && (
         <DependentForm

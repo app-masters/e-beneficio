@@ -96,7 +96,7 @@ export const FamiliesList: React.FC<{}> = () => {
             title="Grupo familiar"
             dataIndex="groupId"
             width="20%"
-            render={(groupId) => groups.find((group) => group.id === groupId)?.title}
+            render={(groupId) => groups.find((group) => group.id === groupId)?.title || ''}
           />
           <Table.Column
             title="Número de Dependentes"

@@ -149,6 +149,9 @@ export default createReducer<FamilyReducerState>(initialState, (builder) =>
     })
     .addCase(doGetFamilySuccess, (state, action) => {
       state.familyLoading = false;
+      state.familyError = undefined;
+      state.error = undefined;
+      state.familySaveError = undefined;
       state.familyItem = !Array.isArray(action.payload) ? action.payload : undefined;
       state.list = Array.isArray(action.payload) ? action.payload : [];
     })
