@@ -156,12 +156,14 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
   };
 
   /**
-   * Handle responsable
+   * Handle responsible
    */
   const responsibleDependent = (value: Dependent) => {
     let list: Dependent[] = values.dependents ? [...values.dependents] : [];
-    const verifyIndex = list.findIndex((f) => f.nis === value.nis || f.id === value.id);
-    if (verifyIndex > -1) list = list.filter((f) => f.nis !== value.nis || f.id === value.id);
+
+    const verifyIndex = list.findIndex((f) => f.nis === value.nis);
+    if (verifyIndex > -1) list = list.filter((f) => f.nis !== value.nis);
+
     if (value.isResponsible) {
       list = list.map((resp: Dependent) => {
         return { ...resp, isResponsible: false };
@@ -196,7 +198,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
         loading={loading}
         title={<Typography.Title>{`${isCreating ? 'Nova' : 'Editar'} Família`}</Typography.Title>}
       >
-        <Form layout="vertical">
+        <Form onSubmitCapture={submitForm} layout="vertical">
           {error && <Alert message="Ocorreu um erro" description={(error as Error).message} type="error" showIcon />}
           <Row gutter={[16, 16]}>
             <Col span={24} md={8}>
@@ -382,105 +384,105 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
             </Col>
           </Row>
           <Divider />
-        </Form>
-        <PageHeader
-          title={<Typography.Text>Membros</Typography.Text>}
-          style={{ padding: 0, paddingBottom: 20 }}
-          extra={[
-            <Button key={'adult'} onClick={() => setModal({ open: true, type: 'adult' })}>
-              Adicionar adulto
-            </Button>,
-            <Button key={'child'} onClick={() => setModal({ open: true, type: 'child' })}>
-              Adicionar criança
-            </Button>
-          ]}
-        />
-        <List
-          dataSource={values.dependents}
-          itemLayout="horizontal"
-          locale={{ emptyText: 'Nenhum membro cadastrado' }}
-          renderItem={(item: Dependent) => (
-            <List.Item
-              actions={[
-                <Button
-                  key={'edit'}
-                  onClick={() => {
-                    setModal({
-                      open: true,
-                      type: item.isHired === null || item.isHired === undefined ? 'child' : 'adult',
-                      item
-                    });
-                  }}
-                >
-                  Editar
-                </Button>,
-                <Button
-                  key={'remove'}
-                  danger
-                  onClick={() =>
-                    Modal.confirm({
-                      title: 'Você realmente quer deletar esse registro?',
-                      icon: <ExclamationCircleOutlined />,
-                      okText: 'Sim',
-                      okType: 'danger',
-                      cancelText: 'Não',
-                      onOk: () => removeDependent(item.nis, item.id)
-                    })
+          <PageHeader
+            title={<Typography.Text>Membros</Typography.Text>}
+            style={{ padding: 0, paddingBottom: 20 }}
+            extra={[
+              <Button key={'adult'} onClick={() => setModal({ open: true, type: 'adult' })}>
+                Adicionar adulto
+              </Button>,
+              <Button key={'child'} onClick={() => setModal({ open: true, type: 'child' })}>
+                Adicionar criança
+              </Button>
+            ]}
+          />
+          <List
+            dataSource={values.dependents}
+            itemLayout="horizontal"
+            locale={{ emptyText: 'Nenhum membro cadastrado' }}
+            renderItem={(item: Dependent) => (
+              <List.Item
+                actions={[
+                  <Button
+                    key={'edit'}
+                    onClick={() => {
+                      setModal({
+                        open: true,
+                        type: item.isHired === null || item.isHired === undefined ? 'child' : 'adult',
+                        item
+                      });
+                    }}
+                  >
+                    Editar
+                  </Button>,
+                  <Button
+                    key={'remove'}
+                    danger
+                    onClick={() =>
+                      Modal.confirm({
+                        title: 'Você realmente quer deletar esse registro?',
+                        icon: <ExclamationCircleOutlined />,
+                        okText: 'Sim',
+                        okType: 'danger',
+                        cancelText: 'Não',
+                        onOk: () => removeDependent(item.nis, item.id)
+                      })
+                    }
+                  >
+                    Remover
+                  </Button>
+                ]}
+              >
+                <List.Item.Meta
+                  title={
+                    <>
+                      {item.isResponsible ? (
+                        <strong>
+                          {'Responsável familiar'} <br />
+                        </strong>
+                      ) : (
+                        ''
+                      )}
+                      {`${item.name} - ${item.isHired === null || item.isHired === undefined ? 'Criança' : 'Adulto'}`}
+                    </>
                   }
-                >
-                  Remover
-                </Button>
-              ]}
-            >
-              <List.Item.Meta
-                title={
-                  <>
-                    {item.isResponsible ? (
-                      <strong>
-                        {'Responsável familiar'} <br />
-                      </strong>
-                    ) : (
-                      ''
-                    )}
-                    {`${item.name} - ${item.isHired === null || item.isHired === undefined ? 'Criança' : 'Adulto'}`}
-                  </>
-                }
-                description={
-                  <Row gutter={[16, 16]}>
-                    <Col span={24} md={12}>
-                      {(item.email || item.phone) && <>{`${item.email || ''} - ${formatPhone(item.phone) || ''}`}</>}
-                      {(item.cpf || item.rg) && (
-                        <>
-                          <br />
-                          {`CPF: ${item.cpf || ''} - RG: ${item.rg || ''}`}
-                        </>
-                      )}
-                      {item.schoolName && (
-                        <>
-                          <br />
-                          {`Escola: ${item.schoolName || ''}`}
-                        </>
-                      )}
-                    </Col>
-                    {item.profession && (
+                  description={
+                    <Row gutter={[16, 16]}>
                       <Col span={24} md={12}>
-                        {`Profissão: ${item.profession || ''}`}
-                        <br />
-                        {`Salário: ${item.salary ? 'R$ ' + formatMoney(item.salary) : 'Não informado'}`}
+                        {(item.email || item.phone) && <>{`${item.email || ''} - ${formatPhone(item.phone) || ''}`}</>}
+                        {(item.cpf || item.rg) && (
+                          <>
+                            <br />
+                            {`CPF: ${item.cpf || ''} - RG: ${item.rg || ''}`}
+                          </>
+                        )}
+                        {item.schoolName && (
+                          <>
+                            <br />
+                            {`Escola: ${item.schoolName || ''}`}
+                          </>
+                        )}
                       </Col>
-                    )}
-                  </Row>
-                }
-              />
-            </List.Item>
-          )}
-        />
-        <Divider />
-        <ActionWrapper>
-          <Button loading={loading} onClick={() => handleSubmit()} type={'primary'}>
-            Concluir
-          </Button>
-        </ActionWrapper>
+                      {item.profession && (
+                        <Col span={24} md={12}>
+                          {`Profissão: ${item.profession || ''}`}
+                          <br />
+                          {`Salário: ${item.salary ? 'R$ ' + formatMoney(item.salary) : 'Não informado'}`}
+                        </Col>
+                      )}
+                    </Row>
+                  }
+                />
+              </List.Item>
+            )}
+          />
+          <Divider />
+          <ActionWrapper>
+            <Button htmlType={'submit'} loading={loading} type={'primary'}>
+              Concluir
+            </Button>
+          </ActionWrapper>
+        </Form>
       </Card>
       {modal.open && (
         <DependentForm

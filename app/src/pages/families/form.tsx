@@ -132,7 +132,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
   };
 
   /**
-   * Handle responsable
+   * Handle responsible
    */
   const responsibleDependent = (value: Dependent) => {
     let list: Dependent[] = values.dependents ? [...values.dependents] : [];
