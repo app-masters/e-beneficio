@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom';
 import { Benefit } from '../../interfaces/benefit';
 import { requestDeleteBenefit, requestGetBenefit } from '../../redux/benefit/actions';
 import { AppState } from '../../redux/rootReducer';
-import { familyGroupList } from '../../utils/constraints';
 import { ActionWrapper, PageContainer } from './styles';
 import { formatMoney } from '../../utils/string';
 import { env } from '../../env';
