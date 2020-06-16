@@ -41,7 +41,7 @@ const schema = yup.object().shape({
 
 const typeFamily = {
   code: '',
-  cityId: '',
+  cityId: 0,
   groupId: '',
   isRegisteredInPerson: undefined,
   totalSalary: undefined,
@@ -113,7 +113,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
         requestSaveFamily(
           newFamily as Family,
           () => {
-            Modal.success({ title: 'Familia salva com sucesso', onOk: () => history.push('/familias') });
+            Modal.success({ title: 'Família salva com sucesso', onOk: () => history.push('/familias') });
           },
           () => setStatus('Ocorreu um erro ao salvar a familia.')
         )
@@ -149,7 +149,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
     return list;
   };
 
-  const groupIdMeta = getFieldMeta('groupName');
+  const groupIdMeta = getFieldMeta('groupId');
 
   const isRegisteredInPersonMeta = getFieldMeta('isRegisteredInPerson');
   const isRegisteredInPersonField = getFieldProps('isRegisteredInPerson');

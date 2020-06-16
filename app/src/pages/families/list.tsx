@@ -20,9 +20,10 @@ import { Group } from '../../interfaces/group';
  */
 export const FamiliesList: React.FC<{}> = () => {
   // Redux state
-  const list = useSelector<AppState, Family[]>(({ familyReducer }) => familyReducer.list as Family[]);
-  const familiesLoading = useSelector<AppState, boolean>(({ familyReducer }) => familyReducer.loading);
+  const list = useSelector<AppState, Family[]>((state) => state.familyReducer.list as Family[]);
+  const familiesLoading = useSelector<AppState, boolean>((state) => state.familyReducer.loading);
   const groups = useSelector<AppState, Group[]>(({ groupReducer }) => groupReducer.list as Group[]);
+  // const familiesError = useSelector<AppState, Error | undefined>((state) => state.familyReducer.error);
 
   const dataSource = useMemo(
     () =>

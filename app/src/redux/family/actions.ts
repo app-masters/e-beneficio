@@ -36,7 +36,7 @@ export const requestGetFamily = (code: string): ThunkResult<void> => {
       // Start request - starting loading state
       dispatch(doGetFamily());
       // Request
-      const response = await backend.get<Family>(`/families`, { params: { code } });
+      const response = await backend.get<Family>(`/families`, { params: { code: code.toUpperCase() } });
       if (response && response.data) {
         // Request finished
         dispatch(doGetFamilySuccess(response.data)); // Dispatch result
