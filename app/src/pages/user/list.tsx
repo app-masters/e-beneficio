@@ -11,6 +11,7 @@ import { requestGetPlaceStore } from '../../redux/placeStore/actions';
 import { requestDeleteUser, requestGetUser } from '../../redux/user/actions';
 import { formatCPF } from '../../utils/string';
 import { roleList } from './../../utils/constraints';
+import EmptyList from '../../components/emptyList';
 
 /**
  * UserList page component
@@ -42,7 +43,12 @@ export const UserList: React.FC<{}> = () => {
           </Link>
         }
       >
-        <Table dataSource={list}>
+        <Table
+          locale={{
+            emptyText: () => <EmptyList title={'Nenhum usuário disponível'} />
+          }}
+          dataSource={list}
+        >
           <Table.Column title="Nome" dataIndex="name" />
           <Table.Column title="Email" dataIndex="email" />
           <Table.Column

@@ -125,14 +125,28 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
    * Remove dependent form component
    */
   const removeDependent = (nis?: string, id?: number | string) => {
-    let list = values.dependents;
+    let list: Dependent[] | undefined = values.dependents ? [...values.dependents] : [];
     if (nis) list = values.dependents?.filter((f: Dependent) => f.nis !== nis);
     else if (id) list = values.dependents?.filter((f: Dependent) => f.id !== Number(id));
+
+    const verifyResponsible = list?.find((f) => f.isResponsible);
+    if (!verifyResponsible) {
+      const adults = list?.filter((f) => f.type === 'adult');
+      if (adults && adults?.length > 0) {
+        const newResponsible = adults.pop();
+        if (newResponsible) {
+          list = list?.filter((f) => f.nis !== newResponsible.nis);
+          newResponsible.isResponsible = true;
+          list?.unshift(newResponsible);
+        }
+      }
+    }
+
     setFieldValue('dependents', list);
   };
 
   /**
-   * Handle responsable
+   * Handle responsible
    */
   const responsibleDependent = (value: Dependent) => {
     let list: Dependent[] = values.dependents ? [...values.dependents] : [];
@@ -144,7 +158,17 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
       });
       list.unshift(value);
     } else {
-      list.push(value);
+      if (value.type === 'adult') {
+        const verifyIfHasResponsible = list.find((f) => f.isResponsible);
+        if (!verifyIfHasResponsible) {
+          value.isResponsible = true;
+          list.unshift(value);
+        } else {
+          list.push(value);
+        }
+      } else {
+        list.push(value);
+      }
     }
     return list;
   };
@@ -554,6 +578,7 @@ export const DependentForm: React.FC<{
         </Form.Item>
         <Form.Item label={'Nascimento'} validateStatus={formValidation(birthdayMeta)} help={formHelper(birthdayMeta)}>
           <DatePicker
+            style={{ width: '100%' }}
             name="birthday"
             format={'DD/MM/YYYY'}
             defaultValue={values.birthday ? moment(values.birthday) : undefined}
@@ -573,7 +598,13 @@ export const DependentForm: React.FC<{
           validateStatus={formValidation(rgMeta)}
           help={formHelper(rgMeta)}
         >
-          <Input id="rg" name="rg" onChange={handleChange} value={formatRG(values.rg)} onPressEnter={submitForm} />
+          <Input
+            id="rg"
+            name="rg"
+            onChange={(event) => setFieldValue('rg', formatRG(event?.target.value))}
+            value={values.rg}
+            onPressEnter={submitForm}
+          />
         </Form.Item>
         <Form.Item
           label={
@@ -585,7 +616,13 @@ export const DependentForm: React.FC<{
           validateStatus={formValidation(cpfMeta)}
           help={formHelper(cpfMeta)}
         >
-          <Input id="cpf" name="cpf" onChange={handleChange} value={formatCPF(values.cpf)} onPressEnter={submitForm} />
+          <Input
+            id="cpf"
+            name="cpf"
+            onChange={(event) => setFieldValue('cpf', formatCPF(event?.target.value))}
+            value={formatCPF(values.cpf)}
+            onPressEnter={submitForm}
+          />
         </Form.Item>
         {type === 'adult' && (
           <>
@@ -596,7 +633,7 @@ export const DependentForm: React.FC<{
               <Input
                 id="phone"
                 name="phone"
-                onChange={handleChange}
+                onChange={(event) => setFieldValue('phone', formatPhone(event?.target.value))}
                 value={formatPhone(values.phone)}
                 onPressEnter={submitForm}
               />

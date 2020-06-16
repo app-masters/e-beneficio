@@ -67,7 +67,7 @@ const ProductConsumption: React.FC<{ family?: Family | null; loading?: boolean }
   });
   const [showCameraModal, setShowCameraModal] = React.useState(false);
   const [showCamera, setShowCamera] = React.useState(false);
-  const [dataSource, setDataSource] = React.useState<FamilyProductConsumption[]>(
+  const [dataSource, setDataSource] = React.useState<FamilyProductConsumption[] | undefined>(
     family?.balance as FamilyProductConsumption[]
   );
 
@@ -88,6 +88,14 @@ const ProductConsumption: React.FC<{ family?: Family | null; loading?: boolean }
    */
   const onSubmitConsumption = () => {
     setConsumerInfo({ ...consumerInfo, error: false });
+
+    const verifyIfHaveSelected = dataSource?.filter((f) => Number(f.consume) > 0);
+    if (verifyIfHaveSelected?.length === 0) {
+      window.scrollTo(0, 0);
+      notification.warning({ message: 'É necessário selecionar no mínimo 1 produto' });
+      return;
+    }
+
     if (!consumerInfo.image) {
       window.scrollTo(0, 0);
       notification.warning({ message: 'É necessário o envio de uma foto do consumidor' });
@@ -98,10 +106,12 @@ const ProductConsumption: React.FC<{ family?: Family | null; loading?: boolean }
       familyId: family?.id as number,
       proofImageUrl: consumerInfo.image,
       products: dataSource
-        .map((item) => {
-          return { id: item.product.id as number, amount: item.consume as number };
-        })
-        .filter((f) => f.amount)
+        ? dataSource
+            .map((item) => {
+              return { id: item.product.id as number, amount: item.consume as number };
+            })
+            .filter((f) => f.amount)
+        : []
     };
     dispatch(requestSaveConsumptionProduct(consumption));
   };
@@ -111,8 +121,8 @@ const ProductConsumption: React.FC<{ family?: Family | null; loading?: boolean }
    */
   const onChangeItemValue = (value: number, productId: number) => {
     const list = JSON.parse(JSON.stringify(dataSource));
-    const indexItem = dataSource.findIndex((f) => f.product.id === productId);
-    list[indexItem].consume = value;
+    const indexItem = dataSource?.findIndex((f) => f.product.id === productId);
+    list[Number(indexItem)].consume = value;
     setDataSource(list);
   };
 
@@ -229,7 +239,12 @@ const ProductConsumption: React.FC<{ family?: Family | null; loading?: boolean }
       </Modal>
       <Divider />
       <h2>Produtos</h2>
-      <Table pagination={false} columns={columns} dataSource={dataSource || []} />
+      <Table
+        locale={{ emptyText: 'Nenhum produto disponível' }}
+        pagination={false}
+        columns={columns}
+        dataSource={dataSource && dataSource.length ? dataSource : []}
+      />
       <Flex style={{ marginTop: 25 }} alignItems="center" justifyContent="flex-end">
         <Button loading={loading} onClick={onSubmitConsumption} htmlType="submit" type="primary">
           Confirmar consumo
