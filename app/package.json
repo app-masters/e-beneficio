@@ -61,7 +61,9 @@
     "prettier-check": "^2.0.0"
   },
   "scripts": {
+    "prestart": "cp ./src/index.html ./ && chmod +x ./env_index.sh && sh ./env_index.sh && mv index.html ./public/ && rm original_index.html",
     "start": "chmod +x ./create_env.sh && sh ./create_env.sh && cp env-config.js ./public/ && react-scripts start",
+    "prebuild": "cp ./src/index.html ./public/",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "checks": "npm run check-prettier && npm run check-lint && npm run check-typescript",
