@@ -15,6 +15,7 @@ jobs:
     outputs:
       branch: ${{ steps.environment.outputs.branch }}
     steps:
+      - uses: actions/checkout@v1
       - name: Set enviroment
         id: environment
         shell: bash
