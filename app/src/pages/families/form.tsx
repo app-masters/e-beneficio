@@ -37,13 +37,13 @@ import { Group } from '../../interfaces/group';
 
 const schema = yup.object().shape({
   code: yup.string().label('Código'),
-  groupName: yup.string().label('Grupo familiar').required()
+  groupId: yup.string().label('Grupo familiar').required()
 });
 
 const typeFamily = {
   code: '',
   cityId: 0,
-  groupName: '',
+  groupId: '',
   isRegisteredInPerson: undefined,
   totalSalary: undefined,
   isOnAnotherProgram: undefined,
@@ -113,7 +113,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
         requestSaveFamily(
           newFamily as Family,
           () => {
-            Modal.success({ title: 'Familia salva com sucesso', onOk: () => history.push('/familias') });
+            Modal.success({ title: 'Família salva com sucesso', onOk: () => history.push('/familias') });
           },
           () => setStatus('Ocorreu um erro ao salvar a familia.')
         )
@@ -149,7 +149,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
     return list;
   };
 
-  const groupNameMeta = getFieldMeta('groupName');
+  const groupIdMeta = getFieldMeta('groupId');
 
   const isRegisteredInPersonMeta = getFieldMeta('isRegisteredInPerson');
   const isRegisteredInPersonField = getFieldProps('isRegisteredInPerson');
@@ -182,22 +182,22 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
             <Col span={24} md={8}>
               <Form.Item
                 label={'Grupo familiar'}
-                validateStatus={formValidation(groupNameMeta)}
-                help={formHelper(groupNameMeta)}
+                validateStatus={formValidation(groupIdMeta)}
+                help={formHelper(groupIdMeta)}
               >
                 <Select
-                  defaultValue={values.groupName?.toString()}
-                  onSelect={(value) => setFieldValue('groupName', value)}
-                  value={values.groupName?.toString() || undefined}
+                  defaultValue={values.groupId?.toString()}
+                  onSelect={(value) => setFieldValue('groupId', value)}
+                  value={values.groupId?.toString() || undefined}
                   onChange={(value: string) => {
-                    setFieldValue('groupName', value);
+                    setFieldValue('groupId', value);
                   }}
                   onBlur={() => {
-                    setFieldTouched('groupName', true);
+                    setFieldTouched('groupId', true);
                   }}
                 >
                   {groups.map((item: Group) => (
-                    <Select.Option key={item.id} value={item.title as string}>
+                    <Select.Option key={item.id} value={Number(item.id).toString()}>
                       {item.title}
                     </Select.Option>
                   ))}

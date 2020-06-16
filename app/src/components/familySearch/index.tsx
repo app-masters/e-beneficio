@@ -52,7 +52,7 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
           <Input.Search
             loading={familyLoading}
             enterButton
-            onChange={(event) => setNis(event.target.value)}
+            onChange={(event) => setNis(event.target.value.toUpperCase())}
             value={nis}
             maxLength={11}
             onPressEnter={() => {

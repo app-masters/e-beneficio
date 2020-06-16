@@ -12,6 +12,8 @@ import { ActionWrapper, PageContainer } from './styles';
 import { Dependent } from '../../interfaces/dependent';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
+import { requestGetGroup } from '../../redux/group/actions';
+import { Group } from '../../interfaces/group';
 
 /**
  * FamiliesList page component
@@ -21,6 +23,7 @@ export const FamiliesList: React.FC<{}> = () => {
   // Redux state
   const list = useSelector<AppState, Family[]>((state) => state.familyReducer.list as Family[]);
   const familiesLoading = useSelector<AppState, boolean>((state) => state.familyReducer.loading);
+  const groups = useSelector<AppState, Group[]>(({ groupReducer }) => groupReducer.list as Group[]);
   // const familiesError = useSelector<AppState, Error | undefined>((state) => state.familyReducer.error);
 
   const dataSource = useMemo(
@@ -39,6 +42,7 @@ export const FamiliesList: React.FC<{}> = () => {
 
   useEffect(() => {
     dispatch(requestGetPlaceFamilies());
+    dispatch(requestGetGroup());
   }, [dispatch]);
 
   return (
@@ -62,8 +66,8 @@ export const FamiliesList: React.FC<{}> = () => {
           <Table.Column title="Código" dataIndex="code" width="18%" />
           <Table.Column
             title="Grupo familiar"
-            dataIndex="groupName"
-            render={(groupName: Family['groupName']) => familyGroupList && familyGroupList[groupName]?.title}
+            dataIndex="groupId"
+            render={(groupId: Family['groupId']) => groups?.find((group) => groupId === group.id)?.title}
             width="18%"
           />
           <Table.Column
