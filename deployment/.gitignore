@@ -6,5 +6,6 @@
 **/.env.admin
 **/.env.portal
 **/.env.app
+**/*.conf
 #**/config.sh
 **/docker-compose.yml

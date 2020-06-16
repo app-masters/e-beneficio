@@ -16,7 +16,7 @@ WORKDIR /usr/share/nginx/html
 COPY --from=build /var/www/build /usr/share/nginx/html
 COPY ./env.sh /usr/share/nginx/html
 RUN rm /etc/nginx/conf.d/default.conf
-COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
+#COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80 443
 
