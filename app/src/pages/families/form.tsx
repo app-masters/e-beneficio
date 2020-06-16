@@ -14,7 +14,6 @@ import {
   PageHeader,
   Modal,
   InputNumber,
-  notification,
   Divider,
   Alert
 } from 'antd';
@@ -447,13 +446,10 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
             setModal({ open: false, type: '' });
           }}
           onCreate={(value: Dependent) => {
-            if (verifyDependentNIS(value)) {
-              //Generate random NIS.
-              value.nis = Math.random().toString(36).substr(0, 10);
-              const list = responsibleDependent(value);
-              setFieldValue('dependents', list);
-              setModal({ open: false, type: '' });
-            }
+            value.nis = Math.random().toString(36).substr(0, 10);
+            const list = responsibleDependent(value);
+            setFieldValue('dependents', list);
+            setModal({ open: false, type: '' });
           }}
         />
       )}
