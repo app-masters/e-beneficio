@@ -16,7 +16,7 @@ const { Option } = Select;
 
 const schema = yup.object().shape({
   title: yup.string().label('Nome').required(),
-  placeId: yup.number().label('Entidade').required(),
+  placeId: yup.number().label('Grupo da Entidade').required(),
   address: yup.string().label('Endereço').required()
 });
 
@@ -68,7 +68,7 @@ export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (pr
       dispatch(
         requestSavePlaceStore(
           values,
-          () => history.push('/localidades'),
+          () => history.push('/entidades'),
           () => setStatus('Ocorreu um erro ao realizar a requisição.')
         )
       );
@@ -84,7 +84,7 @@ export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (pr
     <Modal
       title={isCreating ? 'Criar' : 'Editar'}
       visible={true}
-      onCancel={() => history.push('/localidades')}
+      onCancel={() => history.push('/entidades')}
       onOk={submitForm}
       confirmLoading={loading}
       okType={errors && Object.keys(errors).length > 0 && touched ? 'danger' : 'primary'}

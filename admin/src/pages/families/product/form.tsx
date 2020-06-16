@@ -42,13 +42,13 @@ import { requestGetGroup } from '../../../redux/group/actions';
 
 const schema = yup.object().shape({
   groupName: yup.string().label('Grupo familiar').required(),
-  placeStoreId: yup.string().label('Localidade').required()
+  placeStoreId: yup.string().label('Entidade').required()
 });
 
 const typeFamily = {
   code: '',
-  cityId: 0,
-  groupName: '',
+  cityId: 1,
+  groupId: 1,
   placeStoreId: '',
   isRegisteredInPerson: undefined,
   totalSalary: undefined,
@@ -173,7 +173,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
     return list;
   };
 
-  const groupNameMeta = getFieldMeta('groupName');
+  const groupIdMeta = getFieldMeta('groupId');
   const placeStoreIdMeta = getFieldMeta('placeStoreId');
 
   const isRegisteredInPersonMeta = getFieldMeta('isRegisteredInPerson');
@@ -199,57 +199,32 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
         <Form layout="vertical">
           {error && <Alert message="Ocorreu um erro" description={(error as Error).message} type="error" showIcon />}
           <Row gutter={[16, 16]}>
-            <Col span={24} md={6}>
-              <Form.Item
-                label={'Localidade'}
-                validateStatus={formValidation(placeStoreIdMeta)}
-                help={formHelper(placeStoreIdMeta)}
-              >
-                <Select
-                  defaultValue={values.placeStoreId?.toString()}
-                  onSelect={(value) => setFieldValue('placeStoreId', value)}
-                  value={values.placeStoreId?.toString() || undefined}
-                  onChange={(value: string) => {
-                    setFieldValue('placeStoreId', value);
-                  }}
-                  onBlur={() => {
-                    setFieldTouched('placeStoreId', true);
-                  }}
-                >
-                  {placeStore.map((placeStore) => (
-                    <Select.Option key={placeStore.id} value={Number(placeStore.id).toString()}>
-                      {placeStore.title}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col span={24} md={6}>
+            <Col span={24} md={8}>
               <Form.Item
                 label={'Grupo familiar'}
-                validateStatus={formValidation(groupNameMeta)}
-                help={formHelper(groupNameMeta)}
+                validateStatus={formValidation(groupIdMeta)}
+                help={formHelper(groupIdMeta)}
               >
                 <Select
-                  defaultValue={values.groupName?.toString()}
-                  onSelect={(value) => setFieldValue('groupName', value)}
-                  value={values.groupName?.toString() || undefined}
+                  defaultValue={values.groupId?.toString()}
+                  onSelect={(value) => setFieldValue('groupId', value)}
+                  value={values.groupId?.toString() || undefined}
                   onChange={(value: string) => {
-                    setFieldValue('groupName', value);
+                    setFieldValue('groupId', value);
                   }}
                   onBlur={() => {
-                    setFieldTouched('groupName', true);
+                    setFieldTouched('groupId', true);
                   }}
                 >
                   {groups.map((item: Group) => (
-                    <Select.Option key={item.id} value={item.title as string}>
+                    <Select.Option key={item.id} value={Number(item.id).toString()}>
                       {item.title}
                     </Select.Option>
                   ))}
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={24} md={6} style={ColCheckStyle}>
+            <Col span={24} md={8} style={ColCheckStyle}>
               <Flex alignItems="flex-end" justifyContent="center" style={{ width: '100%', height: '100%' }}>
                 <Form.Item
                   validateStatus={formValidation(isOnGovernProgramMeta)}
@@ -261,7 +236,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
                 </Form.Item>
               </Flex>
             </Col>
-            <Col span={24} md={6} style={ColCheckStyle}>
+            <Col span={24} md={8} style={ColCheckStyle}>
               <Flex alignItems="flex-end" justifyContent="center" style={{ width: '100%', height: '100%' }}>
                 <Form.Item
                   validateStatus={formValidation(isOnAnotherProgramMeta)}
@@ -368,15 +343,42 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
             </Col>
           </Row>
           <Row>
-            <Col span={24} md={24} style={ColCheckStyle}>
+            <Col span={24} md={12}>
               <Form.Item
-                validateStatus={formValidation(isRegisteredInPersonMeta)}
-                help={formHelper(isRegisteredInPersonMeta)}
+                label={'Entidade vinculada'}
+                validateStatus={formValidation(placeStoreIdMeta)}
+                help={formHelper(placeStoreIdMeta)}
               >
-                <Checkbox checked={values.isRegisteredInPerson} {...isRegisteredInPersonField}>
-                  Registrado pessoalmente
-                </Checkbox>
+                <Select
+                  defaultValue={values.placeStoreId?.toString()}
+                  onSelect={(value) => setFieldValue('placeStoreId', value)}
+                  value={values.placeStoreId?.toString() || undefined}
+                  onChange={(value: string) => {
+                    setFieldValue('placeStoreId', value);
+                  }}
+                  onBlur={() => {
+                    setFieldTouched('placeStoreId', true);
+                  }}
+                >
+                  {placeStore.map((placeStore) => (
+                    <Select.Option key={placeStore.id} value={Number(placeStore.id).toString()}>
+                      {placeStore.title}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
+            </Col>
+            <Col span={24} md={12} style={ColCheckStyle}>
+              <Flex alignItems="flex-end" justifyContent="center" style={{ width: '100%', height: '100%' }}>
+                <Form.Item
+                  validateStatus={formValidation(isRegisteredInPersonMeta)}
+                  help={formHelper(isRegisteredInPersonMeta)}
+                >
+                  <Checkbox checked={values.isRegisteredInPerson} {...isRegisteredInPersonField}>
+                    Registrado pessoalmente
+                  </Checkbox>
+                </Form.Item>
+              </Flex>
             </Col>
           </Row>
           <Divider />

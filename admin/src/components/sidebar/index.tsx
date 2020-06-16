@@ -56,7 +56,8 @@ const routes: RouteItem[] = [
     path: '/consumo',
     icon: () => <CarryOutOutlined />,
     name: 'Informar consumo',
-    allowedRoles: ['admin', 'manager']
+    allowedRoles: ['admin', 'manager'],
+    specificToType: 'ticket'
   },
   {
     path: '/familias',
@@ -88,28 +89,28 @@ const routes: RouteItem[] = [
 
   // Items only shown in the `product` consumption type
   {
-    path: '/origem-do-beneficio',
-    icon: () => <BankOutlined />,
-    name: 'Origem do benefício',
-    allowedRoles: ['admin'],
-    specificToType: 'product'
-  },
-  {
     path: '/produtos',
     icon: () => <ShoppingCartOutlined />,
     name: 'Produtos',
     specificToType: 'product'
   },
   {
-    path: '/localidades',
+    path: '/entidades',
     icon: () => <ShopOutlined />,
-    name: 'Localidades',
+    name: 'Entidades',
     specificToType: 'product'
   },
   {
-    path: '/entidades',
+    path: '/grupos-de-entidades',
     icon: () => <SolutionOutlined />,
-    name: 'Entidades',
+    name: 'Grupo de entidades',
+    specificToType: 'product'
+  },
+  {
+    path: '/origem-do-beneficio',
+    icon: () => <BankOutlined />,
+    name: 'Origem do benefício',
+    allowedRoles: ['admin'],
     specificToType: 'product'
   }
 ];

@@ -155,7 +155,8 @@ export const attributes = {
 };
 
 // Intance of the hash generator that will be used to encode the family id
-const hashids = new Hashids('', 6, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890', '');
+// Baraky: I've removed letters and numbers that can appear similar in certain fonts
+const hashids = new Hashids('', 6, 'ABCDEFGHJKMNPQRSTUVWXYZ23456789', '');
 /**
  * After the creation of the family, use its id to generate an code
  *

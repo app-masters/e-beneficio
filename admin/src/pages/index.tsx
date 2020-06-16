@@ -75,8 +75,8 @@ const PrivateRouter: React.FC<{}> = () => {
         {/* Report routes */}
         <Route path="/relatorios" component={ReportList} allowedRole="admin" />
         {/* Place routes */}
-        <Route path="/entidades" component={PlaceList} allowedRole="admin" specificToType="product" />
-        <Route path="/entidades/:id" component={PlaceForm} allowedRole="admin" specificToType="product" />
+        <Route path="/grupos-de-entidades" component={PlaceList} allowedRole="admin" specificToType="product" />
+        <Route path="/grupos-de-entidades/:id" component={PlaceForm} allowedRole="admin" specificToType="product" />
         {/* Group routes */}
         <Route path="/grupos" component={GroupList} allowedRole="admin" specificToType="product" />
         <Route path="/grupos/:id" component={GroupForm} allowedRole="admin" specificToType="product" />
@@ -84,8 +84,8 @@ const PrivateRouter: React.FC<{}> = () => {
         <Route path="/beneficios" component={BenefitList} allowedRole="admin" />
         <Route path="/beneficios/:id" component={BenefitForm} allowedRole="admin" />
         {/* PlaceStore routes */}
-        <Route path="/localidades" component={PlaceStoreList} allowedRole="admin" specificToType="product" />
-        <Route path="/localidades/:id" component={PlaceStoreForm} allowedRole="admin" specificToType="product" />
+        <Route path="/entidades" component={PlaceStoreList} allowedRole="admin" specificToType="product" />
+        <Route path="/entidades/:id" component={PlaceStoreForm} allowedRole="admin" specificToType="product" />
         {/* User routes */}
         <Route path="/usuarios" component={UserList} allowedRole="admin" />
         <Route path="/usuarios/:id" component={UserForm} allowedRole="admin" />

@@ -13,7 +13,7 @@ import moment from 'moment';
 
 const schema = yup.object().shape({
   code: yup.string().label('Código').required(),
-  groupName: yup.string().label('Grupo familiar').required(),
+  groupId: yup.string().label('Grupo familiar').required(),
   responsibleName: yup.string().label('Nome do responsável').required(),
   responsibleNis: yup.string().label('NIS do responsável').required(),
   responsibleBirthday: yup.date().label('Nascimento do responsável').required(),
@@ -24,7 +24,7 @@ const { Option } = Select;
 
 const typeFamily = {
   code: '',
-  groupName: '',
+  groupId: 0,
   responsibleName: '',
   responsibleNis: '',
   responsibleBirthday: '',
@@ -108,14 +108,14 @@ export const FamilyForm: React.FC<RouteComponentProps<{ id: string }>> = (props)
             help={!!groupNameMeta.error && !!groupNameMeta.touched ? groupNameMeta.error : undefined}
           >
             <Select
-              defaultValue={values.groupName?.toString()}
-              onSelect={(value) => setFieldValue('groupName', value)}
-              value={values.groupName?.toString() || undefined}
+              defaultValue={values.groupId?.toString()}
+              onSelect={(value) => setFieldValue('groupId', value)}
+              value={values.groupId?.toString() || undefined}
               onChange={(value: string) => {
-                setFieldValue('groupName', value);
+                setFieldValue('groupId', value);
               }}
               onBlur={() => {
-                setFieldTouched('groupName', true);
+                setFieldTouched('groupId', true);
               }}
             >
               {Object.keys(familyGroupList).map((item) => (
