@@ -4,10 +4,10 @@ set -e
 function getEnvName() {
   ## Validate target environment
   if [[ $# -eq 0 ]]; then
-      echo "No arguments supplied - inform the branch (dev|test|staging|master)";
+      echo "No arguments supplied - inform the branch (dev|test|staging|master|jf-contra-fome)";
       exit 1;
   fi
-  if [[ !"$1" =~ ^(dev|test|staging|master)$ ]]; then
+  if [[ !"$1" =~ ^(dev|test|staging|master|jf-contra-fome)$ ]]; then
       echo "$1 is not a valid branch";
       exit 1;
   fi
@@ -24,7 +24,4 @@ function getEnvName() {
 function setProject(){
   ## Set GCP compute zone
   gcloud config set compute/zone ${ZONE}
-
-  ## Login on GCR
-  gcloud auth configure-docker --quiet
 }
