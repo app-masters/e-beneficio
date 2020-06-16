@@ -12,6 +12,8 @@ import { ActionWrapper, PageContainer } from './styles';
 import { Dependent } from '../../../interfaces/dependent';
 import { requestGetPlaceStore } from '../../../redux/placeStore/actions';
 import { PlaceStore } from '../../../interfaces/placeStore';
+import { Group } from '../../../interfaces/group';
+import { requestGetGroup } from '../../../redux/group/actions';
 
 /**
  * FamiliesList page component
@@ -45,8 +47,14 @@ export const FamiliesList: React.FC<{}> = () => {
   }, [dispatch]);
 
   React.useEffect(() => {
+    dispatch(requestGetGroup());
+  }, [dispatch]);
+
+  React.useEffect(() => {
     if (placeStore.length > 0) dispatch(requestGetPlaceFamilies(placeStore[0].id as number));
   }, [dispatch, placeStore]);
+
+  const groups = useSelector<AppState, Group[]>(({ groupReducer }) => groupReducer.list as Group[]);
 
   return (
     <PageContainer>
@@ -56,7 +64,7 @@ export const FamiliesList: React.FC<{}> = () => {
           <>
             <Select
               style={{ width: 200 }}
-              defaultValue={placeStore[0].id?.toString() || undefined}
+              defaultValue={placeStore[0]?.id?.toString() || undefined}
               value={selectedPlaceStore}
               onSelect={(value) => {
                 setPlaceStore(value);
@@ -84,7 +92,12 @@ export const FamiliesList: React.FC<{}> = () => {
             }
           />
           <Table.Column title="Código" dataIndex="code" width="20%" />
-          <Table.Column title="Grupo familiar" dataIndex="groupName" width="20%" />
+          <Table.Column
+            title="Grupo familiar"
+            dataIndex="groupId"
+            width="20%"
+            render={(groupId) => groups.find((group) => group.id === groupId)?.title}
+          />
           <Table.Column
             title="Número de Dependentes"
             render={(family: Family) => family.dependents?.length || 0}

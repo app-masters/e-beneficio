@@ -24,9 +24,9 @@ export const PlaceList: React.FC<{}> = () => {
   return (
     <PageContainer>
       <Card
-        title={<Typography.Title>{`Entidades`}</Typography.Title>}
+        title={<Typography.Title>{`Grupos de Entidades`}</Typography.Title>}
         extra={
-          <Link to={`/entidades/criar`}>
+          <Link to={`/grupos-de-entidades/criar`}>
             <Button type="primary">Criar</Button>
           </Link>
         }
@@ -42,7 +42,7 @@ export const PlaceList: React.FC<{}> = () => {
             render={(item: Place) => {
               return (
                 <ActionWrapper>
-                  <Link to={`/entidades/${item.id}/editar`}>
+                  <Link to={`/grupos-de-entidades/${item.id}/editar`}>
                     <Button>Editar</Button>
                   </Link>
                   {/* TODO: Add alert on delete */}

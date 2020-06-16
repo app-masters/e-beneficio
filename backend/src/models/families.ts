@@ -471,13 +471,6 @@ export const createFamilyWithDependents = async (
   values: Family | SequelizeFamily,
   cityId: string | number
 ): Promise<SequelizeFamily> => {
-  //verify if family exists
-  const family = await db.families.findOne({
-    where: Sequelize.and({ code: values.code }, values.responsibleNis ? { responsibleNis: values.responsibleNis } : {})
-  });
-  if (family) {
-    throw { status: 412, message: 'Familia já cadastrada.' };
-  }
   //verify if dependent exist
   if (type === 'product') {
     if (values.dependents) {

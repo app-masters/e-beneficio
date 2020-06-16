@@ -5,7 +5,7 @@ export interface Family {
   cityId: number | string;
   placeStoreId?: number | string;
   code: string;
-  groupName: string;
+  groupId: number | string;
   responsibleName?: string;
   responsibleNis?: string;
   responsibleBirthday?: Date;

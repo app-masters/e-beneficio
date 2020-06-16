@@ -51,7 +51,7 @@ export const FamiliesList: React.FC<{}> = () => {
           </Link>
         }
       >
-        <Table loading={familiesLoading} dataSource={dataSource} rowKey="id">
+        <Table dataSource={dataSource} rowKey="id">
           <Table.Column
             title="Nome do Responsável"
             width="18%"

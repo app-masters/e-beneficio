@@ -31,9 +31,9 @@ export const PlaceStoreList: React.FC<{}> = () => {
   return (
     <PageContainer>
       <Card
-        title={<Typography.Title>{`Localidades`}</Typography.Title>}
+        title={<Typography.Title>{`Entidades`}</Typography.Title>}
         extra={
-          <Link to={`/localidades/criar`}>
+          <Link to={`/entidades/criar`}>
             <Button type="primary">Criar</Button>
           </Link>
         }
@@ -61,7 +61,7 @@ export const PlaceStoreList: React.FC<{}> = () => {
             render={(item: PlaceStore) => {
               return (
                 <ActionWrapper>
-                  <Link to={`/localidades/${item.id}/editar`}>
+                  <Link to={`/entidades/${item.id}/editar`}>
                     <Button>Editar</Button>
                   </Link>
                   {/* TODO: Add alert on delete */}
