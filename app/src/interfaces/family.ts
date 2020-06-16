@@ -11,7 +11,7 @@ export interface Family {
   readonly id?: number | string;
   cityId: number | string;
   code: string;
-  groupName: string;
+  groupId: string;
   responsibleName?: string;
   responsibleNis?: string;
   responsibleBirthday?: Date;

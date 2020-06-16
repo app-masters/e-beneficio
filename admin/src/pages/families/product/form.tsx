@@ -41,14 +41,14 @@ import { requestGetGroup } from '../../../redux/group/actions';
 // import { Group } from '../../../interfaces/group';
 
 const schema = yup.object().shape({
-  groupName: yup.string().label('Grupo familiar').required(),
+  groupId: yup.string().label('Grupo familiar').required(),
   placeStoreId: yup.string().label('Entidade').required()
 });
 
 const typeFamily = {
   code: '',
-  cityId: 1,
-  groupId: 1,
+  cityId: '',
+  groupId: '',
   placeStoreId: '',
   isRegisteredInPerson: undefined,
   totalSalary: undefined,

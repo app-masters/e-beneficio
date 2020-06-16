@@ -3,7 +3,6 @@ import { Button, Card, Table, Typography, Modal } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import { familyGroupList } from '../../utils/constraints';
 import { Family } from '../../interfaces/family';
 import { AppState } from '../../redux/rootReducer';
 import { requestGetPlaceFamilies, requestDeactivateFamily } from '../../redux/family/actions';
@@ -12,6 +11,8 @@ import { ActionWrapper, PageContainer } from './styles';
 import { Dependent } from '../../interfaces/dependent';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
+import { requestGetGroup } from '../../redux/group/actions';
+import { Group } from '../../interfaces/group';
 
 /**
  * FamiliesList page component
@@ -19,9 +20,9 @@ import moment from 'moment';
  */
 export const FamiliesList: React.FC<{}> = () => {
   // Redux state
-  const list = useSelector<AppState, Family[]>((state) => state.familyReducer.list as Family[]);
-  const familiesLoading = useSelector<AppState, boolean>((state) => state.familyReducer.loading);
-  // const familiesError = useSelector<AppState, Error | undefined>((state) => state.familyReducer.error);
+  const list = useSelector<AppState, Family[]>(({ familyReducer }) => familyReducer.list as Family[]);
+  const familiesLoading = useSelector<AppState, boolean>(({ familyReducer }) => familyReducer.loading);
+  const groups = useSelector<AppState, Group[]>(({ groupReducer }) => groupReducer.list as Group[]);
 
   const dataSource = useMemo(
     () =>
@@ -39,6 +40,7 @@ export const FamiliesList: React.FC<{}> = () => {
 
   useEffect(() => {
     dispatch(requestGetPlaceFamilies());
+    dispatch(requestGetGroup());
   }, [dispatch]);
 
   return (
@@ -62,8 +64,8 @@ export const FamiliesList: React.FC<{}> = () => {
           <Table.Column title="Código" dataIndex="code" width="18%" />
           <Table.Column
             title="Grupo familiar"
-            dataIndex="groupName"
-            render={(groupName: Family['groupName']) => familyGroupList && familyGroupList[groupName]?.title}
+            dataIndex="groupId"
+            render={(groupId: Family['groupId']) => (groups && groups.find((f) => f.id === groupId))?.title || ''}
             width="18%"
           />
           <Table.Column
