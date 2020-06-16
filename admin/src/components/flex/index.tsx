@@ -39,7 +39,6 @@ export const Flex = styled.div<FlexProps>`
   It is not recommended to add more properties here.
   If that is the case, it's better that you create your own
   flex component for your specific case instead. */
-
   display: flex;
   align-items: ${(props) => (props.alignItems ? props.alignItems : 'initial')};
   justify-content: ${(props) => (props.justifyContent ? props.justifyContent : 'initial')};

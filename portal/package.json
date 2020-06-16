@@ -1,6 +1,6 @@
 {
   "name": "portal",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "homepage": ".",
   "private": true,
   "engines": {
@@ -35,6 +35,7 @@
     "react-webcam": "^5.0.1",
     "redux-persist": "^6.0.0",
     "redux-thunk": "^2.3.0",
+    "rollbar": "^2.16.2",
     "styled-components": "^5.0.1",
     "typescript": "3.8.3",
     "yup": "^0.28.3"
@@ -64,7 +65,9 @@
     "prettier-check": "^2.0.0"
   },
   "scripts": {
+    "prestart": "cp ./src/index.html ./ && chmod +x ./env_index.sh && sh ./env_index.sh && mv index.html ./public/ && rm original_index.html",
     "start": "chmod +x ./env.sh && sh ./env.sh && cp env-config.js ./public/ && react-scripts start",
+    "prebuild": "cp ./src/index.html ./public/",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "checks": "npm run check-prettier && npm run check-lint && npm run check-typescript",

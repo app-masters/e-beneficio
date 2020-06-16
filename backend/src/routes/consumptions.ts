@@ -5,6 +5,8 @@ import { uploadFile } from '../utils/file';
 
 const router = express.Router({ mergeParams: true });
 
+const consumptionType = process.env.CONSUMPTION_TYPE as 'ticket' | 'product';
+
 /**
  * Create new consumption for the placeStore the logged user
  */
@@ -12,6 +14,8 @@ router.post('/', async (req, res) => {
   try {
     let proofImageUrl: string | null = null;
     // Check if there is a image in the request
+    if (req.body.products) req.body.products = JSON.parse(req.body.products);
+
     if (req.files && Object.keys(req.files).length !== 0) {
       let image = req.files.image;
       if (Array.isArray(image)) {
@@ -24,10 +28,21 @@ router.post('/', async (req, res) => {
         proofImageUrl = data.url;
       }
     }
-    const item = await consumptionModel.addConsumption({ ...req.body, proofImageUrl });
-    return res.send(item);
+
+    let item;
+    if (consumptionType === 'ticket') {
+      item = await consumptionModel.addConsumption({ ...req.body, proofImageUrl });
+      // Scrape the purchase data, but don't wait for it
+      consumptionModel.scrapeConsumption(item);
+      return res.send(item);
+    } else {
+      item = await consumptionModel.addConsumptionProduct({ ...req.body, proofImageUrl });
+      return res.send(item);
+    }
   } catch (error) {
-    logging.error(error);
+    if (!error.status || Number(error.status) !== 409) {
+      logging.error(error.message || error, { error, body: req.body });
+    }
     return res.status(error.status || 500).send(error.message);
   }
 });

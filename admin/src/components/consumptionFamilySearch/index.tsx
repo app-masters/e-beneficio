@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { Alert, Button, Descriptions, Form, Input, Typography } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { Flex } from '../flex';
-import { FamilyActions, FamilyWrapper } from './styles';
+import { FamilyActions, FamilyWrapper, InfoContainer } from './styles';
 import { AppState } from '../../redux/rootReducer';
 import { requestGetFamily } from '../../redux/families/actions';
 import { Family } from '../../interfaces/family';
 import moment from 'moment';
 import { env } from '../../env';
+import { formatMoney } from '../../utils/string';
 
 type ComponentProps = {
   onFamilySelect?: (id: Family['id']) => void;
@@ -27,6 +28,9 @@ export const ConsumptionFamilySearch: React.FC<ComponentProps> = (props) => {
   const [birthday, setBirthday] = useState('');
   // Redux state
   const familyLoading = useSelector<AppState, boolean>((state) => state.familiesReducer.familyLoading);
+  const familyError = useSelector<AppState, (Error & { status?: number }) | undefined>(
+    (state) => state.familiesReducer.familyError
+  );
   const family = useSelector<AppState, Family | null | undefined>((state) => state.familiesReducer.familyItem);
 
   // .env
@@ -67,6 +71,20 @@ export const ConsumptionFamilySearch: React.FC<ComponentProps> = (props) => {
           }}
         />
       </Form.Item>
+
+      {familyError && !familyLoading && (
+        <FamilyWrapper>
+          <Alert
+            type={familyError.status === 404 ? 'info' : 'error'}
+            message={
+              <InfoContainer>
+                <Typography.Text>{familyError.message}</Typography.Text>
+              </InfoContainer>
+            }
+          />
+        </FamilyWrapper>
+      )}
+
       {family && props.askForBirthday && (
         <Form.Item
           label="Aniversário do responsável"
@@ -93,9 +111,6 @@ export const ConsumptionFamilySearch: React.FC<ComponentProps> = (props) => {
                   <Descriptions.Item label="Data de nascimento do responsável">
                     {moment(family.responsibleBirthday).format('DD/MM/YYYY')}
                   </Descriptions.Item>
-                  <Descriptions.Item label="Nome da mãe do responsável">
-                    {family.responsibleMotherName}
-                  </Descriptions.Item>
                 </Descriptions>
                 <FamilyActions>
                   <Flex alignItems="center" justifyContent="flex-end" gap>
@@ -117,11 +132,8 @@ export const ConsumptionFamilySearch: React.FC<ComponentProps> = (props) => {
             <Descriptions.Item label="Data de nascimento">
               {moment(family.responsibleBirthday).format('DD/MM/YYYY')}
             </Descriptions.Item>
-            <Descriptions.Item label="Nome da mãe">{family.responsibleMotherName}</Descriptions.Item>
             <Descriptions.Item label="Saldo disponível">
-              <Typography.Paragraph strong>{`R$${(family.balance || 0)
-                .toFixed(2)
-                .replace('.', ',')}`}</Typography.Paragraph>
+              <Typography.Paragraph strong>{`R$${formatMoney(family.balance || 0)}`}</Typography.Paragraph>
             </Descriptions.Item>
           </Descriptions>
         </FamilyWrapper>

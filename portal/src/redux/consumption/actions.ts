@@ -2,6 +2,8 @@ import { createAction } from '@reduxjs/toolkit';
 import { ThunkResult } from '../store';
 import { backend } from '../../utils/networking';
 import { Consumption } from '../../interfaces/consumption';
+import { logging } from '../../utils/logging';
+import analytics from '../../utils/analytics';
 
 // Simple actions and types
 export const doSaveConsumption = createAction<void>('consumption/SAVE');
@@ -14,7 +16,7 @@ export const doSaveConsumptionFailed = createAction<Error | undefined>('consumpt
 export const requestSaveConsumption = (
   item: Pick<Consumption, 'familyId' | 'nfce' | 'proofImageUrl' | 'value'>,
   onSuccess?: () => void,
-  onFailure?: (error?: Error) => void
+  onFailure?: (error?: Error & { status?: number }) => void
 ): ThunkResult<void> => {
   return async (dispatch) => {
     try {
@@ -35,15 +37,25 @@ export const requestSaveConsumption = (
         // Request finished
         dispatch(doSaveConsumptionSuccess(response.data)); // Dispatch result
         if (onSuccess) onSuccess();
+
+        // Log the query to GA
+        analytics.event('Consumo - com sucesso', 'Consumo', 'Incluído');
       } else {
         // Request without response - probably won't happen, but cancel the request
         dispatch(doSaveConsumptionFailed());
         if (onFailure) onFailure();
+
+        // Log the query to GA
+        analytics.event('Consumo - falha na inclusão', 'Consumo', 'Falha na inclusão');
       }
     } catch (error) {
       // Request failed: dispatch error
+      logging.error(error);
       dispatch(doSaveConsumptionFailed(error));
       if (onFailure) onFailure(error);
+
+      // Log the query to GA
+      analytics.event('Consumo - falha na inclusão', 'Consumo', 'Falha na inclusão');
     }
   };
 };

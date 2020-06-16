@@ -1,29 +1,38 @@
-import { Alert, Checkbox, Form, Input, Modal, Select, Spin } from 'antd';
+import { Alert, Checkbox, Form, Input, Modal, Select } from 'antd';
 import { useFormik } from 'formik';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
 import { InputFormatter } from '../../components/inputFormatter';
-import { Place } from '../../interfaces/place';
-import { PlaceStore } from '../../interfaces/placeStore';
 import { User } from '../../interfaces/user';
-import { requestGetPlace } from '../../redux/place/actions';
-import { requestGetPlaceStore } from '../../redux/placeStore/actions';
 import { AppState } from '../../redux/rootReducer';
 import { requestSaveUser } from '../../redux/user/actions';
+import { requestGetPlaceStore } from '../../redux/placeStore/actions';
 import { formatCPF } from '../../utils/string';
 import yup from '../../utils/yup';
 import { roleList } from './../../utils/constraints';
+import { PlaceStore } from '../../interfaces/placeStore';
 
 const { Option } = Select;
 
 const schema = yup.object().shape({
-  placeStoreId: yup.number().label('Loja').required(),
   name: yup.string().label('Nome').required(),
-  password: yup.string().label('Senha').required(),
+  password: yup
+    .string()
+    .label('Senha')
+    .when('isCreating', (isCreating: boolean | null | undefined, schema: yup.StringSchema) =>
+      isCreating ? schema.required() : schema
+    ),
   cpf: yup.string().label('CPF').required(),
   email: yup.string().label('Email').required(),
-  role: yup.string().label('Cargo').required()
+  role: yup.string().label('Cargo').required(),
+  placeStoreId: yup
+    .string()
+    .label('Localidade')
+    .when('role', (role: string | undefined, schema: yup.StringSchema) =>
+      role !== 'admin' ? schema.required() : schema
+    ),
+  isCreating: yup.boolean().label('CriandoUsuario').nullable()
 });
 
 /**
@@ -34,26 +43,21 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
   const history = useHistory();
   const isCreating = props.match.params.id === 'criar';
 
+  const CONSUMPTION_TYPE = process.env.REACT_APP_CONSUMPTION_TYPE || 'ticket';
+
   // Redux state
+  const placeStore = useSelector<AppState, PlaceStore[]>(({ placeStoreReducer }) => placeStoreReducer.list);
   const user = useSelector<AppState, User | undefined>(({ userReducer }) =>
-    userReducer.list.find((item) => item.id === Number(props.match.params.id))
+    userReducer.list.find((item: User) => item.id === Number(props.match.params.id))
   );
   const loading = useSelector<AppState, boolean>(({ userReducer }) => userReducer.loading);
-  const placeStoreLoading = useSelector<AppState, boolean>(({ placeStoreReducer }) => placeStoreReducer.loading);
-  const placeStoreList = useSelector<AppState, PlaceStore[]>(({ placeStoreReducer }) => placeStoreReducer.list);
-  const placeList = useSelector<AppState, Place[]>(({ placeReducer }) => placeReducer.list);
 
   // Redux actions
   const dispatch = useDispatch();
-  useEffect(() => {
-    if (!placeStoreList || placeStoreList.length <= 0) {
-      dispatch(requestGetPlaceStore());
-    }
 
-    if (!placeList || placeList.length <= 0) {
-      dispatch(requestGetPlace());
-    }
-  }, [dispatch, placeStoreList, placeList]);
+  React.useEffect(() => {
+    dispatch(requestGetPlaceStore());
+  }, [dispatch]);
 
   const {
     handleSubmit,
@@ -69,16 +73,21 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
     getFieldProps
   } = useFormik({
     initialValues: user || {
-      placeStoreId: !placeStoreLoading && placeStoreList && placeStoreList.length > 0 ? placeStoreList[0].id : -1,
       name: '',
       password: '',
       cpf: '',
       email: '',
       role: 'admin',
-      active: false
+      placeStoreId: undefined,
+      active: false,
+      isCreating
     },
     validationSchema: schema,
-    onSubmit: (values, { setStatus }) => {
+    onSubmit: (formikValues, { setStatus }) => {
+      const values = { ...formikValues };
+      // Prevent sending an empty password when editing an already existing user
+      if (!isCreating && user && !values.password) values.password = user.password;
+
       setStatus();
       dispatch(
         requestSaveUser(
@@ -94,8 +103,8 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
   const passwordMeta = getFieldMeta('password');
   const cpfMeta = getFieldMeta('cpf');
   const emailMeta = getFieldMeta('email');
-  const placeStoreMeta = getFieldMeta('placeStoreId');
   const roleMeta = getFieldMeta('role');
+  const placeStoreIdMeta = getFieldMeta('placeStoreId');
   const activeMeta = getFieldMeta('active');
   const activeField = getFieldProps('active');
 
@@ -127,21 +136,19 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
             <Input id="email" name="email" onChange={handleChange} value={values.email} onPressEnter={submitForm} />
           </Form.Item>
 
-          {isCreating && (
-            <Form.Item
-              label={'Senha'}
-              validateStatus={!!passwordMeta.error && !!passwordMeta.touched ? 'error' : ''}
-              help={!!passwordMeta.error && !!passwordMeta.touched ? passwordMeta.error : undefined}
-            >
-              <Input
-                id="password"
-                name="password"
-                onChange={handleChange}
-                value={values.password}
-                onPressEnter={submitForm}
-              />
-            </Form.Item>
-          )}
+          <Form.Item
+            label={'Senha'}
+            validateStatus={!!passwordMeta.error && !!passwordMeta.touched ? 'error' : ''}
+            help={!!passwordMeta.error && !!passwordMeta.touched ? passwordMeta.error : undefined}
+          >
+            <Input
+              id="password"
+              name="password"
+              onChange={handleChange}
+              value={passwordMeta.touched ? values.password : undefined}
+              onPressEnter={submitForm}
+            />
+          </Form.Item>
 
           <Form.Item
             label={'CPF'}
@@ -157,38 +164,6 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
               formatter={(value) => formatCPF(value?.toString())}
               parser={(value) => (value ? value.replace(/[./-]/g, '').trim() : '')}
             />
-          </Form.Item>
-
-          <Form.Item
-            label={'Loja'}
-            validateStatus={!!placeStoreMeta.error && !!placeStoreMeta.touched ? 'error' : ''}
-            help={!!placeStoreMeta.error && !!placeStoreMeta.touched ? placeStoreMeta.error : undefined}
-          >
-            <Select
-              disabled={placeStoreLoading}
-              defaultValue={values.placeStoreId?.toString()}
-              onSelect={(value) => setFieldValue('placeStoreId', Number(value))}
-              value={values.placeStoreId?.toString() || undefined}
-              notFoundContent={placeStoreLoading ? <Spin size="small" /> : null}
-              onChange={(value: string) => {
-                setFieldValue('placeStoreId', Number(value));
-              }}
-              onBlur={() => {
-                setFieldTouched('placeStoreId', true);
-              }}
-            >
-              {!placeStoreLoading &&
-                placeStoreList &&
-                placeStoreList.length > 0 &&
-                placeStoreList.map((placeStore) => (
-                  <Option key={placeStore.id} value={placeStore.id?.toString() || '-1'}>
-                    {placeList && placeList.length > 0
-                      ? `${placeList.find((place) => place.id === placeStore.placeId)?.title} - `
-                      : ''}
-                    {placeStore.title}
-                  </Option>
-                ))}
-            </Select>
           </Form.Item>
 
           <Form.Item
@@ -214,6 +189,34 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
               ))}
             </Select>
           </Form.Item>
+
+          {CONSUMPTION_TYPE === 'product' && values.role !== 'admin' && (
+            <Form.Item
+              label={'Localidade'}
+              validateStatus={!!placeStoreIdMeta.error && !!placeStoreIdMeta.touched ? 'error' : ''}
+              help={!!placeStoreIdMeta.error && !!placeStoreIdMeta.touched ? placeStoreIdMeta.error : undefined}
+            >
+              <Select
+                defaultValue={values.placeStoreId}
+                onSelect={(value) => setFieldValue('placeStoreId', value)}
+                value={values.placeStoreId || undefined}
+                onChange={(value) => {
+                  setFieldValue('placeStoreId', value);
+                }}
+                onBlur={() => {
+                  setFieldTouched('placeStoreId', true);
+                }}
+              >
+                {placeStore &&
+                  placeStore.length > 0 &&
+                  placeStore.map((pStore) => (
+                    <Option key={pStore.id} value={Number(pStore.id)}>
+                      {pStore.title}
+                    </Option>
+                  ))}
+              </Select>
+            </Form.Item>
+          )}
 
           <Form.Item
             validateStatus={!!activeMeta.error && !!activeMeta.touched ? 'error' : ''}

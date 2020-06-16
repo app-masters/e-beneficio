@@ -15,7 +15,13 @@ router.get('/families', async (req, res) => {
     const item = await familyModel.findByNis(req.query.nis as string, req.query.cityId as string, undefined, true);
     if (!item) return res.status(404).send('Not found');
     const balance = await consumptionModel.getFamilyDependentBalance(item);
-    return res.send({ ...item.toJSON(), balance });
+    return res.send({
+      id: item.id,
+      balance,
+      school: item.school,
+      responsibleName: item.responsibleName,
+      responsibleBirthday: item.responsibleBirthday
+    });
   } catch (error) {
     logging.error(error);
     return res.status(500).send(error.message);
@@ -55,6 +61,10 @@ router.post('/consumptions', async (req, res) => {
       }
     }
     const item = await consumptionModel.addConsumption({ ...req.body, proofImageUrl });
+
+    // Scrape the purchase data, but don't wait for it
+    consumptionModel.scrapeConsumption(item);
+
     return res.send(item);
   } catch (error) {
     logging.error(error);

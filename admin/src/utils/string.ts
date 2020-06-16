@@ -14,6 +14,19 @@ export const formatPhone = (v?: string | null): string => {
 };
 
 /**
+ * Mask and format RG string
+ */
+export const formatRG = (v?: string | null): string => {
+  if (!v) return '';
+  // Remove anything that is not a number
+  v = v.replace(/\D/g, '').substr(0, 9);
+  v = v.replace(/^(\d{2})(\d)/, '$1.$2');
+  v = v.replace(/^(\d{2}.\d{3})(\d)/, '$1.$2');
+  v = v.replace(/^(\d{2}.\d{3}.\d{3})(\d{1,2})/, '$1-$2');
+  return v;
+};
+
+/**
  * Mask and format color string
  */
 export const formatColor = (v?: string | null): string => {
@@ -59,4 +72,31 @@ export const formatCEP = (v?: string | null): string => {
   v = v.replace(/\D/g, '').substr(0, 8);
   v = v.replace(/^(\d{5})(\d)/, '$1-$2');
   return v;
+};
+
+/**
+ * Format Money string
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const formatMoney = (amount: any, decimalCount = 2, decimal = ',', thousands = '.') => {
+  decimalCount = Math.abs(decimalCount);
+  decimalCount = isNaN(decimalCount) ? 2 : decimalCount;
+
+  const negativeSign = amount < 0 ? '-' : '';
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const i: any = parseInt((amount = Math.abs(Number(amount) || 0).toFixed(decimalCount))).toString();
+  const j = i.length > 3 ? i.length % 3 : 0;
+
+  return (
+    negativeSign +
+    (j ? i.substr(0, j) + thousands : '') +
+    i.substr(j).replace(/(\d{3})(?=\d)/g, '$1' + thousands) +
+    (decimalCount
+      ? decimal +
+        Math.abs(amount - i)
+          .toFixed(decimalCount)
+          .slice(2)
+      : '')
+  );
 };

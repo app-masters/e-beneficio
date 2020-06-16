@@ -10,7 +10,7 @@ const router = express.Router({ mergeParams: true });
 router.get('/', async (req, res) => {
   try {
     if (!req.user?.cityId) throw Error('User without selected city');
-    const items = await benefitModel.getAll(req.user.cityId);
+    const items = await benefitModel.getAllWithProduct(req.user.cityId);
     res.send(items);
   } catch (error) {
     logging.error(error);
@@ -41,7 +41,9 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     if (!req.user?.cityId) throw Error('User without selected city');
-    const item = await benefitModel.create(req.body);
+    let item;
+    if (req.body.value) item = await benefitModel.create(req.body);
+    else item = await benefitModel.createWithProduct(req.body);
     res.send(item);
   } catch (error) {
     logging.error(error);
@@ -55,7 +57,9 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     if (!req.user?.cityId) throw Error('User without selected city');
-    const item = await benefitModel.updateById(req.params.id, req.body, req.user.cityId);
+    let item;
+    if (req.body.value) item = await benefitModel.updateById(req.params.id, req.body, req.user.cityId);
+    else item = await benefitModel.updateWithProduct(req.params.id, req.body, req.user.cityId);
     res.send(item);
   } catch (error) {
     logging.error(error);

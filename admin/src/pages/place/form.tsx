@@ -23,7 +23,7 @@ export const PlaceForm: React.FC<RouteComponentProps<{ id: string }>> = (props) 
 
   // Redux state
   const place = useSelector<AppState, Place | undefined>(({ placeReducer }) =>
-    placeReducer.list.find((item) => item.id === Number(props.match.params.id))
+    placeReducer.list.find((item: Place) => item.id === Number(props.match.params.id))
   );
 
   const loading = useSelector<AppState, boolean>(({ placeReducer }) => placeReducer.loading);
@@ -38,7 +38,7 @@ export const PlaceForm: React.FC<RouteComponentProps<{ id: string }>> = (props) 
       dispatch(
         requestSavePlace(
           values,
-          () => history.push('/estabelecimentos'),
+          () => history.push('/entidades'),
           () => setStatus('Ocorreu um erro ao realizar a requisição.')
         )
       );
@@ -51,7 +51,7 @@ export const PlaceForm: React.FC<RouteComponentProps<{ id: string }>> = (props) 
     <Modal
       title={isCreating ? 'Criar' : 'Editar'}
       visible={true}
-      onCancel={() => history.push('/estabelecimentos')}
+      onCancel={() => history.push('/entidades')}
       onOk={submitForm}
       confirmLoading={loading}
       okType={errors && Object.keys(errors).length > 0 && touched ? 'danger' : 'primary'}

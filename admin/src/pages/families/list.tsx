@@ -32,6 +32,7 @@ import { FamilySearch } from '../../components/familySearch';
 import { spacing } from '../../styles/theme';
 import { ImportReport } from '../../interfaces/family';
 import { backend } from '../../utils/networking';
+import { formatMoney } from '../../utils/string';
 
 const { Dragger } = Upload;
 
@@ -42,7 +43,7 @@ const { Dragger } = Upload;
 export const FamiliesList: React.FC<{}> = () => {
   const dispatch = useDispatch();
   const loading = useSelector<AppState, boolean>(({ familiesReducer }) => familiesReducer.loading);
-  const error = useSelector<AppState, string | undefined>(({ familiesReducer }) => familiesReducer.error);
+  const error = useSelector<AppState, Error | string | undefined>(({ familiesReducer }) => familiesReducer.error);
 
   const importReport = useSelector<AppState, ImportReport | undefined>(
     ({ familiesReducer }) => familiesReducer.importReport
@@ -111,24 +112,55 @@ export const FamiliesList: React.FC<{}> = () => {
     <PageContainer>
       <Row gutter={[16, 16]}>
         <Col span={24}>
-          <Typography.Title>{`Famílias`}</Typography.Title>
-        </Col>
-      </Row>
-      <Row gutter={[16, 16]}>
-        <Col span={24}>
-          <Card loading={dashboardLoading}>
+          <Card title={<Typography.Title>{`Famílias`}</Typography.Title>} loading={dashboardLoading}>
             <Row gutter={[16, 16]}>
-              <Col span={12}>
-                <Statistic title={'Famílias beneficiadas'} value={dashboardData?.familyCount} groupSeparator={'.'} />
-              </Col>
-              <Col span={12}>
+              <Col span={8}>
                 <Statistic
-                  title={'Dependentes beneficiados'}
-                  value={dashboardData?.dependentCount}
+                  title={'Famílias beneficiadas este mês'}
+                  value={formatMoney(dashboardData?.familyCreatedMonthCount, 0)}
+                  groupSeparator={'.'}
+                />
+              </Col>
+              <Col span={8}>
+                <Statistic
+                  title={'Dependentes beneficiados este mês'}
+                  value={formatMoney(dashboardData?.dependentCreatedMonthCount, 0)}
+                  groupSeparator={'.'}
+                />
+              </Col>
+              <Col span={8}>
+                <Statistic
+                  title={'Famílias desativadas este mês'}
+                  value={formatMoney(dashboardData?.familyDeactivatedMonthCount, 0)}
                   groupSeparator={'.'}
                 />
               </Col>
             </Row>
+
+            <Row gutter={[16, 16]}>
+              <Col span={8}>
+                <Statistic
+                  title={'Famílias beneficiadas'}
+                  value={formatMoney(dashboardData?.familyCount, 0)}
+                  groupSeparator={'.'}
+                />
+              </Col>
+              <Col span={8}>
+                <Statistic
+                  title={'Dependentes beneficiados'}
+                  value={formatMoney(dashboardData?.dependentCount, 0)}
+                  groupSeparator={'.'}
+                />
+              </Col>
+              <Col span={8}>
+                <Statistic
+                  title={'Famílias desativadas'}
+                  value={formatMoney(dashboardData?.familyDeactivatedCount, 0)}
+                  groupSeparator={'.'}
+                />
+              </Col>
+            </Row>
+
             <Divider />
             <Row gutter={[16, 16]}>
               <Col span={24} style={ColAlignRight}>

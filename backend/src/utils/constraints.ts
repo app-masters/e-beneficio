@@ -1,9 +1,9 @@
 export const familyGroupList = [
-  { code: 0, title: 'Bolsa família com filho na escola pública', key: 'children' },
-  { code: 1, title: 'Extrema pobreza', key: 'extreme-poverty' },
-  { code: 2, title: 'Linha da pobreza', key: 'poverty-line' },
-  { code: 3, title: 'Perfil CAD único', key: 'cad' },
-  { code: 4, title: 'Perfil CAD único', key: 'cad' } // 3 and 4 will be grouped
+  { id: 1, code: 0, title: 'Bolsa família com filho na escola pública', key: 'children' },
+  { id: 2, code: 1, title: 'Extrema pobreza', key: 'extreme-poverty' },
+  { id: 3, code: 2, title: 'Linha da pobreza', key: 'poverty-line' },
+  { id: 4, code: 3, title: 'Perfil CAD único', key: 'cad' },
+  { id: 4, code: 4, title: 'Perfil CAD único', key: 'cad' } // 3 and 4 will be grouped
 ];
 
 /**

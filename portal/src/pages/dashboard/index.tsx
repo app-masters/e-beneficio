@@ -10,7 +10,8 @@ import {
   Container,
   LogoContainer,
   ActionContainer,
-  FooterImageContainer
+  FooterImageContainer,
+  FooterImageWrapper
 } from './styles';
 import { FamilySearch } from '../../components/familySearch';
 import { Flex } from '../../components/flex';
@@ -44,19 +45,24 @@ export const DashboardPage: React.FC<{}> = () => {
               vulnerabilidade social
             </Title>
             <ActionContainer justify="center" gutter={[16, 16]}>
-              <Col xs={{ span: 24 }} lg={{ span: 6 }}>
+              <Col xs={{ span: 24 }} lg={{ span: 4 }}>
                 <Button block href={'#saldo'} type={'primary'}>
                   Consultar saldo
                 </Button>
               </Col>
-              <Col xs={{ span: 24 }} lg={{ span: 6 }}>
+              <Col xs={{ span: 24 }} lg={{ span: 4 }}>
                 <Button block href={'#compra'} type={'primary'}>
                   Informar compra
                 </Button>
               </Col>
-              <Col xs={{ span: 24 }} lg={{ span: 6 }}>
+              <Col xs={{ span: 24 }} lg={{ span: 4 }}>
                 <Button block href={'#info'} type={'primary'}>
                   Informações sobre o programa
+                </Button>
+              </Col>
+              <Col xs={{ span: 24 }} lg={{ span: 4 }}>
+                <Button block href={'/passo-a-passo'} type={'primary'}>
+                  Ver passo-a-passo
                 </Button>
               </Col>
             </ActionContainer>
@@ -78,7 +84,7 @@ export const DashboardPage: React.FC<{}> = () => {
         <Container>
           <BodyContainer id="saldo">
             <Title level={4}>Ver situação no programa</Title>
-            {!modal && <FamilySearch />}
+            {!modal && <FamilySearch askForConfirmation />}
           </BodyContainer>
         </Container>
         <Container>
@@ -152,8 +158,11 @@ export const DashboardPage: React.FC<{}> = () => {
                 </Panel>
                 <Panel header="Obter mais informações" key="info">
                   <Text>
-                    Para obter mais informações, ligue para {env.REACT_APP_ENV_INFO_PHONE} ou entre no seguinte link e
-                    estaremos prontos para te ajudar
+                    Para obter mais informações, ligue para{' '}
+                    {env.REACT_APP_ENV_INFO_PHONE && env.REACT_APP_ENV_INFO_PHONE.length > 0
+                      ? env.REACT_APP_ENV_INFO_PHONE
+                      : '(32)3690-7342 ou (32)3690-8196 (Secretaria de Educação) (32)3690-7681 ou (32)2104-8177 (SEDETA),'}{' '}
+                    ou entre no seguinte link e estaremos prontos para te ajudar
                   </Text>
                   <PanelActionContainer>
                     <Button href={env.REACT_APP_ENV_INFO_LINK} target="_blank">
@@ -183,6 +192,39 @@ export const DashboardPage: React.FC<{}> = () => {
             </Card>
           </BodyContainer>
         </Container>
+
+        <Container>
+          <BodyContainer id="bought">
+            <Title level={4}>O que posso comprar com meu saldo do programa?</Title>
+            <Card size="small">
+              <Collapse bordered={false} style={PanelStyle}>
+                <Panel header="Pode ser comprado" key="canBought">
+                  <Paragraph>
+                    Poderão ser adquiridos com o cartão Vale-Alimentação os seguintes alimentos para atender as
+                    necessidades alimentares especiais dos alunos: alimentos in natura como frutas, legumes, verduras,
+                    carnes, arroz, feijão, macarrão, farinha, laticínios, fubá, grãos, ovos, queijo, pão, frutas,
+                    legumes, verduras e ovos; minimamente processados como os cereais, as leguminosas, as farinhas,
+                    macarrão ou massa fresca ou seca, as carnes resfriadas ou congeladas e os leites; e processados como
+                    as conservas, as frutas em caldas ou cristalizadas, extratos ou concentrados de tomate, carnes
+                    salgadas e peixes enlatados, queijos e pães.
+                  </Paragraph>
+                </Panel>
+                <Panel header="Não pode ser comprado" key="cantBought">
+                  <Paragraph>
+                    É expressamente proibida a compra de alimentos ultraprocessados como por exemplo, bebida alcoólica,
+                    refrigerante, sorvete, bala, doce, petiscos, biscoitos, e guloseimas em geral, cereais açucarados,
+                    bolos prontos e misturas para bolo, barras de cereal, sopas prontas, macarrão e temperos
+                    ‘instantâneos’, molhos, salgadinhos “de pacote”, refrescos e refrigerantes, iogurtes e bebidas
+                    lácteas adoçados e aromatizados, bebidas energéticas, produtos congelados e prontos para aquecimento
+                    como pratos de massas, pizzas, hambúrgueres e extratos de carne de frango ou peixe empanados do tipo
+                    nuggets, salsichas e outros embutidos.
+                  </Paragraph>
+                </Panel>
+              </Collapse>
+            </Card>
+          </BodyContainer>
+        </Container>
+
         <Footer>
           <Flex vertical justifyContent="center" alignItems="center">
             <Paragraph style={{ textAlign: 'center' }}>
@@ -195,18 +237,18 @@ export const DashboardPage: React.FC<{}> = () => {
                 {'GitHub'}
               </a>
             </Paragraph>
-            <div
-              style={{
-                width: '100%',
-                maxWidth: 1200
-              }}
-            >
+            <FooterImageWrapper>
               <Row style={{ flex: 1, justifyContent: 'space-around' }}>
                 <Col>
                   <Paragraph style={{ textAlign: 'center', fontSize: 12 }}>Desenvolvido pela</Paragraph>
                   <FooterImageContainer>
                     <a href="https://appmasters.io/pt">
-                      <img src={require('../../assets/AppMastersLogo.png')} width={'100%'} style={{ maxWidth: 180 }} />
+                      <img
+                        src={require('../../assets/AppMastersLogo.png')}
+                        alt="AppMastersLogo"
+                        width={'100%'}
+                        style={{ maxWidth: 180 }}
+                      />
                     </a>
                   </FooterImageContainer>
                 </Col>
@@ -216,6 +258,7 @@ export const DashboardPage: React.FC<{}> = () => {
                     <a href="https://www.pjf.mg.gov.br/">
                       <img
                         src={require('../../assets/PrefJuizForaLogo.png')}
+                        alt="PJFLogo"
                         width={'100%'}
                         style={{ maxWidth: 180 }}
                       />
@@ -223,7 +266,10 @@ export const DashboardPage: React.FC<{}> = () => {
                   </FooterImageContainer>
                 </Col>
               </Row>
-            </div>
+            </FooterImageWrapper>
+          </Flex>
+          <Flex justifyContent="center" style={{ marginTop: '20px', fontSize: 10 }}>
+            <Paragraph type="secondary">{`Versão ${env.REACT_APP_VERSION || '0.0.1'}`}</Paragraph>
           </Flex>
         </Footer>
       </Layout>

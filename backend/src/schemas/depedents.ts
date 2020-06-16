@@ -5,10 +5,21 @@ export interface Dependent {
   readonly id?: number | string;
   familyId: number | string;
   name: string;
-  nis: string;
+  nis?: string;
   birthday: Date | string;
   schoolName?: string;
   deactivatedAt?: number | Date | null;
+  //New attributes
+  isResponsible?: boolean;
+  rg?: string;
+  cpf?: string;
+  phone?: string;
+  profession?: string;
+  isHired?: boolean;
+  isFormal?: boolean;
+  salary?: number;
+  email?: string;
+  //
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
@@ -44,7 +55,7 @@ export const attributes = {
   },
   nis: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   },
   birthday: {
     type: DataTypes.DATE,
@@ -56,6 +67,42 @@ export const attributes = {
   },
   deactivatedAt: {
     type: DataTypes.DATE,
+    allowNull: true
+  },
+  rg: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  cpf: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  phone: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  profession: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  isHired: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true
+  },
+  isFormal: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true
+  },
+  salary: {
+    type: DataTypes.NUMBER,
+    allowNull: true
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  isResponsible: {
+    type: DataTypes.BOOLEAN,
     allowNull: true
   }
 };

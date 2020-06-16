@@ -101,9 +101,9 @@ export const ReportList: React.FC<{}> = () => {
                       {!placeLoading &&
                         placeList &&
                         placeList.length > 0 &&
-                        placeList.map((place) => (
-                          <Option key={place.title} value={place.id?.toString() || '-1'}>
-                            {place.title}
+                        placeList.map((entity) => (
+                          <Option key={entity.title} value={entity.id?.toString() || '-1'}>
+                            {entity.title}
                           </Option>
                         ))}
                     </Select>
@@ -133,9 +133,9 @@ export const ReportList: React.FC<{}> = () => {
                       {!placeStoreLoading &&
                         placeStoreList &&
                         placeStoreList.length > 0 &&
-                        placeStoreList.map((placeStore) => (
-                          <Option key={placeStore.title} value={placeStore.id?.toString() || '-1'}>
-                            {placeStore.title}
+                        placeStoreList.map((locality) => (
+                          <Option key={locality.title} value={locality.id?.toString() || '-1'}>
+                            {locality.title}
                           </Option>
                         ))}
                     </Select>

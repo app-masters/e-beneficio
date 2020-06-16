@@ -11,7 +11,7 @@ import moment from 'moment';
 import logging from '../utils/logging';
 import { compareNames } from '../utils/string';
 import { parseFamilyAndSislameItems, certifyDependentsByFamilyList } from './dependents';
-import { getFamilyDependentBalance } from './consumptions';
+import { getFamilyDependentBalance, ProductBalance } from './consumptions';
 
 import { FamilyItem, SislameItem, OriginalSislameItem, OriginalNurseryItem } from '../typings/filesItems';
 import { Family, SequelizeFamily } from '../schemas/families';
@@ -45,6 +45,8 @@ type ImportReport = {
 const importReportList: ImportReport[] = [];
 
 const csvWriterList: { [key: string]: ReturnType<typeof createObjectCsvWriter> } = {};
+
+const type = process.env.CONSUMPTION_TYPE as 'ticket' | 'product';
 
 /**
  * Get or create CSV Writer for the the city
@@ -175,6 +177,13 @@ export const updateImportReport = (importReport: ImportReport, cityId: NonNullab
 
 /**
  * Get all items on the table without any filter
+ */
+export const getAll = async (): Promise<SequelizeFamily[]> => {
+  return await db.families.findAll();
+};
+
+/**
+ * Get all items on the table with filter
  * @param nis searched nis code
  * @param cityId logged user city ID`
  * @param populateDependents should the dependents be returned?
@@ -192,12 +201,68 @@ export const findByNis = async (
     limit: 1,
     include: !populateDependents && !populateSchool ? [] : [{ model: db.dependents, as: 'dependents' }]
   });
-  if (populateSchool && family.dependents) {
+  if (family && populateSchool && family.dependents) {
     const yongerDepedent = family.dependents.sort((a, b) => moment(b.birthday).diff(moment(a.birthday)))[0];
     family.setDataValue('dependents', undefined);
     family.setDataValue('school' as 'id', yongerDepedent.schoolName);
   }
   return family;
+};
+
+/**
+ * Get all items on the table with filter
+ * @param code searched family code
+ * @param cityId logged user city ID
+ * @returns Promise<List of items>
+ */
+export const findByCode = async (
+  code: NonNullable<Family['code']>,
+  cityId: NonNullable<City['id']>
+): Promise<SequelizeFamily & { school?: Dependent['schoolName'] }> => {
+  const [family] = await db.families.findAll({
+    where: { code: code, cityId },
+    limit: 1,
+    include: [{ model: db.dependents, as: 'dependents' }]
+  });
+
+  if (family && family.dependents) {
+    const responsible = family.dependents?.find((f) => f.isResponsible);
+    if (!responsible) throw { status: 409, message: 'Familia sem responsável.' };
+    else family.dependents = [responsible];
+  } else {
+    throw { status: 409, message: 'Familia não encontrada.' };
+  }
+  return family;
+};
+
+/**
+ * Get all items by the place store id
+ * @param placeStoreId searched place store id
+ * @param cityId logged user city ID`
+ * @param populateDependents should the dependents be returned?
+ * @param calculateBalance should family balance be calculated?
+ * @returns Promise<List of items>
+ */
+export const findByPlaceStore = async (
+  placeStoreId: NonNullable<Family['placeStoreId']>,
+  cityId: NonNullable<City['id']>,
+  populateDependents?: boolean,
+  calculateBalance?: boolean
+): Promise<(Family & { balance?: number | ProductBalance })[]> => {
+  const families: (SequelizeFamily & { balance?: number | ProductBalance })[] = await db.families.findAll({
+    where: { placeStoreId, cityId },
+    include: populateDependents ? [{ model: db.dependents, as: 'dependents' }] : undefined,
+    order: [[{ model: db.dependents, as: 'dependents' }, 'isResponsible', 'desc']]
+  });
+
+  const list = await Promise.all(
+    families.map(async (family) => ({
+      ...(family.toJSON() as Family),
+      balance: calculateBalance ? await getFamilyDependentBalance(family) : undefined
+    }))
+  );
+
+  return list;
 };
 
 type CSVReport = {
@@ -230,6 +295,7 @@ export const certifyFamilyByCode = async (family: Family) => {
  * @param family Family Object
  */
 export const certifyFamilyByNis = async (family: Family) => {
+  if (!family.responsibleNis) throw { status: 412, message: 'Familia sem NIS de responsável' };
   const [createdFamily, created] = await db.families.findCreateFind({
     where: { responsibleNis: family.responsibleNis },
     defaults: family
@@ -296,7 +362,7 @@ export const importFamilyFromCSVFile = async (
               // Converting CSV format to DB format
               const family = {
                 code: json.d['cod_familiar_fam'],
-                groupName: group.key,
+                groupId: group.id,
                 responsibleName: json['nom_pessoa'],
                 responsibleBirthday: moment(json['dta_nasc_pessoa'], 'DD/MM/YYYY').toDate(),
                 responsibleNis: json['num_nis_pessoa_atual'],
@@ -358,18 +424,33 @@ export const importFamilyFromCSVFile = async (
  * @param cityId logged user city ID
  */
 export const getDashboardInfo = async (cityId: NonNullable<City['id']>) => {
+  const currentMonth = moment().month();
+
   const dashboard: { [key: string]: number | Date } = { total: 0 };
 
   const families = await db.families.findAll({
-    where: { cityId, deactivatedAt: null }
+    where: { cityId }
   });
-  dashboard.familyCount = families.length;
+
+  dashboard.familyCount = families.filter((f) => !f.deactivatedAt).length;
+  dashboard.familyDeactivatedCount = families.filter((f) => f.deactivatedAt).length;
+
+  dashboard.familyDeactivatedMonthCount = families.filter(
+    (f) => f.deactivatedAt && moment(f.deactivatedAt as Date).month() === currentMonth
+  ).length;
+  dashboard.familyCreatedMonthCount = families.filter(
+    (f) => moment(f.createdAt as Date).month() === currentMonth
+  ).length;
 
   const dependents = await db.dependents.findAll({
-    where: { deactivatedAt: null },
     include: [{ model: db.families, as: 'family', where: { deactivatedAt: null, cityId } }]
   });
-  dashboard.dependentCount = dependents.length;
+
+  dashboard.dependentCreatedMonthCount = dependents.filter(
+    (f) => !f.deactivatedAt && moment(f.createdAt as Date).month() === currentMonth
+  ).length;
+
+  dashboard.dependentCount = dependents.filter((f) => !f.deactivatedAt).length;
 
   const last = await db.families.max<SequelizeFamily, SequelizeFamily['createdAt']>('createdAt');
   if (last) {
@@ -377,6 +458,76 @@ export const getDashboardInfo = async (cityId: NonNullable<City['id']>) => {
   }
 
   return dashboard;
+};
+
+/**
+ * Function to create a new row on the table
+ *
+ * @param values object with the new item data
+ * @param cityId current city of user
+ * @returns Promise<Item>
+ */
+export const createFamilyWithDependents = async (
+  values: Family | SequelizeFamily,
+  cityId: string | number
+): Promise<SequelizeFamily> => {
+  //verify if family exists
+  const family = await db.families.findOne({
+    where: Sequelize.and({ code: values.code }, values.responsibleNis ? { responsibleNis: values.responsibleNis } : {})
+  });
+  if (family) {
+    throw { status: 412, message: 'Familia já cadastrada.' };
+  }
+  //verify if dependent exist
+  if (type === 'product') {
+    if (values.dependents) {
+      const verifyResponsible = values.dependents?.filter((f) => f.isResponsible);
+      if (verifyResponsible.length > 1)
+        throw { status: 412, message: 'Somente um membro responsável por familia é permitido.' };
+      if (verifyResponsible.length === 0)
+        throw { status: 412, message: 'É necessário um membro responsável por familia.' };
+
+      const dependentRg = values.dependents?.map((dep) => {
+        return dep.rg as string;
+      });
+      const dependentCpf = values.dependents?.map((dep) => {
+        return dep.cpf as string;
+      });
+      const dependents = await db.dependents.findAll({
+        where: Sequelize.or(
+          // { nis: { [Sequelize.Op.in]: dependentNis } },
+          { rg: { [Sequelize.Op.in]: dependentRg } },
+          { cpf: { [Sequelize.Op.in]: dependentCpf } }
+        )
+      });
+      if (dependents.length > 0) {
+        const listOfNames = dependents.map((dep) => {
+          return dep.name;
+        });
+        throw {
+          status: 412,
+          message: `Dependente${listOfNames.length > 1 ? 's' : ''} ${listOfNames.toString()} já cadastrado${
+            listOfNames.length > 1 ? 's' : ''
+          }.`
+        };
+      }
+    } else {
+      throw { status: 412, message: 'É necessário no mínimo um membro por familia.' };
+    }
+  }
+
+  return db.families.create({ ...values, cityId }).then(async (family) => {
+    if (values.dependents) {
+      const depedentsList = values.dependents?.map((dep) => {
+        dep.familyId = family.id as number;
+        return dep;
+      });
+      if (depedentsList && depedentsList?.length > 0) {
+        family.dependents = await db.dependents.bulkCreate(depedentsList as Dependent[]);
+      }
+    }
+    return family;
+  });
 };
 
 /**
@@ -402,8 +553,77 @@ export const updateById = async (
   const cityItem = await db.families.findByPk(id);
   if (cityItem) {
     // The update return an array [count, item[]], so I'm destructuring to get the updated benefit
-    const [, [item]] = await db.families.update(values, { where: { id }, returning: true });
-    return item;
+    await db.families.update(values, { where: { id } });
+
+    if (type === 'product') {
+      if (values.dependents) {
+        const verifyResponsible = values.dependents?.filter((f) => f.isResponsible);
+        if (verifyResponsible.length > 1)
+          throw { status: 412, message: 'Somente um membro responsável por familia é permitido.' };
+        if (verifyResponsible.length === 0)
+          throw { status: 412, message: 'É necessário um membro responsável por familia.' };
+
+        const depIds = values.dependents.map((dep: Dependent) => {
+          return dep.id;
+        });
+        const familyDependents = await db.dependents.findAll({ where: { familyId: values.id as number } });
+        const dependentsToAdd = values.dependents
+          .filter((f) => !f.id)
+          .map((dep) => {
+            return { ...dep, familyId: values.id };
+          });
+        const dependentsToUpdate = values.dependents.filter((f) => f.id);
+        const dependentsToRemove = familyDependents.filter((f) => !depIds.includes(f.id));
+
+        await db.dependents.bulkCreate(dependentsToAdd);
+
+        dependentsToUpdate.map(async (up) => {
+          if (up.id) await db.dependents.update({ ...up }, { where: { id: up.id } });
+        });
+
+        dependentsToRemove.map(async (dt) => {
+          if (dt.id) await db.dependents.destroy({ where: { id: dt.id } });
+        });
+      } else {
+        throw { status: 412, message: 'É necessário no mínimo um membro por familia.' };
+      }
+    }
+
+    return await db.families.findOne({
+      where: { id: values.id as number },
+      include: [{ model: db.dependents, as: 'dependents', where: { familyId: values.id as number } }]
+    });
+  }
+  return null;
+};
+
+/**
+ * Function to deactivate a row on the table by the unique ID
+ * @param id unique ID of the desired item
+ * @returns Promise<Item>
+ */
+export const deactivateFamilyAndDependentsById = async (
+  id: NonNullable<Family['id']>
+): Promise<SequelizeFamily | null> => {
+  // Trying to get item on the city
+  const cityItem: (SequelizeFamily & { balance?: number | ProductBalance }) | null = await db.families.findByPk(id, {
+    include: [{ model: db.dependents, as: 'dependents' }]
+  });
+  if (cityItem) {
+    // If it have dependents, deactvate all of then
+    if (cityItem.dependents) {
+      await Promise.all(
+        cityItem.dependents.map((dependent) =>
+          db.dependents.update({ deactivatedAt: moment().toDate() }, { where: { id: dependent.id || 0 } })
+        )
+      );
+    }
+    await db.families.update({ deactivatedAt: moment().toDate() }, { where: { id } });
+
+    cityItem.reload({ include: [{ model: db.dependents, as: 'dependents' }] });
+    cityItem.balance = await getFamilyDependentBalance(cityItem);
+
+    return cityItem;
   }
   return null;
 };
@@ -448,7 +668,7 @@ export const parseFamilyItem = (
     responsibleBirthday: moment(family['DTNASCTIT'], 'DD/MM/YYYY').toDate(),
     responsibleMotherName: '',
     code: '',
-    groupName: getFamilyGroupByCode(0).key,
+    groupId: getFamilyGroupByCode(0).id,
     cityId,
     phone: extra?.phone,
     phone2: extra?.phone2,

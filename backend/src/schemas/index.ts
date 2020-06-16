@@ -8,6 +8,10 @@ import { initBenefitSchema } from './benefits';
 import { initFamilySchema } from './families';
 import { initConsumptionSchema } from './consumptions';
 import { initDependentSchema } from './depedents';
+import { initProductSchema } from './products';
+import { initBenefitProductSchema } from './benefitProducts';
+import { initConsumptionProductsSchema } from './consumptionProducts';
+import { initGroupSchema } from './groups';
 
 import * as config from '../../database/config';
 
@@ -23,7 +27,11 @@ const db = {
   benefits: initBenefitSchema(sequelize),
   families: initFamilySchema(sequelize),
   consumptions: initConsumptionSchema(sequelize),
-  dependents: initDependentSchema(sequelize)
+  dependents: initDependentSchema(sequelize),
+  products: initProductSchema(sequelize),
+  benefitProducts: initBenefitProductSchema(sequelize),
+  consumptionProducts: initConsumptionProductsSchema(sequelize),
+  groups: initGroupSchema(sequelize)
 };
 
 // Creating DB relations

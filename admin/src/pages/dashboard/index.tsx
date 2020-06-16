@@ -6,6 +6,11 @@ import { User } from '../../interfaces/user';
 import { requestGetDashboard } from '../../redux/dashboard/actions';
 import { AppState } from '../../redux/rootReducer';
 import { PageContainer } from './styles';
+import { formatMoney } from '../../utils/string';
+import { env } from '../../env';
+
+// Application consumption type
+const consumptionType = env.REACT_APP_CONSUMPTION_TYPE as 'ticket' | 'product';
 
 /**
  * Dashboard page component
@@ -31,39 +36,51 @@ export const DashboardPage: React.FC<{}> = () => {
           <Card>
             <Statistic
               title="Hoje"
-              value={dashboard?.todayFamilies}
+              value={formatMoney(dashboard?.todayFamilies, 0)}
               suffix={dashboard?.todayFamilies === 1 ? 'família auxiliada' : 'famílias auxiliadas'}
             />
-            <Divider />
-            <Typography.Text type="secondary">
-              R$ {dashboard?.todayConsumption.toFixed(2).replace('.', ',')} em consumo
-            </Typography.Text>
+            {consumptionType !== 'product' && (
+              <>
+                <Divider />
+                <Typography.Text type="secondary">
+                  R$ {formatMoney(dashboard?.todayConsumption)} em consumo
+                </Typography.Text>
+              </>
+            )}
           </Card>
         </Col>
         <Col span={24} md={8}>
           <Card>
             <Statistic
               title="Últimos 7 dias"
-              value={dashboard?.weekFamilies}
+              value={formatMoney(dashboard?.weekFamilies, 0)}
               suffix={dashboard?.weekFamilies === 1 ? 'família auxiliada' : 'famílias auxiliadas'}
             />
-            <Divider />
-            <Typography.Text type="secondary">
-              R$ {dashboard?.weekConsumption.toFixed(2).replace('.', ',')} em consumo
-            </Typography.Text>
+            {consumptionType !== 'product' && (
+              <>
+                <Divider />
+                <Typography.Text type="secondary">
+                  R$ {formatMoney(dashboard?.weekConsumption)} em consumo
+                </Typography.Text>
+              </>
+            )}
           </Card>
         </Col>
         <Col span={24} md={8}>
           <Card>
             <Statistic
               title="Últimos 30 dias"
-              value={dashboard?.monthFamilies}
+              value={formatMoney(dashboard?.monthFamilies, 0)}
               suffix={dashboard?.monthFamilies === 1 ? 'família auxiliada' : 'famílias auxiliadas'}
             />
-            <Divider />
-            <Typography.Text type="secondary">
-              R$ {dashboard?.monthConsumption.toFixed(2).replace('.', ',')} em consumo
-            </Typography.Text>
+            {consumptionType !== 'product' && (
+              <>
+                <Divider />
+                <Typography.Text type="secondary">
+                  R$ {formatMoney(dashboard?.monthConsumption)} em consumo
+                </Typography.Text>
+              </>
+            )}
           </Card>
         </Col>
       </Row>

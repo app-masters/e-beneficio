@@ -103,6 +103,10 @@ export const initUserSchema = (sequelize: Sequelize): SequelizeUserModel => {
       foreignKey: 'placeStoreId',
       as: 'placeStore'
     });
+    Schema.hasMany(models.families, {
+      foreignKey: 'createdById',
+      as: 'families'
+    });
   };
 
   return Schema;

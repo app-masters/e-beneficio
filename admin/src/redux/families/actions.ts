@@ -28,8 +28,9 @@ export const doGetDashboardFamily = createAction<void>('dashboardFamily/GET');
 export const doGetDashboardFamilySuccess = createAction<DashboardFamily>('dashboardFamily/GET_SUCCESS');
 export const doGetDashboardFamilyFailed = createAction<Error | undefined>('dashboardFamily/GET_FAILED');
 
+export const doClearFamily = createAction<void>('family/CLEAR');
 export const doGetFamily = createAction<void>('family/GET');
-export const doGetFamilySuccess = createAction<Family>('family/GET_SUCCESS');
+export const doGetFamilySuccess = createAction<Family | Family[]>('family/GET_SUCCESS');
 export const doGetFamilyFailed = createAction<Error | undefined>('family/GET_FAILED');
 
 export const doSaveFamily = createAction<void>('family/SAVE');
@@ -43,6 +44,15 @@ export const doDeleteFamilyFailed = createAction<Error | undefined>('family/DELE
 export const doGetFileFamily = createAction<void>('families/GET');
 export const doGetFileFamilySuccess = createAction<File | null>('families/GET_SUCCESS');
 export const doGetFileFamilyFailed = createAction<Error | undefined>('families/GET_FAILED');
+
+/**
+ * Get family Thunk action
+ */
+export const requestClearFamily = (): ThunkResult<void> => {
+  return async (dispatch) => {
+    dispatch(doClearFamily());
+  };
+};
 
 /**
  * Get current import report Thunk action
@@ -268,13 +278,13 @@ export const requestGetDashboardFamily = (): ThunkResult<void> => {
 /**
  * Get family Thunk action
  */
-export const requestGetFamily = (nis: string, cityId: string): ThunkResult<void> => {
+export const requestGetPlaceFamilies = (placeStoreId: string | number): ThunkResult<void> => {
   return async (dispatch) => {
     try {
       // Start request - starting loading state
       dispatch(doGetFamily());
       // Request
-      const response = await backend.get<Family>(`/families`, { params: { nis, cityId } });
+      const response = await backend.get<Family>(`/families/place?placeStoreId=${placeStoreId}`);
       if (response && response.data) {
         // Request finished
         dispatch(doGetFamilySuccess(response.data)); // Dispatch result
@@ -285,6 +295,49 @@ export const requestGetFamily = (nis: string, cityId: string): ThunkResult<void>
     } catch (error) {
       // Request failed: dispatch error
       logging.error(error);
+      dispatch(doGetFamilyFailed(error));
+    }
+  };
+};
+
+/**
+ * Get family Thunk action
+ */
+export const requestGetFamily = (nis: string, cityId: string): ThunkResult<void> => {
+  return async (dispatch) => {
+    try {
+      // Start request - starting loading state
+      dispatch(doGetFamily());
+      // Request
+      const response = await backend.get<Family | Family[]>(`/families`, { params: { nis, cityId } });
+      if (response && response.data) {
+        // Request finished
+        dispatch(doGetFamilySuccess(response.data)); // Dispatch result
+      } else {
+        // Request finished, but no item was found
+        dispatch(doGetFamilyFailed());
+      }
+    } catch (error) {
+      // Request failed: dispatch error
+      if (error.response) {
+        error.status = error.response.status;
+        switch (Number(error.response.status)) {
+          case 404:
+            error.message = 'Não encontramos nenhuma família utilizando esse NIS.';
+            break;
+          default:
+            logging.error(error);
+            error.message = 'Ocorreu uma falha inesperada e os programadores foram avisados.';
+            break;
+        }
+      } else if (error.message === 'Network Error' && !window.navigator.onLine) {
+        error.message =
+          'Ocorreu um erro ao conectar ao servidor. ' +
+          'Verifique se a conexão com a internet está funcionando corretamente.';
+      } else {
+        logging.error(error);
+        error.message = 'Ocorreu uma falha inesperada e os programadores foram avisados.';
+      }
       dispatch(doGetFamilyFailed(error));
     }
   };
@@ -324,6 +377,7 @@ export const requestSaveFamily = (
     } catch (error) {
       // Request failed: dispatch error
       logging.error(error);
+      error.message = error.response ? error.response.data : error.message;
       dispatch(doSaveFamilyFailed(error));
       if (onFailure) onFailure(error);
     }

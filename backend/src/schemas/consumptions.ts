@@ -1,4 +1,20 @@
 import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize';
+import { Product } from './products';
+import { ConsumptionProducts } from './consumptionProducts';
+
+export interface PurchaseData {
+  place?: string;
+  totalValue?: number;
+  payment: {
+    name?: string;
+    value?: number;
+  }[];
+  products: {
+    name?: string;
+    amount?: number;
+    totalValue?: number;
+  }[];
+}
 
 // Simple item type
 export interface Consumption {
@@ -6,11 +22,17 @@ export interface Consumption {
   familyId: number | string;
   placeStoreId?: number | string;
   nfce?: string;
-  value: number;
+  value?: number;
+  invalidValue?: number;
   proofImageUrl?: string;
+  reviewedAt?: number | Date | null;
+  purchaseData?: PurchaseData;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
+  //Join
+  products?: (Product & { amount: number })[] | null;
+  consumptionProducts?: ConsumptionProducts[];
 }
 // Sequelize returns type
 export type SequelizeConsumption = Consumption & Model;
@@ -53,8 +75,21 @@ export const attributes = {
     type: DataTypes.FLOAT,
     allowNull: false
   },
+  invalidValue: {
+    type: DataTypes.FLOAT,
+    allowNull: true,
+    defaultValue: 0.0
+  },
+  reviewedAt: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
   proofImageUrl: {
     type: DataTypes.STRING,
+    allowNull: true
+  },
+  purchaseData: {
+    type: DataTypes.JSON,
     allowNull: true
   }
 };
@@ -78,6 +113,10 @@ export const initConsumptionSchema = (sequelize: Sequelize): SequelizeConsumptio
     Schema.belongsTo(models.placeStores, {
       foreignKey: 'placeStoreId',
       as: 'placeStore'
+    });
+    Schema.hasMany(models.consumptionProducts, {
+      foreignKey: 'consumptionsId',
+      as: 'consumptionProducts'
     });
   };
 

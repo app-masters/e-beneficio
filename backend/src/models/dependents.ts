@@ -51,7 +51,10 @@ export const deactivateOthersOnFamily = (
  * @param item Dependent Object
  */
 export const certifyByNIS = async (item: Dependent) => {
-  const [createdItem, created] = await db.dependents.findCreateFind({ where: { nis: item.nis }, defaults: item });
+  const [createdItem, created] = await db.dependents.findCreateFind({
+    where: { nis: item.nis as string },
+    defaults: item
+  });
   if (!created) {
     // Just update the item with the new data
     const [, [dbItem]] = await db.dependents.update(

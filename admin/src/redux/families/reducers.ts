@@ -33,8 +33,9 @@ import { DashboardFamily } from '../../interfaces/dashboardFamily';
 import { Family, ImportReport } from '../../interfaces/family';
 
 export interface FamilyReducerState {
+  list: Family[];
   loading: boolean;
-  error?: string;
+  error?: Error | string | undefined;
   uploadReport?: CSVReport;
 
   fileFamilyLoading: boolean;
@@ -59,6 +60,7 @@ export interface FamilyReducerState {
 }
 
 const initialState = {
+  list: [],
   loading: false,
   fileFamilyLoading: false,
   dashboardLoading: false,
@@ -147,7 +149,8 @@ export default createReducer<FamilyReducerState>(initialState, (builder) =>
     })
     .addCase(doGetFamilySuccess, (state, action) => {
       state.familyLoading = false;
-      state.familyItem = action.payload;
+      state.familyItem = !Array.isArray(action.payload) ? action.payload : undefined;
+      state.list = Array.isArray(action.payload) ? action.payload : [];
     })
     .addCase(doGetFamilyFailed, (state, action) => {
       state.familyLoading = false;

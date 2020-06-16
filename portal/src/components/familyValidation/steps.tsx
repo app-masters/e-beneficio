@@ -47,7 +47,7 @@ export const StepNIS: React.FC<{}> = () => {
 
   return (
     <Form layout="vertical" onSubmitCapture={handleSubmit}>
-      {familyError && <Alert message="" description={'NIS não encontrado'} type="error" />}
+      {familyError && <Alert message="" description={familyError.message} type="error" />}
       <Form.Item
         label="Código NIS do responsável"
         validateStatus={!!nisMeta.error && !!nisMeta.touched ? 'error' : ''}
@@ -149,7 +149,7 @@ export const StepConfirmFamily: React.FC<{ family?: Family | null; onConfirm?: (
             <Descriptions layout="vertical" size="small" title="Família encontrada" colon={false} bordered>
               <Descriptions.Item label="Nome do responsável">{family?.responsibleName}</Descriptions.Item>
               <Descriptions.Item label="Data de nascimento do responsável">
-                {family?.responsibleBirthday ? moment(family?.responsibleBirthday).format('DD/MM/YYYY') : ''}
+                {family?.responsibleBirthday ? moment(family?.responsibleBirthday).utc().format('DD/MM/YYYY') : ''}
               </Descriptions.Item>
             </Descriptions>
             <FamilyActions>
@@ -182,7 +182,6 @@ export const StepSelectedFamily: React.FC<{ family?: Family | null }> = ({ famil
         <Descriptions.Item label="Data de nascimento">
           {family?.responsibleBirthday ? moment(family?.responsibleBirthday).format('DD/MM/YYYY') : ''}
         </Descriptions.Item>
-        <Descriptions.Item label="Nome da mãe">{family?.responsibleMotherName}</Descriptions.Item>
         <Descriptions.Item label="Saldo disponível">
           <Typography.Paragraph strong>{`R$${(family?.balance || 0)
             .toFixed(2)

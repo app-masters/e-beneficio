@@ -1,11 +1,17 @@
 import styled from 'styled-components';
 import backgroundImage from '../../assets/banner.jpg';
 import { Row } from 'antd';
+import { Flex } from '../../components/flex';
 
 export const PanelStyle = {
   backgroundColor: '#00000000',
   marginTop: 0
 };
+
+export const FooterImageWrapper = styled.div`
+  width: 100%;
+  max-width: 1200px;
+`;
 
 export const PriceLabelStyle = {
   fontSize: '12pt'
@@ -23,22 +29,19 @@ export const IconCheckStyle = {
   marginLeft: 5
 };
 
-export const ImageContainer = styled.div`
-  display: flex;
+export const ImageContainer = styled(Flex)`
   flex-direction: column;
   align-items: center;
   padding: ${(props) => props.theme.spacing.md};
 `;
 
-export const FooterImageContainer = styled.div`
+export const FooterImageContainer = styled(Flex)`
   height: 40px;
-  display: flex;
   justify-content: center;
   align-items: center;
 `;
 
-export const HeaderContainer = styled.div`
-  display: flex;
+export const HeaderContainer = styled(Flex)`
   flex-direction: column;
   align-items: center;
   background-image: url(${backgroundImage});
@@ -49,8 +52,7 @@ export const HeaderContainer = styled.div`
   margin-bottom: ${(props) => props.theme.spacing.md};
 `;
 
-export const HeaderContent = styled.div`
-  display: flex;
+export const HeaderContent = styled(Flex)`
   width: 100%;
   height: 100%;
   max-height: 1200px;
@@ -62,13 +64,11 @@ export const HeaderContent = styled.div`
   padding-bottom: 0;
 `;
 
-export const PageContainer = styled.div`
-  display: flex;
+export const PageContainer = styled(Flex)`
   flex-direction: column;
 `;
 
-export const PanelActionContainer = styled.div`
-  display: flex;
+export const PanelActionContainer = styled(Flex)`
   width: 100%;
   justify-content: center;
   padding: ${(props) => props.theme.spacing.md};
@@ -80,8 +80,7 @@ export const ActionContainer = styled(Row)`
   padding-bottom: ${(props) => props.theme.spacing.sm};
 `;
 
-export const BodyContainer = styled.div`
-  display: flex;
+export const BodyContainer = styled(Flex)`
   flex-direction: column;
   padding: ${(props) => props.theme.spacing.sm};
   margin-bottom: ${(props) => props.theme.spacing.default};

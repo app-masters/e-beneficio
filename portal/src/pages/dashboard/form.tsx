@@ -1,7 +1,7 @@
 import { QrcodeOutlined, WarningFilled, CheckOutlined } from '@ant-design/icons';
 import { Button, Modal, Row, Col, Typography, Form, InputNumber, Divider, Alert } from 'antd';
 import { useFormik } from 'formik';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import QrReader from 'react-qr-reader';
 import { useSelector, useDispatch } from 'react-redux';
 import { FamilySearch } from '../../components/familyValidation';
@@ -11,6 +11,7 @@ import yup from '../../utils/yup';
 import { requestSaveConsumption } from '../../redux/consumption/actions';
 import { requestResetFamily } from '../../redux/family/actions';
 import { IconCheckStyle, ImageContainer, PriceStyle, PriceLabelStyle } from './styles';
+import { logging } from '../../utils/logging';
 
 /**
  * Clear NFCe QRCode result
@@ -18,6 +19,10 @@ import { IconCheckStyle, ImageContainer, PriceStyle, PriceLabelStyle } from './s
  */
 const handleQRCode = (value: string | null) => {
   if (!value) return null;
+  if (value.indexOf('nfce.fazenda.mg.gov.br') < 0) {
+    // Invalid QRCode
+    return 'invalid';
+  }
   return value;
   // // https://nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=31200417745613005462650030000484351494810435|2|1|1|d3bfca6136abee66286116203f747bc8e6fd3300
   // const nfce = value.split('nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=')[1];
@@ -65,7 +70,7 @@ export const StepQRCodeChose: React.FC<{ onPick: (pick: string) => void }> = ({ 
         baixo da nota e parece com o seguinte:
       </Typography.Paragraph>
       <ImageContainer>
-        <img src={require('../../assets/qrCodeImage.png')} height="80%" style={{ maxHeight: 200 }} />
+        <img src={require('../../assets/qrCodeImage.png')} alt="QRCode" height="80%" style={{ maxHeight: 200 }} />
       </ImageContainer>
       <Row typeof="flex" gutter={[16, 16]}>
         <Col span={'24'}>
@@ -92,7 +97,7 @@ export const StepNoQRCode: React.FC<{ onBack: () => void; onConfirm: () => void 
     <div>
       <Typography.Paragraph>
         Sem o QRCode, precisamos que você entregue o comprovante da sua compra para que um responsável possa adicionar
-        sua compra na lista da recarga. Junto com a nota fiscal, trava seu documento.
+        sua compra na lista da recarga. Junto com a nota fiscal, traga seu documento.
       </Typography.Paragraph>
       <Typography.Paragraph>
         Entregue sua nota fiscal na Secreataria de Educação, no horário de 12:00 às 17:00 no endereço:
@@ -125,11 +130,12 @@ const schema = yup.object().shape({
  */
 export const StepWithQRCode: React.FC<{ onBack: () => void; onFinish: () => void }> = ({ onBack, onFinish }) => {
   const family = useSelector<AppState, Family | null | undefined>((state) => state.familyReducer.item);
+  const loading = useSelector<AppState, boolean>((state) => state.consumptionReducer.loading);
   const [showQRModal, setQRModal] = React.useState<boolean>(false);
 
   const dispatch = useDispatch();
 
-  const { handleSubmit, values, getFieldMeta, status, setFieldValue } = useFormik({
+  const { handleSubmit, values, getFieldMeta, status, setFieldValue, setStatus } = useFormik({
     initialValues: {
       nfce: '',
       value: ''
@@ -138,7 +144,7 @@ export const StepWithQRCode: React.FC<{ onBack: () => void; onFinish: () => void
     onSubmit: (values, { setStatus }) => {
       setStatus();
       const invalidConsumptionValue = !!(family && Number(values.value) > family.balance);
-      if (family && !invalidConsumptionValue) {
+      if (!loading && family && !invalidConsumptionValue) {
         const data = {
           nfce: values.nfce,
           value: Number(values.value),
@@ -150,8 +156,12 @@ export const StepWithQRCode: React.FC<{ onBack: () => void; onFinish: () => void
             () => {
               Modal.success({ title: 'Consumo salvo com sucesso', onOk: () => onFinish() });
             },
-            () => {
-              setStatus('Ocorreu um erro durante o processamento.');
+            (error) => {
+              if (error && error.message.indexOf('409') > -1) {
+                setStatus('Essa nota fiscal já está vinculada no nosso sistema');
+              } else {
+                setStatus('Ocorreu um erro durante o processamento. Por favor tente novamente em algumas horas');
+              }
             }
           )
         );
@@ -217,7 +227,11 @@ export const StepWithQRCode: React.FC<{ onBack: () => void; onFinish: () => void
           Ler código QRCode
         </Button>
         {showQRModal && (
-          <ModalQrCode onQrRead={(nfce) => setFieldValue('nfce', nfce)} onClose={() => setQRModal(false)} />
+          <ModalQrCode
+            onQrRead={(nfce) => setFieldValue('nfce', nfce)}
+            onClose={() => setQRModal(false)}
+            onInvalid={setStatus}
+          />
         )}
       </Form.Item>
 
@@ -229,12 +243,7 @@ export const StepWithQRCode: React.FC<{ onBack: () => void; onFinish: () => void
             </Button>
           </Col>
           <Col span={'12'}>
-            <Button
-              block
-              type="primary"
-              // disabled={values.nfce === ''}
-              htmlType={'submit'}
-            >
+            <Button block type="primary" disabled={loading} htmlType="submit">
               Confirmar
             </Button>
           </Col>
@@ -248,31 +257,15 @@ export const StepWithQRCode: React.FC<{ onBack: () => void; onFinish: () => void
  * ModalQrCode component
  * @param props component props
  */
-export const ModalQrCode: React.FC<{ onClose: () => void; onQrRead: (nfce: string) => void }> = ({
-  onClose,
-  onQrRead
-}) => {
+export const ModalQrCode: React.FC<{
+  onClose: () => void;
+  onQrRead: (nfce: string) => void;
+  onInvalid: (message?: string) => void;
+}> = ({ onClose, onQrRead, onInvalid }) => {
   const [permission, setPermission] = useState<string>('');
 
-  useEffect(() => {
-    // if (navigator.getUserMedia) {
-    // navigator.getUserMedia({ video: true },
-    //   (localMediaStream) => {
-    //     setPermission(localMediaStream.active ? 'grant' : 'denied');
-    //   },
-    //   (err) => {
-    //     // Log the error to the console.
-    //     // alert(JSON.stringify(err));
-    //   }
-    // );
-    // } else {
-    navigator.permissions
-      .query({ name: 'camera' })
-      .then((value) => {
-        setPermission(value.state);
-      })
-      .catch((err) => console.log(err));
-  }, []);
+  // Check for ios so the user is advised to use another device
+  const usingIOS = /(iPad|iPhone|iPod)/g.test(navigator?.userAgent || '');
 
   return (
     <Modal
@@ -283,21 +276,47 @@ export const ModalQrCode: React.FC<{ onClose: () => void; onQrRead: (nfce: strin
       onCancel={onClose}
       visible={true}
     >
-      {permission !== 'denied' ? (
+      {// User needs to allow the user of the camera
+      permission !== 'denied' &&
+      // User device don't have a camera or it is not enabled (Apple errors falls here)
+      permission !== 'unsupported' &&
+      // Unknown error
+      permission !== 'unknown' ? (
         // Necessary to disable the camera
         <QrReader
           delay={200}
           resolution={800}
-          onError={console.error}
+          onError={(error) => {
+            if (error.name === 'NotAllowedError') setPermission('denied');
+            else if (error.name === 'NotFoundError' || error.name === 'NoVideoInputDevicesError') {
+              setPermission('unsupported');
+            } else {
+              setPermission('unknown');
+              logging.error(error);
+            }
+          }}
           onScan={(item) => {
             const nfce = handleQRCode(item);
+            onInvalid();
             if (nfce) {
-              onQrRead(nfce);
-              onClose();
-            } else console.log(new Date().getTime(), 'reading...');
+              if (nfce !== 'invalid') {
+                // Readed and it's a valid code
+                onQrRead(nfce);
+                onClose();
+              } else {
+                // Readed but it's a invalid QRCode
+                onClose();
+                onInvalid(
+                  'Esse código QRCode não tem os dados da nota fiscal da compra. Se sua nota fiscal não tem outro QRCode, precisamos que traga a nota para a Secreataria de Educação, no horário de 12:00 às 17:00 no endereço: Avenida Getúlio Vargas, 200 - Segundo piso, Centro - Espaço Mascarenhas'
+                );
+              }
+            } else {
+              // Not readed yet
+              console.log(new Date().getTime(), 'reading...');
+            }
           }}
         />
-      ) : (
+      ) : permission === 'denied' ? (
         <>
           <Typography.Title level={3}>{' Acesso não permitido a câmera.'}</Typography.Title>
           <Divider />
@@ -316,6 +335,24 @@ export const ModalQrCode: React.FC<{ onClose: () => void; onQrRead: (nfce: strin
               <li>Clique em Fechar e em seguida clique no botão de leitura novamente.</li>
             </ul>
           </Typography>
+        </>
+      ) : (
+        <>
+          <Typography.Title level={3}>{'Falha ao acessar a câmera.'}</Typography.Title>
+          <Divider />
+          {usingIOS ? (
+            <Typography.Paragraph>
+              Infelizmente aparelhos iOS ainda não são suportados, tente acessar o site por outro aparelho
+            </Typography.Paragraph>
+          ) : (
+            <>
+              <Typography.Paragraph>Ocorreu um erro ao acessar a câmera do aparelho.</Typography.Paragraph>
+              <Typography.Paragraph>
+                Verifique se a câmera do seu aparelho está funcionando corretamente. Se o erro continuar, tente acessar
+                o site por outro dispositivo
+              </Typography.Paragraph>
+            </>
+          )}
         </>
       )}
     </Modal>

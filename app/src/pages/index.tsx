@@ -16,6 +16,8 @@ import { useRefreshToken } from '../utils/auth';
 import { LogoutPage } from './logout';
 import { ConsumptionForm } from './consumption';
 import { ReportList } from './report';
+import { FamiliesList } from './families/list';
+import { FamiliesForm } from './families/form';
 
 /**
  * Router available only for logged users
@@ -30,10 +32,11 @@ const PrivateRouter: React.FC<{}> = () => {
         <Route path="/logout" component={LogoutPage} />
         <Route path="/consumo" component={ConsumptionForm} />
         <Route path="/relatorios" component={ReportList} />
+        <Route exact path="/familias" component={FamiliesList} />
+        <Route path="/familias/:id" component={FamiliesForm} />
         <ManagerRouter>
           <Route path="/usuarios" component={UserList} />
           <Route path="/usuarios/:id" component={UserForm} />
-
           <Route path="/lojas" component={PlaceStoreList} />
           <Route path="/lojas/:id" component={PlaceStoreForm} />
         </ManagerRouter>

@@ -15,7 +15,7 @@ import { ActionWrapper, PageContainer } from './styles';
  */
 export const PlaceList: React.FC<{}> = () => {
   // Redux state
-  const list = useSelector<AppState, Place[]>((state) => state.placeReducer.list as Place[]);
+  const list = useSelector<AppState, Place[]>(({ placeReducer }) => placeReducer.list as Place[]);
   // Redux actions
   const dispatch = useDispatch();
   useEffect(() => {
@@ -24,9 +24,9 @@ export const PlaceList: React.FC<{}> = () => {
   return (
     <PageContainer>
       <Card
-        title={<Typography.Title>{`Estabelecimentos`}</Typography.Title>}
+        title={<Typography.Title>{`Entidades`}</Typography.Title>}
         extra={
-          <Link to={`/estabelecimentos/criar`}>
+          <Link to={`/entidades/criar`}>
             <Button type="primary">Criar</Button>
           </Link>
         }
@@ -42,7 +42,7 @@ export const PlaceList: React.FC<{}> = () => {
             render={(item: Place) => {
               return (
                 <ActionWrapper>
-                  <Link to={`/estabelecimentos/${item.id}/editar`}>
+                  <Link to={`/entidades/${item.id}/editar`}>
                     <Button>Editar</Button>
                   </Link>
                   {/* TODO: Add alert on delete */}

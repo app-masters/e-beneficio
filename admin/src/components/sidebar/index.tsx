@@ -1,26 +1,33 @@
 import {
-  // BarChartOutlined,
   CarryOutOutlined,
   BankOutlined,
   IdcardOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  // ShopOutlined,
-  // SolutionOutlined,
+  ShopOutlined,
   UserOutlined,
-  HomeOutlined
+  HomeOutlined,
+  BookOutlined,
+  ShoppingCartOutlined,
+  SolutionOutlined
 } from '@ant-design/icons';
 import { Button, Layout, Menu, Popover } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from 'styled-components';
-import { localStorageConstraints } from '../../utils/constraints';
+import { localStorageConstraints, Role } from '../../utils/constraints';
 import { Flex } from '../flex';
 import { FixSider, MenuHeight, MenuIcon } from './styles';
+import { useSelector } from 'react-redux';
+import { AppState } from '../../redux/rootReducer';
+import { User } from '../../interfaces/user';
+import { env } from '../../env';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
+
+const consumptionType = env.REACT_APP_CONSUMPTION_TYPE as 'ticket' | 'product';
 
 interface RouteItem {
   group?: boolean;
@@ -29,6 +36,8 @@ interface RouteItem {
   name: string;
   children?: RouteItem[];
   disabled?: boolean;
+  allowedRoles?: Role[];
+  specificToType?: 'ticket' | 'product';
 }
 
 const routes: RouteItem[] = [
@@ -37,45 +46,71 @@ const routes: RouteItem[] = [
     icon: () => <HomeOutlined />,
     name: 'Início'
   },
-  // {
-  //   path: '/relatorios',
-  //   icon: () => <BarChartOutlined />,
-  //   name: 'Relatórios'
-  // },
   {
-    path: '/beneficios',
-    icon: () => <CarryOutOutlined />,
-    name: 'Beneficios'
-  },
-  {
-    path: '/familias',
-    icon: () => <IdcardOutlined />,
-    name: 'Famílias'
-  },
-  {
-    path: '/usuarios',
-    icon: () => <UserOutlined />,
-    name: 'Usuários'
+    path: '/validar',
+    icon: () => <BookOutlined />,
+    name: 'Validar Produtos',
+    specificToType: 'ticket'
   },
   {
     path: '/consumo',
     icon: () => <CarryOutOutlined />,
-    name: 'Informar consumo'
+    name: 'Informar consumo',
+    allowedRoles: ['admin', 'manager']
   },
-  // {
-  //   path: '/lojas',
-  //   icon: () => <ShopOutlined />,
-  //   name: 'Lojas'
-  // },
-  // {
-  //   path: '/estabelecimentos',
-  //   icon: () => <SolutionOutlined />,
-  //   name: 'Estabelecimentos'
-  // },
+  {
+    path: '/familias',
+    icon: () => <IdcardOutlined />,
+    name: 'Famílias',
+    allowedRoles: ['admin']
+  },
+  {
+    path: '/beneficios',
+    icon: () => <CarryOutOutlined />,
+    name: 'Beneficios',
+    allowedRoles: ['admin']
+  },
+  {
+    path: '/usuarios',
+    icon: () => <UserOutlined />,
+    name: 'Usuários',
+    allowedRoles: ['admin']
+  },
+
+  // Items only shown in the `ticket` consumption type
   {
     path: '/instituicoes',
     icon: () => <BankOutlined />,
-    name: 'Instituições'
+    name: 'Instituições',
+    allowedRoles: ['admin'],
+    specificToType: 'ticket'
+  },
+
+  // Items only shown in the `product` consumption type
+  {
+    path: '/origem-do-beneficio',
+    icon: () => <BankOutlined />,
+    name: 'Origem do benefício',
+    allowedRoles: ['admin'],
+    specificToType: 'product'
+  },
+  {
+    path: '/produtos',
+    icon: () => <ShoppingCartOutlined />,
+    name: 'Produtos',
+    specificToType: 'product'
+  },
+  {
+    path: '/localidades',
+    icon: () => <ShopOutlined />,
+    name: 'Localidades',
+    specificToType: 'product'
+  },
+  {
+    path: '/entidades',
+    icon: () => <SolutionOutlined />,
+    name: 'Entidades',
+    specificToType: 'product'
   }
 ];
 
@@ -84,10 +119,17 @@ const routes: RouteItem[] = [
  * @param item The route item object with the route metadata from the route tree
  * @param parentPath the current menu path in the tree(accounting its parent)
  */
-const menuItem = (item: RouteItem, parentPath: string) => {
+const menuItem = (item: RouteItem, parentPath: string, userRole?: Role) => {
   const key = `${parentPath}${item.path}`;
   const maxLength = 30;
   const name = item.name.length > maxLength ? `${item.name.slice(0, maxLength - 3)}...` : item.name;
+
+  // Only show the menu item if the current consumption type matches the item
+  if (item.specificToType && consumptionType !== item.specificToType) return null;
+
+  // Only show the menu item if the user is allowed to see it
+  if ((item.allowedRoles && userRole && item.allowedRoles.indexOf(userRole) === -1) || (item.allowedRoles && !userRole))
+    return null;
 
   /**
    * A component that returns the menu item inner content
@@ -125,6 +167,9 @@ export const Sidebar: React.FC = () => {
   const location = useLocation();
   const theme = useTheme();
 
+  const user = useSelector<AppState, User | undefined>((state) => state.authReducer.user);
+  const role = user?.role as Role | undefined;
+
   // The collapse state for the sidebar
   const [collapsed, setCollapsed] = useState(
     Boolean(localStorage.getItem(localStorageConstraints.SIDEBAR_COLLAPSED)) || false
@@ -146,7 +191,7 @@ export const Sidebar: React.FC = () => {
         <MenuHeight>
           <Menu theme="light" mode="inline" defaultSelectedKeys={[location ? location.pathname : '/']}>
             {/* Render the links based on the nav arrays */}
-            {routes.map((navLink) => menuItem(navLink, ''))}
+            {routes.map((navLink) => menuItem(navLink, '', role))}
           </Menu>
         </MenuHeight>
         <Flex vertical={collapsed} alignItems="center" gap="sm" justifyContent="space-between">

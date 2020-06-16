@@ -15,7 +15,7 @@ const testName = 'consumption';
 
 const family = {
   code: Math.floor(Math.random() * 10000000).toString(),
-  groupName: getFamilyGroupByCode(1)?.key,
+  groupId: getFamilyGroupByCode(1)?.id,
   responsibleName: 'TEREZA DE JESUS',
   responsibleBirthday: moment('01/01/1980', 'DD/MM/YYYY').toDate(),
   responsibleNis: Math.floor(Math.random() * 10000000000).toString(),
@@ -26,9 +26,8 @@ let createdFamily: Family;
 
 const benefit = {
   title: '[CAD25123] Auxilio municipal de alimentação',
-  groupName: getFamilyGroupByCode(1)?.key,
-  month: 5,
-  year: 2020,
+  groupId: getFamilyGroupByCode(1)?.id,
+  date: moment().toDate(),
   value: 500,
   institutionId: 0
 } as Benefit;
@@ -48,13 +47,14 @@ test(`[${testName}] Create mock data`, async () => {
 
 test(`[${testName}] Get family balance`, async () => {
   const balance = await consumptionModel.getFamilyBalance(createdFamily);
-  expect(balance).toBeGreaterThanOrEqual(benefit.value);
+  expect(balance).toBeGreaterThanOrEqual(benefit.value as number);
 });
 
 test(`[${testName}] Consume all the balance`, async () => {
   let balance = await consumptionModel.getFamilyBalance(createdFamily);
   const consumption: Consumption = {
     value: balance,
+    invalidValue: 0,
     familyId: createdFamily.id as number,
     nfce: new Date().getTime().toString(),
     placeStoreId: placeStore.id as number
@@ -70,6 +70,7 @@ test(`[${testName}] Consume all the balance`, async () => {
 test(`[${testName}] Consume more than the balance`, async () => {
   const consumption: Consumption = {
     value: 100,
+    invalidValue: 0,
     familyId: createdFamily.id as number,
     nfce: new Date().getTime().toString(),
     placeStoreId: placeStore.id as number

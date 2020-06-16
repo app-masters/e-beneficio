@@ -3,6 +3,8 @@ import logging from '../utils/logging';
 import * as familyModel from '../models/families';
 import * as consumptionModel from '../models/consumptions';
 
+const type = process.env.CONSUMPTION_TYPE as 'ticket' | 'product';
+
 const router = express.Router({ mergeParams: true });
 
 /**
@@ -11,13 +13,24 @@ const router = express.Router({ mergeParams: true });
 router.get('/', async (req, res) => {
   try {
     if (!req.user?.cityId) throw Error('User without selected city');
-    const item = await familyModel.findByNis(req.query.nis as string, req.user.cityId, true);
-    // const balance = await consumptionModel.getFamilyBalance(item);
-    const balance = await consumptionModel.getFamilyDependentBalance(item);
-    res.send({ ...item.toJSON(), balance });
+    let item;
+    if (req.query.nis) {
+      item = await familyModel.findByNis(req.query.nis as string, req.user.cityId, true);
+    } else if (req.query.code) {
+      item = await familyModel.findByCode(req.query.code as string, req.user.cityId);
+    } else {
+      const list = await familyModel.getAll();
+      return res.send(list);
+    }
+    if (item) {
+      const balance = await consumptionModel.getFamilyDependentBalance(item);
+      return res.send({ ...item.toJSON(), balance });
+    } else {
+      return res.status(404).send('Not found');
+    }
   } catch (error) {
     logging.error(error);
-    res.status(500).send(error.message);
+    return res.status(500).send(error.message);
   }
 });
 
@@ -28,6 +41,27 @@ router.get('/dashboard', async (req, res) => {
   try {
     if (!req.user?.cityId) throw Error('User without selected city');
     const data = await familyModel.getDashboardInfo(req.user.cityId);
+    res.send(data);
+  } catch (error) {
+    logging.error(error);
+    res.status(500).send(error.message);
+  }
+});
+
+/**
+ * List of families associated with a place
+ */
+router.get('/place', async (req, res) => {
+  try {
+    if (!req.user?.cityId) throw Error('User without selected city');
+    if (!req.user?.placeStoreId && !req.query.placeStoreId) throw Error('User without place store');
+    const data = await familyModel.findByPlaceStore(
+      req.user.placeStoreId || Number(req.query.placeStoreId),
+      req.user.cityId,
+      true,
+      true
+    );
+
     res.send(data);
   } catch (error) {
     logging.error(error);
@@ -121,7 +155,27 @@ router.get('/import-status', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     if (!req.user?.cityId) throw Error('User without selected city');
-    const item = await familyModel.create(req.body);
+    // If product type, add the user id and placeStoreId to family
+    if (type === 'product') {
+      if (!req.user.placeStoreId && !req.body.placeStoreId) throw Error('User without place store');
+      req.body.createdById = req.user.id;
+      req.body.placeStoreId = req.user.placeStoreId ? req.user.placeStoreId : req.body.placeStoreId;
+    }
+    const item = await familyModel.createFamilyWithDependents(req.body, req.user?.cityId);
+    res.send(item);
+  } catch (error) {
+    logging.error(error);
+    res.status(500).send(error.message);
+  }
+});
+
+/**
+ * Sub-route to PUT an existing item
+ */
+router.put('/:id/deactivate', async (req, res) => {
+  try {
+    if (!req.user?.cityId) throw Error('User without selected city');
+    const item = await familyModel.deactivateFamilyAndDependentsById(req.params.id);
     res.send(item);
   } catch (error) {
     logging.error(error);
