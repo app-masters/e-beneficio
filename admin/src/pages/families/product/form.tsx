@@ -160,10 +160,8 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
    */
   const responsibleDependent = (value: Dependent) => {
     let list: Dependent[] = values.dependents ? [...values.dependents] : [];
-
     const verifyIndex = list.findIndex((f) => f.nis === value.nis);
     if (verifyIndex > -1) list = list.filter((f) => f.nis !== value.nis);
-
     if (value.isResponsible) {
       list = list.map((resp: Dependent) => {
         return { ...resp, isResponsible: false };
@@ -198,7 +196,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
         loading={loading}
         title={<Typography.Title>{`${isCreating ? 'Nova' : 'Editar'} Família`}</Typography.Title>}
       >
-        <Form onSubmitCapture={submitForm} layout="vertical">
+        <Form onSubmitCapture={handleSubmit} layout="vertical">
           {error && <Alert message="Ocorreu um erro" description={(error as Error).message} type="error" showIcon />}
           <Row gutter={[16, 16]}>
             <Col span={24} md={8}>
@@ -432,6 +430,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
                     Remover
                   </Button>
                 ]}
+                style={{ paddingBottom: 0 }}
               >
                 <List.Item.Meta
                   title={
@@ -449,25 +448,16 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
                   description={
                     <Row gutter={[16, 16]}>
                       <Col span={24} md={12}>
-                        {(item.email || item.phone) && <>{`${item.email || ''} - ${formatPhone(item.phone) || ''}`}</>}
-                        {(item.cpf || item.rg) && (
-                          <>
-                            <br />
-                            {`CPF: ${item.cpf || ''} - RG: ${item.rg || ''}`}
-                          </>
-                        )}
-                        {item.schoolName && (
-                          <>
-                            <br />
-                            {`Escola: ${item.schoolName || ''}`}
-                          </>
-                        )}
+                        <Row>
+                          {(item.email || item.phone) && `${item.email || ''} - ${formatPhone(item.phone) || ''}`}
+                        </Row>
+                        <Row>{(item.cpf || item.rg) && `CPF: ${item.cpf || ''} - RG: ${item.rg || ''}`}</Row>
+                        <Row>{item.schoolName && `Escola: ${item.schoolName || ''}`}</Row>
                       </Col>
                       {item.profession && (
                         <Col span={24} md={12}>
-                          {`Profissão: ${item.profession || ''}`}
-                          <br />
-                          {`Salário: ${item.salary ? 'R$ ' + formatMoney(item.salary) : 'Não informado'}`}
+                          <Row>{`Profissão: ${item.profession || ''}`}</Row>
+                          <Row>{`Salário: ${item.salary ? 'R$ ' + formatMoney(item.salary) : 'Não informado'}`}</Row>
                         </Col>
                       )}
                     </Row>
@@ -495,7 +485,6 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
             setModal({ open: false, type: '' });
           }}
           onCreate={(value: Dependent) => {
-            //Generate random NIS.
             value.nis = Math.random().toString(36).substr(0, 10);
             const list = responsibleDependent(value);
             setFieldValue('dependents', list);
