@@ -160,7 +160,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
    */
   const responsibleDependent = (value: Dependent) => {
     let list: Dependent[] = values.dependents ? [...values.dependents] : [];
-    const verifyIndex = list.findIndex((f) => f.nis === value.nis || f.id === value.id);
+    const verifyIndex = list.findIndex((f) => f.nis === value.nis || f.id === value.id || f.id === value.id);
     if (verifyIndex > -1) list = list.filter((f) => f.nis !== value.nis || f.id === value.id);
     if (value.isResponsible) {
       list = list.map((resp: Dependent) => {

@@ -12,6 +12,8 @@ import { ActionWrapper, PageContainer } from './styles';
 import { formatMoney } from '../../utils/string';
 import { env } from '../../env';
 import { requestGetProduct } from '../../redux/product/actions';
+import { Group } from '../../interfaces/group';
+import { requestGetGroup } from '../../redux/group/actions';
 
 const TYPE = env.REACT_APP_CONSUMPTION_TYPE as 'ticket' | 'product';
 const showProductList = TYPE === 'product';
@@ -23,12 +25,14 @@ const showProductList = TYPE === 'product';
 export const BenefitList: React.FC<{}> = () => {
   // Redux state
   const list = useSelector<AppState, Benefit[]>((state) => state.benefitReducer.list as Benefit[]);
+  const groups = useSelector<AppState, Group[]>(({ groupReducer }) => groupReducer.list as Group[]);
 
   // Redux actions
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(requestGetBenefit());
     dispatch(requestGetProduct());
+    dispatch(requestGetGroup());
   }, [dispatch]);
 
   return (
@@ -45,8 +49,8 @@ export const BenefitList: React.FC<{}> = () => {
           <Table.Column title="Nome" dataIndex="title" />
           <Table.Column
             title="Grupo"
-            dataIndex="groupName"
-            render={(data: Benefit['groupName']) => familyGroupList[data]?.title || data}
+            dataIndex="groupId"
+            render={(data: Benefit['groupId']) => groups?.find((group) => group.id === data)?.title}
           />
           <Table.Column title="Data" dataIndex="date" render={(data) => moment(data).format('MM/YYYY')} />
           {/* Show the product list column depending on the type of benefit */}
