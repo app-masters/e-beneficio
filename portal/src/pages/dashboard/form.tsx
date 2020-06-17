@@ -1,5 +1,5 @@
 import { QrcodeOutlined, WarningFilled, CheckOutlined } from '@ant-design/icons';
-import { Button, Modal, Row, Col, Typography, Form, InputNumber, Divider, Alert } from 'antd';
+import { Button, Modal, Row, Col, Typography, Form, InputNumber, Divider, Alert, Input } from 'antd';
 import { useFormik } from 'formik';
 import React, { useState } from 'react';
 import QrReader from 'react-qr-reader';
@@ -12,6 +12,7 @@ import { requestSaveConsumption } from '../../redux/consumption/actions';
 import { requestResetFamily } from '../../redux/family/actions';
 import { IconCheckStyle, ImageContainer, PriceStyle, PriceLabelStyle } from './styles';
 import { logging } from '../../utils/logging';
+import { formatMoney } from '../../utils/formatters';
 
 /**
  * Clear NFCe QRCode result
@@ -178,9 +179,7 @@ export const StepWithQRCode: React.FC<{ onBack: () => void; onFinish: () => void
       {status && <Alert message="Erro no formulário" description={status} type="error" />}
       <Form.Item>
         <Typography.Text style={PriceLabelStyle}>{'Saldo disponível: '}</Typography.Text>
-        <Typography.Text style={PriceStyle}>{`R$${(family?.balance || 0)
-          .toFixed(2)
-          .replace('.', ',')}`}</Typography.Text>
+        <Typography.Text style={PriceStyle}>{`R$${formatMoney(family?.balance || 0)}`}</Typography.Text>
       </Form.Item>
       <Form.Item
         label="Valor total da compra"
@@ -226,6 +225,7 @@ export const StepWithQRCode: React.FC<{ onBack: () => void; onFinish: () => void
         <Button icon={<QrcodeOutlined />} block onClick={() => setQRModal(true)}>
           Ler código QRCode
         </Button>
+        <Input hidden name="nfce" id="nfce" onChange={(event) => setFieldValue('nfce', event.target.value)} />
         {showQRModal && (
           <ModalQrCode
             onQrRead={(nfce) => setFieldValue('nfce', nfce)}
