@@ -11,6 +11,7 @@ import { ActionWrapper, PageContainer } from './styles';
 import { Dependent } from '../../interfaces/dependent';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
+import EmptyList from '../../components/emptyList';
 import { requestGetGroup } from '../../redux/group/actions';
 import { Group } from '../../interfaces/group';
 
@@ -54,7 +55,13 @@ export const FamiliesList: React.FC<{}> = () => {
           </Link>
         }
       >
-        <Table dataSource={dataSource} rowKey="id">
+        <Table
+          locale={{
+            emptyText: () => <EmptyList title={'Nenhuma família disponível'} />
+          }}
+          dataSource={dataSource}
+          rowKey="id"
+        >
           <Table.Column
             title="Nome do Responsável"
             width="18%"

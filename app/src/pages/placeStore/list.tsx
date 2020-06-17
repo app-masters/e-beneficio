@@ -10,6 +10,7 @@ import { ActionWrapper, PageContainer } from './styles';
 import { formatCNPJ } from '../../utils/string';
 import { Place } from '../../interfaces/place';
 import { requestGetPlace } from '../../redux/place/actions';
+import EmptyList from '../../components/emptyList';
 
 /**
  * List component
@@ -39,7 +40,12 @@ export const PlaceStoreList: React.FC<{}> = () => {
           </Link>
         }
       >
-        <Table dataSource={list}>
+        <Table
+          locale={{
+            emptyText: () => <EmptyList title={'Nenhuma loja disponível'} />
+          }}
+          dataSource={list}
+        >
           <Table.Column
             title="Estabelecimento"
             dataIndex="placeId"
