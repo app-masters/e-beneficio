@@ -14,6 +14,7 @@ import { requestClearFamily } from '../../redux/family/actions';
 import { UploadOutlined, CameraOutlined, WarningFilled } from '@ant-design/icons';
 import { CameraUpload } from './cameraUpload';
 import Webcam from 'react-webcam';
+import { spacing } from '../../styles/theme';
 
 /**
  * Dashboard page component
@@ -139,14 +140,6 @@ const ProductConsumption: React.FC<{ family?: Family | null; loading?: boolean }
 
   return (
     <div>
-      <Button
-        danger={consumerInfo.error}
-        size="large"
-        icon={<CameraOutlined />}
-        onClick={() => setShowCameraModal(true)}
-      >
-        {consumerInfo.image ? 'Alterar foto do consumidor' : 'Adicionar foto do consumidor'}
-      </Button>
       <Modal
         okText={
           showCamera ? (
@@ -228,8 +221,18 @@ const ProductConsumption: React.FC<{ family?: Family | null; loading?: boolean }
         </Typography.Paragraph>
       </Modal>
       <Divider />
-      <h2>Produtos</h2>
+      <Typography.Title level={4}>Produtos</Typography.Title>
       <Table pagination={false} columns={columns} dataSource={dataSource || []} />
+      <Flex justifyContent="center" alignItems="center" style={{ marginTop: spacing.default }}>
+        <Button
+          danger={consumerInfo.error}
+          size="large"
+          icon={<CameraOutlined />}
+          onClick={() => setShowCameraModal(true)}
+        >
+          {consumerInfo.image ? 'Alterar foto de comprovação' : 'Foto de comprovação'}
+        </Button>
+      </Flex>
       <Flex style={{ marginTop: 25 }} alignItems="center" justifyContent="flex-end">
         <Button loading={loading} onClick={onSubmitConsumption} htmlType="submit" type="primary">
           Confirmar consumo
