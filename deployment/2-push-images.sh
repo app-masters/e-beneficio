@@ -3,14 +3,15 @@ set -e
 
 ## Get Current env
 source utils.sh
-getEnvName $1
 
 ## Include config
 source config.sh
-source ${ENV}/config.sh
 
 ## Set project
 setProject
+
+## Login on GCR
+gcloud auth configure-docker --quiet
 
 #####
 
@@ -18,8 +19,10 @@ setProject
 ### FILES AND FINAL PULL
 # BACKEND
 echo -e "\n# > Pushing backend dockerfile...\n"
-docker push ${BACKEND_CONTAINER_IMAGE}
+docker push "${BACKEND_CONTAINER_IMAGE}"
 echo -e "\n# > Pushing admin dockerfile...\n"
-docker push ${ADMIN_CONTAINER_IMAGE}
+docker push "${ADMIN_CONTAINER_IMAGE}"
 echo -e "\n# > Pushing portal dockerfile...\n"
-docker push ${PORTAL_CONTAINER_IMAGE}
+docker push "${PORTAL_CONTAINER_IMAGE}"
+echo -e "\n# > Pushing app dockerfile...\n"
+docker push "${APP_CONTAINER_IMAGE}"

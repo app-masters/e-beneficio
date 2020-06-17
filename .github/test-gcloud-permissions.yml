@@ -14,13 +14,11 @@ jobs:
     steps:
       - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
-          service_account_email: ${{ secrets.GCP_SA_EMAIL_TEST_3 }}
-          service_account_key: ${{ secrets.GCP_SA_KEY_TEST_3 }}
-          project_id: "covid19jf"
-          export_default_credentials: true
+          service_account_key: ${{ secrets.GCP_KEY_JF_CONTRAFOME }}
+          project_id: "jf-contra-fome"
       - run: gcloud components install --quiet beta
       - run: gcloud info
-      - run: gcloud beta compute ssh "resources-dev-2" --zone "us-central1-a" --command="pwd && ls"
+      - run: gcloud beta compute ssh "jf-contra-fome" --zone "us-central1-a" --command="pwd && ls && ls -la /srv/project/"
 
 
 # test-account-3 + compute-admin + updated metadata with "enable-oslogin"
