@@ -114,7 +114,6 @@ jobs:
         with:
           service_account_key: ${{ secrets.GCP_KEY_JF_CONTRAFOME }}
           project_id: "jf-contra-fome"
-#          export_default_credentials: true
 
       - run: gcloud components install --quiet beta
       - run: gcloud info
