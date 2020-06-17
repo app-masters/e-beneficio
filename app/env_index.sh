@@ -17,6 +17,14 @@ fi
 
 echo "Setting index.html environment variables"
 
+# Get the consumption type from the .env
+consumptionType=$(grep "REACT_APP_CONSUMPTION_TYPE=" .env | sed -e 's/^[^=]*=//')
+consumptionType=$(printf '%s_\n' "$consumptionType" | awk '{ print toupper($0) }')
+
+# Convert each COND_ variable to PRODUCT_ or TICKET_ before processing all the .env variables
+sed "s/%COND_/%$consumptionType/g" "$FILE" > "tmp_$FILE"
+mv "tmp_$FILE" "$FILE"
+
 # Read each line in .env file
 # Each line represents key=value pairs
 while read -r line || [[ -n "$line" ]];
