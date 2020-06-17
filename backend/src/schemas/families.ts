@@ -1,5 +1,5 @@
 import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor, CreateOptions } from 'sequelize';
-import Hashids from 'hashids';
+import Hashids from 'hashids/cjs';
 import { Dependent } from './depedents';
 import { Consumption } from './consumptions';
 
