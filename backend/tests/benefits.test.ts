@@ -1,9 +1,12 @@
 import moment from 'moment';
 import db, { sequelize } from '../src/schemas';
 import * as consumptionModel from '../src/models/consumptions';
-// import { Family } from '../src/schemas/families';
+import { Family } from '../src/schemas/families';
 import { getFamilyGroupByCode } from '../src/utils/constraints';
 import { Benefit } from '../src/schemas/benefits';
+import { PlaceStore } from '../src/schemas/placeStores';
+import { Institution } from '../src/schemas/institutions';
+import { Group } from '../src/schemas/groups';
 
 afterAll(() => {
   sequelize.close();
@@ -11,47 +14,179 @@ afterAll(() => {
 
 const testName = 'benefits';
 
-const benefit = {
-  institutionId: 1,
-  groupId: 1,
-  title: 'BenefitTest 1',
-  date: moment('05/05/2020', 'DD/MM/YYYY').toDate()
-} as Benefit;
-let createdBenefit: Benefit | null;
-
 const family = {
-  code: Math.floor(Math.random() * 10000000).toString(),
+  code: '1234567890',
   groupId: getFamilyGroupByCode(1)?.id,
-  responsibleName: 'Family After',
+  responsibleName: 'ALESSANDRO MACANHA',
   responsibleBirthday: moment('01/01/1980', 'DD/MM/YYYY').toDate(),
-  responsibleNis: Math.floor(Math.random() * 10000000000).toString(),
-  responsibleMotherName: '',
-  createdAt: moment('05/06/2020', 'DD/MM/YYYY').toDate(),
+  responsibleNis: '1234567890',
+  responsibleMotherName: 'CUSTODIA SOLANGE',
   cityId: 0
-};
+} as Family;
+let createdFamily: Family;
+
+const benefit = {
+  title: '[CAD25123] Auxilio municipal de teste',
+  value: 500,
+  date: moment().toDate(),
+  institutionId: 0
+} as Benefit;
+const group = {
+  title: 'Grupo de Testes'
+} as Group;
+let createdGroup: Group;
+let createdBenefit: Benefit;
+let placeStore: PlaceStore;
+let institution: Institution;
 
 test(`[${testName}] Create mock data`, async () => {
-  createdBenefit = await db.benefits.findOne({ where: { title: benefit.title } });
-  if (!createdBenefit) createdBenefit = await db.benefits.create({ ...benefit, institutionId: 1 });
-  expect(createdBenefit).toBeDefined();
-  expect(createdBenefit.id).toBeDefined();
+  [placeStore] = await db.placeStores.findAll({ limit: 1 });
+  [institution] = await db.institutions.findAll({ where: { cityId: placeStore.cityId as number }, limit: 1 });
+
+  const verifyGroup = await db.groups.findOne({ where: { title: 'Grupo de Testes' } });
+  if (verifyGroup) createdGroup = verifyGroup;
+  else createdGroup = await db.groups.create({ ...group });
+  expect(createdGroup).toBeDefined();
+  expect(createdGroup.id).toBeDefined();
+
+  const verifyBenefit = await db.benefits.findOne({ where: { title: '[CAD25123] Auxilio municipal de teste' } });
+  if (!verifyBenefit) {
+    benefit.groupId = institution.id as number;
+    benefit.institutionId = institution.id as number;
+    createdBenefit = await db.benefits.create({ ...benefit });
+    expect(createdBenefit).toBeDefined();
+    expect(createdBenefit.id).toBeDefined();
+    for (let i = 1; i < 11; i++) {
+      await db.benefitProducts.create({
+        productId: i,
+        benefitId: createdBenefit.id,
+        amount: 2
+      });
+    }
+  } else createdBenefit = verifyBenefit;
+
+  const verifyFamily = await db.families.findOne({ where: { code: '1234567890' } });
+  if (verifyFamily) createdFamily = verifyFamily;
+  else createdFamily = await db.families.create({ ...family, groupId: createdGroup.id, cityId: placeStore.cityId });
+
+  expect(createdFamily).toBeDefined();
+  expect(createdFamily.id).toBeDefined();
 });
 
-test(`[${testName}] Get family before benefit`, async () => {
-  try {
-    family.createdAt = moment('03/03/2020', 'DD/MM/YYYY').toDate();
-    await consumptionModel.getFamilyDependentBalance(family);
-  } catch (e) {
-    expect(e.message).toBe('Nenhum benefício disponível');
-  }
-});
-
-test(`[${testName}] Get family after benefit`, async () => {
-  const [, [family]] = await db.families.update(
-    { createdAt: moment('09/09/2020', 'DD/MM/YYYY').toDate() },
-    { where: { responsibleNis: '1234' }, returning: true }
+test(`[${testName}] Benefit on start of current month`, async () => {
+  await db.benefits.update(
+    { date: moment().startOf('month').toDate() },
+    { where: { id: createdBenefit.id as number } }
   );
-  let balance;
-  if (family) balance = await consumptionModel.getFamilyDependentBalance(family);
+  const balance = await consumptionModel.getFamilyDependentBalanceProduct(createdFamily);
+  expect(balance).toBeDefined();
   expect(balance).toBeInstanceOf(Array);
+  expect(balance.length).toBeGreaterThan(0);
+});
+
+test(`[${testName}] Benefit on end of current month`, async () => {
+  await db.benefits.update({ date: moment().endOf('month').toDate() }, { where: { id: createdBenefit.id as number } });
+  const balance = await consumptionModel.getFamilyDependentBalanceProduct(createdFamily);
+  expect(balance).toBeDefined();
+  expect(balance).toBeInstanceOf(Array);
+  expect(balance.length).toBe(0);
+});
+
+test(`[${testName}] Benefit on start of last month`, async () => {
+  await db.benefits.update(
+    { date: moment().subtract(1, 'month').startOf('month').toDate() },
+    { where: { id: createdBenefit.id as number } }
+  );
+  const balance = await consumptionModel.getFamilyDependentBalanceProduct(createdFamily);
+  expect(balance).toBeDefined();
+  expect(balance).toBeInstanceOf(Array);
+  expect(balance.length).toBe(0);
+});
+
+test(`[${testName}] Benefit on end of last month`, async () => {
+  await db.benefits.update(
+    { date: moment().subtract(1, 'month').endOf('month').toDate() },
+    { where: { id: createdBenefit.id as number } }
+  );
+  const balance = await consumptionModel.getFamilyDependentBalanceProduct(createdFamily);
+  expect(balance).toBeDefined();
+  expect(balance).toBeInstanceOf(Array);
+  expect(balance.length).toBe(0);
+});
+
+test(`[${testName}] Benefit on start of next month`, async () => {
+  await db.benefits.update(
+    { date: moment().add(1, 'month').startOf('month').toDate() },
+    { where: { id: createdBenefit.id as number } }
+  );
+  const balance = await consumptionModel.getFamilyDependentBalanceProduct(createdFamily);
+  expect(balance).toBeDefined();
+  expect(balance).toBeInstanceOf(Array);
+  expect(balance.length).toBe(0);
+});
+
+test(`[${testName}] Benefit on end of next month`, async () => {
+  await db.benefits.update(
+    { date: moment().add(1, 'month').endOf('month').toDate() },
+    { where: { id: createdBenefit.id as number } }
+  );
+  const balance = await consumptionModel.getFamilyDependentBalanceProduct(createdFamily);
+  expect(balance).toBeDefined();
+  expect(balance).toBeInstanceOf(Array);
+  expect(balance.length).toBe(0);
+});
+
+test(`[${testName}] Benefit on end of next month`, async () => {
+  await db.benefits.update(
+    { date: moment().add(1, 'month').endOf('month').toDate() },
+    { where: { id: createdBenefit.id as number } }
+  );
+  const balance = await consumptionModel.getFamilyDependentBalanceProduct(createdFamily);
+  expect(balance).toBeDefined();
+  expect(balance).toBeInstanceOf(Array);
+  expect(balance.length).toBe(0);
+});
+
+test(`[${testName}] Benefit on start of last year`, async () => {
+  await db.benefits.update(
+    { date: moment().subtract(1, 'year').startOf('year').toDate() },
+    { where: { id: createdBenefit.id as number } }
+  );
+  const balance = await consumptionModel.getFamilyDependentBalanceProduct(createdFamily);
+  expect(balance).toBeDefined();
+  expect(balance).toBeInstanceOf(Array);
+  expect(balance.length).toBe(0);
+});
+
+test(`[${testName}] Benefit on end of last year`, async () => {
+  await db.benefits.update(
+    { date: moment().subtract(1, 'year').endOf('year').toDate() },
+    { where: { id: createdBenefit.id as number } }
+  );
+  const balance = await consumptionModel.getFamilyDependentBalanceProduct(createdFamily);
+  expect(balance).toBeDefined();
+  expect(balance).toBeInstanceOf(Array);
+  expect(balance.length).toBe(0);
+});
+
+test(`[${testName}] Benefit on start of next year`, async () => {
+  await db.benefits.update(
+    { date: moment().add(1, 'year').startOf('year').toDate() },
+    { where: { id: createdBenefit.id as number } }
+  );
+  const balance = await consumptionModel.getFamilyDependentBalanceProduct(createdFamily);
+  expect(balance).toBeDefined();
+  expect(balance).toBeInstanceOf(Array);
+  expect(balance.length).toBe(0);
+});
+
+test(`[${testName}] Benefit on end of next year`, async () => {
+  await db.benefits.update(
+    { date: moment().add(1, 'year').endOf('year').toDate() },
+    { where: { id: createdBenefit.id as number } }
+  );
+  const balance = await consumptionModel.getFamilyDependentBalanceProduct(createdFamily);
+  expect(balance).toBeDefined();
+  expect(balance).toBeInstanceOf(Array);
+  expect(balance.length).toBe(0);
 });

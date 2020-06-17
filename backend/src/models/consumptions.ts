@@ -3,6 +3,7 @@ import db from '../schemas';
 import { Consumption, SequelizeConsumption } from '../schemas/consumptions';
 import { PlaceStore } from '../schemas/placeStores';
 import { Family } from '../schemas/families';
+import { BenefitProduct } from '../schemas/benefitProducts';
 import moment from 'moment';
 import logging from '../utils/logging';
 import { Place } from '../schemas/places';
@@ -32,9 +33,11 @@ export const getFamilyDependentBalanceProduct = async (family: Family): Promise<
   //Filter benefit by family date
   const familyBenefitsFilterDate = familyBenefits
     .filter((benefit) => {
-      const isSameMonthYear = moment(benefit.date).isSameOrBefore(moment(family.createdAt || moment()), 'month');
-      const isTodayAfterDate = moment().isAfter(moment(benefit.date));
-      return isSameMonthYear && isTodayAfterDate ? benefit : null;
+      const isSameMonthYear = moment(family.createdAt || moment()).isSame(benefit.date, 'month');
+      const isTodayAfterDate = moment().isSameOrAfter(moment(benefit.date));
+      let isNotDeactivated = true;
+      if (family.deactivatedAt) isNotDeactivated = moment(benefit.date).isBefore(moment(family.deactivatedAt));
+      return isSameMonthYear && isTodayAfterDate && isNotDeactivated ? benefit : null;
     })
     .filter((f) => f);
   if (familyBenefitsFilterDate.length === 0) {
@@ -63,8 +66,18 @@ export const getFamilyDependentBalanceProduct = async (family: Family): Promise<
       consumptionsId: consumptionIds as number[]
     }
   });
+  //Group products
+  const groupedProductsAvailable: BenefitProduct[] = [];
+  listOfProductsAvailable.reduce((res, value) => {
+    if (!res[value.productId]) {
+      res[value.productId] = { benefitId: value.benefitId, productId: value.productId, amount: 0 };
+      groupedProductsAvailable.push(res[value.productId]);
+    }
+    res[value.productId].amount += value.amount;
+    return res;
+  }, {});
   //Get difference between available products and consumed products
-  const differenceProducts = listOfProductsAvailable.map((product) => {
+  const differenceProducts = groupedProductsAvailable.map((product) => {
     const items = productsFamilyConsumption.filter((f) => f.productId === product.productId);
     // const item = productsFamilyConsumption.find((f) => f.productId === product.productId);
     let amount = 0;
