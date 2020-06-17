@@ -9,5 +9,15 @@ export const env = {
   REACT_APP_ENV_CITY_ID: window._env_?.REACT_APP_ENV_CITY_ID || process.env.REACT_APP_ENV_CITY_ID,
   REACT_APP_CONSUMPTION_TYPE:
     window._env_?.REACT_APP_CONSUMPTION_TYPE || process.env.REACT_APP_CONSUMPTION_TYPE || 'ticket',
-  NODE_ENV: window._env_?.NODE_ENV || process.env.NODE_ENV
+  NODE_ENV: window._env_?.NODE_ENV || process.env.NODE_ENV,
+
+  // Conditional environment variables
+  ADMIN_TITLE:
+    window._env_?.REACT_APP_CONSUMPTION_TYPE === 'ticket'
+      ? window._env_?.TICKET_ADMIN_TITLE
+      : window._env_?.PRODUCT_ADMIN_TITLE,
+  PUBLIC_URL:
+    window._env_?.REACT_APP_CONSUMPTION_TYPE === 'ticket'
+      ? window._env_?.TICKET_PUBLIC_URL
+      : window._env_?.PRODUCT_PUBLIC_URL
 };

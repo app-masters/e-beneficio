@@ -32,5 +32,5 @@
     ]
   },
   "exclude": ["node_modules", "dist", ".awcache", "backend"],
-  "include": ["./**/*.d.ts", "./**/*.ts", "./**/*.tsx", "../../**/*.d.ts"]
+  "include": ["./**/*.d.ts", "./**/*.ts", "./**/*.tsx"]
 }
