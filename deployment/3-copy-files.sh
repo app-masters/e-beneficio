@@ -74,3 +74,10 @@ if test -f "$FILE"; then
 else
     echo "Not sending ${FILE}";
 fi
+## Credentials
+FILE=./${ENV}/storage-service-account.json
+if test -f "$FILE"; then
+    gcloud compute scp ${FILE} ${INSTANCE_NAME}:${REMOTE_PATH}
+else
+    echo "Not sending ${FILE}";
+fi
