@@ -57,7 +57,9 @@ const init = (listeningCallback: () => void, errorCallback: (error: Error) => vo
     server.on('listening', listeningCallback);
 
     //Setup the server cronjobs
-    setupCronjobs();
+    if (process.env.CONSUMPTION_TYPE !== 'product') {
+      setupCronjobs();
+    }
   } catch (e) {
     errorCallback(e);
   }
