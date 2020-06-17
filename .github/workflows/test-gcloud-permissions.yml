@@ -18,7 +18,7 @@ jobs:
           project_id: "jf-contra-fome"
       - run: gcloud components install --quiet beta
       - run: gcloud info
-      - run: gcloud beta compute ssh "jf-contra-fome" --zone "us-central1-a" --command="pwd && ls"
+      - run: gcloud beta compute ssh "jf-contra-fome" --zone "us-central1-a" --command="pwd && ls && ls -la /srv/project/"
 
 
 # test-account-3 + compute-admin + updated metadata with "enable-oslogin"
