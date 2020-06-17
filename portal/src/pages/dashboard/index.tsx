@@ -57,7 +57,7 @@ export const DashboardPage: React.FC<{}> = () => {
               </Col>
               <Col xs={{ span: 24 }} lg={{ span: 4 }}>
                 <Button block href={'#info'} type={'primary'}>
-                  Informações sobre o programa
+                  Informações
                 </Button>
               </Col>
               <Col xs={{ span: 24 }} lg={{ span: 4 }}>

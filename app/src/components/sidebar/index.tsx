@@ -1,5 +1,4 @@
 import {
-  BarChartOutlined,
   CarryOutOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
@@ -101,13 +100,7 @@ export const Sidebar: React.FC = (props) => {
     }
   ];
 
-  const privateRoutes: RouteItem[] = [
-    {
-      path: '/relatorios',
-      icon: () => <BarChartOutlined />,
-      name: 'Relatórios'
-    }
-  ];
+  const privateRoutes: RouteItem[] = [];
 
   const adminRoutes: RouteItem[] = [
     {

@@ -15,5 +15,5 @@
       "pre-push": "lerna run checks"
     }
   },
-  "name": "phormar"
+  "name": "e-beneficio"
 }

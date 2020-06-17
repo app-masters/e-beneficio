@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "nodemon --config nodemon.json -- exec src/index.js",
-    "start-production": "pm2-runtime src/index.js",
+    "start-production": "pm2-runtime src/index.js --max_restarts=3",
     "build": "tsc --build",
     "test": "node node_modules/.bin/jest --config ./jest.config.js -i",
     "create": "sequelize db:create",
