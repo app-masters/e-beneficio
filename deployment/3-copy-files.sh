@@ -14,6 +14,9 @@ setProject
 
 #####
 
+## Test permissions
+gcloud compute ssh "${INSTANCE_NAME}" --command="cd ${REMOTE_PATH} && ls -la && touch test && rm test"
+
 ### FILES AND FINAL PULL
 FILE=./${ENV}/docker-compose.yml
 if test -f "$FILE"; then
