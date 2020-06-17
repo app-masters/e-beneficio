@@ -1,5 +1,6 @@
 import { Storage } from '@google-cloud/storage';
 import logging from './logging';
+import fs from 'fs';
 
 const googleCloud = {
   getBucket: () => {
@@ -69,6 +70,7 @@ const googleCloud = {
   check: async () => {
     try {
       const filePath = `${__dirname}/test.file`;
+      fs.writeFileSync(filePath, 'Just a test file created to test storage'); // Create file
       let result: any;
       result = await googleCloud.upload(filePath, 'test.file');
       if (!result) throw new Error('Google Cloud upload didt worked');

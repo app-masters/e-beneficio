@@ -1,5 +1,4 @@
 import logging from './logging';
-require('./test.file'); // Adding file to the build
 
 interface Provider {
   provider?: Provider | null;
