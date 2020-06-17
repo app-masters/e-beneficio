@@ -3,7 +3,7 @@ import { familyGroupList } from './../utils/constraints';
 export interface Benefit {
   readonly id?: number;
   institutionId: number;
-  groupName: string;
+  groupId: number;
   title: string;
   date: Date;
   value: keyof typeof familyGroupList;
