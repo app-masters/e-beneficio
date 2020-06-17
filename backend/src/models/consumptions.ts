@@ -32,7 +32,7 @@ export const getFamilyDependentBalanceProduct = async (family: Family): Promise<
   //Filter benefit by family date
   const familyBenefitsFilterDate = familyBenefits
     .filter((benefit) => {
-      const isSameMonthYear = moment(benefit.date).isSame(moment(family.createdAt || moment()), 'month');
+      const isSameMonthYear = moment(benefit.date).isSameOrBefore(moment(family.createdAt || moment()), 'month');
       const isTodayAfterDate = moment().isAfter(moment(benefit.date));
       return isSameMonthYear && isTodayAfterDate ? benefit : null;
     })
