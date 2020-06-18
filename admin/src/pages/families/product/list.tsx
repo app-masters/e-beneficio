@@ -108,6 +108,9 @@ export const FamiliesList: React.FC<{}> = () => {
             render={(item: User) => {
               return (
                 <ActionWrapper>
+                  <Link to={`/familias/${item.id}/info`}>
+                    <Button>Visualizar</Button>
+                  </Link>
                   <Link to={`/familias/${item.id}/editar`}>
                     <Button>Editar</Button>
                   </Link>

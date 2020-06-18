@@ -1003,3 +1003,22 @@ export const generateListFile = async (cityId: NonNullable<City['id']>) => {
   await csvFileWriter.writeRecords(fileFamilies);
   return path.resolve(filePath);
 };
+
+/**
+ * List family consumptions
+ * @param id FamilyId
+ */
+export const getFamilyConsumption = async (id: number | string): Promise<number> => {
+  const family = await db.families.findOne({ where: { id } });
+  if (!family) {
+    throw { status: 412, message: 'Família não encontrada.' };
+  }
+
+  // Get all consumptions already made
+  const [consumption] = await db.consumptions.findAll({
+    where: { familyId: family.id as number },
+    group: ['Consumptions.familyId']
+  });
+
+  return consumption;
+};
