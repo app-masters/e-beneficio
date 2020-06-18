@@ -51,7 +51,7 @@ export const BenefitList: React.FC<{}> = () => {
             dataIndex="groupId"
             render={(data: Benefit['groupId']) => groups?.find((group) => group.id === data)?.title}
           />
-          <Table.Column title="Data" dataIndex="date" render={(data) => moment(data).format('MM/YYYY')} />
+          <Table.Column title="Data" dataIndex="date" render={(data) => moment(data).format('DD/MM/YYYY')} />
           {/* Show the product list column depending on the type of benefit */}
           {!showProductList && (
             <Table.Column

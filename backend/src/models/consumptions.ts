@@ -70,7 +70,12 @@ export const getFamilyDependentBalanceProduct = async (family: Family): Promise<
   const groupedProductsAvailable: BenefitProduct[] = [];
   listOfProductsAvailable.reduce((res, value) => {
     if (!res[value.productId]) {
-      res[value.productId] = { benefitId: value.benefitId, productId: value.productId, amount: 0 };
+      res[value.productId] = {
+        product: value.product,
+        benefitId: value.benefitId,
+        productId: value.productId,
+        amount: 0
+      };
       groupedProductsAvailable.push(res[value.productId]);
     }
     res[value.productId].amount += value.amount;

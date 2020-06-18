@@ -36,7 +36,6 @@ export const requestGetProduct = (): ThunkResult<void> => {
 
       if (response && response.data) {
         // Request finished
-        console.log(response.data);
         dispatch(doGetProductSuccess(response.data)); // Dispatch result
       } else {
         // Request without response - probably won't happen, but cancel the request

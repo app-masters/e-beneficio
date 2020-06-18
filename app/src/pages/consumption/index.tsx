@@ -89,16 +89,13 @@ const ProductConsumption: React.FC<{ family?: Family | null; loading?: boolean }
    */
   const onSubmitConsumption = () => {
     setConsumerInfo({ ...consumerInfo, error: false });
-
     const verifyIfHaveSelected = dataSource?.filter((f) => Number(f.consume) > 0);
     if (verifyIfHaveSelected?.length === 0) {
       window.scrollTo(0, 0);
       notification.warning({ message: 'É necessário selecionar no mínimo 1 produto' });
       return;
     }
-
     if (!consumerInfo.image) {
-      window.scrollTo(0, 0);
       notification.warning({ message: 'É necessário o envio de uma foto do consumidor' });
       setConsumerInfo({ ...consumerInfo, error: true });
       return;
@@ -238,8 +235,6 @@ const ProductConsumption: React.FC<{ family?: Family | null; loading?: boolean }
         columns={columns}
         dataSource={dataSource && dataSource.length ? dataSource : []}
       />
-      <Typography.Title level={4}>Produtos</Typography.Title>
-      <Table pagination={false} columns={columns} dataSource={dataSource || []} />
       <Flex justifyContent="center" alignItems="center" style={{ marginTop: spacing.default }}>
         <Button
           danger={consumerInfo.error}

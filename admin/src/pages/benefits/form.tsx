@@ -107,7 +107,7 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
   const institutionIdMeta = getFieldMeta('institutionId');
   const productsMeta = getFieldMeta('benefitProducts');
 
-  const monthFormat = 'MM/YYYY';
+  const dateFormat = 'DD/MM/YYYY';
 
   return (
     <Modal
@@ -139,8 +139,9 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
                 <DatePicker
                   locale={locale}
                   picker="month"
+                  name="date"
                   style={{ width: '100%' }}
-                  format={monthFormat}
+                  format={dateFormat}
                   defaultValue={values.date ? moment(values.date) : undefined}
                   onChange={(date) => {
                     setFieldValue('date', date);
