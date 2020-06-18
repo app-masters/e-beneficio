@@ -111,13 +111,7 @@ const ProductConsumption: React.FC<{ family?: Family | null; loading?: boolean }
             .filter((f) => f.amount)
         : []
     };
-    dispatch(
-      requestSaveConsumptionProduct(
-        consumption,
-        () => alert('Sucesso'),
-        () => alert('Falha')
-      )
-    );
+    dispatch(requestSaveConsumptionProduct(consumption));
   };
 
   /**
