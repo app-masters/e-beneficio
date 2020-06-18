@@ -45,6 +45,12 @@ do
     # Clean all possibles backslash as this are reserved character in the sed regex
     cleanvalue=$(printf '%s' "$value" | sed -e 's/\//\\\//g')
 
+    # index.html cannot have 'REACT_APP_' variables or they will be replaced at build time.
+    # Remove the 'REACT_APP_' prefix
+    if printf '%s\n' "$varname" | grep -q -e 'REACT_APP_'; then
+      varname=$(printf '%s' "$varname" | sed -e 's/REACT_APP_//g')
+    fi
+
     # Implace substitution was causing some strage errors, so create a temporary file and then rename it
     sed "s/%$varname%/$cleanvalue/g" "$FILE" > "tmp_$FILE"
     mv "tmp_$FILE" "$FILE"
