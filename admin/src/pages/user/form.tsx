@@ -16,6 +16,8 @@ import { env } from '../../env';
 
 const { Option } = Select;
 
+const CONSUMPTION_TYPE = env.REACT_APP_CONSUMPTION_TYPE || 'ticket';
+
 const schema = yup.object().shape({
   name: yup.string().label('Nome').required(),
   password: yup
@@ -31,7 +33,7 @@ const schema = yup.object().shape({
     .string()
     .label('Entidade')
     .when('role', (role: string | undefined, schema: yup.StringSchema) =>
-      role !== 'admin' ? schema.required() : schema
+      role !== 'admin' && CONSUMPTION_TYPE === 'product' ? schema.required() : schema
     ),
   isCreating: yup.boolean().label('CriandoUsuario').nullable()
 });
@@ -43,8 +45,6 @@ const schema = yup.object().shape({
 export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) => {
   const history = useHistory();
   const isCreating = props.match.params.id === 'criar';
-
-  const CONSUMPTION_TYPE = env.REACT_APP_CONSUMPTION_TYPE || 'ticket';
 
   // Redux state
   const placeStore = useSelector<AppState, PlaceStore[]>(({ placeStoreReducer }) => placeStoreReducer.list);
