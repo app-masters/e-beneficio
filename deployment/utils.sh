@@ -23,5 +23,6 @@ function getEnvName() {
 
 function setProject(){
   ## Set GCP compute zone
-  gcloud config set compute/zone ${ZONE}
+  gcloud config set compute/zone "${ZONE}"
+  gcloud config set project "${PROJECT}"
 }
