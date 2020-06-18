@@ -11,12 +11,6 @@ export const env = {
   NODE_ENV: window._env_?.NODE_ENV || process.env.NODE_ENV,
 
   // Conditional environment variables
-  APP_TITLE:
-    window._env_?.REACT_APP_CONSUMPTION_TYPE === 'ticket'
-      ? window._env_?.TICKET_APP_TITLE
-      : window._env_?.PRODUCT_APP_TITLE,
-  PUBLIC_URL:
-    window._env_?.REACT_APP_CONSUMPTION_TYPE === 'ticket'
-      ? window._env_?.TICKET_PUBLIC_URL
-      : window._env_?.PRODUCT_PUBLIC_URL
+  APP_TITLE: window._env_?.APP_TITLE || process.env.APP_TITLE,
+  PUBLIC_URL: window._env_?.PUBLIC_URL || process.env.PUBLIC_URL
 };
