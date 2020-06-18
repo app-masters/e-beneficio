@@ -4,7 +4,7 @@ import { Image, Wrapper } from './styles';
 import { Typography } from 'antd';
 
 const consumptionType = env.REACT_APP_CONSUMPTION_TYPE as 'ticket' | 'product';
-const adminTitle = env.ADMIN_TITLE;
+const adminTitle = env.REACT_APP_TITLE;
 
 /**
  * Simple logo component that changes according to the consumption type
