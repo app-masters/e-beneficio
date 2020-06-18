@@ -111,6 +111,7 @@ export const FamiliesList: React.FC<{}> = () => {
                   <Link to={`/familias/${item.id}/info`}>
                     <Button>Visualizar</Button>
                   </Link>
+                  <div style={{ width: 10 }} />
                   <Link to={`/familias/${item.id}/editar`}>
                     <Button>Editar</Button>
                   </Link>

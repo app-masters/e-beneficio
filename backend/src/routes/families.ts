@@ -204,8 +204,8 @@ router.put('/:id', async (req, res) => {
 router.get('/consumption', async (req, res) => {
   try {
     if (!req.query.id) throw Error('No family sended');
-    const list = familyModel.getFamilyConsumption(req.query.id as string);
-    return res.send(list);
+    const consumptions = await familyModel.getFamilyConsumption(req.query.id as string);
+    return res.send(consumptions);
   } catch (error) {
     if (!error.status || Number(error.status) !== 409) {
       logging.error(error.message || error, { error, body: req.body });

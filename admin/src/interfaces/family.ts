@@ -27,6 +27,7 @@ export interface Family {
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
   // Join
+  responsibleDependent?: Dependent | null;
   dependents: Dependent[];
   balance?: number;
 }

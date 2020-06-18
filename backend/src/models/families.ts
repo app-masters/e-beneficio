@@ -17,6 +17,7 @@ import { FamilyItem, SislameItem, OriginalSislameItem, OriginalNurseryItem } fro
 import { Family, SequelizeFamily } from '../schemas/families';
 import { City } from '../schemas/cities';
 import { Dependent } from '../schemas/depedents';
+import { SequelizeConsumption } from '../schemas/consumptions';
 
 type ImportReport = {
   status: 'Em espera' | 'Finalizado' | 'Falhou' | 'Lendo arquivos' | 'Filtrando dados' | 'Salvando' | 'Cruzando dados';
@@ -1008,17 +1009,17 @@ export const generateListFile = async (cityId: NonNullable<City['id']>) => {
  * List family consumptions
  * @param id FamilyId
  */
-export const getFamilyConsumption = async (id: number | string): Promise<number> => {
+export const getFamilyConsumption = async (id: number | string): Promise<SequelizeConsumption[]> => {
   const family = await db.families.findOne({ where: { id } });
   if (!family) {
     throw { status: 412, message: 'Família não encontrada.' };
   }
-
   // Get all consumptions already made
-  const [consumption] = await db.consumptions.findAll({
+  const consumption = await db.consumptions.findAll({
     where: { familyId: family.id as number },
-    group: ['Consumptions.familyId']
+    include: [
+      { model: db.consumptionProducts, as: 'consumptionProducts', include: [{ model: db.products, as: 'product' }] }
+    ]
   });
-
   return consumption;
 };
