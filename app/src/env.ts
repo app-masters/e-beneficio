@@ -8,9 +8,7 @@ export const env = {
   REACT_APP_COMMIT_SHA: window._env_?.REACT_APP_COMMIT_SHA || process.env.REACT_APP_COMMIT_SHA,
   REACT_APP_CONSUMPTION_TYPE:
     window._env_?.REACT_APP_CONSUMPTION_TYPE || process.env.REACT_APP_CONSUMPTION_TYPE || 'ticket',
+  REACT_APP_TITLE: window._env_?.REACT_APP_TITLE || process.env.REACT_APP_TITLE,
   NODE_ENV: window._env_?.NODE_ENV || process.env.NODE_ENV,
-
-  // Conditional environment variables
-  APP_TITLE: window._env_?.APP_TITLE || process.env.APP_TITLE,
   PUBLIC_URL: window._env_?.PUBLIC_URL || process.env.PUBLIC_URL
 };

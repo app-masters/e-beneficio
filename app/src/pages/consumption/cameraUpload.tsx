@@ -24,15 +24,15 @@ export const CameraUpload: React.FC<{ onSetImage: (imageUrl: string) => void }> 
    * Before upload
    */
   const beforeUpload = (file: File) => {
-    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-    if (!isJpgOrPng) {
+    const isJpgOrPngOrJpg = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg';
+    if (!isJpgOrPngOrJpg) {
       message.error('Só é possível enviar imagens');
     }
     const isLt2M = file.size / 1024 / 1024 < 2;
     if (!isLt2M) {
       message.error('A imagem deve ser menor que 2MB!');
     }
-    return isJpgOrPng && isLt2M;
+    return isJpgOrPngOrJpg && isLt2M;
   };
 
   /**

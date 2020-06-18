@@ -9,7 +9,7 @@ export const env = {
   REACT_APP_ENV_CITY_ID: window._env_?.REACT_APP_ENV_CITY_ID || process.env.REACT_APP_ENV_CITY_ID,
   REACT_APP_CONSUMPTION_TYPE:
     window._env_?.REACT_APP_CONSUMPTION_TYPE || process.env.REACT_APP_CONSUMPTION_TYPE || 'ticket',
+  REACT_APP_TITLE: window._env_?.REACT_APP_TITLE || process.env.REACT_APP_TITLE,
   NODE_ENV: window._env_?.NODE_ENV || process.env.NODE_ENV,
-  ADMIN_TITLE: window._env_?.ADMIN_TITLE || process.env.ADMIN_TITLE,
   PUBLIC_URL: window._env_?.PUBLIC_URL || process.env.PUBLIC_URL
 };

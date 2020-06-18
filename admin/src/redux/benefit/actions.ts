@@ -58,9 +58,9 @@ export const requestSaveBenefit = (
       // Request
       let response;
       if (item.id) {
-        response = await backend.put<Benefit>(`/Benefits/${item.id}`, { ...item });
+        response = await backend.put<Benefit>(`/benefits/${item.id}`, { ...item });
       } else {
-        response = await backend.post<Benefit>(`/Benefits`, { ...item });
+        response = await backend.post<Benefit>(`/benefits`, { ...item });
       }
       if (response && response.data) {
         // Request finished
@@ -89,7 +89,7 @@ export const requestDeleteBenefit = (id: number): ThunkResult<void> => {
       // Start request - starting loading state
       dispatch(doGetBenefit());
       // Request
-      await backend.delete<void>(`/Benefits/${id || ''}`);
+      await backend.delete<void>(`/benefits/${id || ''}`);
       // Finished
       dispatch(doDeleteBenefitSuccess({ id })); // Dispatch result
     } catch (error) {

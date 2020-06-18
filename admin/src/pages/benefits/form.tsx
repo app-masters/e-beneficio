@@ -138,6 +138,8 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
               >
                 <DatePicker
                   locale={locale}
+                  picker="month"
+                  name="date"
                   style={{ width: '100%' }}
                   format={dateFormat}
                   defaultValue={values.date ? moment(values.date) : undefined}
