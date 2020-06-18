@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "nodemon --config nodemon.json -- exec src/index.js",
-    "start-production": "pm2-runtime src/index.js",
+    "start-production": "pm2-runtime src/index.js --max_restarts=3",
     "build": "tsc --build",
     "test": "node node_modules/.bin/jest --config ./jest.config.js -i",
     "create": "sequelize db:create",
@@ -64,6 +64,7 @@
     "express": "4.17.1",
     "express-fileupload": "^1.1.7-alpha.3",
     "faker": "^4.1.0",
+    "hashids": "^2.2.1",
     "js-levenshtein": "^1.1.6",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
@@ -82,8 +83,8 @@
     "ts-node-dev": "1.0.0-pre.44"
   },
   "devDependencies": {
-    "@types/node-cron": "^2.0.3",
     "@types/cheerio": "^0.22.18",
+    "@types/node-cron": "^2.0.3",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "6.10.1",
     "eslint-plugin-prettier": "3.1.3",

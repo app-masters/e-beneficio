@@ -17,7 +17,7 @@ COPY --from=build /var/www/build /usr/share/nginx/html
 COPY ./env.sh /usr/share/nginx/html
 COPY ./env_index.sh /usr/share/nginx/html
 RUN rm /etc/nginx/conf.d/default.conf
-COPY ./nginx/nginx.production.conf /etc/nginx/conf.d/default.conf
+#COPY ./nginx/nginx.production.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80 443
 

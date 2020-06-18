@@ -30,6 +30,8 @@ fi
 source config.sh
 source ${ENV}/config.sh
 
+
+
 ## Set GCP compute zone
 gcloud config set project ${PROJECT}
 gcloud config set compute/zone ${ZONE}

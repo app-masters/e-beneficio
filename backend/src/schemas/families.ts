@@ -1,4 +1,5 @@
-import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize';
+import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor, CreateOptions } from 'sequelize';
+import Hashids from 'hashids/cjs';
 import { Dependent } from './depedents';
 import { Consumption } from './consumptions';
 
@@ -7,11 +8,11 @@ export interface Family {
   readonly id?: number | string;
   cityId: number | string;
   code: string;
-  groupName: string;
-  responsibleName: string;
-  responsibleNis: string;
-  responsibleBirthday: Date;
-  responsibleMotherName: string;
+  groupId: number | string;
+  responsibleName?: string;
+  responsibleNis?: string;
+  responsibleBirthday?: Date;
+  responsibleMotherName?: string;
   address?: string;
   phone?: string;
   phone2?: string;
@@ -28,6 +29,8 @@ export interface Family {
   numberOfRooms?: number;
   haveSewage?: boolean;
   sewageComment?: string;
+  createdById?: number | string;
+  placeStoreId?: number | string;
   // Join
   dependents?: Dependent[];
   consumptions?: Consumption[];
@@ -61,25 +64,29 @@ export const attributes = {
     type: DataTypes.STRING(11),
     allowNull: false
   },
-  groupName: {
-    type: DataTypes.STRING,
-    allowNull: false
+  groupId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'Groups',
+      id: 'id'
+    }
   },
   responsibleName: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   },
   responsibleNis: {
     type: DataTypes.STRING(11),
-    allowNull: false
+    allowNull: true
   },
   responsibleBirthday: {
     type: DataTypes.DATE,
-    allowNull: false
+    allowNull: true
   },
   responsibleMotherName: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   },
   phone: {
     type: DataTypes.STRING,
@@ -128,6 +135,39 @@ export const attributes = {
   sewageComment: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+  placeStoreId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'PlaceStores',
+      id: 'id'
+    }
+  },
+  createdById: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'Users',
+      id: 'id'
+    }
+  }
+};
+
+// Intance of the hash generator that will be used to encode the family id
+// Baraky: I've removed letters and numbers that can appear similar in certain fonts
+const hashids = new Hashids('', 6, 'ABCDEFGHJKMNPQRSTUVWXYZ23456789', '');
+/**
+ * After the creation of the family, use its id to generate an code
+ *
+ * @param family The created family
+ * @param options Sequelize create options
+ */
+const afterCreate = async (family: SequelizeFamily, options: CreateOptions) => {
+  // If the family doesn't have an option, hash one from its id
+  if (!family.code) {
+    family.code = hashids.encode(Number(family.id));
+    await family.update({ code: family.code }, options);
   }
 };
 
@@ -140,6 +180,8 @@ const tableName = 'Families';
  */
 export const initFamilySchema = (sequelize: Sequelize): SequelizeFamilyModel => {
   const Schema = sequelize.define(tableName, attributes, { timestamps: true }) as SequelizeFamilyModel;
+
+  Schema.addHook('afterCreate', afterCreate);
 
   Schema.associate = (models): void => {
     // Sequelize relations
@@ -155,8 +197,17 @@ export const initFamilySchema = (sequelize: Sequelize): SequelizeFamilyModel => 
       foreignKey: 'familyId',
       as: 'dependents'
     });
-    Schema.hasMany(models.benefits, {
-      foreignKey: 'groupName'
+    Schema.belongsTo(models.placeStores, {
+      foreignKey: 'placeStoreId',
+      as: 'placeStore'
+    });
+    Schema.belongsTo(models.users, {
+      foreignKey: 'createdById',
+      as: 'createdBy'
+    });
+    Schema.belongsTo(models.groups, {
+      foreignKey: 'groupId',
+      as: 'group'
     });
   };
 

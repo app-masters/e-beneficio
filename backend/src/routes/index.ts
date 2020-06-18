@@ -18,6 +18,7 @@ import familyRoutes from './families';
 import consumptionRoutes from './consumptions';
 import dashboardRoutes from './dashboard';
 import productsRoutes from './products';
+import groupsRoutes from './groups';
 
 const router = express.Router();
 
@@ -38,6 +39,7 @@ router.use('/families', jwtMiddleware, familyRoutes);
 router.use('/consumptions', consumptionRoutes);
 router.use('/dashboard', jwtMiddleware, dashboardRoutes);
 router.use('/products', jwtMiddleware, productsRoutes);
+router.use('/groups', jwtMiddleware, groupsRoutes);
 router.use('/static', jwtMiddleware, express.static(`${path.dirname(__dirname)}/../database/storage`));
 
 export default router;

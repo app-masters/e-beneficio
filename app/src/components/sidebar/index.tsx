@@ -1,12 +1,12 @@
 import {
-  BarChartOutlined,
   CarryOutOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   HomeOutlined,
   UserOutlined,
-  ShopOutlined
+  ShopOutlined,
+  IdcardOutlined
 } from '@ant-design/icons';
 import { Button, Layout, Menu, Popover } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -89,19 +89,18 @@ export const Sidebar: React.FC = (props) => {
       name: 'Início'
     },
     {
+      path: '/familias',
+      icon: () => <IdcardOutlined />,
+      name: 'Famílias'
+    },
+    {
       path: '/consumo',
       icon: () => <CarryOutOutlined />,
       name: 'Informar consumo'
     }
   ];
 
-  const privateRoutes: RouteItem[] = [
-    {
-      path: '/relatorios',
-      icon: () => <BarChartOutlined />,
-      name: 'Relatórios'
-    }
-  ];
+  const privateRoutes: RouteItem[] = [];
 
   const adminRoutes: RouteItem[] = [
     {

@@ -1,14 +1,24 @@
-import { Dependent } from './depedents';
+import { Dependent } from './dependent';
 
 export interface Family {
   readonly id?: number | string;
   cityId: number | string;
+  placeStoreId?: number | string;
   code: string;
-  groupName: string;
-  responsibleName: string;
-  responsibleNis: string;
-  responsibleBirthday: Date;
-  responsibleMotherName: string;
+  groupId: number | string;
+  responsibleName?: string;
+  responsibleNis?: string;
+  responsibleBirthday?: Date;
+  responsibleMotherName?: string;
+  //New attributes
+  isRegisteredInPerson?: boolean;
+  totalSalary?: number;
+  isOnAnotherProgram?: boolean;
+  isOnGovernProgram?: boolean;
+  houseType?: string;
+  numberOfRooms?: number;
+  haveSewage?: boolean;
+  sewageComment?: string;
   address?: string;
   phone?: string;
   phone2?: string;

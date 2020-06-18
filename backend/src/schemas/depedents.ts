@@ -5,11 +5,12 @@ export interface Dependent {
   readonly id?: number | string;
   familyId: number | string;
   name: string;
-  nis: string;
+  nis?: string;
   birthday: Date | string;
   schoolName?: string;
   deactivatedAt?: number | Date | null;
   //New attributes
+  isResponsible?: boolean;
   rg?: string;
   cpf?: string;
   phone?: string;
@@ -54,7 +55,7 @@ export const attributes = {
   },
   nis: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   },
   birthday: {
     type: DataTypes.DATE,
@@ -98,6 +99,10 @@ export const attributes = {
   },
   email: {
     type: DataTypes.STRING,
+    allowNull: true
+  },
+  isResponsible: {
+    type: DataTypes.BOOLEAN,
     allowNull: true
   }
 };

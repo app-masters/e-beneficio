@@ -15,9 +15,8 @@ import { formatCNPJ } from '../../utils/string';
 const { Option } = Select;
 
 const schema = yup.object().shape({
-  title: yup.string().label('Loja').required(),
-  placeId: yup.number().label('Estabelecimento').required(),
-  cnpj: yup.string().label('CNPJ').required(),
+  title: yup.string().label('Nome').required(),
+  placeId: yup.number().label('Grupo da Entidade').required(),
   address: yup.string().label('Endereço').required()
 });
 
@@ -69,7 +68,7 @@ export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (pr
       dispatch(
         requestSavePlaceStore(
           values,
-          () => history.push('/lojas'),
+          () => history.push('/entidades'),
           () => setStatus('Ocorreu um erro ao realizar a requisição.')
         )
       );
@@ -85,7 +84,7 @@ export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (pr
     <Modal
       title={isCreating ? 'Criar' : 'Editar'}
       visible={true}
-      onCancel={() => history.push('/lojas')}
+      onCancel={() => history.push('/entidades')}
       onOk={submitForm}
       confirmLoading={loading}
       okType={errors && Object.keys(errors).length > 0 && touched ? 'danger' : 'primary'}
@@ -94,7 +93,7 @@ export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (pr
       <form onSubmit={handleSubmit}>
         <Form layout="vertical">
           <Form.Item
-            label={'Loja'}
+            label={'Nome'}
             validateStatus={!!titleMeta.error && !!titleMeta.touched ? 'error' : ''}
             help={!!titleMeta.error && !!titleMeta.touched ? titleMeta.error : undefined}
           >
@@ -102,7 +101,7 @@ export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (pr
           </Form.Item>
 
           <Form.Item
-            label={'Estabelecimento'}
+            label={'Entidade'}
             validateStatus={!!placeIdMeta.error && !!placeIdMeta.touched ? 'error' : ''}
             help={!!placeIdMeta.error && !!placeIdMeta.touched ? placeIdMeta.error : undefined}
           >
@@ -122,9 +121,9 @@ export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (pr
               {!placeLoading &&
                 placeList &&
                 placeList.length > 0 &&
-                placeList.map((place) => (
-                  <Option key={place.title} value={place.id?.toString() || '-1'}>
-                    {place.title}
+                placeList.map((entity) => (
+                  <Option key={entity.title} value={entity.id?.toString() || '-1'}>
+                    {entity.title}
                   </Option>
                 ))}
             </Select>

@@ -5,6 +5,7 @@ import { Card, Input, Button, Form, Typography } from 'antd';
 import { requestLoginUser, requestLogout } from '../../redux/auth/actions';
 import { AppState } from '../../redux/rootReducer';
 
+import { Logo } from '../../components/logo';
 import { FormContainer, PageContainer } from './styles';
 
 /**
@@ -26,6 +27,7 @@ export const LoginPage: React.FC<{}> = () => {
 
   return (
     <PageContainer>
+      <Logo />
       <Card>
         <FormContainer>
           <Form

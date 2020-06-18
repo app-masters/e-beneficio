@@ -1,3 +1,5 @@
+import { FieldMetaProps } from 'formik';
+
 export const APP_PREFIX = 'app';
 
 export const PERSIST_KEY = `${APP_PREFIX}/root`;
@@ -19,4 +21,19 @@ export const roleList = {
   operator: { title: 'Operador' },
   manager: { title: 'Gerente' },
   financial: { title: 'Financeiro' }
+};
+
+/**
+ * Helper function
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const formHelper = (type: FieldMetaProps<any>) => {
+  return !!type.error && !!type.touched ? type.error : undefined;
+};
+/**
+ * Validation function
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const formValidation = (type: FieldMetaProps<any>) => {
+  return !!type.error && !!type.touched ? 'error' : '';
 };

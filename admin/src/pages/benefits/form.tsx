@@ -10,23 +10,24 @@ import { Institution } from '../../interfaces/institution';
 import { requestSaveBenefit } from '../../redux/benefit/actions';
 import { requestGetInstitution } from '../../redux/institution/actions';
 import { AppState } from '../../redux/rootReducer';
-import { familyGroupList } from '../../utils/constraints';
 import yup from '../../utils/yup';
 import { ProductSelector } from './productSelector';
 import { env } from '../../env';
+import { Group } from '../../interfaces/group';
+import { requestGetGroup } from '../../redux/group/actions';
 
 const TYPE = env.REACT_APP_CONSUMPTION_TYPE as 'ticket' | 'product';
-const showProductList = TYPE === 'product';
+const isConsumptionProduct = TYPE === 'product';
 
 const { Option } = Select;
 
 const schema = yup.object().shape({
   institutionId: yup.number().label('Instituição').required(),
-  groupName: yup.string().label('Família').required(),
+  groupId: yup.number().label('Grupo familiar').required(),
   title: yup.string().label('Nome').required(),
   date: yup.date().label('Data').required(),
-  value: !showProductList ? yup.string().label('Valor').required() : yup.string().label('Valor').nullable(),
-  benefitProducts: showProductList
+  value: !isConsumptionProduct ? yup.string().label('Valor').required() : yup.string().label('Valor').nullable(),
+  benefitProducts: isConsumptionProduct
     ? yup
         .array()
         .test(
@@ -51,6 +52,10 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
     dispatch(requestGetInstitution());
   }, [dispatch]);
 
+  React.useEffect(() => {
+    dispatch(requestGetGroup());
+  }, [dispatch]);
+
   // Redux state
   const benefit = useSelector<AppState, Benefit | undefined>(({ benefitReducer }) =>
     benefitReducer.list.find((item: Benefit) => item.id === Number(props.match.params.id))
@@ -59,6 +64,7 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
   const loading = useSelector<AppState, boolean>(({ benefitReducer }) => benefitReducer.loading);
   const institutionLoading = useSelector<AppState, boolean>(({ institutionReducer }) => institutionReducer.loading);
   const institutionList = useSelector<AppState, Institution[]>(({ institutionReducer }) => institutionReducer.list);
+  const groups = useSelector<AppState, Group[]>(({ groupReducer }) => groupReducer.list as Group[]);
 
   const {
     handleSubmit,
@@ -74,7 +80,7 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
   } = useFormik({
     initialValues: benefit || {
       institutionId: !institutionLoading && institutionList && institutionList.length > 0 ? institutionList[0].id : 1,
-      groupName: 'children',
+      groupId: 1,
       title: '',
       date: undefined,
       year: undefined,
@@ -95,13 +101,13 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
   });
 
   const titleMeta = getFieldMeta('title');
-  const groupMeta = getFieldMeta('groupName');
+  const groupMeta = getFieldMeta('groupId');
   const dateMeta = getFieldMeta('year');
   const valueMeta = getFieldMeta('value');
   const institutionIdMeta = getFieldMeta('institutionId');
   const productsMeta = getFieldMeta('benefitProducts');
 
-  const monthFormat = 'MM/YYYY';
+  const dateFormat = 'DD/MM/YYYY';
 
   return (
     <Modal
@@ -110,14 +116,14 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
       onCancel={() => history.push('/beneficios')}
       onOk={submitForm}
       confirmLoading={loading}
-      width={showProductList ? 840 : undefined}
+      width={isConsumptionProduct ? 840 : undefined}
       okType={errors && Object.keys(errors).length > 0 && touched ? 'danger' : 'primary'}
     >
       {status && <Alert message="Erro no formulário" description={status} type="error" />}
       <form onSubmit={handleSubmit}>
         <Form layout="vertical">
           <Row justify="space-between">
-            <Col span={showProductList ? 11 : 24}>
+            <Col span={isConsumptionProduct ? 11 : 24}>
               <Form.Item
                 label={'Nome'}
                 validateStatus={!!titleMeta.error && !!titleMeta.touched ? 'error' : ''}
@@ -133,8 +139,9 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
                 <DatePicker
                   locale={locale}
                   picker="month"
+                  name="date"
                   style={{ width: '100%' }}
-                  format={monthFormat}
+                  format={dateFormat}
                   defaultValue={values.date ? moment(values.date) : undefined}
                   onChange={(date) => {
                     setFieldValue('date', date);
@@ -143,7 +150,7 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
               </Form.Item>
 
               <Form.Item
-                label={'Instituição'}
+                label={isConsumptionProduct ? 'Origem do benefício' : 'Instituição'}
                 validateStatus={!!institutionIdMeta.error && !!institutionIdMeta.touched ? 'error' : ''}
                 help={!!institutionIdMeta.error && !!institutionIdMeta.touched ? institutionIdMeta.error : undefined}
               >
@@ -172,31 +179,31 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
               </Form.Item>
 
               <Form.Item
-                label={'Grupo'}
+                label={'Grupo famíliar'}
                 validateStatus={!!groupMeta.error && !!groupMeta.touched ? 'error' : ''}
                 help={!!groupMeta.error && !!groupMeta.touched ? groupMeta.error : undefined}
               >
                 <Select
-                  defaultValue={values.groupName}
-                  onSelect={(value) => setFieldValue('groupName', value)}
-                  value={values.groupName || undefined}
+                  defaultValue={values.groupId?.toString()}
+                  onSelect={(value) => setFieldValue('groupId', value)}
+                  value={values.groupId?.toString() || undefined}
                   onChange={(value: string) => {
-                    setFieldValue('groupName', value);
+                    setFieldValue('groupId', value);
                   }}
                   onBlur={() => {
-                    setFieldTouched('groupName', true);
+                    setFieldTouched('groupId', true);
                   }}
                 >
-                  {Object.keys(familyGroupList).map((key) => (
-                    <Option key={key} value={key}>
-                      {familyGroupList[key].title}
-                    </Option>
+                  {groups.map((item: Group) => (
+                    <Select.Option key={item.id} value={Number(item.id).toString()}>
+                      {item.title}
+                    </Select.Option>
                   ))}
                 </Select>
               </Form.Item>
 
               {/* Value per dependent should only be shown when the TYPE is `ticket` */}
-              {!showProductList && (
+              {!isConsumptionProduct && (
                 <Form.Item
                   label="Valor por dependente"
                   validateStatus={!!valueMeta.error && !!valueMeta.touched ? 'error' : ''}
@@ -206,7 +213,7 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
                 </Form.Item>
               )}
             </Col>
-            {showProductList && (
+            {isConsumptionProduct && (
               <ProductSelector
                 validateStatus={!!productsMeta.error && !!productsMeta.touched ? 'error' : ''}
                 help={!!productsMeta.error && !!productsMeta.touched ? productsMeta.error : undefined}

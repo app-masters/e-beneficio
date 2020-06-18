@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
+import { BrowserRouter, Switch, Route as RouterRoute, RouteProps as RouterRouteProps } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { AppState } from '../redux/rootReducer';
 import { User } from '../interfaces/user';
@@ -15,7 +15,33 @@ import { DashboardPage } from './dashboard';
 import { useRefreshToken } from '../utils/auth';
 import { LogoutPage } from './logout';
 import { ConsumptionForm } from './consumption';
-import { ReportList } from './report';
+import { FamiliesList } from './families/list';
+import { FamiliesForm } from './families/form';
+
+export const roleList = {
+  admin: { title: 'Administrador' },
+  operator: { title: 'Operador' },
+  manager: { title: 'Gerente' },
+  financial: { title: 'Financeiro' }
+};
+
+export type Role = keyof typeof roleList;
+
+type RouteProps = RouterRouteProps & { allowedRole?: Role | Role[] };
+
+/**
+ * Extend react-router-dom route to allow or deny users based on its role and
+ * show the route only when the specific type is match
+ */
+const Route: React.FC<RouteProps> = ({ allowedRole, ...props }) => {
+  const user = useSelector<AppState, User | undefined>((state) => state.authReducer.user);
+
+  // Only show the route if the user is allowed to see it
+  const allowedRoles = (allowedRole && !Array.isArray(allowedRole) ? [allowedRole] : allowedRole) as Role[] | undefined;
+  if ((allowedRoles && user && allowedRoles.indexOf(user.role as Role) === -1) || (allowedRoles && !user)) return null;
+
+  return <RouterRoute {...props} />;
+};
 
 /**
  * Router available only for logged users
@@ -29,36 +55,16 @@ const PrivateRouter: React.FC<{}> = () => {
       <>
         <Route path="/logout" component={LogoutPage} />
         <Route path="/consumo" component={ConsumptionForm} />
-        <Route path="/relatorios" component={ReportList} />
-        <ManagerRouter>
-          <Route path="/usuarios" component={UserList} />
-          <Route path="/usuarios/:id" component={UserForm} />
-
-          <Route path="/lojas" component={PlaceStoreList} />
-          <Route path="/lojas/:id" component={PlaceStoreForm} />
-        </ManagerRouter>
+        <Route exact path="/familias" component={FamiliesList} />
+        <Route path="/familias/:id" component={FamiliesForm} />
+        <Route path="/usuarios" component={UserList} allowedRole="manager" />
+        <Route path="/usuarios/:id" component={UserForm} allowedRole="manager" />
+        <Route path="/lojas" component={PlaceStoreList} allowedRole="manager" />
+        <Route path="/lojas/:id" component={PlaceStoreForm} allowedRole="manager" />
         {/* Dashboard */}
         <Route path="/" component={DashboardPage} exact />
       </>
     </AdminLayout>
-  );
-};
-
-/**
- * Router available when the user is manager
- * @param props component props
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ManagerRouter: React.FC<any> = ({ children }) => {
-  const currentUser = useSelector<AppState, User>((state) => state.authReducer.user as User);
-  return currentUser.role === 'manager' ? (
-    children
-  ) : (
-    <Redirect
-      to={{
-        pathname: '/'
-      }}
-    />
   );
 };
 

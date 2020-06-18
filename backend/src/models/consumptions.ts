@@ -3,6 +3,7 @@ import db from '../schemas';
 import { Consumption, SequelizeConsumption } from '../schemas/consumptions';
 import { PlaceStore } from '../schemas/placeStores';
 import { Family } from '../schemas/families';
+import { BenefitProduct } from '../schemas/benefitProducts';
 import moment from 'moment';
 import logging from '../utils/logging';
 import { Place } from '../schemas/places';
@@ -12,24 +13,35 @@ import { Dependent } from '../schemas/depedents';
 import { scrapeNFCeData } from '../utils/nfceScraper';
 import { SequelizeProduct } from '../schemas/products';
 
+export type ProductBalance = {
+  product: {
+    id?: number | string;
+    name?: string;
+  };
+  amountAvailable: number;
+  amountGranted: number;
+  amountConsumed: number;
+}[];
+
 /**
  * Get balance report by dependent when product
  * @param family the family
  */
-export const getFamilyDependentBalanceProduct = async (family: Family) => {
-  //Family groupName
-  const familyBenefits = await db.benefits.findAll({ where: { groupName: family.groupName } });
+export const getFamilyDependentBalanceProduct = async (family: Family): Promise<ProductBalance> => {
+  //Family groupId
+  const familyBenefits = await db.benefits.findAll({ where: { groupId: family.groupId } });
   //Filter benefit by family date
   const familyBenefitsFilterDate = familyBenefits
     .filter((benefit) => {
-      const isAfter = moment(benefit.date).isSameOrAfter(moment(family.createdAt || moment()));
-      let isBefore = true;
-      if (family.deactivatedAt) isBefore = moment(benefit.date).isBefore(moment(family.deactivatedAt));
-      return isAfter && isBefore ? benefit : null;
+      const isSameMonthYear = moment(family.createdAt || moment()).isSameOrBefore(benefit.date, 'month');
+      const isTodayAfterDate = moment().isSameOrAfter(moment(benefit.date));
+      let isNotDeactivated = true;
+      if (family.deactivatedAt) isNotDeactivated = moment(benefit.date).isBefore(moment(family.deactivatedAt));
+      return isSameMonthYear && isTodayAfterDate && isNotDeactivated ? benefit : null;
     })
     .filter((f) => f);
   if (familyBenefitsFilterDate.length === 0) {
-    throw { status: 422, message: 'Nenhum benefício disponível' };
+    return [];
   }
   //Get all products by benefit
   const benefitsIds = familyBenefitsFilterDate.map((item) => {
@@ -54,8 +66,18 @@ export const getFamilyDependentBalanceProduct = async (family: Family) => {
       consumptionsId: consumptionIds as number[]
     }
   });
+  //Group products
+  const groupedProductsAvailable: BenefitProduct[] = [];
+  listOfProductsAvailable.reduce((res, value) => {
+    if (!res[value.productId]) {
+      res[value.productId] = { benefitId: value.benefitId, productId: value.productId, amount: 0 };
+      groupedProductsAvailable.push(res[value.productId]);
+    }
+    res[value.productId].amount += value.amount;
+    return res;
+  }, {});
   //Get difference between available products and consumed products
-  const differenceProducts = listOfProductsAvailable.map((product) => {
+  const differenceProducts = groupedProductsAvailable.map((product) => {
     const items = productsFamilyConsumption.filter((f) => f.productId === product.productId);
     // const item = productsFamilyConsumption.find((f) => f.productId === product.productId);
     let amount = 0;
@@ -105,7 +127,7 @@ export const getFamilyDependentBalanceTicket = async (family: Family, availableB
   if (!availableBenefits) {
     // Populating benefits if it's not available
     availableBenefits = await db.benefits.findAll({
-      where: { groupName: family.groupName },
+      where: { groupId: family.groupId },
       include: [{ model: db.institutions, as: 'institution', where: { cityId: family.cityId } }]
     });
   }
@@ -119,7 +141,7 @@ export const getFamilyDependentBalanceTicket = async (family: Family, availableB
 
     for (const benefit of availableBenefits) {
       const benefitDate = moment(benefit.date as Date);
-      if (benefit.groupName !== family.groupName) continue; // Don't check if it's from another group
+      if (benefit.groupId !== family.groupId) continue; // Don't check if it's from another group
       // Check all the dates
       const notInFuture = benefitDate.toDate() <= todayDate.endOf('month').toDate();
       const afterCreation = benefitDate.toDate() >= startDate.startOf('month').toDate();
@@ -149,8 +171,8 @@ export const getFamilyDependentBalanceTicket = async (family: Family, availableB
  * @param availableBenefits benefit
  */
 export const getFamilyDependentBalance = async (family: Family, availableBenefits?: Benefit[]) => {
-  const isTicket = process.env.CONSUMPTION_TYPE === 'ticket';
-  if (isTicket) return getFamilyDependentBalanceTicket(family, availableBenefits);
+  const CONSUMPTION_TYPE = process.env.CONSUMPTION_TYPE as 'ticket' | 'product';
+  if (CONSUMPTION_TYPE === 'ticket') return getFamilyDependentBalanceTicket(family, availableBenefits);
   else return getFamilyDependentBalanceProduct(family);
 };
 
@@ -198,12 +220,12 @@ export const getFamilyBalance = async (family: Family): Promise<number> => {
         {
           date: { [Sequelize.Op.lte]: todayDate.endOf('month').toDate() }
         },
-        { groupName: family.groupName }
+        { groupId: family.groupId }
       ]
     },
-    attributes: ['groupName', [Sequelize.fn('sum', Sequelize.col('value')), 'total']],
+    attributes: ['groupId', [Sequelize.fn('sum', Sequelize.col('value')), 'total']],
     include: [{ model: db.institutions, as: 'institution', where: { cityId: family.cityId }, attributes: [] }],
-    group: ['Benefits.groupName']
+    group: ['Benefits.groupId']
   });
 
   // Get all consumptions already made
@@ -262,7 +284,7 @@ export const addConsumption = async (
   }
 
   const balance = await getFamilyDependentBalance(family);
-  if (balance < Number(values.value)) {
+  if (balance && balance < Number(values.value)) {
     // Insuficient balance
     throw { status: 422, message: 'Saldo insuficiente' };
   }
@@ -284,7 +306,7 @@ export const addConsumptionProduct = async (values: Consumption): Promise<Sequel
 
   //Get family benefit and its products.
   const familyBenefit = await db.benefits.findAll({
-    where: { groupName: family.groupName }
+    where: { groupId: family.groupId }
   });
   //Get all products by benefit
   const benefitsIds = familyBenefit.map((item) => {

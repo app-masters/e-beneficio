@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Switch, Route as RouterRoute, Redirect, RouteProps } from 'react-router-dom';
+import { BrowserRouter, Switch, Route as RouterRoute, RouteProps as RouterRouteProps } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { AppState } from '../redux/rootReducer';
 import { User } from '../interfaces/user';
@@ -8,8 +8,8 @@ import { AdminLayout } from '../components/adminLayout';
 // Pages
 import { LoginPage } from './login';
 import { DashboardPage } from './dashboard';
-import { PlaceList } from './places/list';
-import { PlaceForm } from './places/form';
+import { PlaceList } from './place/list';
+import { PlaceForm } from './place/form';
 import { useRefreshToken } from '../utils/auth';
 import { LogoutPage } from './logout';
 import { BenefitList } from './benefits/list';
@@ -27,33 +27,34 @@ import { ReportList } from './report';
 import { ProductValidationList } from './product/validationList';
 import { ProductList } from './product/list';
 import { ProductForm } from './product/form';
+import { FamiliesForm as FamiliesFormProduct } from './families/product/form';
+import { FamiliesList as FamiliesListProduct } from './families/product/list';
+import { GroupList } from './groups/list';
+import { GroupForm } from './groups/form';
+
 import { Role } from '../utils/constraints';
 import { env } from '../env';
 
+// Application consumption type
+const consumptionType = env.REACT_APP_CONSUMPTION_TYPE as 'ticket' | 'product';
+
+type RouteProps = RouterRouteProps & { allowedRole?: Role | Role[]; specificToType?: 'ticket' | 'product' };
+
 /**
- * Extend react-router-dom route to allow or deny users based on its role
+ * Extend react-router-dom route to allow or deny users based on its role and
+ * show the route only when the specific type is match
  */
-const Route: React.FC<RouteProps & { allowedRole?: Role | Role[] }> = ({ allowedRole, ...props }) => {
+const Route: React.FC<RouteProps> = ({ allowedRole, specificToType, ...props }) => {
   const user = useSelector<AppState, User | undefined>((state) => state.authReducer.user);
+
+  // Only show the route if the consumption type matches
+  if (specificToType && specificToType !== consumptionType) return null;
+
+  // Only show the route if the user is allowed to see it
   const allowedRoles = (allowedRole && !Array.isArray(allowedRole) ? [allowedRole] : allowedRole) as Role[] | undefined;
   if ((allowedRoles && user && allowedRoles.indexOf(user.role as Role) === -1) || (allowedRoles && !user)) return null;
 
   return <RouterRoute {...props} />;
-};
-
-/**
- * Router available only for when env is ticket
- * @param props component props
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const PrivateTypeRoute = ({ component, ...rest }: any) => {
-  const isTicket = env.REACT_APP_CONSUMPTION_TYPE === 'ticket';
-  /**
-   * Function to redirect user
-   */
-  const routeComponent = (props: RouteProps) =>
-    !isTicket ? React.createElement(component, props) : <Redirect to={{ pathname: '/' }} />;
-  return <Route {...rest} render={routeComponent} />;
 };
 
 /**
@@ -68,31 +69,40 @@ const PrivateRouter: React.FC<{}> = () => {
       <>
         <Route path="/logout" component={LogoutPage} />
         {/* Product routes */}
-        <Route path="/validar" component={ProductValidationList} />
-        <PrivateTypeRoute allowedRole="admin" path="/produtos" component={ProductList} />
-        <PrivateTypeRoute allowedRole="admin" path="/produtos/:id" component={ProductForm} />
+        <Route path="/validar" component={ProductValidationList} specificToType="ticket" />
+        <Route path="/produtos" component={ProductList} allowedRole="admin" specificToType="product" />
+        <Route path="/produtos/:id" component={ProductForm} allowedRole="admin" specificToType="product" />
         {/* Report routes */}
-        <Route allowedRole="admin" path="/estabelecimentos" component={PlaceList} />
+        <Route path="/relatorios" component={ReportList} allowedRole="admin" />
         {/* Place routes */}
-        <Route allowedRole="admin" path="/relatorios" component={ReportList} />
-        <Route allowedRole="admin" path="/estabelecimentos/:id" component={PlaceForm} />
+        <Route path="/grupos-de-entidades" component={PlaceList} allowedRole="admin" specificToType="product" />
+        <Route path="/grupos-de-entidades/:id" component={PlaceForm} allowedRole="admin" specificToType="product" />
+        {/* Group routes */}
+        <Route path="/grupos" component={GroupList} allowedRole="admin" specificToType="product" />
+        <Route path="/grupos/:id" component={GroupForm} allowedRole="admin" specificToType="product" />
         {/* Benefit routes */}
-        <Route allowedRole="admin" path="/beneficios" component={BenefitList} />
-        <Route allowedRole="admin" path="/beneficios/:id" component={BenefitForm} />
-        {/* Store routes */}
-        <Route allowedRole="admin" path="/lojas" component={PlaceStoreList} />
-        <Route allowedRole="admin" path="/lojas/:id" component={PlaceStoreForm} />
+        <Route path="/beneficios" component={BenefitList} allowedRole="admin" />
+        <Route path="/beneficios/:id" component={BenefitForm} allowedRole="admin" />
+        {/* PlaceStore routes */}
+        <Route path="/entidades" component={PlaceStoreList} allowedRole="admin" specificToType="product" />
+        <Route path="/entidades/:id" component={PlaceStoreForm} allowedRole="admin" specificToType="product" />
         {/* User routes */}
-        <Route allowedRole="admin" path="/usuarios" component={UserList} />
-        <Route allowedRole="admin" path="/usuarios/:id" component={UserForm} />
+        <Route path="/usuarios" component={UserList} allowedRole="admin" />
+        <Route path="/usuarios/:id" component={UserForm} allowedRole="admin" />
         {/* Institution routes */}
-        <Route allowedRole="admin" path="/instituicoes" component={InstitutionList} />
-        <Route allowedRole="admin" path="/instituicoes/:id" component={InstitutionForm} />
-        {/* Institution routes */}
-        <Route allowedRole="admin" path="/familias" component={FamiliesList} />
-        <Route allowedRole="admin" path="/familias/:id" component={FamilyForm} />
+        <Route path="/instituicoes" component={InstitutionList} allowedRole="admin" specificToType="ticket" />
+        <Route path="/instituicoes/:id" component={InstitutionForm} allowedRole="admin" specificToType="ticket" />
+        {/* Benefit origin routes */}
+        <Route path="/origem-do-beneficio" component={InstitutionList} allowedRole="admin" />
+        <Route path="/origem-do-beneficio/:id" component={InstitutionForm} allowedRole="admin" />
+        {/* Families routes ticket*/}
+        <Route path="/familias" component={FamiliesList} allowedRole="admin" specificToType="ticket" />
+        <Route path="/familias/:id" component={FamilyForm} allowedRole="admin" specificToType="ticket" />
+        {/* Families routes product*/}
+        <Route exact path="/familias" component={FamiliesListProduct} allowedRole="admin" specificToType="product" />
+        <Route path="/familias/:id" component={FamiliesFormProduct} allowedRole="admin" specificToType="product" />
         {/* Consumptions routes */}
-        <Route allowedRole="admin" path="/consumo" component={ConsumptionForm} />
+        <Route path="/consumo" component={ConsumptionForm} allowedRole="admin" />
         {/* Dashboard */}
         <Route path="/" component={DashboardPage} exact />
       </>

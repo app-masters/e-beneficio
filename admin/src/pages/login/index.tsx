@@ -6,6 +6,7 @@ import { requestLoginUser, requestLogout } from '../../redux/auth/actions';
 import { AppState } from '../../redux/rootReducer';
 
 import { FormContainer, PageContainer } from './styles';
+import { Logo } from '../../components/logo';
 
 /**
  * Login page component
@@ -26,6 +27,7 @@ export const LoginPage: React.FC<{}> = () => {
 
   return (
     <PageContainer>
+      <Logo />
       <Card>
         <FormContainer>
           <Form

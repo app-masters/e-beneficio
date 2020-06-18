@@ -24,3 +24,6 @@ yarn-error.log*
 # Temporary env files
 /public/env-config.js
 env-config.js
+
+# The public env has the env variables built in it
+/public/index.html
