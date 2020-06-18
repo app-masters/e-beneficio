@@ -12,6 +12,7 @@ import { formatCPF } from '../../utils/string';
 import yup from '../../utils/yup';
 import { roleList } from './../../utils/constraints';
 import { PlaceStore } from '../../interfaces/placeStore';
+import { env } from '../../env';
 
 const { Option } = Select;
 
@@ -28,7 +29,7 @@ const schema = yup.object().shape({
   role: yup.string().label('Cargo').required(),
   placeStoreId: yup
     .string()
-    .label('Localidade')
+    .label('Entidade')
     .when('role', (role: string | undefined, schema: yup.StringSchema) =>
       role !== 'admin' ? schema.required() : schema
     ),
@@ -43,7 +44,7 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
   const history = useHistory();
   const isCreating = props.match.params.id === 'criar';
 
-  const CONSUMPTION_TYPE = process.env.REACT_APP_CONSUMPTION_TYPE || 'ticket';
+  const CONSUMPTION_TYPE = env.REACT_APP_CONSUMPTION_TYPE || 'ticket';
 
   // Redux state
   const placeStore = useSelector<AppState, PlaceStore[]>(({ placeStoreReducer }) => placeStoreReducer.list);
@@ -192,7 +193,7 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
 
           {CONSUMPTION_TYPE === 'product' && values.role !== 'admin' && (
             <Form.Item
-              label={'Localidade'}
+              label={'Entidade'}
               validateStatus={!!placeStoreIdMeta.error && !!placeStoreIdMeta.touched ? 'error' : ''}
               help={!!placeStoreIdMeta.error && !!placeStoreIdMeta.touched ? placeStoreIdMeta.error : undefined}
             >
