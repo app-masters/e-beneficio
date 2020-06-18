@@ -74,10 +74,12 @@ describe('App - Product - Family', () => {
     });
     cy.get('.ant-modal-confirm-body-wrapper').within(() => {
       cy.contains('Família salva com sucesso');
+      cy.wait(1000);
+      cy.get('button:contains("OK")').click();
     });
 
-    cy.saveLocalStorage();
     cy.wait(2000);
+    cy.saveLocalStorage();
   });
 
   it.only('Family with member already registered', () => {
@@ -90,7 +92,6 @@ describe('App - Product - Family', () => {
     cy.get('form').within(() => {
       cy.get('.ant-select-selection-search-input').click();
     });
-    cy.wait(100);
     cy.get('.ant-select-item-option-content').first().click({ force: true });
 
     cy.get('button:contains("Adicionar adulto")').click();
@@ -114,16 +115,79 @@ describe('App - Product - Family', () => {
     });
     cy.get('.ant-alert').should('be.visible');
 
-    cy.saveLocalStorage();
     cy.wait(2000);
   });
 
   it.only('Registered family consumption ', () => {
+    cy.removeLocalStorage('persist:app/root');
+    cy.server();
+    cy.route('GET', '/fam*').as('families');
+    cy.route('POST', '/consumptions').as('consumption');
+
     cy.get('[href="/consumo"]').first().click();
     const family = JSON.parse(localStorage.getItem('@family') || '');
     cy.get('form').within(() => {
       cy.get('input').type(family.code);
+      cy.get('[type="button"]').first().click();
     });
-    cy.wait(2000);
+
+    cy.wait('@families').should((xhr) => {
+      expect(xhr.status).to.equal(200);
+      expect(xhr.url).contains('code');
+
+      expect(xhr.response.body.balance).to.exist;
+      expect(xhr.response.body.balance.length).to.be.greaterThan(0);
+
+      cy.get('button:contains("Sim, confirmar")').click();
+
+      cy.get('.ant-table-wrapper')
+        .should('be.visible')
+        .within(() => {
+          const rows = cy.get('tbody > tr');
+          rows.each(($li, index) => {
+            if (index % 4 === 0)
+              cy.wrap($li).within(() => {
+                cy.get('td')
+                  .last()
+                  .within(() => {
+                    cy.get('button').last().click({ force: true });
+                  });
+              });
+          });
+        });
+
+      cy.get('button:contains("Foto de comprovação")').click({ force: true });
+
+      cy.get('.ant-modal-content').within(() => {
+        cy.get('input[type=file]').then((subject) => {
+          cy.fixture('user.png').then((image) => {
+            Cypress.Blob.base64StringToBlob(image, 'image/png').then(function (blob) {
+              const testfile = new File([blob], 'TestImage', { type: 'image/png' });
+              const dataTransfer = new DataTransfer();
+              const fileInput = subject[0];
+
+              dataTransfer.items.add(testfile);
+              fileInput.files = dataTransfer.files;
+
+              cy.wrap(subject).trigger('change', { force: true });
+            });
+          });
+        });
+        cy.wait(500);
+        cy.get('[type="button"]').last().click({ force: true });
+      });
+
+      cy.get('button:contains("Confirmar consumo")').click({ force: true });
+    });
+
+    cy.wait('@consumption').should((xhr) => {
+      expect(xhr.status).to.equal(200);
+      cy.get('.ant-modal-confirm-body-wrapper').within(() => {
+        cy.contains('Consumo salvo com sucesso');
+        cy.wait(1000);
+        cy.get('button:contains("OK")').click();
+      });
+    });
+    cy.wait(3000);
   });
 });
