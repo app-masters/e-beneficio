@@ -1,6 +1,6 @@
 import React from 'react';
 import { PageContainer } from '../styles';
-import { Card, Row, Col, Typography } from 'antd';
+import { Card, Typography, Button } from 'antd';
 import { Link } from 'react-router-dom';
 
 /**
@@ -9,15 +9,11 @@ import { Link } from 'react-router-dom';
 export const ReportList: React.FC<{}> = () => {
   return (
     <PageContainer>
-      <Row gutter={[16, 16]}>
-        <Col span={8}>
-          <Link to="relatorios/consumo">
-            <Card>
-              <Typography.Title>Consumo por Familia</Typography.Title>
-            </Card>
-          </Link>
-        </Col>
-      </Row>
+      <Card title={<Typography.Title>Relatórios</Typography.Title>}>
+        <Link to="relatorios/consumo">
+          <Button size={'large'}>Consumo por Familia</Button>
+        </Link>
+      </Card>
     </PageContainer>
   );
 };

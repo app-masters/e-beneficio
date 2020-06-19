@@ -14,6 +14,7 @@ import { Group } from '../../../interfaces/group';
 import { requestGetConsumptionFamily } from '../../../redux/consumption/actions';
 import { Consumption } from '../../../interfaces/consumption';
 import { CameraOutlined } from '@ant-design/icons';
+import { requestGetFamily } from '../../../redux/families/actions';
 
 /**
  * Families Info page
@@ -22,6 +23,8 @@ export const FamiliesInfo: React.FC<RouteComponentProps<{ id: string }>> = (prop
   const family = useSelector<AppState, Family | undefined>(({ familiesReducer }) =>
     familiesReducer?.list?.find((f) => f.id === Number(props.match.params.id))
   );
+
+  const familyLoading = useSelector<AppState, boolean>(({ familiesReducer }) => familiesReducer?.loading);
 
   const consumption = useSelector<AppState, Consumption[]>(
     ({ consumptionReducer }) => consumptionReducer.list as Consumption[]
@@ -33,14 +36,15 @@ export const FamiliesInfo: React.FC<RouteComponentProps<{ id: string }>> = (prop
   const history = useHistory();
 
   React.useEffect(() => {
-    if (family) {
+    if (props.match.params.id) {
       dispatch(requestGetPlaceStore());
       dispatch(requestGetGroup());
-      dispatch(requestGetConsumptionFamily(family.id as number));
+      dispatch(requestGetFamily(undefined, undefined, props.match.params.id));
+      dispatch(requestGetConsumptionFamily(props.match.params.id));
     } else {
-      history.push('/familias');
+      history.push('/families');
     }
-  }, [family, dispatch, history]);
+  }, [history, dispatch, props]);
 
   const groups = useSelector<AppState, Group[]>(({ groupReducer }) => groupReducer.list as Group[]);
   const placeStore = useSelector<AppState, PlaceStore[]>(
@@ -48,14 +52,14 @@ export const FamiliesInfo: React.FC<RouteComponentProps<{ id: string }>> = (prop
   );
 
   const familyResponsible = React.useMemo(() => {
-    return family?.responsibleDependent;
+    return family?.dependents.find((f) => f.isResponsible);
   }, [family]);
 
   return (
     <PageContainer>
       <Row gutter={[16, 16]}>
         <Col span={24}>
-          <Card title={<Typography.Title>Família</Typography.Title>}>
+          <Card loading={familyLoading} title={<Typography.Title>Família</Typography.Title>}>
             <Descriptions column={4} layout="vertical">
               <Descriptions.Item label="Código">{family?.code}</Descriptions.Item>
               <Descriptions.Item label="Grupo familiar">
@@ -93,7 +97,7 @@ export const FamiliesInfo: React.FC<RouteComponentProps<{ id: string }>> = (prop
       </Row>
       <Row gutter={[16, 16]}>
         <Col span={24}>
-          <Card title={<h1>Membros</h1>}>
+          <Card loading={familyLoading} title={<h1>Membros</h1>}>
             <List
               dataSource={family?.dependents || []}
               itemLayout="horizontal"

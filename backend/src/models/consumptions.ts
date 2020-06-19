@@ -680,14 +680,22 @@ export const getConsumptionFamilyReport = async (
     });
   }
 
-  if (rangeConsumption)
+  if (rangeConsumption) {
+    const consumptionDate = [
+      moment(rangeConsumption ? rangeConsumption[0] : undefined)
+        .startOf('day')
+        .toDate(),
+      moment(rangeConsumption ? rangeConsumption[1] : undefined)
+        .startOf('day')
+        .toDate()
+    ];
     families = families.filter((family) => {
       const list = family.consumptions?.filter((consumption) =>
-        moment(consumption.createdAt as Date).isBetween(moment(rangeConsumption[0]), moment(rangeConsumption[1]))
+        moment(consumption.createdAt as Date).isBetween(moment(consumptionDate[0]), moment(consumptionDate[1]))
       );
       return list && list?.length > 0 && family;
     });
-
+  }
   return await Promise.all(
     families.map(async (family) => {
       const balance = await getFamilyDependentBalanceProduct(family);

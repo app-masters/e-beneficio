@@ -609,7 +609,13 @@ export const DependentForm: React.FC<{
           validateStatus={formValidation(rgMeta)}
           help={formHelper(rgMeta)}
         >
-          <Input id="rg" name="rg" onChange={handleChange} value={formatRG(values.rg)} onPressEnter={submitForm} />
+          <Input
+            id="rg"
+            name="rg"
+            onChange={(event) => setFieldValue('rg', formatRG(event.target.value))}
+            value={values.rg}
+            onPressEnter={submitForm}
+          />
         </Form.Item>
         <Form.Item
           label={
@@ -621,7 +627,13 @@ export const DependentForm: React.FC<{
           validateStatus={formValidation(cpfMeta)}
           help={formHelper(cpfMeta)}
         >
-          <Input id="cpf" name="cpf" onChange={handleChange} value={formatCPF(values.cpf)} onPressEnter={submitForm} />
+          <Input
+            id="cpf"
+            name="cpf"
+            onChange={(event) => setFieldValue('cpf', formatCPF(event.target.value))}
+            value={values.cpf}
+            onPressEnter={submitForm}
+          />
         </Form.Item>
         {type === 'adult' && (
           <>

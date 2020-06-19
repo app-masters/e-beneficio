@@ -13,6 +13,7 @@ import { AppState } from '../../../redux/rootReducer';
 import { ReportConsumptionFamily } from '../../../interfaces/report';
 import moment from 'moment';
 import { Dependent } from '../../../interfaces/dependent';
+import { useHistory } from 'react-router-dom';
 
 const schema = yup.object().shape({
   rangeFamily: yup.string().label('Data familia').required().nullable(),
@@ -25,6 +26,7 @@ const schema = yup.object().shape({
  */
 export const ConsumptionFamilyList: React.FC<{}> = () => {
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const report = useSelector<AppState, ReportConsumptionFamily[]>(
     ({ reportReducer }) => reportReducer.consumptionFamily as ReportConsumptionFamily[]
@@ -82,7 +84,7 @@ export const ConsumptionFamilyList: React.FC<{}> = () => {
     <PageContainer>
       <PrintableBodyWrapper>
         <Card
-          title={<Typography.Title>{`Relatório de consumo`}</Typography.Title>}
+          title={<Typography.Title>{`Relatório - Consumo por Família`}</Typography.Title>}
           extra={
             <Button className="no-print" onClick={() => window.print()}>
               Imprimir
@@ -166,7 +168,7 @@ export const ConsumptionFamilyList: React.FC<{}> = () => {
             onRow={(record) => {
               return {
                 onClick: () => {
-                  alert(JSON.stringify(record));
+                  history.push(`/familias/${record.familyId}/info`);
                 }
               };
             }}
@@ -193,6 +195,15 @@ export const ConsumptionFamilyList: React.FC<{}> = () => {
             />
             <Table.Column title={'Entidade'} key={'placeStoreId'} dataIndex={'placeStore'} />
             <Table.Column
+              title={'Situação'}
+              key={'status'}
+              render={(item: ReportConsumptionFamily) => {
+                if (item.neverConsumed) return 'Nunca consumiu';
+                else if (item.consumedAll) return 'Consumiu todo saldo';
+                else return 'Consumiu parte do saldo';
+              }}
+            />
+            {/* <Table.Column
               title={'Nunca consumiu'}
               key={'neverConsumed'}
               align={'center'}
@@ -205,7 +216,7 @@ export const ConsumptionFamilyList: React.FC<{}> = () => {
               align={'center'}
               dataIndex={'consumedAll'}
               render={(consumedAll) => <Checkbox checked={consumedAll} />}
-            />
+            /> */}
           </Table>
         </Card>
       </PrintableBodyWrapper>

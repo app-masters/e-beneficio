@@ -63,7 +63,7 @@ export const requestGetConsumptionFamily = (
       // Request
       const familyDate = encodeURIComponent(JSON.stringify(rangeFamily));
       const consumptionDate = encodeURIComponent(JSON.stringify(rangeConsumption));
-      let url = `/consumptions/report-family?rangeFamily=${familyDate}&rangeConsumption=${consumptionDate}&membeCpf=${memberCpf}`;
+      let url = `/consumptions/report-family?rangeFamily=${familyDate}&rangeConsumption=${consumptionDate}&memberCpf=${memberCpf}`;
       if (onlyWithoutConsumption) url += `&onlyWithoutConsumption=${onlyWithoutConsumption}`;
       const response = await backend.get<ReportConsumptionFamily[]>(url);
 
