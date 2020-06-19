@@ -1,3 +1,5 @@
+import { ConsumptionProducts } from './consumptionProducts';
+
 export interface Consumption {
   readonly id?: number | string;
   familyId: number | string;
@@ -10,4 +12,6 @@ export interface Consumption {
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
   reviewedAt?: number | Date | null;
+  //Join
+  consumptionProducts?: ConsumptionProducts[] | null;
 }

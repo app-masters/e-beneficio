@@ -6,6 +6,10 @@ import { logging } from '../../lib/logging';
 import { Consumption } from '../../interfaces/consumption';
 
 // Simple actions and types
+export const doGetConsumptionFamily = createAction<void>('consumption/GET_FAMILY');
+export const doGetConsumptionFamilySuccess = createAction<Consumption[] | undefined>('consumption/GET_SUCCESS_FAMILY');
+export const doGetConsumptionFamilyFailed = createAction<Error | undefined>('consumption/GET_FAILED_FAMILY');
+
 export const doGetConsumption = createAction<void>('consumption/GET');
 export const doGetConsumptionSuccess = createAction<Report | undefined>('consumption/GET_SUCCESS');
 export const doGetConsumptionFailed = createAction<Error | undefined>('consumption/GET_FAILED');
@@ -13,6 +17,31 @@ export const doGetConsumptionFailed = createAction<Error | undefined>('consumpti
 export const doSaveConsumption = createAction<void>('consumption/SAVE');
 export const doSaveConsumptionSuccess = createAction<Consumption>('consumption/SAVE_SUCCESS');
 export const doSaveConsumptionFailed = createAction<Error | undefined>('consumption/SAVE_FAILED');
+
+/**
+ * Get Consumption Thunk action
+ */
+export const requestGetConsumptionFamily = (id: string | number): ThunkResult<void> => {
+  return async (dispatch) => {
+    try {
+      //Start request - starting loading state
+      dispatch(doGetConsumptionFamily());
+      // Request
+      const response = await backend.get<Consumption[]>(`/families/consumption?id=` + id);
+      if (response && response.data) {
+        // Request finished
+        dispatch(doGetConsumptionFamilySuccess(response.data)); // Dispatch result
+      } else {
+        // Request without response - probably won't happen, but cancel the request
+        dispatch(doGetConsumptionFamilyFailed());
+      }
+    } catch (error) {
+      // Request failed: dispatch error
+      logging.error(error);
+      dispatch(doGetConsumptionFamilyFailed(error));
+    }
+  };
+};
 
 /**
  * Get Consumption Thunk action

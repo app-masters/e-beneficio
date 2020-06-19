@@ -65,7 +65,7 @@ const typeFamily = {
  * @param props component props
  */
 export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (props) => {
-  const isCreating = props.match.params.id === 'criar';
+  const isCreating = !!!props.match.params.id;
   const [modal, setModal] = React.useState<{
     item?: Dependent | null;
     open: boolean;
@@ -98,7 +98,7 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
     if (!isCreating && !family) {
       history.push('/familias');
     }
-  }, [isCreating, history, family]);
+  }, [isCreating, family, history]);
 
   const loading = useSelector<AppState, boolean>(({ familiesReducer }) => familiesReducer.familyLoading);
   const error = useSelector<AppState, Error | string | undefined>(

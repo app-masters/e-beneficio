@@ -69,6 +69,9 @@ router.post('/image', async (req, res) => {
   }
 });
 
+/**
+ * Report
+ */
 router.get('/report', async (req, res) => {
   try {
     if (!req.user?.cityId) throw Error('User without selected store creating consumption');
