@@ -35,7 +35,13 @@ export const GroupForm: React.FC<RouteComponentProps<{ id: string }>> = (props) 
     validationSchema: schema,
     onSubmit: (values, { setStatus }) => {
       setStatus();
-      dispatch(requestSaveGroup(values));
+      dispatch(
+        requestSaveGroup(
+          values,
+          () => history.push('/grupos'),
+          () => setStatus('Ocorreu um erro ao realizar a requisição.')
+        )
+      );
     }
   });
 
