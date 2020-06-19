@@ -25,7 +25,7 @@ const schema = yup.object().shape({
   institutionId: yup.number().label('Instituição').required(),
   groupId: yup.number().label('Grupo familiar').required(),
   title: yup.string().label('Nome').required(),
-  date: yup.date().label('Data').required(),
+  date: yup.date().label('Data de início').required(),
   value: !isConsumptionProduct ? yup.string().label('Valor').required() : yup.string().label('Valor').nullable(),
   benefitProducts: isConsumptionProduct
     ? yup
@@ -120,110 +120,112 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
       okType={errors && Object.keys(errors).length > 0 && touched ? 'danger' : 'primary'}
     >
       {status && <Alert message="Erro no formulário" description={status} type="error" />}
-      <Form onSubmitCapture={handleSubmit} layout="vertical">
-        <Row justify="space-between">
-          <Col span={isConsumptionProduct ? 11 : 24}>
-            <Form.Item
-              label={'Nome'}
-              validateStatus={!!titleMeta.error && !!titleMeta.touched ? 'error' : ''}
-              help={!!titleMeta.error && !!titleMeta.touched ? titleMeta.error : undefined}
-            >
-              <Input id="title" name="title" onChange={handleChange} value={values.title} onPressEnter={submitForm} />
-            </Form.Item>
-            <Form.Item
-              label={'Data'}
-              validateStatus={!!dateMeta.error && !!dateMeta.touched ? 'error' : ''}
-              help={!!dateMeta.error && !!dateMeta.touched ? dateMeta.error : undefined}
-            >
-              <DatePicker
-                locale={locale}
-                picker="month"
-                name="date"
-                style={{ width: '100%' }}
-                format={dateFormat}
-                defaultValue={values.date ? moment(values.date) : undefined}
-                onChange={(date) => {
-                  setFieldValue('date', date);
+      <form onSubmit={handleSubmit}>
+        <Form layout="vertical">
+          <Row justify="space-between">
+            <Col span={isConsumptionProduct ? 11 : 24}>
+              <Form.Item
+                label={'Nome'}
+                validateStatus={!!titleMeta.error && !!titleMeta.touched ? 'error' : ''}
+                help={!!titleMeta.error && !!titleMeta.touched ? titleMeta.error : undefined}
+              >
+                <Input id="title" name="title" onChange={handleChange} value={values.title} onPressEnter={submitForm} />
+              </Form.Item>
+              <Form.Item
+                label={'Data de início'}
+                validateStatus={!!dateMeta.error && !!dateMeta.touched ? 'error' : ''}
+                help={!!dateMeta.error && !!dateMeta.touched ? dateMeta.error : undefined}
+              >
+                <DatePicker
+                  locale={locale}
+                  picker="month"
+                  name="date"
+                  style={{ width: '100%' }}
+                  format={dateFormat}
+                  defaultValue={values.date ? moment(values.date) : undefined}
+                  onChange={(date) => {
+                    setFieldValue('date', date);
+                  }}
+                />
+              </Form.Item>
+
+              <Form.Item
+                label={isConsumptionProduct ? 'Origem do benefício' : 'Instituição'}
+                validateStatus={!!institutionIdMeta.error && !!institutionIdMeta.touched ? 'error' : ''}
+                help={!!institutionIdMeta.error && !!institutionIdMeta.touched ? institutionIdMeta.error : undefined}
+              >
+                <Select
+                  disabled={institutionLoading}
+                  defaultValue={values.institutionId?.toString()}
+                  onSelect={(value) => setFieldValue('institutionId', Number(value))}
+                  value={values.institutionId?.toString() || undefined}
+                  notFoundContent={institutionLoading ? <Spin size="small" /> : null}
+                  onChange={(value: string) => {
+                    setFieldValue('institutionId', Number(value));
+                  }}
+                  onBlur={() => {
+                    setFieldTouched('institutionId', true);
+                  }}
+                >
+                  {!institutionLoading &&
+                    institutionList &&
+                    institutionList.length > 0 &&
+                    institutionList.map((institution) => (
+                      <Option key={institution.id} value={institution.id?.toString() || '-1'}>
+                        {institution.title}
+                      </Option>
+                    ))}
+                </Select>
+              </Form.Item>
+
+              <Form.Item
+                label={'Grupo famíliar'}
+                validateStatus={!!groupMeta.error && !!groupMeta.touched ? 'error' : ''}
+                help={!!groupMeta.error && !!groupMeta.touched ? groupMeta.error : undefined}
+              >
+                <Select
+                  defaultValue={values.groupId?.toString()}
+                  onSelect={(value) => setFieldValue('groupId', value)}
+                  value={values.groupId?.toString() || undefined}
+                  onChange={(value: string) => {
+                    setFieldValue('groupId', value);
+                  }}
+                  onBlur={() => {
+                    setFieldTouched('groupId', true);
+                  }}
+                >
+                  {groups.map((item: Group) => (
+                    <Select.Option key={item.id} value={Number(item.id).toString()}>
+                      {item.title}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+
+              {/* Value per dependent should only be shown when the TYPE is `ticket` */}
+              {!isConsumptionProduct && (
+                <Form.Item
+                  label="Valor por dependente"
+                  validateStatus={!!valueMeta.error && !!valueMeta.touched ? 'error' : ''}
+                  help={!!valueMeta.error && !!valueMeta.touched ? valueMeta.error : undefined}
+                >
+                  <Input id="value" name="value" prefix="R$" onChange={handleChange} value={values.value} />
+                </Form.Item>
+              )}
+            </Col>
+            {isConsumptionProduct && (
+              <ProductSelector
+                validateStatus={!!productsMeta.error && !!productsMeta.touched ? 'error' : ''}
+                help={!!productsMeta.error && !!productsMeta.touched ? productsMeta.error : undefined}
+                value={values.benefitProducts}
+                onChange={(value) => {
+                  setFieldValue('benefitProducts', value);
                 }}
               />
-            </Form.Item>
-
-            <Form.Item
-              label={isConsumptionProduct ? 'Origem do benefício' : 'Instituição'}
-              validateStatus={!!institutionIdMeta.error && !!institutionIdMeta.touched ? 'error' : ''}
-              help={!!institutionIdMeta.error && !!institutionIdMeta.touched ? institutionIdMeta.error : undefined}
-            >
-              <Select
-                disabled={institutionLoading}
-                defaultValue={values.institutionId?.toString()}
-                onSelect={(value) => setFieldValue('institutionId', Number(value))}
-                value={values.institutionId?.toString() || undefined}
-                notFoundContent={institutionLoading ? <Spin size="small" /> : null}
-                onChange={(value: string) => {
-                  setFieldValue('institutionId', Number(value));
-                }}
-                onBlur={() => {
-                  setFieldTouched('institutionId', true);
-                }}
-              >
-                {!institutionLoading &&
-                  institutionList &&
-                  institutionList.length > 0 &&
-                  institutionList.map((institution) => (
-                    <Option key={institution.id} value={institution.id?.toString() || '-1'}>
-                      {institution.title}
-                    </Option>
-                  ))}
-              </Select>
-            </Form.Item>
-
-            <Form.Item
-              label={'Grupo famíliar'}
-              validateStatus={!!groupMeta.error && !!groupMeta.touched ? 'error' : ''}
-              help={!!groupMeta.error && !!groupMeta.touched ? groupMeta.error : undefined}
-            >
-              <Select
-                defaultValue={values.groupId?.toString()}
-                onSelect={(value) => setFieldValue('groupId', value)}
-                value={values.groupId?.toString() || undefined}
-                onChange={(value: string) => {
-                  setFieldValue('groupId', value);
-                }}
-                onBlur={() => {
-                  setFieldTouched('groupId', true);
-                }}
-              >
-                {groups.map((item: Group) => (
-                  <Select.Option key={item.id} value={Number(item.id).toString()}>
-                    {item.title}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-
-            {/* Value per dependent should only be shown when the TYPE is `ticket` */}
-            {!isConsumptionProduct && (
-              <Form.Item
-                label="Valor por dependente"
-                validateStatus={!!valueMeta.error && !!valueMeta.touched ? 'error' : ''}
-                help={!!valueMeta.error && !!valueMeta.touched ? valueMeta.error : undefined}
-              >
-                <Input id="value" name="value" prefix="R$" onChange={handleChange} value={values.value} />
-              </Form.Item>
             )}
-          </Col>
-          {isConsumptionProduct && (
-            <ProductSelector
-              validateStatus={!!productsMeta.error && !!productsMeta.touched ? 'error' : ''}
-              help={!!productsMeta.error && !!productsMeta.touched ? productsMeta.error : undefined}
-              value={values.benefitProducts}
-              onChange={(value) => {
-                setFieldValue('benefitProducts', value);
-              }}
-            />
-          )}
-        </Row>
-      </Form>
+          </Row>
+        </Form>
+      </form>
     </Modal>
   );
 };

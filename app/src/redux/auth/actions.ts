@@ -4,6 +4,7 @@ import { ThunkResult } from '../store';
 import { backend } from '../../utils/networking';
 import { getRefresh, setAuthorization, setRefresh } from '../../utils/auth';
 import { logging } from '../../lib/logging';
+import { forbiddenRoles, Role } from '../../utils/constraints';
 
 // Simple actions and types
 export const doLogoutUser = createAction<void>('auth/USER_LOGOUT');
@@ -36,15 +37,23 @@ export const requestLoginUser = (email: string, password: string): ThunkResult<v
       dispatch(doLoginUser());
       const response = await backend.post<TokenResponse>('/auth/login', { email, password });
       if (response && response.data) {
-        // Request finished
-        setAuthorization(response.data.token);
-        setRefresh(response.data.refreshToken);
+        // Check if the user is allowed to loggin
+        if (forbiddenRoles.includes(response.data.user.role as Role)) {
+          setAuthorization();
+          setRefresh();
+          logging.removePerson();
+          dispatch(doLoginUserFailed(new Error('Cargo não permitido.')));
+        } else {
+          // Request finished
+          setAuthorization(response.data.token);
+          setRefresh(response.data.refreshToken);
 
-        if (response.data.user.id) {
-          logging.setPerson(response.data.user.id, response.data.user.name, response.data.user.email);
+          if (response.data.user.id) {
+            logging.setPerson(response.data.user.id, response.data.user.name, response.data.user.email);
+          }
+
+          dispatch(doLoginUserSuccess(response.data)); // Dispatch result
         }
-
-        dispatch(doLoginUserSuccess(response.data)); // Dispatch result
       } else {
         // Request without response - probably won't happen, but cancel the request
         setAuthorization();

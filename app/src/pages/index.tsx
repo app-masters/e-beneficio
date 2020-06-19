@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { AppState } from '../redux/rootReducer';
 import { User } from '../interfaces/user';
 import { AdminLayout } from '../components/adminLayout';
+import { Role } from '../utils/constraints';
 
 // Pages
 import { LoginPage } from './login';
@@ -17,15 +18,6 @@ import { LogoutPage } from './logout';
 import { ConsumptionForm } from './consumption';
 import { FamiliesList } from './families/list';
 import { FamiliesForm } from './families/form';
-
-export const roleList = {
-  admin: { title: 'Administrador' },
-  operator: { title: 'Operador' },
-  manager: { title: 'Gerente' },
-  financial: { title: 'Financeiro' }
-};
-
-export type Role = keyof typeof roleList;
 
 type RouteProps = RouterRouteProps & { allowedRole?: Role | Role[] };
 

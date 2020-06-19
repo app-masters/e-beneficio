@@ -23,6 +23,10 @@ export const roleList = {
   financial: { title: 'Financeiro' }
 };
 
+export type Role = keyof typeof roleList;
+
+export const forbiddenRoles: Role[] = ['admin'];
+
 /**
  * Helper function
  */
