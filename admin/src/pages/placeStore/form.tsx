@@ -11,6 +11,10 @@ import { Place } from '../../interfaces/place';
 import { requestSavePlaceStore } from '../../redux/placeStore/actions';
 import { InputFormatter } from '../../components/inputFormatter';
 import { formatCNPJ } from '../../utils/string';
+import { env } from '../../env';
+
+// Application consumption type
+const consumptionType = env.REACT_APP_CONSUMPTION_TYPE as 'ticket' | 'product';
 
 const { Option } = Select;
 
@@ -27,6 +31,7 @@ const schema = yup.object().shape({
 export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (props) => {
   const history = useHistory();
   const isCreating = props.match.params.id === 'criar';
+  const storeLabel = consumptionType !== 'product' ? 'Entidade' : 'Grupo de entidades';
 
   // Redux state
   const placeStore = useSelector<AppState, PlaceStore | undefined>(({ placeStoreReducer }) =>
@@ -101,7 +106,7 @@ export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (pr
           </Form.Item>
 
           <Form.Item
-            label={'Entidade'}
+            label={storeLabel}
             validateStatus={!!placeIdMeta.error && !!placeIdMeta.touched ? 'error' : ''}
             help={!!placeIdMeta.error && !!placeIdMeta.touched ? placeIdMeta.error : undefined}
           >

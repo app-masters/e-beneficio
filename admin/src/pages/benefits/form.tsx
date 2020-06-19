@@ -25,7 +25,7 @@ const schema = yup.object().shape({
   institutionId: yup.number().label('Instituição').required(),
   groupId: yup.number().label('Grupo familiar').required(),
   title: yup.string().label('Nome').required(),
-  date: yup.date().label('Data').required(),
+  date: yup.date().label('Data de início').required(),
   value: !isConsumptionProduct ? yup.string().label('Valor').required() : yup.string().label('Valor').nullable(),
   benefitProducts: isConsumptionProduct
     ? yup
@@ -132,7 +132,7 @@ export const BenefitForm: React.FC<RouteComponentProps<{ id: string }>> = (props
                 <Input id="title" name="title" onChange={handleChange} value={values.title} onPressEnter={submitForm} />
               </Form.Item>
               <Form.Item
-                label={'Data'}
+                label={'Data de início'}
                 validateStatus={!!dateMeta.error && !!dateMeta.touched ? 'error' : ''}
                 help={!!dateMeta.error && !!dateMeta.touched ? dateMeta.error : undefined}
               >

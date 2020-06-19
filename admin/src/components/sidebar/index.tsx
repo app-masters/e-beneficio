@@ -10,7 +10,8 @@ import {
   HomeOutlined,
   BookOutlined,
   ShoppingCartOutlined,
-  SolutionOutlined
+  SolutionOutlined,
+  TeamOutlined
 } from '@ant-design/icons';
 import { Button, Layout, Menu, Popover } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -104,6 +105,12 @@ const routes: RouteItem[] = [
     path: '/grupos-de-entidades',
     icon: () => <SolutionOutlined />,
     name: 'Grupo de entidades',
+    specificToType: 'product'
+  },
+  {
+    path: '/grupos',
+    icon: () => <TeamOutlined />,
+    name: 'Grupos',
     specificToType: 'product'
   },
   {
