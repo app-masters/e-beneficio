@@ -2,6 +2,7 @@ import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor, CreateOptions } f
 import Hashids from 'hashids/cjs';
 import { Dependent } from './depedents';
 import { Consumption } from './consumptions';
+import { ProductBalance } from '../models/consumptions';
 
 // Simple item type
 export interface Family {
@@ -32,6 +33,7 @@ export interface Family {
   createdById?: number | string;
   placeStoreId?: number | string;
   // Join
+  balance?: ProductBalance;
   dependents?: Dependent[];
   consumptions?: Consumption[];
 }

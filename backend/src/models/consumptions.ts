@@ -12,6 +12,7 @@ import { Benefit } from '../schemas/benefits';
 import { Dependent } from '../schemas/depedents';
 import { scrapeNFCeData } from '../utils/nfceScraper';
 import { SequelizeProduct } from '../schemas/products';
+import dependents from '../../database/seeders/dependents';
 
 export type ProductBalance = {
   product: {
@@ -632,4 +633,73 @@ export const validateConsumption = async (consumption: Consumption, shouldThrow 
     }
     logging.critical('Failed to validate consumption', error);
   }
+};
+
+/**
+ * Get report for consumptions on the place on the interval
+ *
+ * @param rangeFamily range of family date
+ * @param rangeConsumption range of consumption date
+ * @param memberCpf member cpf
+ * @param onlyWithoutConsumption get only when have consumption
+ * @returns Promise<List of items>
+ */
+export const getConsumptionFamilyReport = async (
+  rangeFamily?: Date[] | string[] | null,
+  rangeConsumption?: Date[] | string[] | null,
+  memberCpf?: string,
+  onlyWithoutConsumption?: boolean
+) => {
+  const placeStores = await db.placeStores.findAll();
+  const familyDate = [
+    moment(rangeFamily ? rangeFamily[0] : undefined)
+      .startOf('day')
+      .toDate(),
+    moment(rangeFamily ? rangeFamily[1] : undefined)
+      .startOf('day')
+      .toDate()
+  ];
+  let families = await db.families.findAll({
+    where: { createdAt: { [Sequelize.Op.between]: familyDate as Date[] } },
+    include: [
+      { model: db.consumptions, as: 'consumptions' },
+      { model: db.dependents, as: 'dependents' }
+    ]
+  });
+
+  if (memberCpf) {
+    families = families.filter((family) => {
+      const responsible = family.dependents?.find((dependent) => dependent.isResponsible);
+      return responsible?.cpf === memberCpf;
+    });
+  }
+
+  if (onlyWithoutConsumption) {
+    families = families.filter((family) => {
+      return !family.consumptions || family.consumptions?.length === 0;
+    });
+  }
+
+  if (rangeConsumption)
+    families = families.filter((family) => {
+      const list = family.consumptions?.filter((consumption) =>
+        moment(consumption.createdAt as Date).isBetween(moment(rangeConsumption[0]), moment(rangeConsumption[1]))
+      );
+      return list && list?.length > 0 && family;
+    });
+
+  return await Promise.all(
+    families.map(async (family) => {
+      const balance = await getFamilyDependentBalanceProduct(family);
+      const placeStore = placeStores.find((placeStore) => placeStore.id === family.placeStoreId);
+      return {
+        familyId: family.id,
+        responsible: family.dependents?.find((dependent) => dependent.isResponsible),
+        createdAt: family.createdAt,
+        placeStore: placeStore ? placeStore.title : undefined,
+        neverConsumed: !!!family.consumptions || family.consumptions?.length === 0,
+        consumedAll: balance.filter((product) => product.amountAvailable > 0).length === 0
+      };
+    })
+  );
 };

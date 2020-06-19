@@ -10,7 +10,8 @@ import {
   HomeOutlined,
   BookOutlined,
   ShoppingCartOutlined,
-  SolutionOutlined
+  SolutionOutlined,
+  FileTextOutlined
 } from '@ant-design/icons';
 import { Button, Layout, Menu, Popover } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -75,6 +76,12 @@ const routes: RouteItem[] = [
     path: '/usuarios',
     icon: () => <UserOutlined />,
     name: 'Usuários',
+    allowedRoles: ['admin']
+  },
+  {
+    path: '/relatorios',
+    icon: () => <FileTextOutlined />,
+    name: 'Relatórios',
     allowedRoles: ['admin']
   },
 

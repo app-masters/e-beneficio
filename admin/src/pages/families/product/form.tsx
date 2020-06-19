@@ -26,7 +26,6 @@ import moment from 'moment';
 import { PageContainer, ColCheckStyle, ActionWrapper } from './styles';
 import { Dependent } from '../../../interfaces/dependent';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-// import { requestSaveFamily } from '../../../redux/family/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { Family } from '../../../interfaces/family';
 import { AppState } from '../../../redux/rootReducer';
@@ -37,8 +36,6 @@ import { PlaceStore } from '../../../interfaces/placeStore';
 import { requestSaveFamily } from '../../../redux/families/actions';
 import { Group } from '../../../interfaces/group';
 import { requestGetGroup } from '../../../redux/group/actions';
-// import { requestGetGroup } from '../../../redux/group/actions';
-// import { Group } from '../../../interfaces/group';
 
 const schema = yup.object().shape({
   groupId: yup.string().label('Grupo familiar').required(),
