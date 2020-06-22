@@ -28,9 +28,8 @@ export interface ReportConsumptionFamily {
 
 export interface ReportConsumptionPlaceStore {
   readonly id?: number | string;
-  placeStoreId: number | string;
+  placeStore: number | string;
   familiesAmount: number;
   consumedAmount: number;
   consumedAvailable: number;
-  createdAt: string | Date | null;
 }

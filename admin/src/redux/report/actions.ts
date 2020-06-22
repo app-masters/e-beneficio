@@ -66,9 +66,14 @@ export const requestGetConsumptionFamily = (
       //Start request - starting loading state
       dispatch(doGetConsumptionFamily());
       // Request
+      let url = `/consumptions/report-family?`;
       const familyDate = encodeURIComponent(JSON.stringify(rangeFamily));
-      const consumptionDate = encodeURIComponent(JSON.stringify(rangeConsumption));
-      let url = `/consumptions/report-family?rangeFamily=${familyDate}&rangeConsumption=${consumptionDate}&memberCpf=${memberCpf}`;
+      url += `rangeFamily=${familyDate}`;
+      if (rangeConsumption) {
+        const consumptionDate = encodeURIComponent(JSON.stringify(rangeConsumption));
+        url += `&rangeConsumption=${consumptionDate}`;
+      }
+      if (memberCpf) url += `&memberCpf=${memberCpf}`;
       if (onlyWithoutConsumption) url += `&onlyWithoutConsumption=${onlyWithoutConsumption}`;
       const response = await backend.get<ReportConsumptionFamily[]>(url);
 
@@ -90,14 +95,17 @@ export const requestGetConsumptionFamily = (
 /**
  * Get ConsumptionPlaceStore Thunk action
  */
-export const requestGetConsumptionPlaceStore = (rangeConsumption: string[]): ThunkResult<void> => {
+export const requestGetConsumptionPlaceStore = (rangeConsumption?: string[]): ThunkResult<void> => {
   return async (dispatch) => {
     try {
       //Start request - starting loading state
       dispatch(doGetConsumptionPlaceStore());
       // Request
-      const consumptionDate = encodeURIComponent(JSON.stringify(rangeConsumption));
-      const url = `/consumptions/report-placestore?rangeConsumption=${consumptionDate}`;
+      let url = `/consumptions/report-placestore?`;
+      if (rangeConsumption) {
+        const consumptionDate = encodeURIComponent(JSON.stringify(rangeConsumption));
+        url += `rangeConsumption=${consumptionDate}`;
+      }
       const response = await backend.get<ReportConsumptionPlaceStore[]>(url);
 
       if (response && response.data) {

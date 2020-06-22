@@ -13,12 +13,15 @@ import { Dependent } from '../schemas/depedents';
 import { scrapeNFCeData } from '../utils/nfceScraper';
 import { SequelizeProduct } from '../schemas/products';
 import dependents from '../../database/seeders/dependents';
+import consumptions from '../../database/seeders/consumptions';
+import { ConsumptionProducts } from '../schemas/consumptionProducts';
 
 export type ProductBalance = {
   product: {
     id?: number | string;
     name?: string;
   };
+  createdAt?: number | Date | null | undefined;
   amountAvailable: number;
   amountGranted: number;
   amountConsumed: number;
@@ -26,7 +29,9 @@ export type ProductBalance = {
 
 /**
  * Get balance report by dependent when product
+ *
  * @param family the family
+ * @param rangeConsumptionDate
  */
 export const getFamilyDependentBalanceProduct = async (family: Family): Promise<ProductBalance> => {
   //Family groupId
@@ -72,6 +77,7 @@ export const getFamilyDependentBalanceProduct = async (family: Family): Promise<
   listOfProductsAvailable.reduce((res, value) => {
     if (!res[value.productId]) {
       res[value.productId] = {
+        createdAt: value.createdAt,
         product: value.product,
         benefitId: value.benefitId,
         productId: value.productId,
@@ -85,7 +91,6 @@ export const getFamilyDependentBalanceProduct = async (family: Family): Promise<
   //Get difference between available products and consumed products
   const differenceProducts = groupedProductsAvailable.map((product) => {
     const items = productsFamilyConsumption.filter((f) => f.productId === product.productId);
-    // const item = productsFamilyConsumption.find((f) => f.productId === product.productId);
     let amount = 0;
     if (items.length > 0)
       amount = items
@@ -102,6 +107,7 @@ export const getFamilyDependentBalanceProduct = async (family: Family): Promise<
     }
     return {
       product: { id: product.product?.id, name: product.product?.name },
+      createdAt: product.createdAt,
       amountAvailable: amountDifference,
       amountGranted: product.amount,
       amountConsumed: amount ? amount : 0
@@ -710,4 +716,63 @@ export const getConsumptionFamilyReport = async (
       };
     })
   );
+};
+
+/**
+ * Get report for consumptions on the place on the interval
+ * @param rangeConsumption range of consumption date
+ * @returns Promise<List of items>
+ */
+export const getConsumptionPlaceStoreReport = async (rangeConsumption?: Date[] | string[] | null) => {
+  const placeStores = await db.placeStores.findAll({
+    include: [
+      {
+        model: db.families,
+        as: 'families'
+      }
+    ]
+  });
+
+  await Promise.all(
+    placeStores.map(async (placeStore) => {
+      await Promise.all(
+        placeStore.families.map(async (family) => {
+          family.balance = await getFamilyDependentBalanceProduct(family);
+        })
+      );
+    })
+  );
+
+  const reportList: any[] = [];
+  placeStores.map((placeStore: PlaceStore) => {
+    let familyConsumption = 0;
+    let familyAvailable = 0;
+    if (placeStore.families)
+      placeStore.families.map((family) => {
+        family.balance?.map((balance) => {
+          familyConsumption += balance.amountConsumed;
+          if (rangeConsumption) {
+            if (balance.amountAvailable > 0) {
+              const isBetween = moment(balance.createdAt as Date).isBetween(
+                moment(rangeConsumption[0]),
+                moment(rangeConsumption[1])
+              );
+              familyAvailable += isBetween ? balance.amountAvailable : 0;
+            } else {
+              familyAvailable += balance.amountAvailable;
+            }
+          } else familyAvailable += balance.amountAvailable;
+        });
+      });
+
+    const report = {
+      placeStore: placeStore.title,
+      familiesAmount: placeStore.families.length,
+      consumedAmount: familyConsumption,
+      consumedAvailable: familyAvailable
+    };
+    reportList.push(report);
+  });
+
+  return reportList;
 };

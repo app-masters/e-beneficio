@@ -13,7 +13,7 @@ export const ReportList: React.FC<{}> = () => {
         <Row gutter={[16, 16]}>
           <Col>
             <Link to="relatorios/consumo-familia">
-              <Button size={'large'}>Consumo por familia</Button>
+              <Button size={'large'}>Consumo por família</Button>
             </Link>
           </Col>
           <Col>

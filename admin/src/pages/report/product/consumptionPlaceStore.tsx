@@ -100,10 +100,10 @@ export const ConsumptionPlaceStoreList: React.FC<{}> = () => {
             </Row>
           </Form>
           <Table dataSource={report || []} loading={loading} locale={{ emptyText: 'Nenhum dado disponível' }}>
-            <Table.Column title={'Estabelecimento'} key={'placeStoreId'} dataIndex={'placeStoreId'} />
+            <Table.Column title={'Estabelecimento'} key={'placeStore'} dataIndex={'placeStore'} />
             <Table.Column title={'Famílias registradas'} key={'familiesAmount'} dataIndex={'familiesAmount'} />
             <Table.Column title={'Total consumido'} key={'consumedAmount'} dataIndex={'consumedAmount'} />
-            <Table.Column title={'Ainda não consumido'} key={'consumedAvailable'} dataIndex={'consumedAvailable'} />
+            <Table.Column title={'Não consumido'} key={'consumedAvailable'} dataIndex={'consumedAvailable'} />
           </Table>
         </Card>
       </PrintableBodyWrapper>
