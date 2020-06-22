@@ -1,9 +1,7 @@
-import express, { query } from 'express';
+import express from 'express';
 import logging from '../utils/logging';
 import * as consumptionModel from '../models/consumptions';
 import { uploadFile } from '../utils/file';
-import { filter } from 'bluebird';
-import moment from 'moment';
 
 const router = express.Router({ mergeParams: true });
 
@@ -104,7 +102,7 @@ router.get('/report', async (req, res) => {
  */
 router.get('/report-family', async (req, res) => {
   try {
-    // if (!req.user?.cityId) throw Error('User without selected store creating consumption');
+    if (!req.user?.cityId) throw Error('User without selected store creating consumption');
     const filters = {
       rangeFamily: req.query.rangeFamily ? JSON.parse(req.query.rangeFamily as string) : undefined,
       rangeConsumption: req.query.rangeConsumption ? JSON.parse(req.query.rangeConsumption as string) : undefined,
@@ -129,7 +127,7 @@ router.get('/report-family', async (req, res) => {
  */
 router.get('/report-placestore', async (req, res) => {
   try {
-    // if (!req.user?.cityId) throw Error('User without selected store creating consumption');
+    if (!req.user?.cityId) throw Error('User without selected store creating consumption');
     const filters = {
       rangeConsumption: req.query.rangeConsumption ? JSON.parse(req.query.rangeConsumption as string) : undefined
     };

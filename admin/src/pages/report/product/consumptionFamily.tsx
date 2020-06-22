@@ -129,7 +129,7 @@ export const ConsumptionFamilyList: React.FC<{}> = () => {
               </Col>
               <Col span={8}>
                 <Form.Item
-                  label="Cpf do membro"
+                  label="CPF do membro"
                   validateStatus={formValidation(memberCpfMeta)}
                   help={formHelper(memberCpfMeta)}
                 >
@@ -150,7 +150,7 @@ export const ConsumptionFamilyList: React.FC<{}> = () => {
                   help={formHelper(onlyWithoutConsumptionMeta)}
                 >
                   <Checkbox checked={values.onlyWithoutConsumption} {...onlyWithoutConsumptionField}>
-                    Apénas sem consumo
+                    Apenas sem consumo
                   </Checkbox>
                 </Form.Item>
               </Col>
