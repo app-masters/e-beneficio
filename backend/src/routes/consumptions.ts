@@ -1,9 +1,7 @@
-import express, { query } from 'express';
+import express from 'express';
 import logging from '../utils/logging';
 import * as consumptionModel from '../models/consumptions';
 import { uploadFile } from '../utils/file';
-import { filter } from 'bluebird';
-import moment from 'moment';
 
 const router = express.Router({ mergeParams: true });
 
