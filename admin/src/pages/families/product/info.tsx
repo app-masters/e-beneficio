@@ -24,8 +24,8 @@ export const FamiliesInfo: React.FC<RouteComponentProps<{ id: string }>> = (prop
     familiesReducer?.list?.find((f) => f.id === Number(props.match.params.id))
   );
 
-  const familyLoading = useSelector<AppState, boolean>(({ familiesReducer }) => familiesReducer?.loading);
 
+  const familyLoading = useSelector<AppState, boolean>(({ familiesReducer }) => familiesReducer?.loading);
   const consumption = useSelector<AppState, Consumption[]>(
     ({ consumptionReducer }) => consumptionReducer.list as Consumption[]
   );

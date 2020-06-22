@@ -139,24 +139,36 @@ export const getFamilyDependentBalanceTicket = async (family: Family, availableB
   }
 
   const todayDate = moment();
+  let lastBenefit: Benefit | null = null;
 
   let balance = 0;
   for (const dependent of family.dependents as Dependent[]) {
-    const startDate = moment(dependent.createdAt as Date);
-    const endDate = moment(dependent.deactivatedAt as Date);
+    const dependentCreatedAt = moment(dependent.createdAt as Date);
+    const dependentDeactivatedAt = moment(dependent.deactivatedAt as Date);
 
     for (const benefit of availableBenefits) {
       const benefitDate = moment(benefit.date as Date);
       if (benefit.groupId !== family.groupId) continue; // Don't check if it's from another group
       // Check all the dates
-      const notInFuture = benefitDate.toDate() <= todayDate.endOf('month').toDate();
-      const afterCreation = benefitDate.toDate() >= startDate.startOf('month').toDate();
-      const beforeDeactivation = dependent.deactivatedAt
-        ? benefitDate.toDate() <= endDate.endOf('month').toDate()
+      const dependentRegistredBeforeBenefit = dependentCreatedAt.isSameOrBefore(moment(benefitDate).endOf('month'));
+      const afterBenefitActivation = todayDate.isSameOrAfter(benefitDate);
+      const dependetNotDeactivatedBeforeBenefit = dependent.deactivatedAt
+        ? benefitDate.isSameOrBefore(dependentDeactivatedAt)
         : true;
-      if (benefit.value && notInFuture && afterCreation && beforeDeactivation) {
+
+      if (
+        benefit.value &&
+        dependentRegistredBeforeBenefit &&
+        dependetNotDeactivatedBeforeBenefit &&
+        afterBenefitActivation
+      ) {
         // Valid benefit
         balance += Number(benefit.value);
+
+        // Store the last benefit received
+        if (!lastBenefit || (lastBenefit && moment(lastBenefit.date).isAfter(benefitDate))) {
+          lastBenefit = benefit;
+        }
       }
     }
   }
@@ -168,7 +180,27 @@ export const getFamilyDependentBalanceTicket = async (family: Family, availableB
 
   // Calculating consumption
   const consumption = family.consumptions.reduce((sum, item) => sum + Number(item.value), 0);
-  return balance - consumption;
+
+  // Discount invalid values from future months
+  const sumValue = family.consumptions.reduce((sum, consumption) => {
+    if (consumption.createdAt && moment(consumption.createdAt).isBefore(moment(lastBenefit?.date))) {
+      if (consumption.invalidValue) {
+        // Check for the payment with money
+        const paidWithMoney =
+          consumption.purchaseData?.payment.reduce(
+            (sum, payment) =>
+              payment.name && payment.value && payment.name.toLocaleLowerCase().includes('dinheiro')
+                ? sum + payment.value
+                : sum,
+            0
+          ) || 0;
+        return sum + Math.max(Number(consumption.invalidValue) - paidWithMoney, 0);
+      }
+    }
+    return sum;
+  }, 0);
+
+  return balance - consumption - sumValue;
 };
 
 /**
