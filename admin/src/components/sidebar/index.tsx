@@ -68,6 +68,19 @@ const routes: RouteItem[] = [
     allowedRoles: ['admin']
   },
   {
+    path: '/relatorios',
+    icon: () => <FileTextOutlined />,
+    name: 'Relatórios',
+    allowedRoles: ['admin'],
+    specificToType: 'product',
+    children: [
+      {
+        path: '/consumo',
+        name: 'Consumo'
+      }
+    ]
+  },
+  {
     path: '/beneficios',
     icon: () => <CarryOutOutlined />,
     name: 'Beneficios',
@@ -79,13 +92,6 @@ const routes: RouteItem[] = [
     name: 'Usuários',
     allowedRoles: ['admin']
   },
-  {
-    path: '/relatorios',
-    icon: () => <FileTextOutlined />,
-    name: 'Relatórios',
-    allowedRoles: ['admin']
-  },
-
   // Items only shown in the `ticket` consumption type
   {
     path: '/instituicoes',
