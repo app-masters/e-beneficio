@@ -26,7 +26,6 @@ import moment from 'moment';
 import { PageContainer, ColCheckStyle, ActionWrapper } from './styles';
 import { Dependent } from '../../../interfaces/dependent';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-// import { requestSaveFamily } from '../../../redux/family/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { Family } from '../../../interfaces/family';
 import { AppState } from '../../../redux/rootReducer';
@@ -37,8 +36,6 @@ import { PlaceStore } from '../../../interfaces/placeStore';
 import { requestSaveFamily } from '../../../redux/families/actions';
 import { Group } from '../../../interfaces/group';
 import { requestGetGroup } from '../../../redux/group/actions';
-// import { requestGetGroup } from '../../../redux/group/actions';
-// import { Group } from '../../../interfaces/group';
 
 const schema = yup.object().shape({
   groupId: yup.string().label('Grupo familiar').required(),
@@ -612,7 +609,13 @@ export const DependentForm: React.FC<{
           validateStatus={formValidation(rgMeta)}
           help={formHelper(rgMeta)}
         >
-          <Input id="rg" name="rg" onChange={handleChange} value={formatRG(values.rg)} onPressEnter={submitForm} />
+          <Input
+            id="rg"
+            name="rg"
+            onChange={(event) => setFieldValue('rg', formatRG(event.target.value))}
+            value={values.rg}
+            onPressEnter={submitForm}
+          />
         </Form.Item>
         <Form.Item
           label={
@@ -624,7 +627,13 @@ export const DependentForm: React.FC<{
           validateStatus={formValidation(cpfMeta)}
           help={formHelper(cpfMeta)}
         >
-          <Input id="cpf" name="cpf" onChange={handleChange} value={formatCPF(values.cpf)} onPressEnter={submitForm} />
+          <Input
+            id="cpf"
+            name="cpf"
+            onChange={(event) => setFieldValue('cpf', formatCPF(event.target.value))}
+            value={values.cpf}
+            onPressEnter={submitForm}
+          />
         </Form.Item>
         {type === 'adult' && (
           <>

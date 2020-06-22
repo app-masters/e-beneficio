@@ -31,6 +31,7 @@ import {
 } from './actions';
 import { DashboardFamily } from '../../interfaces/dashboardFamily';
 import { Family, ImportReport } from '../../interfaces/family';
+import { addToList } from '../../utils/list';
 
 export interface FamilyReducerState {
   list: Family[];
@@ -153,7 +154,13 @@ export default createReducer<FamilyReducerState>(initialState, (builder) =>
       state.error = undefined;
       state.familySaveError = undefined;
       state.familyItem = !Array.isArray(action.payload) ? action.payload : undefined;
-      state.list = Array.isArray(action.payload) ? action.payload : [];
+      if (Array.isArray(action.payload)) {
+        // User got the list
+        state.list = addToList(null, action.payload);
+      } else {
+        // User got a single item
+        state.list = addToList(action.payload, state.list);
+      }
     })
     .addCase(doGetFamilyFailed, (state, action) => {
       state.familyLoading = false;

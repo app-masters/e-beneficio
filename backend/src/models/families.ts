@@ -237,6 +237,32 @@ export const findByCode = async (
 };
 
 /**
+ * Get all items on the table with filter
+ * @param id searched family id
+ * @param cityId logged user city ID
+ * @returns Promise<List of items>
+ */
+export const findById = async (
+  id: NonNullable<Family['id']>,
+  cityId: NonNullable<City['id']>
+): Promise<SequelizeFamily & { school?: Dependent['schoolName'] }> => {
+  const [family] = await db.families.findAll({
+    where: { id, cityId },
+    limit: 1,
+    include: [{ model: db.dependents, as: 'dependents' }]
+  });
+
+  if (family && family.dependents) {
+    const responsible = family.dependents?.find((f) => f.isResponsible);
+    if (!responsible) throw { status: 409, message: 'Familia sem responsável.' };
+    else family.dependents = [responsible];
+  } else {
+    throw { status: 409, message: 'Familia não encontrada.' };
+  }
+  return family;
+};
+
+/**
  * Get all items by the place store id
  * @param placeStoreId searched place store id
  * @param cityId logged user city ID`

@@ -1,15 +1,27 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { doGetConsumption, doGetConsumptionSuccess, doGetConsumptionFailed } from './actions';
-import { Report } from '../../interfaces/report';
+import {
+  doGetConsumption,
+  doGetConsumptionSuccess,
+  doGetConsumptionFailed,
+  doGetConsumptionFamily,
+  doGetConsumptionFamilySuccess,
+  doGetConsumptionFamilyFailed
+} from './actions';
+import { Report, ReportConsumptionFamily } from '../../interfaces/report';
 
 export interface ReportReducerState {
   item?: Report;
   loading: boolean;
   error?: Error;
+
+  consumptionFamily?: ReportConsumptionFamily[];
+  consumptionFamilyLoading: boolean;
+  consumptionFamilyError?: Error;
 }
 
 const initialState = {
-  loading: false
+  loading: false,
+  consumptionFamilyLoading: false
 };
 
 export default createReducer<ReportReducerState>(initialState, (builder) =>
@@ -26,5 +38,18 @@ export default createReducer<ReportReducerState>(initialState, (builder) =>
     .addCase(doGetConsumptionFailed, (state, action) => {
       state.loading = false;
       state.error = action.payload;
+    })
+    // Get ConsumptionFamily
+    .addCase(doGetConsumptionFamily, (state) => {
+      state.consumptionFamilyLoading = true;
+      state.consumptionFamilyError = undefined;
+    })
+    .addCase(doGetConsumptionFamilySuccess, (state, action) => {
+      state.consumptionFamilyLoading = false;
+      state.consumptionFamily = action.payload;
+    })
+    .addCase(doGetConsumptionFamilyFailed, (state, action) => {
+      state.consumptionFamilyLoading = false;
+      state.consumptionFamilyError = action.payload;
     })
 );

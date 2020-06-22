@@ -11,6 +11,7 @@ import {
   BookOutlined,
   ShoppingCartOutlined,
   SolutionOutlined,
+  FileTextOutlined,
   TeamOutlined
 } from '@ant-design/icons';
 import { Button, Layout, Menu, Popover } from 'antd';
@@ -76,6 +77,12 @@ const routes: RouteItem[] = [
     path: '/usuarios',
     icon: () => <UserOutlined />,
     name: 'Usuários',
+    allowedRoles: ['admin']
+  },
+  {
+    path: '/relatorios',
+    icon: () => <FileTextOutlined />,
+    name: 'Relatórios',
     allowedRoles: ['admin']
   },
 

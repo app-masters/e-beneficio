@@ -1,7 +1,9 @@
-import express from 'express';
+import express, { query } from 'express';
 import logging from '../utils/logging';
 import * as consumptionModel from '../models/consumptions';
 import { uploadFile } from '../utils/file';
+import { filter } from 'bluebird';
+import moment from 'moment';
 
 const router = express.Router({ mergeParams: true });
 
@@ -91,6 +93,28 @@ router.get('/report', async (req, res) => {
     }
 
     return res.send(data);
+  } catch (error) {
+    logging.error(error);
+    return res.status(error.status || 500).send(error.message);
+  }
+});
+
+router.get('/report-family', async (req, res) => {
+  try {
+    if (!req.user?.cityId) throw Error('User without selected store creating consumption');
+    const filters = {
+      rangeFamily: JSON.parse(req.query.rangeFamily as string),
+      rangeConsumption: JSON.parse(req.query.rangeConsumption as string),
+      memberCpf: req.query.memberCpf as string,
+      onlyWithoutConsumption: !!req.query.onlyWithoutConsumption
+    };
+    const report = await consumptionModel.getConsumptionFamilyReport(
+      filters.rangeFamily,
+      filters.rangeConsumption,
+      filters.memberCpf,
+      filters.onlyWithoutConsumption
+    );
+    return res.send(report);
   } catch (error) {
     logging.error(error);
     return res.status(error.status || 500).send(error.message);

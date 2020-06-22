@@ -620,7 +620,7 @@ export const DependentForm: React.FC<{
               <Input
                 id="phone"
                 name="phone"
-                onChange={(event) => setFieldValue('phone', formatPhone(event?.target.value))}
+                onChange={handleChange}
                 value={formatPhone(values.phone)}
                 onPressEnter={submitForm}
               />

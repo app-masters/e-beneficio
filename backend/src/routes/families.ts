@@ -14,7 +14,9 @@ router.get('/', async (req, res) => {
   try {
     if (!req.user?.cityId) throw Error('User without selected city');
     let item;
-    if (req.query.nis) {
+    if (req.query.id) {
+      item = await familyModel.findById(req.query.id as string, req.user.cityId);
+    } else if (req.query.nis) {
       item = await familyModel.findByNis(req.query.nis as string, req.user.cityId, true);
     } else if (req.query.code) {
       item = await familyModel.findByCode(req.query.code as string, req.user.cityId);

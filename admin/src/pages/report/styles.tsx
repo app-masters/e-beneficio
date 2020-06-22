@@ -4,6 +4,11 @@ export const PageContainer = styled.div`
   padding: ${(props) => props.theme.spacing.md};
 `;
 
+export const ColCheckStyle = {
+  display: 'flex',
+  alignItems: 'flex-end'
+};
+
 export const PrintableBodyWrapper = styled.div`
   @media print {
     z-index: 9999;
