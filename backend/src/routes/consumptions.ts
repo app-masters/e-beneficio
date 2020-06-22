@@ -101,7 +101,7 @@ router.get('/report', async (req, res) => {
 
 router.get('/report-family', async (req, res) => {
   try {
-    // if (!req.user?.cityId) throw Error('User without selected store creating consumption');
+    if (!req.user?.cityId) throw Error('User without selected store creating consumption');
     const filters = {
       rangeFamily: JSON.parse(req.query.rangeFamily as string),
       rangeConsumption: JSON.parse(req.query.rangeConsumption as string),
