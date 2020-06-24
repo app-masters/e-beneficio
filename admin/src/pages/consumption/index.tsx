@@ -299,7 +299,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                         // weird ts error
                         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
                         // @ts-ignore
-                        const imageUri = cameraRef.current.getScreenshot();
+                        const imageUri = cameraRef.current.getScreenshot({ width: 900, height: 600 });
                         setShowCameraModal(false);
                         setFieldValue('proofImageUrl', imageUri);
                       }
@@ -309,6 +309,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                     <FormImageContainer>
                       {showCamera ? (
                         <Webcam
+                          screenshotQuality={0.85}
                           videoConstraints={{ facingMode: cameraFacingMode }}
                           audio={false}
                           width="100%"
