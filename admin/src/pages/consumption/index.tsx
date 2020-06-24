@@ -1,18 +1,5 @@
 import { CameraOutlined, QrcodeOutlined, WarningFilled, UploadOutlined, ReloadOutlined } from '@ant-design/icons';
-import {
-  Alert,
-  Button,
-  Card,
-  Checkbox,
-  Form,
-  Input,
-  InputNumber,
-  Modal,
-  Typography,
-  Divider,
-  Spin,
-  Upload
-} from 'antd';
+import { Alert, Button, Card, Form, Input, InputNumber, Modal, Typography, Divider, Spin, Upload } from 'antd';
 import { useFormik } from 'formik';
 import { IdcardOutlined } from '@ant-design/icons';
 import React, { useEffect, useRef, useState } from 'react';
