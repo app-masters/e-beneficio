@@ -91,7 +91,7 @@ export const StepBirthDay: React.FC<{ family?: Family | null; onValidBirthday?: 
     enableReinitialize: true,
     onSubmit: (values, { setStatus }) => {
       const sameBirthday =
-        moment(family?.responsibleBirthday).diff(moment(values.birthday, 'DD/MM/YYYY'), 'days') === 0;
+        Math.abs(moment(family?.responsibleBirthday).diff(moment(values.birthday, 'DD/MM/YYYY'), 'days')) < 2;
       if (sameBirthday && onValidBirthday) onValidBirthday();
       else setStatus('Data de aniversário inválida.');
     }
@@ -148,9 +148,6 @@ export const StepConfirmFamily: React.FC<{ family?: Family | null; onConfirm?: (
           <div>
             <Descriptions layout="vertical" size="small" title="Família encontrada" colon={false} bordered>
               <Descriptions.Item label="Nome do responsável">{family?.responsibleName}</Descriptions.Item>
-              <Descriptions.Item label="Data de nascimento do responsável">
-                {family?.responsibleBirthday ? moment(family?.responsibleBirthday).utc().format('DD/MM/YYYY') : ''}
-              </Descriptions.Item>
             </Descriptions>
             <FamilyActions>
               <Typography.Paragraph strong>Os dados estão corretos?</Typography.Paragraph>
