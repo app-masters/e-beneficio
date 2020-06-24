@@ -33,7 +33,7 @@ export interface Family {
   createdById?: number | string;
   placeStoreId?: number | string;
   // Join
-  balance?: ProductBalance;
+  balance?: ProductBalance | number;
   dependents?: Dependent[];
   consumptions?: Consumption[];
 }
