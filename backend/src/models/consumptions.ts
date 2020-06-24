@@ -695,7 +695,12 @@ export const getConsumptionFamilyReport = async (
       .toDate()
   ];
   let families = await db.families.findAll({
-    where: { createdAt: { [Sequelize.Op.between]: familyDate as Date[] } },
+    where: {
+      [Sequelize.Op.and]: [
+        { createdAt: { [Sequelize.Op.gte]: familyDate[0] } },
+        { createdAt: { [Sequelize.Op.lte]: familyDate[1] } }
+      ]
+    },
     include: [
       { model: db.consumptions, as: 'consumptions' },
       { model: db.dependents, as: 'dependents' }
@@ -703,14 +708,14 @@ export const getConsumptionFamilyReport = async (
   });
 
   if (memberCpf) {
-    families = families.filter((family) => {
-      const responsible = family.dependents?.find((dependent) => dependent.isResponsible);
+    families = families.filter((family: Family) => {
+      const responsible = family.dependents?.find((dependent: Dependent) => dependent.isResponsible);
       return responsible?.cpf === memberCpf;
     });
   }
 
   if (onlyWithoutConsumption) {
-    families = families.filter((family) => {
+    families = families.filter((family: Family) => {
       return !family.consumptions || family.consumptions?.length === 0;
     });
   }
@@ -724,20 +729,20 @@ export const getConsumptionFamilyReport = async (
         .startOf('day')
         .toDate()
     ];
-    families = families.filter((family) => {
-      const list = family.consumptions?.filter((consumption) =>
+    families = families.filter((family: Family) => {
+      const list = family.consumptions?.filter((consumption: Consumption) =>
         moment(consumption.createdAt as Date).isBetween(moment(consumptionDate[0]), moment(consumptionDate[1]))
       );
       return list && list?.length > 0 && family;
     });
   }
   return await Promise.all(
-    families.map(async (family) => {
+    families.map(async (family: Family) => {
       const balance = await getFamilyDependentBalanceProduct(family);
-      const placeStore = placeStores.find((placeStore) => placeStore.id === family.placeStoreId);
+      const placeStore = placeStores.find((placeStore: PlaceStore) => placeStore.id === family.placeStoreId);
       return {
         familyId: family.id,
-        responsible: family.dependents?.find((dependent) => dependent.isResponsible),
+        responsible: family.dependents?.find((dependent: Dependent) => dependent.isResponsible),
         createdAt: family.createdAt,
         placeStore: placeStore ? placeStore.title : undefined,
         neverConsumed: !!!family.consumptions || family.consumptions?.length === 0,
