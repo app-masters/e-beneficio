@@ -24,8 +24,8 @@ import { FamiliesList } from './families/list';
 import { FamiliesForm } from './families/form';
 import { ConsumptionForm } from './consumption';
 import { ReportList } from './report';
-import { ReportList as ReportListProduct } from './report/product';
-import { ConsumptionFamilyList } from './report/product/consumption';
+import { ConsumptionFamilyList } from './report/product/consumptionFamily';
+import { ConsumptionPlaceStoreList } from './report/product/consumptionPlaceStore';
 import { ProductValidationList } from './product/validationList';
 import { ProductList } from './product/list';
 import { ProductForm } from './product/form';
@@ -77,10 +77,15 @@ const PrivateRouter: React.FC<{}> = () => {
         <Route path="/produtos/:id" component={ProductForm} allowedRole="admin" specificToType="product" />
         {/* Report routes */}
         <Route exact path="/relatorios" component={ReportList} allowedRole="admin" specificToType="ticket" />
-        <Route exact path="/relatorios" component={ReportListProduct} allowedRole="admin" specificToType="product" />
         <Route
-          path="/relatorios/consumo"
+          path="/relatorios/consumo-familia"
           component={ConsumptionFamilyList}
+          allowedRole="admin"
+          specificToType="product"
+        />
+        <Route
+          path="/relatorios/consumo-estabelecimento"
+          component={ConsumptionPlaceStoreList}
           allowedRole="admin"
           specificToType="product"
         />

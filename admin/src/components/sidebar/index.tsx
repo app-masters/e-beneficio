@@ -75,8 +75,12 @@ const routes: RouteItem[] = [
     specificToType: 'product',
     children: [
       {
-        path: '/consumo',
-        name: 'Consumo'
+        path: '/consumo-familia',
+        name: 'Consumo Familia'
+      },
+      {
+        path: '/consumo-estabelecimento',
+        name: 'Consumo Estabelecimento'
       }
     ]
   },

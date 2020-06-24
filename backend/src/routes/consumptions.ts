@@ -97,12 +97,15 @@ router.get('/report', async (req, res) => {
   }
 });
 
+/**
+ * Report family
+ */
 router.get('/report-family', async (req, res) => {
   try {
     if (!req.user?.cityId) throw Error('User without selected store creating consumption');
     const filters = {
-      rangeFamily: JSON.parse(req.query.rangeFamily as string),
-      rangeConsumption: JSON.parse(req.query.rangeConsumption as string),
+      rangeFamily: req.query.rangeFamily ? JSON.parse(req.query.rangeFamily as string) : undefined,
+      rangeConsumption: req.query.rangeConsumption ? JSON.parse(req.query.rangeConsumption as string) : undefined,
       memberCpf: req.query.memberCpf as string,
       onlyWithoutConsumption: !!req.query.onlyWithoutConsumption
     };
@@ -112,6 +115,23 @@ router.get('/report-family', async (req, res) => {
       filters.memberCpf,
       filters.onlyWithoutConsumption
     );
+    return res.send(report);
+  } catch (error) {
+    logging.error(error);
+    return res.status(error.status || 500).send(error.message);
+  }
+});
+
+/**
+ * Report placeStore
+ */
+router.get('/report-placestore', async (req, res) => {
+  try {
+    // if (!req.user?.cityId) throw Error('User without selected store creating consumption');
+    const filters = {
+      rangeConsumption: req.query.rangeConsumption ? JSON.parse(req.query.rangeConsumption as string) : undefined
+    };
+    const report = await consumptionModel.getConsumptionPlaceStoreReport(filters.rangeConsumption);
     return res.send(report);
   } catch (error) {
     logging.error(error);

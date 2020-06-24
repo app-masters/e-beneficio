@@ -25,3 +25,11 @@ export interface ReportConsumptionFamily {
   neverConsumed: boolean;
   consumedAll: boolean;
 }
+
+export interface ReportConsumptionPlaceStore {
+  readonly id?: number | string;
+  placeStore: number | string;
+  familiesAmount: number;
+  consumedAmount: number;
+  consumedAvailable: number;
+}
