@@ -1,5 +1,9 @@
 import Sequelize, { Op } from 'sequelize';
 import db from '../schemas';
+import path from 'path';
+import fs from 'fs';
+import csv from 'csvtojson';
+import { createObjectCsvWriter } from 'csv-writer';
 import { Consumption, SequelizeConsumption } from '../schemas/consumptions';
 import { PlaceStore } from '../schemas/placeStores';
 import { Family } from '../schemas/families';
@@ -12,6 +16,7 @@ import { Benefit } from '../schemas/benefits';
 import { Dependent } from '../schemas/depedents';
 import { scrapeNFCeData } from '../utils/nfceScraper';
 import { SequelizeProduct } from '../schemas/products';
+import { last } from 'lodash';
 
 export type ProductBalance = {
   product: {
@@ -741,4 +746,135 @@ export const getConsumptionFamilyReport = async (
       };
     })
   );
+};
+
+type TicketItem = {
+  Portador: string;
+  'Id Adicional': string;
+  Cartão: string;
+  'Dt Proces.': string;
+  'Dt Trans.': string;
+  Tipo: string;
+  NSU: string;
+  Estabelecimento: string;
+  Valor: string;
+  Operação: string;
+  Status: string;
+};
+
+type ReportItem = {
+  createdAt?: string;
+  responsibleNis?: string;
+  responsibleName?: string;
+  numberOfDependents?: number;
+  balance?: number;
+  invalidValue?: number;
+  hasDeclaredSomething?: string; // humanized boolean
+  hasDeclaredAll?: string; // humanized boolean
+  nextBenefit?: number;
+  nextBenefitWithDiscounts?: number;
+  consumedValue?: number;
+  declaredValue?: number;
+};
+
+/**
+ * Generate report for Ticket file
+ * @param filePath file absolute path
+ * @param cityId logged user unique city ID
+ */
+export const generateTicketReport = async (filePath: string, cityId: NonNullable<City['id']>) => {
+  // Reading ticket file
+  const ticketFile: TicketItem[] = await csv({ delimiter: ',', flatKeys: true }).fromFile(filePath);
+
+  // Getting relevant info
+  const families = await db.families.findAll({
+    where: { cityId },
+    include: [
+      { model: db.dependents, as: 'dependents' },
+      { model: db.consumptions, as: 'consumptions' }
+    ]
+  });
+  let declaredAllCount = 0;
+  const allBenefits = await db.benefits.findAll({
+    include: [{ model: db.institutions, as: 'institution', where: { cityId } }]
+  });
+
+  // Creating report file
+  const reportPath = `${path.dirname(__dirname)}/../database/storage/ticket_report_${cityId}.csv`;
+  // Create file
+  fs.writeFileSync(reportPath, '');
+  const csvFileWriter = createObjectCsvWriter({
+    path: reportPath,
+    header: [
+      { id: 'responsibleNis', title: 'NIS do responsável' },
+      { id: 'responsibleName', title: 'Nome do responsável' },
+      { id: 'numberOfDependents', title: 'Quantidade de dependentes' },
+      { id: 'balance', title: 'Saldo atual' },
+      { id: 'invalidValue', title: 'Valor inválido declarado' },
+      { id: 'hasDeclaredSomething', title: 'Declarou algo?' },
+      { id: 'hasDeclaredAll', title: 'Declarou tudo?' },
+      { id: 'nextBenefit', title: 'Valor bruto do benefício' },
+      { id: 'nextBenefitWithDiscounts', title: 'Valor do benefício com os descontos' },
+      { id: 'consumedValue', title: 'Valor consumido (Ticket)' },
+      { id: 'declaredValue', title: 'Valor declarado' },
+      { id: 'createdAt', title: 'Data de criação' }
+    ]
+  });
+
+  const report: ReportItem[] = [];
+
+  for (const family of families) {
+    // Generating a report item for each family
+    const reportItem: ReportItem = {};
+
+    // Filling basic data
+    reportItem.createdAt = moment(family.createdAt as Date).format('DD/MM/YYYY');
+    reportItem.responsibleNis = family.responsibleNis;
+    reportItem.responsibleName = family.responsibleName;
+    reportItem.numberOfDependents = family.dependents?.length || 0;
+    reportItem.hasDeclaredSomething = (family.consumptions || []).length > 0 ? 'Sim' : 'Não';
+
+    // Getting family balance
+    const balance = await getFamilyDependentBalance(family, allBenefits);
+
+    reportItem.balance = balance as number;
+    reportItem.declaredValue = family.consumptions?.reduce((sum, item) => sum + (item.value || 0), 0) || 0;
+
+    // Dealing with true consumed values
+    const ticketPurchases = ticketFile.filter((item) => item['Id Adicional'] === family.responsibleNis);
+    reportItem.consumedValue = ticketPurchases.reduce((sum, item) => sum + Number(item['Valor']), 0);
+    const hasDeclaredAll = reportItem.consumedValue === reportItem.consumedValue;
+    reportItem.hasDeclaredAll = hasDeclaredAll ? 'Sim' : 'Não';
+    if (hasDeclaredAll) declaredAllCount++;
+
+    // Getting benefit value
+    const lastBenefit = allBenefits[allBenefits.length - 1];
+    reportItem.nextBenefit = (lastBenefit.value || 0) * (family.dependents || []).length;
+
+    reportItem.invalidValue = (family.consumptions || []).reduce((sum, consumption) => {
+      if (consumption.invalidValue) {
+        // Check for the payment with money
+        const paidWithMoney =
+          consumption.purchaseData?.payment.reduce(
+            (sum, payment) =>
+              payment.name && payment.value && payment.name.toLocaleLowerCase().includes('dinheiro')
+                ? sum + payment.value
+                : sum,
+            0
+          ) || 0;
+        return sum + Math.max(Number(consumption.invalidValue) - paidWithMoney, 0);
+      }
+      return sum;
+    }, 0);
+
+    reportItem.nextBenefitWithDiscounts =
+      reportItem.nextBenefit * (reportItem.hasDeclaredAll ? 1 : 0.7) - reportItem.invalidValue;
+
+    report.push(reportItem);
+  }
+  console.log(report);
+  await csvFileWriter.writeRecords(report);
+
+  console.log(`[report] ${declaredAllCount} declared all`);
+  return path.resolve(reportPath);
 };

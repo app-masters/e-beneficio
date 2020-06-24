@@ -1,4 +1,6 @@
 import { createAction } from '@reduxjs/toolkit';
+import path from 'path';
+import moment from 'moment';
 import { ThunkResult } from '../store';
 import { backend } from '../../utils/networking';
 import { Report } from '../../interfaces/report';
@@ -17,6 +19,10 @@ export const doGetConsumptionFailed = createAction<Error | undefined>('consumpti
 export const doSaveConsumption = createAction<void>('consumption/SAVE');
 export const doSaveConsumptionSuccess = createAction<Consumption>('consumption/SAVE_SUCCESS');
 export const doSaveConsumptionFailed = createAction<Error | undefined>('consumption/SAVE_FAILED');
+
+export const doGetTicketReportFile = createAction<void>('consumption/GET_TICKET_REPORT_FILE');
+export const doGetTicketReportFileSuccess = createAction<void>('consumption/GET_TICKET_REPORT_FILE');
+export const doGetTicketReportFileFailed = createAction<string | undefined>('consumption/GET_TICKET_REPORT_FAILED');
 
 /**
  * Get Consumption Thunk action
@@ -128,6 +134,65 @@ export const requestSaveConsumption = (
       logging.error(error);
       dispatch(doSaveConsumptionFailed(error));
       if (onFailure) onFailure(error);
+    }
+  };
+};
+
+/**
+ * Request Ticket report file
+ */
+export const requestTicketReportFile = (
+  file: File,
+  onSuccess?: () => void,
+  onFailure?: (error?: string) => void
+): ThunkResult<void> => {
+  return async (dispatch) => {
+    /**
+     * Calls the failure functions
+     * @param error The error string
+     */
+    const onError = (error?: string) => {
+      dispatch(doGetTicketReportFileFailed(error));
+      if (onFailure) onFailure(error);
+    };
+
+    try {
+      if (file) {
+        // If the extension is correct
+        if (path.extname(file.name) === '.csv') {
+          // Start request - starting loading state
+          dispatch(doGetTicketReportFile());
+
+          const data = new FormData();
+          data.append('file', file);
+
+          // Request
+          const response = await backend.post<string>(`/consumptions/report-ticket`, data, {
+            timeout: 1000 * 60 * 60 * 6
+          });
+          if (response && response.data && response.status === 200) {
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `Relatorio_Ticket_${moment().format('YYYYMMDDHHmmss')}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            // Request finished
+            dispatch(doGetTicketReportFileSuccess()); // Dispatch result
+            if (onSuccess) onSuccess();
+          } else {
+            // Request without response - probably won't happen, but cancel the request
+            onError(`Ocorreu um erro no servidor. Tente novamente.`);
+          }
+        } else {
+          onError(`O tipo de arquivo precisa ser .csv.`);
+        }
+      } else {
+        onError(`Nenhum arquivo encontrado.`);
+      }
+    } catch (error) {
+      logging.error(error);
+      onError(error.message);
     }
   };
 };
