@@ -28,7 +28,6 @@ export type ProductBalance = {
  * Get balance report by dependent when product
  *
  * @param family the family
- * @param rangeConsumptionDate
  */
 export const getFamilyDependentBalanceProduct = async (family: Family): Promise<ProductBalance> => {
   //Family groupId
@@ -768,9 +767,9 @@ export const getConsumptionPlaceStoreReport = async (rangeConsumption?: Date[] |
   });
 
   await Promise.all(
-    placeStores.map(async (placeStore) => {
+    placeStores.map(async (placeStore: PlaceStore) => {
       await Promise.all(
-        placeStore.families.map(async (family) => {
+        placeStore.families.map(async (family: Family) => {
           family.balance = await getFamilyDependentBalanceProduct(family);
         })
       );
@@ -782,8 +781,8 @@ export const getConsumptionPlaceStoreReport = async (rangeConsumption?: Date[] |
     let familyConsumption = 0;
     let familyAvailable = 0;
     if (placeStore.families)
-      placeStore.families.map((family) => {
-        family.balance?.map((balance) => {
+      placeStore.families.map((family: Family) => {
+        (family.balance as ProductBalance)?.map((balance) => {
           familyConsumption += balance.amountConsumed;
           if (rangeConsumption) {
             if (balance.amountAvailable > 0) {
