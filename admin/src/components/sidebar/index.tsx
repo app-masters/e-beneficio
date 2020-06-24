@@ -11,6 +11,7 @@ import {
   BookOutlined,
   ShoppingCartOutlined,
   SolutionOutlined,
+  FileTextOutlined,
   TeamOutlined
 } from '@ant-design/icons';
 import { Button, Layout, Menu, Popover } from 'antd';
@@ -67,6 +68,23 @@ const routes: RouteItem[] = [
     allowedRoles: ['admin']
   },
   {
+    path: '/relatorios',
+    icon: () => <FileTextOutlined />,
+    name: 'Relatórios',
+    allowedRoles: ['admin'],
+    specificToType: 'product',
+    children: [
+      {
+        path: '/consumo-familia',
+        name: 'Consumo Familia'
+      },
+      {
+        path: '/consumo-estabelecimento',
+        name: 'Consumo Estabelecimento'
+      }
+    ]
+  },
+  {
     path: '/beneficios',
     icon: () => <CarryOutOutlined />,
     name: 'Beneficios',
@@ -78,7 +96,6 @@ const routes: RouteItem[] = [
     name: 'Usuários',
     allowedRoles: ['admin']
   },
-
   // Items only shown in the `ticket` consumption type
   {
     path: '/instituicoes',

@@ -67,6 +67,9 @@ router.post('/image', async (req, res) => {
   }
 });
 
+/**
+ * Report
+ */
 router.get('/report', async (req, res) => {
   try {
     if (!req.user?.cityId) throw Error('User without selected store creating consumption');
@@ -91,6 +94,69 @@ router.get('/report', async (req, res) => {
   } catch (error) {
     logging.error(error);
     return res.status(error.status || 500).send(error.message);
+  }
+});
+
+/**
+ * Report family
+ */
+router.get('/report-family', async (req, res) => {
+  try {
+    if (!req.user?.cityId) throw Error('User without selected store creating consumption');
+    const filters = {
+      rangeFamily: req.query.rangeFamily ? JSON.parse(req.query.rangeFamily as string) : undefined,
+      rangeConsumption: req.query.rangeConsumption ? JSON.parse(req.query.rangeConsumption as string) : undefined,
+      memberCpf: req.query.memberCpf as string,
+      onlyWithoutConsumption: !!req.query.onlyWithoutConsumption
+    };
+    const report = await consumptionModel.getConsumptionFamilyReport(
+      filters.rangeFamily,
+      filters.rangeConsumption,
+      filters.memberCpf,
+      filters.onlyWithoutConsumption
+    );
+    return res.send(report);
+  } catch (error) {
+    logging.error(error);
+    return res.status(error.status || 500).send(error.message);
+  }
+});
+
+/**
+ * Report placeStore
+ */
+router.get('/report-placestore', async (req, res) => {
+  try {
+    // if (!req.user?.cityId) throw Error('User without selected store creating consumption');
+    const filters = {
+      rangeConsumption: req.query.rangeConsumption ? JSON.parse(req.query.rangeConsumption as string) : undefined
+    };
+    const report = await consumptionModel.getConsumptionPlaceStoreReport(filters.rangeConsumption);
+    return res.send(report);
+  } catch (error) {
+    logging.error(error);
+    return res.status(error.status || 500).send(error.message);
+  }
+});
+
+router.post('/report-ticket', async (req, res) => {
+  try {
+    if (!req.user?.cityId) throw Error('User without selected city');
+    // Check files
+    if (!req.files || !req.files.file) {
+      return res.status(400).send('No files were uploaded.');
+    }
+    let file = req.files.file;
+    if (Array.isArray(file)) {
+      file = file[0];
+    }
+
+    // Run the import function, the status will be monitored using the report function/route
+    const filePath = await consumptionModel.generateTicketReport(file.tempFilePath, req.user.cityId);
+    return res.sendFile(filePath);
+  } catch (error) {
+    logging.error(error);
+    return res.status(500).send(error.message);
   }
 });
 

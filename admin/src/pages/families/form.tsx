@@ -35,7 +35,7 @@ const typeFamily = {
  * Form family component
  * @param props component props
  */
-export const FamilyForm: React.FC<RouteComponentProps<{ id: string }>> = (props) => {
+export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (props) => {
   const history = useHistory();
   const dispatch = useDispatch();
   const isCreating = props.match.params.id === 'criar';

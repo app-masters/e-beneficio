@@ -1,6 +1,7 @@
-import { CameraOutlined, QrcodeOutlined, WarningFilled, UploadOutlined } from '@ant-design/icons';
-import { Alert, Button, Card, Checkbox, Form, Input, InputNumber, Modal, Typography, Divider } from 'antd';
+import { CameraOutlined, QrcodeOutlined, WarningFilled, UploadOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Alert, Button, Card, Form, Input, InputNumber, Modal, Typography, Divider, Spin, Upload } from 'antd';
 import { useFormik } from 'formik';
+import { IdcardOutlined } from '@ant-design/icons';
 import React, { useEffect, useRef, useState } from 'react';
 import QrReader from 'react-qr-reader';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,13 +9,17 @@ import { RouteComponentProps, useHistory } from 'react-router-dom';
 import Webcam from 'react-webcam';
 import { Flex } from '../../components/flex';
 import { Family } from '../../interfaces/family';
-import { requestSaveConsumption } from '../../redux/consumption/actions';
+import { requestSaveConsumption, requestTicketReportFile } from '../../redux/consumption/actions';
 import { AppState } from '../../redux/rootReducer';
 import yup from '../../utils/yup';
 import moment from 'moment';
 import { PageContainer, FormImageContainer } from './styles';
 import { ConsumptionFamilySearch } from '../../components/consumptionFamilySearch';
 import { CameraUpload } from './cameraUpload';
+import { User } from '../../interfaces/user';
+import { logging } from '../../lib/logging';
+
+const { Dragger } = Upload;
 
 const schema = yup.object().shape({
   nfce: yup.string().label('Nota fiscal eletrônica'),
@@ -31,10 +36,6 @@ const schema = yup.object().shape({
 const handleQRCode = (value: string | null) => {
   if (!value) return null;
   return value;
-  // https://nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=31200417745613005462650030000484351494810435|2|1|1|d3bfca6136abee66286116203f747bc8e6fd3300
-  // const nfce = value.split('nfce.fazenda.mg.gov.br/portalnfce/sistema/qrcode.xhtml?p=')[1];
-  // if (!nfce) return null; // Not a valid nfce QRCode
-  // return nfce.split('|')[0];
 };
 
 /**
@@ -51,9 +52,12 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
   const [showQRCodeModal, setShowQRCodeModal] = useState(false);
   const [showCameraModal, setShowCameraModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
+  const [cameraFacingMode, setCameraFacingMode] = useState<'user' | 'environment'>('environment');
 
   // Redux state
+  const loggedUser = useSelector<AppState, User | undefined>((state) => state.authReducer.user);
   const family = useSelector<AppState, Family | null | undefined>((state) => state.familiesReducer.familyItem);
+  const loading = useSelector<AppState, boolean>((state) => state.consumptionReducer.loading);
 
   useEffect(() => {
     navigator.permissions
@@ -61,7 +65,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
       .then((value) => {
         setPermission(value.state);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => logging.error(err));
   }, []);
 
   const {
@@ -73,8 +77,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
     status,
     errors,
     touched,
-    setFieldValue,
-    getFieldProps
+    setFieldValue
   } = useFormik({
     initialValues: {
       nfce: '',
@@ -84,7 +87,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
       nisCode: '',
       familyId: '',
       birthday: '',
-      acceptCheck: false
+      acceptCheck: true
     },
     validationSchema: schema,
     onSubmit: (values, { setStatus }) => {
@@ -115,9 +118,6 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
   const invalidValueMeta = getFieldMeta('invalidValue');
   const imageMeta = getFieldMeta('proofImageUrl');
   const nfceMeta = getFieldMeta('nfce');
-
-  const acceptCheckMeta = getFieldMeta('acceptCheck');
-  const acceptCheckField = getFieldProps('acceptCheck');
 
   const invalidConsumptionValue = !!(family && family.balance && values.value > 0 && values.value > family.balance);
   const invalidValueConsumption = !!(values.value < values.invalidValue);
@@ -308,16 +308,29 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                   >
                     <FormImageContainer>
                       {showCamera ? (
-                        <Webcam audio={false} width="100%" ref={cameraRef} />
+                        <Webcam
+                          videoConstraints={{ facingMode: cameraFacingMode }}
+                          audio={false}
+                          width="100%"
+                          ref={cameraRef}
+                        />
                       ) : (
                         <CameraUpload onSetImage={(image: string) => setFieldValue('proofImageUrl', image)} />
                       )}
                     </FormImageContainer>
                     {showCamera ? (
-                      <Button onClick={() => setShowCamera(false)}>
-                        <UploadOutlined />
-                        Enviar arquivo
-                      </Button>
+                      <Flex justifyContent="space-between">
+                        <Button onClick={() => setShowCamera(false)}>
+                          <UploadOutlined />
+                          Enviar arquivo
+                        </Button>
+                        <Button
+                          onClick={() => setCameraFacingMode(cameraFacingMode === 'user' ? 'environment' : 'user')}
+                        >
+                          <ReloadOutlined style={{ fontSize: '0.6rem' }} />
+                          Alternar câmera
+                        </Button>
+                      </Flex>
                     ) : (
                       <Button onClick={() => setShowCamera(true)}>
                         <CameraOutlined />
@@ -338,14 +351,6 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                     <img alt="example" style={{ width: '100%', maxWidth: '600px' }} src={values.proofImageUrl} />
                   </Form.Item>
                 )}
-                <Form.Item
-                  validateStatus={!!acceptCheckMeta.error && !!acceptCheckMeta.touched ? 'error' : ''}
-                  help={!!acceptCheckMeta.error && !!acceptCheckMeta.touched ? acceptCheckMeta.error : undefined}
-                >
-                  <Checkbox checked={values.acceptCheck} {...acceptCheckField}>
-                    Apenas itens contemplados pelo o programa estão incluídos na compra que está sendo inserida
-                  </Checkbox>
-                </Form.Item>
               </>
             )}
           </Form>
@@ -367,6 +372,32 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
         </form>
         {status && <Alert message="Erro no formulário" description={status} type="error" />}
       </Card>
+      {loggedUser && loggedUser.role !== 'operator' && (
+        <Card title="Relatório de consumo Ticket" style={{ marginTop: '20px' }}>
+          <Spin spinning={loading}>
+            <Flex full gap>
+              <div style={{ flex: 1 }}>
+                <Dragger
+                  id="file"
+                  name="file"
+                  accept=".csv"
+                  action={undefined}
+                  showUploadList={false}
+                  customRequest={({ file }) => dispatch(requestTicketReportFile(file))}
+                >
+                  <p className="ant-upload-drag-icon">
+                    <IdcardOutlined />
+                  </p>
+                  <p className="ant-upload-text">
+                    Clique ou arraste um arquivo de consumos da Ticket para gerar o relatório
+                  </p>
+                  <p className="ant-upload-hint">O arquivo precisa ser do tipo CSV</p>
+                </Dragger>
+              </div>
+            </Flex>
+          </Spin>
+        </Card>
+      )}
     </PageContainer>
   );
 };

@@ -1,5 +1,9 @@
 import Sequelize, { Op } from 'sequelize';
 import db from '../schemas';
+import path from 'path';
+import fs from 'fs';
+import csv from 'csvtojson';
+import { createObjectCsvWriter } from 'csv-writer';
 import { Consumption, SequelizeConsumption } from '../schemas/consumptions';
 import { PlaceStore } from '../schemas/placeStores';
 import { Family } from '../schemas/families';
@@ -18,6 +22,7 @@ export type ProductBalance = {
     id?: number | string;
     name?: string;
   };
+  createdAt?: number | Date | null | undefined;
   amountAvailable: number;
   amountGranted: number;
   amountConsumed: number;
@@ -25,6 +30,7 @@ export type ProductBalance = {
 
 /**
  * Get balance report by dependent when product
+ *
  * @param family the family
  */
 export const getFamilyDependentBalanceProduct = async (family: Family): Promise<ProductBalance> => {
@@ -71,6 +77,7 @@ export const getFamilyDependentBalanceProduct = async (family: Family): Promise<
   listOfProductsAvailable.reduce((res, value) => {
     if (!res[value.productId]) {
       res[value.productId] = {
+        createdAt: value.createdAt,
         product: value.product,
         benefitId: value.benefitId,
         productId: value.productId,
@@ -84,7 +91,6 @@ export const getFamilyDependentBalanceProduct = async (family: Family): Promise<
   //Get difference between available products and consumed products
   const differenceProducts = groupedProductsAvailable.map((product) => {
     const items = productsFamilyConsumption.filter((f) => f.productId === product.productId);
-    // const item = productsFamilyConsumption.find((f) => f.productId === product.productId);
     let amount = 0;
     if (items.length > 0)
       amount = items
@@ -101,6 +107,7 @@ export const getFamilyDependentBalanceProduct = async (family: Family): Promise<
     }
     return {
       product: { id: product.product?.id, name: product.product?.name },
+      createdAt: product.createdAt,
       amountAvailable: amountDifference,
       amountGranted: product.amount,
       amountConsumed: amount ? amount : 0
@@ -138,24 +145,36 @@ export const getFamilyDependentBalanceTicket = async (family: Family, availableB
   }
 
   const todayDate = moment();
+  let lastBenefit: Benefit | null = null;
 
   let balance = 0;
   for (const dependent of family.dependents as Dependent[]) {
-    const startDate = moment(dependent.createdAt as Date);
-    const endDate = moment(dependent.deactivatedAt as Date);
+    const dependentCreatedAt = moment(dependent.createdAt as Date);
+    const dependentDeactivatedAt = moment(dependent.deactivatedAt as Date);
 
     for (const benefit of availableBenefits) {
       const benefitDate = moment(benefit.date as Date);
       if (benefit.groupId !== family.groupId) continue; // Don't check if it's from another group
       // Check all the dates
-      const notInFuture = benefitDate.toDate() <= todayDate.endOf('month').toDate();
-      const afterCreation = benefitDate.toDate() >= startDate.startOf('month').toDate();
-      const beforeDeactivation = dependent.deactivatedAt
-        ? benefitDate.toDate() <= endDate.endOf('month').toDate()
+      const dependentRegistredBeforeBenefit = dependentCreatedAt.isSameOrBefore(moment(benefitDate).endOf('month'));
+      const afterBenefitActivation = todayDate.isSameOrAfter(benefitDate);
+      const dependetNotDeactivatedBeforeBenefit = dependent.deactivatedAt
+        ? benefitDate.isSameOrBefore(dependentDeactivatedAt)
         : true;
-      if (benefit.value && notInFuture && afterCreation && beforeDeactivation) {
+
+      if (
+        benefit.value &&
+        dependentRegistredBeforeBenefit &&
+        dependetNotDeactivatedBeforeBenefit &&
+        afterBenefitActivation
+      ) {
         // Valid benefit
         balance += Number(benefit.value);
+
+        // Store the last benefit received
+        if (!lastBenefit || (lastBenefit && moment(lastBenefit.date).isAfter(benefitDate))) {
+          lastBenefit = benefit;
+        }
       }
     }
   }
@@ -167,7 +186,27 @@ export const getFamilyDependentBalanceTicket = async (family: Family, availableB
 
   // Calculating consumption
   const consumption = family.consumptions.reduce((sum, item) => sum + Number(item.value), 0);
-  return balance - consumption;
+
+  // Discount invalid values from future months
+  const sumValue = family.consumptions.reduce((sum, consumption) => {
+    if (consumption.createdAt && moment(consumption.createdAt).isBefore(moment(lastBenefit?.date))) {
+      if (consumption.invalidValue) {
+        // Check for the payment with money
+        const paidWithMoney =
+          consumption.purchaseData?.payment.reduce(
+            (sum, payment) =>
+              payment.name && payment.value && payment.name.toLocaleLowerCase().includes('dinheiro')
+                ? sum + payment.value
+                : sum,
+            0
+          ) || 0;
+        return sum + Math.max(Number(consumption.invalidValue) - paidWithMoney, 0);
+      }
+    }
+    return sum;
+  }, 0);
+
+  return balance - consumption - sumValue;
 };
 
 /**
@@ -632,4 +671,276 @@ export const validateConsumption = async (consumption: Consumption, shouldThrow 
     }
     logging.critical('Failed to validate consumption', error);
   }
+};
+
+/**
+ * Get report for consumptions on the place on the interval
+ *
+ * @param rangeFamily range of family date
+ * @param rangeConsumption range of consumption date
+ * @param memberCpf member cpf
+ * @param onlyWithoutConsumption get only when have consumption
+ * @returns Promise<List of items>
+ */
+export const getConsumptionFamilyReport = async (
+  rangeFamily?: Date[] | string[] | null,
+  rangeConsumption?: Date[] | string[] | null,
+  memberCpf?: string,
+  onlyWithoutConsumption?: boolean
+) => {
+  const placeStores = await db.placeStores.findAll();
+  const familyDate = [
+    moment(rangeFamily ? rangeFamily[0] : undefined)
+      .startOf('day')
+      .toDate(),
+    moment(rangeFamily ? rangeFamily[1] : undefined)
+      .startOf('day')
+      .toDate()
+  ];
+  let families = await db.families.findAll({
+    where: {
+      [Sequelize.Op.and]: [
+        { createdAt: { [Sequelize.Op.gte]: familyDate[0] } },
+        { createdAt: { [Sequelize.Op.lte]: familyDate[1] } }
+      ]
+    },
+    include: [
+      { model: db.consumptions, as: 'consumptions' },
+      { model: db.dependents, as: 'dependents' }
+    ]
+  });
+
+  if (memberCpf) {
+    families = families.filter((family: Family) => {
+      const responsible = family.dependents?.find((dependent: Dependent) => dependent.isResponsible);
+      return responsible?.cpf === memberCpf;
+    });
+  }
+
+  if (onlyWithoutConsumption) {
+    families = families.filter((family: Family) => {
+      return !family.consumptions || family.consumptions?.length === 0;
+    });
+  }
+
+  if (rangeConsumption) {
+    const consumptionDate = [
+      moment(rangeConsumption ? rangeConsumption[0] : undefined)
+        .startOf('day')
+        .toDate(),
+      moment(rangeConsumption ? rangeConsumption[1] : undefined)
+        .startOf('day')
+        .toDate()
+    ];
+    families = families.filter((family: Family) => {
+      const list = family.consumptions?.filter((consumption: Consumption) =>
+        moment(consumption.createdAt as Date).isBetween(moment(consumptionDate[0]), moment(consumptionDate[1]))
+      );
+      return list && list?.length > 0 && family;
+    });
+  }
+  return await Promise.all(
+    families.map(async (family: Family) => {
+      const balance = await getFamilyDependentBalanceProduct(family);
+      const placeStore = placeStores.find((placeStore: PlaceStore) => placeStore.id === family.placeStoreId);
+      return {
+        familyId: family.id,
+        responsible: family.dependents?.find((dependent: Dependent) => dependent.isResponsible),
+        createdAt: family.createdAt,
+        placeStore: placeStore ? placeStore.title : undefined,
+        neverConsumed: !!!family.consumptions || family.consumptions?.length === 0,
+        consumedAll: balance.filter((product) => product.amountAvailable > 0).length === 0
+      };
+    })
+  );
+};
+
+/**
+ * Get report for consumptions on the place on the interval
+ * @param rangeConsumption range of consumption date
+ * @returns Promise<List of items>
+ */
+export const getConsumptionPlaceStoreReport = async (rangeConsumption?: Date[] | string[] | null) => {
+  const placeStores = await db.placeStores.findAll({
+    include: [
+      {
+        model: db.families,
+        as: 'families'
+      }
+    ]
+  });
+
+  await Promise.all(
+    placeStores.map(async (placeStore: PlaceStore) => {
+      await Promise.all(
+        placeStore.families.map(async (family: Family) => {
+          family.balance = await getFamilyDependentBalanceProduct(family);
+        })
+      );
+    })
+  );
+
+  const reportList: any[] = [];
+  placeStores.map((placeStore: PlaceStore) => {
+    let familyConsumption = 0;
+    let familyAvailable = 0;
+    if (placeStore.families)
+      placeStore.families.map((family: Family) => {
+        (family.balance as ProductBalance)?.map((balance) => {
+          familyConsumption += balance.amountConsumed;
+          if (rangeConsumption) {
+            if (balance.amountAvailable > 0) {
+              const isBetween = moment(balance.createdAt as Date).isBetween(
+                moment(rangeConsumption[0]),
+                moment(rangeConsumption[1])
+              );
+              familyAvailable += isBetween ? balance.amountAvailable : 0;
+            } else {
+              familyAvailable += balance.amountAvailable;
+            }
+          } else familyAvailable += balance.amountAvailable;
+        });
+      });
+
+    const report = {
+      placeStore: placeStore.title,
+      familiesAmount: placeStore.families.length,
+      consumedAmount: familyConsumption,
+      consumedAvailable: familyAvailable
+    };
+    reportList.push(report);
+  });
+
+  return reportList;
+};
+
+type TicketItem = {
+  Portador: string;
+  'Id Adicional': string;
+  Cartão: string;
+  'Dt Proces.': string;
+  'Dt Trans.': string;
+  Tipo: string;
+  NSU: string;
+  Estabelecimento: string;
+  Valor: string;
+  Operação: string;
+  Status: string;
+};
+
+type ReportItem = {
+  createdAt?: string;
+  responsibleNis?: string;
+  responsibleName?: string;
+  numberOfDependents?: number;
+  balance?: number;
+  invalidValue?: number;
+  hasDeclaredSomething?: string; // humanized boolean
+  hasDeclaredAll?: string; // humanized boolean
+  nextBenefit?: number;
+  nextBenefitWithDiscounts?: number;
+  consumedValue?: number;
+  declaredValue?: number;
+};
+
+/**
+ * Generate report for Ticket file
+ * @param filePath file absolute path
+ * @param cityId logged user unique city ID
+ */
+export const generateTicketReport = async (filePath: string, cityId: NonNullable<City['id']>) => {
+  // Reading ticket file
+  const ticketFile: TicketItem[] = await csv({ delimiter: ',', flatKeys: true }).fromFile(filePath);
+
+  // Getting relevant info
+  const families = await db.families.findAll({
+    where: { cityId },
+    include: [
+      { model: db.dependents, as: 'dependents' },
+      { model: db.consumptions, as: 'consumptions' }
+    ]
+  });
+  let declaredAllCount = 0;
+  const allBenefits = await db.benefits.findAll({
+    include: [{ model: db.institutions, as: 'institution', where: { cityId } }]
+  });
+
+  // Creating report file
+  const reportPath = `${path.dirname(__dirname)}/../database/storage/ticket_report_${cityId}.csv`;
+  // Create file
+  fs.writeFileSync(reportPath, '');
+  const csvFileWriter = createObjectCsvWriter({
+    path: reportPath,
+    header: [
+      { id: 'responsibleNis', title: 'NIS do responsável' },
+      { id: 'responsibleName', title: 'Nome do responsável' },
+      { id: 'numberOfDependents', title: 'Quantidade de dependentes' },
+      { id: 'balance', title: 'Saldo atual' },
+      { id: 'invalidValue', title: 'Valor inválido declarado' },
+      { id: 'hasDeclaredSomething', title: 'Declarou algo?' },
+      { id: 'hasDeclaredAll', title: 'Declarou tudo?' },
+      { id: 'nextBenefit', title: 'Valor bruto do benefício' },
+      { id: 'nextBenefitWithDiscounts', title: 'Valor do benefício com os descontos' },
+      { id: 'consumedValue', title: 'Valor consumido (Ticket)' },
+      { id: 'declaredValue', title: 'Valor declarado' },
+      { id: 'createdAt', title: 'Data de criação' }
+    ]
+  });
+
+  const report: ReportItem[] = [];
+
+  for (const family of families) {
+    // Generating a report item for each family
+    const reportItem: ReportItem = {};
+
+    // Filling basic data
+    reportItem.createdAt = moment(family.createdAt as Date).format('DD/MM/YYYY');
+    reportItem.responsibleNis = family.responsibleNis;
+    reportItem.responsibleName = family.responsibleName;
+    reportItem.numberOfDependents = family.dependents?.length || 0;
+    reportItem.hasDeclaredSomething = (family.consumptions || []).length > 0 ? 'Sim' : 'Não';
+
+    // Getting family balance
+    const balance = await getFamilyDependentBalance(family, allBenefits);
+
+    reportItem.balance = balance as number;
+    reportItem.declaredValue = family.consumptions?.reduce((sum, item) => sum + (item.value || 0), 0) || 0;
+
+    // Dealing with true consumed values
+    const ticketPurchases = ticketFile.filter((item) => item['Id Adicional'] === family.responsibleNis);
+    reportItem.consumedValue = ticketPurchases.reduce((sum, item) => sum + Number(item['Valor']), 0);
+    const hasDeclaredAll = reportItem.consumedValue === reportItem.consumedValue;
+    reportItem.hasDeclaredAll = hasDeclaredAll ? 'Sim' : 'Não';
+    if (hasDeclaredAll) declaredAllCount++;
+
+    // Getting benefit value
+    const lastBenefit = allBenefits[allBenefits.length - 1];
+    reportItem.nextBenefit = (lastBenefit.value || 0) * (family.dependents || []).length;
+
+    reportItem.invalidValue = (family.consumptions || []).reduce((sum, consumption) => {
+      if (consumption.invalidValue) {
+        // Check for the payment with money
+        const paidWithMoney =
+          consumption.purchaseData?.payment.reduce(
+            (sum, payment) =>
+              payment.name && payment.value && payment.name.toLocaleLowerCase().includes('dinheiro')
+                ? sum + payment.value
+                : sum,
+            0
+          ) || 0;
+        return sum + Math.max(Number(consumption.invalidValue) - paidWithMoney, 0);
+      }
+      return sum;
+    }, 0);
+
+    reportItem.nextBenefitWithDiscounts =
+      reportItem.nextBenefit * (reportItem.hasDeclaredAll ? 1 : 0.7) - reportItem.invalidValue;
+
+    report.push(reportItem);
+  }
+  console.log(report);
+  await csvFileWriter.writeRecords(report);
+
+  console.log(`[report] ${declaredAllCount} declared all`);
+  return path.resolve(reportPath);
 };

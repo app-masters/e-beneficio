@@ -21,14 +21,17 @@ import { UserForm } from './user/form';
 import { InstitutionForm } from './institutions/form';
 import { InstitutionList } from './institutions/list';
 import { FamiliesList } from './families/list';
-import { FamilyForm } from './families/form';
+import { FamiliesForm } from './families/form';
 import { ConsumptionForm } from './consumption';
 import { ReportList } from './report';
+import { ConsumptionFamilyList } from './report/product/consumptionFamily';
+import { ConsumptionPlaceStoreList } from './report/product/consumptionPlaceStore';
 import { ProductValidationList } from './product/validationList';
 import { ProductList } from './product/list';
 import { ProductForm } from './product/form';
 import { FamiliesForm as FamiliesFormProduct } from './families/product/form';
 import { FamiliesList as FamiliesListProduct } from './families/product/list';
+import { FamiliesInfo as FamiliesInfoProduct } from './families/product/info';
 import { GroupList } from './groups/list';
 import { GroupForm } from './groups/form';
 
@@ -73,7 +76,19 @@ const PrivateRouter: React.FC<{}> = () => {
         <Route path="/produtos" component={ProductList} allowedRole="admin" specificToType="product" />
         <Route path="/produtos/:id" component={ProductForm} allowedRole="admin" specificToType="product" />
         {/* Report routes */}
-        <Route path="/relatorios" component={ReportList} allowedRole="admin" />
+        <Route exact path="/relatorios" component={ReportList} allowedRole="admin" specificToType="ticket" />
+        <Route
+          path="/relatorios/consumo-familia"
+          component={ConsumptionFamilyList}
+          allowedRole="admin"
+          specificToType="product"
+        />
+        <Route
+          path="/relatorios/consumo-estabelecimento"
+          component={ConsumptionPlaceStoreList}
+          allowedRole="admin"
+          specificToType="product"
+        />
         {/* Place routes */}
         <Route path="/grupos-de-entidades" component={PlaceList} allowedRole="admin" specificToType="product" />
         <Route path="/grupos-de-entidades/:id" component={PlaceForm} allowedRole="admin" specificToType="product" />
@@ -97,10 +112,30 @@ const PrivateRouter: React.FC<{}> = () => {
         <Route path="/origem-do-beneficio/:id" component={InstitutionForm} allowedRole="admin" />
         {/* Families routes ticket*/}
         <Route path="/familias" component={FamiliesList} allowedRole="admin" specificToType="ticket" />
-        <Route path="/familias/:id" component={FamilyForm} allowedRole="admin" specificToType="ticket" />
+        <Route path="/familias/:id" component={FamiliesForm} allowedRole="admin" specificToType="ticket" />
         {/* Families routes product*/}
         <Route exact path="/familias" component={FamiliesListProduct} allowedRole="admin" specificToType="product" />
-        <Route path="/familias/:id" component={FamiliesFormProduct} allowedRole="admin" specificToType="product" />
+        <Route
+          exact
+          path="/familias/criar"
+          component={FamiliesFormProduct}
+          allowedRole="admin"
+          specificToType="product"
+        />
+        <Route
+          exact
+          path="/familias/:id/editar"
+          component={FamiliesFormProduct}
+          allowedRole="admin"
+          specificToType="product"
+        />
+        <Route
+          exact
+          path="/familias/:id/info"
+          component={FamiliesInfoProduct}
+          allowedRole="admin"
+          specificToType="product"
+        />
         {/* Consumptions routes */}
         <Route path="/consumo" component={ConsumptionForm} allowedRole="admin" />
         {/* Dashboard */}

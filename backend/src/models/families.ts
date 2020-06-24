@@ -17,6 +17,7 @@ import { FamilyItem, SislameItem, OriginalSislameItem, OriginalNurseryItem } fro
 import { Family, SequelizeFamily } from '../schemas/families';
 import { City } from '../schemas/cities';
 import { Dependent } from '../schemas/depedents';
+import { SequelizeConsumption } from '../schemas/consumptions';
 
 type ImportReport = {
   status: 'Em espera' | 'Finalizado' | 'Falhou' | 'Lendo arquivos' | 'Filtrando dados' | 'Salvando' | 'Cruzando dados';
@@ -221,6 +222,32 @@ export const findByCode = async (
 ): Promise<SequelizeFamily & { school?: Dependent['schoolName'] }> => {
   const [family] = await db.families.findAll({
     where: { code: code, cityId },
+    limit: 1,
+    include: [{ model: db.dependents, as: 'dependents' }]
+  });
+
+  if (family && family.dependents) {
+    const responsible = family.dependents?.find((f) => f.isResponsible);
+    if (!responsible) throw { status: 409, message: 'Familia sem responsável.' };
+    else family.dependents = [responsible];
+  } else {
+    throw { status: 409, message: 'Familia não encontrada.' };
+  }
+  return family;
+};
+
+/**
+ * Get all items on the table with filter
+ * @param id searched family id
+ * @param cityId logged user city ID
+ * @returns Promise<List of items>
+ */
+export const findById = async (
+  id: NonNullable<Family['id']>,
+  cityId: NonNullable<City['id']>
+): Promise<SequelizeFamily & { school?: Dependent['schoolName'] }> => {
+  const [family] = await db.families.findAll({
+    where: { id, cityId },
     limit: 1,
     include: [{ model: db.dependents, as: 'dependents' }]
   });
@@ -1002,4 +1029,23 @@ export const generateListFile = async (cityId: NonNullable<City['id']>) => {
   });
   await csvFileWriter.writeRecords(fileFamilies);
   return path.resolve(filePath);
+};
+
+/**
+ * List family consumptions
+ * @param id FamilyId
+ */
+export const getFamilyConsumption = async (id: number | string): Promise<SequelizeConsumption[]> => {
+  const family = await db.families.findOne({ where: { id } });
+  if (!family) {
+    throw { status: 412, message: 'Família não encontrada.' };
+  }
+  // Get all consumptions already made
+  const consumption = await db.consumptions.findAll({
+    where: { familyId: family.id as number },
+    include: [
+      { model: db.consumptionProducts, as: 'consumptionProducts', include: [{ model: db.products, as: 'product' }] }
+    ]
+  });
+  return consumption;
 };

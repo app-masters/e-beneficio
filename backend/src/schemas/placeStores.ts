@@ -1,4 +1,5 @@
 import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize';
+import { Family } from './families';
 
 // Simple item type
 export interface PlaceStore {
@@ -11,6 +12,8 @@ export interface PlaceStore {
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
+  //Join
+  families: Family[];
 }
 // Sequelize returns type
 export type SequelizePlaceStore = PlaceStore & Model;
