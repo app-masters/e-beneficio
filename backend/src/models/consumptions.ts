@@ -832,15 +832,16 @@ type ReportItem = {
   createdAt?: string;
   responsibleNis?: string;
   responsibleName?: string;
-  numberOfDependents?: number;
-  balance?: number;
-  invalidValue?: number;
+  numberOfDependents?: number | string;
+  balance?: number | string;
+  invalidValue?: number | string;
   hasDeclaredSomething?: string; // humanized boolean
+  hasConsumedSomething?: string; // humanized boolean
   hasDeclaredAll?: string; // humanized boolean
-  nextBenefit?: number;
-  nextBenefitWithDiscounts?: number;
-  consumedValue?: number;
-  declaredValue?: number;
+  nextBenefit?: number | string;
+  nextBenefitWithDiscounts?: number | string;
+  consumedValue?: number | string;
+  declaredValue?: number | string;
 };
 
 /**
@@ -875,14 +876,15 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
       { id: 'responsibleNis', title: 'NIS do responsável' },
       { id: 'responsibleName', title: 'Nome do responsável' },
       { id: 'numberOfDependents', title: 'Quantidade de dependentes' },
+      { id: 'hasDeclaredAll', title: 'Declarou tudo?' },
+      { id: 'hasDeclaredSomething', title: 'Declarou algo?' },
+      { id: 'hasConsumedSomething', title: 'Consumiu algo? (Ticket)' },
+      { id: 'declaredValue', title: 'Valor declarado' },
+      { id: 'consumedValue', title: 'Valor consumido (Ticket)' },
       { id: 'balance', title: 'Saldo atual' },
       { id: 'invalidValue', title: 'Valor inválido declarado' },
-      { id: 'hasDeclaredSomething', title: 'Declarou algo?' },
-      { id: 'hasDeclaredAll', title: 'Declarou tudo?' },
       { id: 'nextBenefit', title: 'Valor bruto do benefício' },
       { id: 'nextBenefitWithDiscounts', title: 'Valor do benefício com os descontos' },
-      { id: 'consumedValue', title: 'Valor consumido (Ticket)' },
-      { id: 'declaredValue', title: 'Valor declarado' },
       { id: 'createdAt', title: 'Data de criação' }
     ]
   });
@@ -908,8 +910,9 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
 
     // Dealing with true consumed values
     const ticketPurchases = ticketFile.filter((item) => item['Id Adicional'] === family.responsibleNis);
+    reportItem.hasConsumedSomething = ticketPurchases.length > 0 ? 'Sim' : 'Não';
     reportItem.consumedValue = ticketPurchases.reduce((sum, item) => sum + Number(item['Valor']), 0);
-    const hasDeclaredAll = reportItem.consumedValue === reportItem.consumedValue;
+    const hasDeclaredAll = Math.abs(reportItem.declaredValue - reportItem.consumedValue) < 1;
     reportItem.hasDeclaredAll = hasDeclaredAll ? 'Sim' : 'Não';
     if (hasDeclaredAll) declaredAllCount++;
 
@@ -934,9 +937,16 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
     }, 0);
 
     reportItem.nextBenefitWithDiscounts =
-      reportItem.nextBenefit * (reportItem.hasDeclaredAll ? 1 : 0.7) - reportItem.invalidValue;
+      reportItem.nextBenefit * (reportItem.hasDeclaredAll ? 1 : 0.7) - Number(reportItem.invalidValue);
 
     report.push(reportItem);
+
+    // Making money the right format
+    reportItem.invalidValue = reportItem.invalidValue.toFixed(2).replace('.', ',');
+    reportItem.consumedValue = reportItem.consumedValue.toFixed(2).replace('.', ',');
+    reportItem.declaredValue = reportItem.declaredValue.toFixed(2).replace('.', ',');
+    reportItem.nextBenefit = reportItem.nextBenefit.toFixed(2).replace('.', ',');
+    reportItem.nextBenefitWithDiscounts = reportItem.nextBenefitWithDiscounts.toFixed(2).replace('.', ',');
   }
   console.log(report);
   await csvFileWriter.writeRecords(report);
