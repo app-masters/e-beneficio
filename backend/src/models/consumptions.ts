@@ -23,6 +23,7 @@ export type ProductBalance = {
     id?: number | string;
     name?: string;
   };
+  createdAt?: number | Date | null | undefined;
   amountAvailable: number;
   amountGranted: number;
   amountConsumed: number;
@@ -30,6 +31,7 @@ export type ProductBalance = {
 
 /**
  * Get balance report by dependent when product
+ *
  * @param family the family
  */
 export const getFamilyDependentBalanceProduct = async (family: Family): Promise<ProductBalance> => {
@@ -76,6 +78,7 @@ export const getFamilyDependentBalanceProduct = async (family: Family): Promise<
   listOfProductsAvailable.reduce((res, value) => {
     if (!res[value.productId]) {
       res[value.productId] = {
+        createdAt: value.createdAt,
         product: value.product,
         benefitId: value.benefitId,
         productId: value.productId,
@@ -89,7 +92,6 @@ export const getFamilyDependentBalanceProduct = async (family: Family): Promise<
   //Get difference between available products and consumed products
   const differenceProducts = groupedProductsAvailable.map((product) => {
     const items = productsFamilyConsumption.filter((f) => f.productId === product.productId);
-    // const item = productsFamilyConsumption.find((f) => f.productId === product.productId);
     let amount = 0;
     if (items.length > 0)
       amount = items
@@ -106,6 +108,7 @@ export const getFamilyDependentBalanceProduct = async (family: Family): Promise<
     }
     return {
       product: { id: product.product?.id, name: product.product?.name },
+      createdAt: product.createdAt,
       amountAvailable: amountDifference,
       amountGranted: product.amount,
       amountConsumed: amount ? amount : 0
@@ -696,7 +699,12 @@ export const getConsumptionFamilyReport = async (
       .toDate()
   ];
   let families = await db.families.findAll({
-    where: { createdAt: { [Sequelize.Op.between]: familyDate as Date[] } },
+    where: {
+      [Sequelize.Op.and]: [
+        { createdAt: { [Sequelize.Op.gte]: familyDate[0] } },
+        { createdAt: { [Sequelize.Op.lte]: familyDate[1] } }
+      ]
+    },
     include: [
       { model: db.consumptions, as: 'consumptions' },
       { model: db.dependents, as: 'dependents' }
@@ -704,14 +712,14 @@ export const getConsumptionFamilyReport = async (
   });
 
   if (memberCpf) {
-    families = families.filter((family) => {
-      const responsible = family.dependents?.find((dependent) => dependent.isResponsible);
+    families = families.filter((family: Family) => {
+      const responsible = family.dependents?.find((dependent: Dependent) => dependent.isResponsible);
       return responsible?.cpf === memberCpf;
     });
   }
 
   if (onlyWithoutConsumption) {
-    families = families.filter((family) => {
+    families = families.filter((family: Family) => {
       return !family.consumptions || family.consumptions?.length === 0;
     });
   }
@@ -725,20 +733,20 @@ export const getConsumptionFamilyReport = async (
         .startOf('day')
         .toDate()
     ];
-    families = families.filter((family) => {
-      const list = family.consumptions?.filter((consumption) =>
+    families = families.filter((family: Family) => {
+      const list = family.consumptions?.filter((consumption: Consumption) =>
         moment(consumption.createdAt as Date).isBetween(moment(consumptionDate[0]), moment(consumptionDate[1]))
       );
       return list && list?.length > 0 && family;
     });
   }
   return await Promise.all(
-    families.map(async (family) => {
+    families.map(async (family: Family) => {
       const balance = await getFamilyDependentBalanceProduct(family);
-      const placeStore = placeStores.find((placeStore) => placeStore.id === family.placeStoreId);
+      const placeStore = placeStores.find((placeStore: PlaceStore) => placeStore.id === family.placeStoreId);
       return {
         familyId: family.id,
-        responsible: family.dependents?.find((dependent) => dependent.isResponsible),
+        responsible: family.dependents?.find((dependent: Dependent) => dependent.isResponsible),
         createdAt: family.createdAt,
         placeStore: placeStore ? placeStore.title : undefined,
         neverConsumed: !!!family.consumptions || family.consumptions?.length === 0,
@@ -746,6 +754,65 @@ export const getConsumptionFamilyReport = async (
       };
     })
   );
+};
+
+/**
+ * Get report for consumptions on the place on the interval
+ * @param rangeConsumption range of consumption date
+ * @returns Promise<List of items>
+ */
+export const getConsumptionPlaceStoreReport = async (rangeConsumption?: Date[] | string[] | null) => {
+  const placeStores = await db.placeStores.findAll({
+    include: [
+      {
+        model: db.families,
+        as: 'families'
+      }
+    ]
+  });
+
+  await Promise.all(
+    placeStores.map(async (placeStore: PlaceStore) => {
+      await Promise.all(
+        placeStore.families.map(async (family: Family) => {
+          family.balance = await getFamilyDependentBalanceProduct(family);
+        })
+      );
+    })
+  );
+
+  const reportList: any[] = [];
+  placeStores.map((placeStore: PlaceStore) => {
+    let familyConsumption = 0;
+    let familyAvailable = 0;
+    if (placeStore.families)
+      placeStore.families.map((family: Family) => {
+        (family.balance as ProductBalance)?.map((balance) => {
+          familyConsumption += balance.amountConsumed;
+          if (rangeConsumption) {
+            if (balance.amountAvailable > 0) {
+              const isBetween = moment(balance.createdAt as Date).isBetween(
+                moment(rangeConsumption[0]),
+                moment(rangeConsumption[1])
+              );
+              familyAvailable += isBetween ? balance.amountAvailable : 0;
+            } else {
+              familyAvailable += balance.amountAvailable;
+            }
+          } else familyAvailable += balance.amountAvailable;
+        });
+      });
+
+    const report = {
+      placeStore: placeStore.title,
+      familiesAmount: placeStore.families.length,
+      consumedAmount: familyConsumption,
+      consumedAvailable: familyAvailable
+    };
+    reportList.push(report);
+  });
+
+  return reportList;
 };
 
 type TicketItem = {

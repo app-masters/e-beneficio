@@ -5,9 +5,12 @@ import {
   doGetConsumptionFailed,
   doGetConsumptionFamily,
   doGetConsumptionFamilySuccess,
-  doGetConsumptionFamilyFailed
+  doGetConsumptionFamilyFailed,
+  doGetConsumptionPlaceStore,
+  doGetConsumptionPlaceStoreSuccess,
+  doGetConsumptionPlaceStoreFailed
 } from './actions';
-import { Report, ReportConsumptionFamily } from '../../interfaces/report';
+import { Report, ReportConsumptionFamily, ReportConsumptionPlaceStore } from '../../interfaces/report';
 
 export interface ReportReducerState {
   item?: Report;
@@ -17,11 +20,16 @@ export interface ReportReducerState {
   consumptionFamily?: ReportConsumptionFamily[];
   consumptionFamilyLoading: boolean;
   consumptionFamilyError?: Error;
+
+  consumptionPlaceStore?: ReportConsumptionPlaceStore[];
+  consumptionPlaceStoreLoading: boolean;
+  consumptionPlaceStoreError?: Error;
 }
 
 const initialState = {
   loading: false,
-  consumptionFamilyLoading: false
+  consumptionFamilyLoading: false,
+  consumptionPlaceStoreLoading: false
 };
 
 export default createReducer<ReportReducerState>(initialState, (builder) =>
@@ -47,9 +55,24 @@ export default createReducer<ReportReducerState>(initialState, (builder) =>
     .addCase(doGetConsumptionFamilySuccess, (state, action) => {
       state.consumptionFamilyLoading = false;
       state.consumptionFamily = action.payload;
+      state.consumptionFamilyError = undefined;
     })
     .addCase(doGetConsumptionFamilyFailed, (state, action) => {
       state.consumptionFamilyLoading = false;
       state.consumptionFamilyError = action.payload;
+    })
+    // Get ConsumptionPlaceStore
+    .addCase(doGetConsumptionPlaceStore, (state) => {
+      state.consumptionPlaceStoreLoading = true;
+      state.consumptionPlaceStoreError = undefined;
+    })
+    .addCase(doGetConsumptionPlaceStoreSuccess, (state, action) => {
+      state.consumptionPlaceStoreLoading = false;
+      state.consumptionPlaceStore = action.payload;
+      state.consumptionPlaceStoreError = undefined;
+    })
+    .addCase(doGetConsumptionPlaceStoreFailed, (state, action) => {
+      state.consumptionPlaceStoreLoading = false;
+      state.consumptionPlaceStoreError = action.payload;
     })
 );

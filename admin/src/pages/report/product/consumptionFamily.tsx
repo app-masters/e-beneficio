@@ -34,7 +34,7 @@ export const ConsumptionFamilyList: React.FC<{}> = () => {
   const loading = useSelector<AppState, boolean>(({ reportReducer }) => reportReducer.consumptionFamilyLoading);
 
   const initialValues = React.useMemo(() => {
-    const localFilter = localStorage.getItem('e-beneficio-report-consumption-filter');
+    const localFilter = localStorage.getItem('e-beneficio-report-consumption-family-filter');
     if (localFilter) {
       const filter = JSON.parse(localFilter);
 
@@ -61,7 +61,7 @@ export const ConsumptionFamilyList: React.FC<{}> = () => {
     validationSchema: schema,
     onSubmit: (values, { setStatus }) => {
       setStatus();
-      localStorage.setItem('e-beneficio-report-consumption-filter', JSON.stringify(values));
+      localStorage.setItem('e-beneficio-report-consumption-family-filter', JSON.stringify(values));
       dispatch(
         requestGetConsumptionFamily(
           values.rangeFamily,
