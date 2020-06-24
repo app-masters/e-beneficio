@@ -16,7 +16,6 @@ import { Benefit } from '../schemas/benefits';
 import { Dependent } from '../schemas/depedents';
 import { scrapeNFCeData } from '../utils/nfceScraper';
 import { SequelizeProduct } from '../schemas/products';
-import { last } from 'lodash';
 
 export type ProductBalance = {
   product: {

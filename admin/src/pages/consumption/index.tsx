@@ -77,8 +77,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
     status,
     errors,
     touched,
-    setFieldValue,
-    getFieldProps
+    setFieldValue
   } = useFormik({
     initialValues: {
       nfce: '',
