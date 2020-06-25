@@ -40,7 +40,7 @@ export const PlaceStoreList: React.FC<{}> = () => {
       >
         <Table dataSource={list}>
           <Table.Column
-            title="Entidade"
+            title="Grupo de entidade"
             dataIndex="placeId"
             render={(data: PlaceStore['placeId']) =>
               placeLoading || !placeList || placeList.length <= 0 ? (
