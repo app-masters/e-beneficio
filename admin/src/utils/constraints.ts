@@ -21,7 +21,8 @@ export const roleList = {
   admin: { title: 'Administrador' },
   operator: { title: 'Operador' },
   manager: { title: 'Gerente' },
-  financial: { title: 'Financeiro' }
+  financial: { title: 'Financeiro' },
+  cashier: { title: 'Caixa' }
 };
 
 /**

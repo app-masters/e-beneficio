@@ -5,7 +5,6 @@ import {
   MenuUnfoldOutlined,
   HomeOutlined,
   UserOutlined,
-  ShopOutlined,
   IdcardOutlined
 } from '@ant-design/icons';
 import { Button, Layout, Menu, Popover } from 'antd';
@@ -31,6 +30,7 @@ interface RouteItem {
   name: string;
   children?: RouteItem[];
   disabled?: boolean;
+  allowedRoles?: string[];
 }
 
 /**
@@ -39,10 +39,14 @@ interface RouteItem {
  * @param parentPath the current menu path in the tree(accounting its parent)
  * @param onClick callback for click
  */
-const menuItem = (item: RouteItem, parentPath: string, onClick: () => void) => {
+const menuItem = (item: RouteItem, parentPath: string, onClick: () => void, userRole: User['role']) => {
   const key = `${parentPath}${item.path}`;
   const maxLength = 30;
   const name = item.name.length > maxLength ? `${item.name.slice(0, maxLength - 3)}...` : item.name;
+
+  // Only show the menu item if the user is allowed to see it
+  if ((item.allowedRoles && userRole && item.allowedRoles.indexOf(userRole) === -1) || (item.allowedRoles && !userRole))
+    return null;
 
   /**
    * A component that returns the menu item inner content
@@ -54,7 +58,7 @@ const menuItem = (item: RouteItem, parentPath: string, onClick: () => void) => {
     </>
   );
 
-  const childItems = item.children?.map((navLink) => menuItem(navLink, key, onClick));
+  const childItems = item.children?.map((navLink) => menuItem(navLink, key, onClick, userRole));
 
   return item.children ? (
     item.group ? (
@@ -91,29 +95,19 @@ export const Sidebar: React.FC = (props) => {
     {
       path: '/familias',
       icon: () => <IdcardOutlined />,
-      name: 'Famílias'
+      name: 'Famílias',
+      allowedRoles: ['admin', 'finacial', 'manager', 'operator'] // Not cashier
     },
     {
       path: '/consumo',
       icon: () => <CarryOutOutlined />,
       name: 'Informar consumo'
-    }
-  ];
-
-  const privateRoutes: RouteItem[] = [];
-
-  const adminRoutes: RouteItem[] = [
+    },
     {
       path: '/usuarios',
       icon: () => <UserOutlined />,
       name: 'Usuários',
-      disabled: currentUser.role !== 'manager'
-    },
-    {
-      path: '/lojas',
-      icon: () => <ShopOutlined />,
-      name: 'Lojas',
-      disabled: currentUser.role !== 'manager'
+      allowedRoles: ['manager']
     }
   ];
 
@@ -148,13 +142,7 @@ export const Sidebar: React.FC = (props) => {
           <MenuHeight>
             <Menu theme="light" mode="inline" defaultSelectedKeys={[location ? location.pathname : '/']}>
               {/* Render the links based on the nav arrays */}
-              {routes.map((navLink) => menuItem(navLink, '', () => setCollapsed(true)))}
-              {currentUser.role !== 'operator'
-                ? privateRoutes.map((navLink) => menuItem(navLink, '', () => setCollapsed(true)))
-                : null}
-              {currentUser.role === 'manager'
-                ? adminRoutes.map((navLink) => menuItem(navLink, '', () => setCollapsed(true)))
-                : null}
+              {routes.map((navLink) => menuItem(navLink, '', () => setCollapsed(true), currentUser.role))}
             </Menu>
           </MenuHeight>
           <Flex vertical={collapsed} alignItems="center" gap="sm" justifyContent="space-between">

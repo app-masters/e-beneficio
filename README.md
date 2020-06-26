@@ -55,7 +55,7 @@ npm run seed
 `IMPORTANTE:` Ao rodar o seed pela primeira vez, o seed `users` irá criar um usuário para cada role existente no sistema, seguindo o seguinte padrão: 
 
 ```
-Role: admin or manager or financial or operator
+Role: admin or manager or financial or operator or cashier
 Email: {role}@login.com
 Password: {role}
 ```
