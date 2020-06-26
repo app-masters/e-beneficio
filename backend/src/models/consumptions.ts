@@ -16,6 +16,7 @@ import { Benefit } from '../schemas/benefits';
 import { Dependent } from '../schemas/depedents';
 import { scrapeNFCeData } from '../utils/nfceScraper';
 import { SequelizeProduct } from '../schemas/products';
+import { allowedNamesList, allowedNISList } from '../utils/constraints';
 
 export type ProductBalance = {
   product: {
@@ -835,13 +836,15 @@ type ReportItem = {
   numberOfDependents?: number | string;
   balance?: number | string;
   invalidValue?: number | string;
-  hasDeclaredSomething?: string; // humanized boolean
-  hasConsumedSomething?: string; // humanized boolean
-  hasDeclaredAll?: string; // humanized boolean
+  hasDeclaredSomething?: string | boolean; // humanized boolean
+  hasConsumedSomething?: string | boolean; // humanized boolean
+  hasDeclaredAll?: string | boolean; // humanized boolean
   nextBenefit?: number | string;
   nextBenefitWithDiscounts?: number | string;
   consumedValue?: number | string;
   declaredValue?: number | string;
+  nisOnList?: string | boolean;
+  nameOnList?: string | boolean;
 };
 
 /**
@@ -885,6 +888,8 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
       { id: 'invalidValue', title: 'Valor inválido declarado' },
       { id: 'nextBenefit', title: 'Valor bruto do benefício' },
       { id: 'nextBenefitWithDiscounts', title: 'Valor do benefício com os descontos' },
+      { id: 'nisOnList', title: 'NIS nas exceções' },
+      { id: 'nameOnList', title: 'Nome nas exceções' },
       { id: 'createdAt', title: 'Data de criação' }
     ]
   });
@@ -900,7 +905,7 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
     reportItem.responsibleNis = family.responsibleNis;
     reportItem.responsibleName = family.responsibleName;
     reportItem.numberOfDependents = family.dependents?.length || 0;
-    reportItem.hasDeclaredSomething = (family.consumptions || []).length > 0 ? 'Sim' : 'Não';
+    reportItem.hasDeclaredSomething = (family.consumptions || []).length > 0;
 
     // Getting family balance
     const balance = await getFamilyDependentBalance(family, allBenefits);
@@ -910,10 +915,10 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
 
     // Dealing with true consumed values
     const ticketPurchases = ticketFile.filter((item) => item['Id Adicional'] === family.responsibleNis);
-    reportItem.hasConsumedSomething = ticketPurchases.length > 0 ? 'Sim' : 'Não';
+    reportItem.hasConsumedSomething = ticketPurchases.length > 0;
     reportItem.consumedValue = ticketPurchases.reduce((sum, item) => sum + Number(item['Valor']), 0);
     const hasDeclaredAll = Math.abs(reportItem.declaredValue - reportItem.consumedValue) < 1;
-    reportItem.hasDeclaredAll = hasDeclaredAll ? 'Sim' : 'Não';
+    reportItem.hasDeclaredAll = hasDeclaredAll;
     if (hasDeclaredAll) declaredAllCount++;
 
     // Getting benefit value
@@ -936,10 +941,26 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
       return sum;
     }, 0);
 
-    reportItem.nextBenefitWithDiscounts =
-      reportItem.nextBenefit * (hasDeclaredAll ? 1 : 0.7) - Number(reportItem.invalidValue);
+    reportItem.nameOnList = allowedNamesList.indexOf(family.responsibleName as string) > -1;
+    reportItem.nisOnList = allowedNISList.indexOf(family.responsibleNis as string) > -1;
+
+    if (!reportItem.nameOnList && !reportItem.nisOnList) {
+      reportItem.nextBenefitWithDiscounts =
+        reportItem.nextBenefit * (reportItem.hasDeclaredSomething ? 1 : 0.7) - Number(reportItem.invalidValue);
+    } else {
+      reportItem.nextBenefitWithDiscounts = reportItem.nextBenefit - Number(reportItem.invalidValue);
+    }
+
+    reportItem.nextBenefitWithDiscounts = Math.max(reportItem.nextBenefitWithDiscounts, 0);
 
     report.push(reportItem);
+
+    // Humanizing booleans
+    reportItem.nameOnList = reportItem.nameOnList ? 'Sim' : 'Não';
+    reportItem.nisOnList = reportItem.nisOnList ? 'Sim' : 'Não';
+    reportItem.hasDeclaredSomething = reportItem.hasDeclaredSomething ? 'Sim' : 'Não';
+    reportItem.hasDeclaredAll = reportItem.hasDeclaredAll ? 'Sim' : 'Não';
+    reportItem.hasConsumedSomething = reportItem.hasConsumedSomething ? 'Sim' : 'Não';
 
     // Making money the right format
     reportItem.invalidValue = reportItem.invalidValue.toFixed(2).replace('.', ',');
@@ -948,7 +969,6 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
     reportItem.nextBenefit = reportItem.nextBenefit.toFixed(2).replace('.', ',');
     reportItem.nextBenefitWithDiscounts = reportItem.nextBenefitWithDiscounts.toFixed(2).replace('.', ',');
   }
-  console.log(report);
   await csvFileWriter.writeRecords(report);
 
   console.log(`[report] ${declaredAllCount} declared all`);
