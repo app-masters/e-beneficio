@@ -937,7 +937,7 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
     }, 0);
 
     reportItem.nextBenefitWithDiscounts =
-      reportItem.nextBenefit * (reportItem.hasDeclaredAll ? 1 : 0.7) - Number(reportItem.invalidValue);
+      reportItem.nextBenefit * (hasDeclaredAll ? 1 : 0.7) - Number(reportItem.invalidValue);
 
     report.push(reportItem);
 
