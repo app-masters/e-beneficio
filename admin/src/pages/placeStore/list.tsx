@@ -7,7 +7,7 @@ import { PlaceStore } from '../../interfaces/placeStore';
 import { requestDeletePlaceStore, requestGetPlaceStore } from '../../redux/placeStore/actions';
 import { AppState } from '../../redux/rootReducer';
 import { ActionWrapper, PageContainer } from './styles';
-import { formatCNPJ } from '../../utils/string';
+import { formatCNPJ, formatPhone } from '../../utils/string';
 import { Place } from '../../interfaces/place';
 import { requestGetPlace } from '../../redux/place/actions';
 
@@ -40,7 +40,7 @@ export const PlaceStoreList: React.FC<{}> = () => {
       >
         <Table dataSource={list}>
           <Table.Column
-            title="Entidade"
+            title="Grupo de entidade"
             dataIndex="placeId"
             render={(data: PlaceStore['placeId']) =>
               placeLoading || !placeList || placeList.length <= 0 ? (
@@ -57,6 +57,9 @@ export const PlaceStoreList: React.FC<{}> = () => {
             render={(data: PlaceStore['cnpj']) => (data !== '' ? formatCNPJ(data) : 'Não informado')}
           />
           <Table.Column title="Endereço" dataIndex="address" />
+          <Table.Column title="Responsável" dataIndex="responsibleName" />
+          <Table.Column title="Telefone" dataIndex="responsiblePhone" render={(data) => formatPhone(data)} />
+          <Table.Column title="Email" dataIndex="responsibleEmail" />
           <Table.Column
             render={(item: PlaceStore) => {
               return (

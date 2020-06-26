@@ -9,6 +9,9 @@ export interface PlaceStore {
   title: string;
   address: string;
   cnpj: string;
+  responsibleName?: string;
+  responsiblePhone?: string;
+  responsibleEmail?: string;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
@@ -59,6 +62,18 @@ export const attributes = {
   cnpj: {
     type: DataTypes.STRING(50),
     allowNull: false
+  },
+  responsibleName: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  responsiblePhone: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  responsibleEmail: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 };
 

@@ -33,6 +33,14 @@ const list = [
     email: 'operator@login.com',
     password: 'operator',
     active: true
+  },
+  {
+    name: 'Usuário caixa (estabelecimento)',
+    role: 'cashier',
+    cpf: '00000000003',
+    email: 'cashier@login.com',
+    password: 'cashier',
+    active: true
   }
 ] as User[];
 

@@ -1,4 +1,4 @@
-import { Alert, Form, Modal, Input, Select, Spin } from 'antd';
+import { Alert, Form, Modal, Input, Select, Spin, Divider } from 'antd';
 import { useFormik } from 'formik';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,7 +10,7 @@ import { requestGetPlace } from '../../redux/place/actions';
 import { Place } from '../../interfaces/place';
 import { requestSavePlaceStore } from '../../redux/placeStore/actions';
 import { InputFormatter } from '../../components/inputFormatter';
-import { formatCNPJ } from '../../utils/string';
+import { formatCNPJ, formatPhone } from '../../utils/string';
 import { env } from '../../env';
 
 // Application consumption type
@@ -21,7 +21,10 @@ const { Option } = Select;
 const schema = yup.object().shape({
   title: yup.string().label('Nome').required(),
   placeId: yup.number().label('Grupo da Entidade').required(),
-  address: yup.string().label('Endereço').required()
+  address: yup.string().label('Endereço').required(),
+  responsibleName: yup.string().label('Nome do responsável'),
+  responsiblePhone: yup.string().label('Telefone do responsável'),
+  responsibleEmail: yup.string().label('Email do responsável')
 });
 
 /**
@@ -65,7 +68,10 @@ export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (pr
       placeId: !placeLoading && placeList && placeList.length > 0 ? placeList[0].id : -1,
       title: '',
       cnpj: '',
-      address: ''
+      address: '',
+      responsibleName: '',
+      responsiblePhone: '',
+      responsibleEmail: ''
     },
     validationSchema: schema,
     onSubmit: (values, { setStatus }) => {
@@ -83,6 +89,9 @@ export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (pr
   const titleMeta = getFieldMeta('title');
   const cnpjMeta = getFieldMeta('cnpj');
   const addressMeta = getFieldMeta('address');
+  const responsibleNameMeta = getFieldMeta('responsibleName');
+  const responsiblePhoneMeta = getFieldMeta('responsiblePhone');
+  const responsibleEmailMeta = getFieldMeta('responsibleEmail');
   const placeIdMeta = getFieldMeta('placeId');
 
   return (
@@ -161,6 +170,54 @@ export const PlaceStoreForm: React.FC<RouteComponentProps<{ id: string }>> = (pr
               onChange={handleChange}
               value={values.address}
               onPressEnter={submitForm}
+            />
+          </Form.Item>
+          <Divider />
+          <Form.Item
+            label={'Nome do responsável'}
+            validateStatus={!!responsibleNameMeta.error && !!responsibleNameMeta.touched ? 'error' : ''}
+            help={!!responsibleNameMeta.error && !!responsibleNameMeta.touched ? responsibleNameMeta.error : undefined}
+          >
+            <InputFormatter
+              id="responsibleName"
+              name="responsibleName"
+              onPressEnter={submitForm}
+              value={values.responsibleName}
+              setValue={(value) => setFieldValue('responsibleName', value)}
+              formatter={(value) => value}
+              parser={(value) => value}
+            />
+          </Form.Item>
+          <Form.Item
+            label={'Telefone do responsável'}
+            validateStatus={!!responsiblePhoneMeta.error && !!responsiblePhoneMeta.touched ? 'error' : ''}
+            help={
+              !!responsiblePhoneMeta.error && !!responsiblePhoneMeta.touched ? responsiblePhoneMeta.error : undefined
+            }
+          >
+            <InputFormatter
+              id="responsiblePhone"
+              name="responsiblePhone"
+              onPressEnter={submitForm}
+              value={values.responsiblePhone}
+              setValue={(value) => setFieldValue('responsiblePhone', value)}
+              formatter={(value) => formatPhone(value?.toString())}
+              parser={(value) => (value ? value.replace(/[^\w\s]/gi, '').trim() : '')}
+            />
+          </Form.Item>
+          <Form.Item
+            label={'Email do responsável'}
+            validateStatus={!!responsibleEmailMeta.error && !!responsibleEmailMeta.touched ? 'error' : ''}
+            help={
+              !!responsibleEmailMeta.error && !!responsibleEmailMeta.touched ? responsibleEmailMeta.error : undefined
+            }
+          >
+            <InputFormatter
+              id="responsibleEmail"
+              name="responsibleEmail"
+              onPressEnter={submitForm}
+              value={values.responsibleEmail}
+              setValue={(value) => setFieldValue('responsibleEmail', value)}
             />
           </Form.Item>
         </Form>
