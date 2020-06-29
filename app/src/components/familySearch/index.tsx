@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Alert, Button, Descriptions, Form, Input, Typography } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { Flex } from '../flex';
@@ -7,6 +7,7 @@ import { AppState } from '../../redux/rootReducer';
 import { requestGetFamily } from '../../redux/family/actions';
 import { Family } from '../../interfaces/family';
 import moment from 'moment';
+import { Dependent } from '../../interfaces/dependent';
 
 type ComponentProps = {
   onFamilySelect?: (id: Family['id']) => void;
@@ -23,6 +24,8 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
   // Local state
   const [nis, setNis] = useState('');
   const [familyId, setFamilyId] = useState<Family['id']>();
+  const [responsibleCPF, setResponsibleCPF] = useState<NonNullable<Dependent['cpf']>>('');
+
   // Redux state
   const familyLoading = useSelector<AppState, boolean>(({ familyReducer }) => familyReducer.loading);
   const family = useSelector<AppState, Family | null | undefined>(({ familyReducer }) => familyReducer.item);
@@ -44,6 +47,11 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
     }
   };
 
+  const sameCPF = useMemo(() => {
+    const CPF = (family?.dependents || []).find((d) => d.isResponsible)?.cpf;
+    return CPF && CPF === responsibleCPF;
+  }, [family, responsibleCPF]);
+
   return (
     <>
       {error && <Alert message="Ocorreu um erro" description={error.message} type="error" showIcon />}
@@ -57,16 +65,33 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
             maxLength={11}
             onPressEnter={() => {
               changeFamilyId(undefined);
+              setResponsibleCPF('');
               dispatch(requestGetFamily(nis));
             }}
             onSearch={(value) => {
               changeFamilyId(undefined);
+              setResponsibleCPF('');
               dispatch(requestGetFamily(value));
             }}
           />
         </Form.Item>
+        {family && family.id && (
+          <Form.Item
+            label="CPF do responsável"
+            validateStatus={responsibleCPF.length > 10 && !sameCPF ? 'error' : ''}
+            help={responsibleCPF.length > 10 && !sameCPF ? 'CPF incorreto' : ''}
+          >
+            <Input
+              style={{ width: '100%' }}
+              id="responsibleCPF"
+              name="responsibleCPF"
+              onChange={(event) => setResponsibleCPF(event.target.value)}
+            />
+          </Form.Item>
+        )}
       </Form>
-      {!familyId && !familyLoading && family && familyDependent && (
+
+      {!familyId && !familyLoading && family && familyDependent && sameCPF && (
         <FamilyWrapper>
           <Alert
             type="info"
