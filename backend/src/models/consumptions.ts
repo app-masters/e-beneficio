@@ -946,7 +946,8 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
 
     if (!reportItem.nameOnList && !reportItem.nisOnList) {
       reportItem.nextBenefitWithDiscounts =
-        reportItem.nextBenefit * (reportItem.hasDeclaredSomething ? 1 : 0.7) - Number(reportItem.invalidValue);
+        reportItem.nextBenefit * (!reportItem.hasConsumedSomething || reportItem.hasDeclaredSomething ? 1 : 0.7) -
+        Number(reportItem.invalidValue);
     } else {
       reportItem.nextBenefitWithDiscounts = reportItem.nextBenefit - Number(reportItem.invalidValue);
     }
