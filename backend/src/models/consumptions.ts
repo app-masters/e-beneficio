@@ -969,6 +969,7 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
     reportItem.declaredValue = reportItem.declaredValue.toFixed(2).replace('.', ',');
     reportItem.nextBenefit = reportItem.nextBenefit.toFixed(2).replace('.', ',');
     reportItem.nextBenefitWithDiscounts = reportItem.nextBenefitWithDiscounts.toFixed(2).replace('.', ',');
+    reportItem.balance = reportItem.balance.toFixed(2).replace('.', ',');
   }
   await csvFileWriter.writeRecords(report);
 
