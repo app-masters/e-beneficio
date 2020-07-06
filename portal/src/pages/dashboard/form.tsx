@@ -10,9 +10,8 @@ import { AppState } from '../../redux/rootReducer';
 import yup from '../../utils/yup';
 import { requestSaveConsumption } from '../../redux/consumption/actions';
 import { requestResetFamily } from '../../redux/family/actions';
-import { IconCheckStyle, ImageContainer, PriceStyle, PriceLabelStyle } from './styles';
+import { IconCheckStyle, ImageContainer } from './styles';
 import { logging } from '../../utils/logging';
-import { formatMoney } from '../../utils/formatters';
 
 /**
  * Clear NFCe QRCode result
@@ -177,10 +176,6 @@ export const StepWithQRCode: React.FC<{ onBack: () => void; onFinish: () => void
   return (
     <Form layout="vertical" onSubmitCapture={handleSubmit}>
       {status && <Alert message="Erro no formulário" description={status} type="error" />}
-      <Form.Item>
-        <Typography.Text style={PriceLabelStyle}>{'Saldo disponível: '}</Typography.Text>
-        <Typography.Text style={PriceStyle}>{`R$${formatMoney(family?.balance || 0)}`}</Typography.Text>
-      </Form.Item>
       <Form.Item
         label="Valor total da compra"
         validateStatus={(!!valueMeta.error && !!valueMeta.touched) || invalidConsumptionValue ? 'error' : ''}

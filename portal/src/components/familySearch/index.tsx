@@ -18,7 +18,7 @@ import { Family } from '../../interfaces/family';
 import moment from 'moment';
 import { env } from '../../env';
 import yup from '../../utils/yup';
-import { formatDate, formatMoney } from '../../utils/formatters';
+import { formatDate } from '../../utils/formatters';
 
 const { Text } = Typography;
 
@@ -228,8 +228,8 @@ const ConfirmFamily: React.FC<{ family: Family | null | undefined; onConfirm: ()
  */
 const FamilyBalance: React.FC<{ family: Family }> = ({ family }) => (
   <>
-    <Text style={PriceLabelStyle}>{'Saldo disponível: '}</Text>
-    <Text style={PriceStyle}>{`R$${formatMoney(family.balance || 0)}`}</Text>
+    <Text style={PriceLabelStyle}>{'Situação no programa: '}</Text>
+    <Text style={PriceStyle}>{`Família cadastrada`}</Text>
     <HowToHeaderContainer>
       <HowToLabel>Você pode utilizar seus créditos utilizando o cartão recebido.</HowToLabel>
       {family.school && (
@@ -239,8 +239,8 @@ const FamilyBalance: React.FC<{ family: Family }> = ({ family }) => (
         </HowToLabel>
       )}
       <HowToLabel>
-        Se o saldo for superior ao disponível, possivelmente você precisa informar suas últimas compras para receber o
-        reembolso.
+        Após utilizar o cartão, lembre-se de guardar a nota fiscal e informar ela para receber o reembolso no próximo
+        mês
       </HowToLabel>
       <Flex justifyContent="center">
         <Button href={'#compra'}>Informar compra</Button>

@@ -41,7 +41,7 @@ export const requestGetFamily = (nis: string, cityId: string): ThunkResult<void>
           case 404:
             error.message =
               'Não encontramos nenhuma família utilizando esse NIS.' +
-              'Tenha certeza que é o NIS do responsável familiar para conseguir consultar o saldo.';
+              'Tenha certeza que é o NIS do responsável familiar para conseguir consultar a situação.';
 
             // Log the query to GA
             analytics.event('Consulta - não participante', 'Consulta', 'Não participante');
