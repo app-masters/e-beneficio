@@ -12,7 +12,7 @@ describe('Portal - Family search', () => {
     cy.wait('@public-families').should((xhr) => {
       expect(xhr.status).to.equal(404);
       cy.contains(
-        'Não encontramos nenhuma família utilizando esse NIS.Tenha certeza que é o NIS do responsável familiar para conseguir consultar o saldo.'
+        'Não encontramos nenhuma família utilizando esse NIS.Tenha certeza que é o NIS do responsável familiar para conseguir consultar'
       );
     });
     cy.wait(2000);

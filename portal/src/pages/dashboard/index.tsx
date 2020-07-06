@@ -46,8 +46,8 @@ export const DashboardPage: React.FC<{}> = () => {
             </Title>
             <ActionContainer justify="center" gutter={[16, 16]}>
               <Col xs={{ span: 24 }} lg={{ span: 4 }}>
-                <Button block href={'#saldo'} type={'primary'}>
-                  Consultar saldo
+                <Button block href={'#situacao'} type={'primary'}>
+                  Consultar situação
                 </Button>
               </Col>
               <Col xs={{ span: 24 }} lg={{ span: 4 }}>
@@ -82,7 +82,7 @@ export const DashboardPage: React.FC<{}> = () => {
           </BodyContainer>
         </Container>
         <Container>
-          <BodyContainer id="saldo">
+          <BodyContainer id="situacao">
             <Title level={4}>Ver situação no programa</Title>
             {!modal && <FamilySearch askForConfirmation />}
           </BodyContainer>
@@ -117,7 +117,7 @@ export const DashboardPage: React.FC<{}> = () => {
                   </Paragraph>
                   <Text>Para saber se você está incluído, faça a busca pelo NIS do responsável familiar.</Text>
                   <PanelActionContainer>
-                    <Button href={'#saldo'}>Consultar saldo pelo NIS</Button>
+                    <Button href={'#situacao'}>Consultar situação pelo NIS</Button>
                   </PanelActionContainer>
                 </Panel>
                 <Panel header="Acho que tenho direito mas não estou na lista" key="list">

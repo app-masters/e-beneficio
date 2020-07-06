@@ -152,10 +152,7 @@ export const InstructionsPage: React.FC<{}> = () => {
               <ImageContainer>
                 <img style={{ width: '130%' }} src={imageStep07} alt="Selecione QR-Code" />
               </ImageContainer>
-              <Paragraph>
-                Você finalizou a prestação de contas. Não se esqueça de <a href="/#saldo">CONSULTAR O SALDO</a> antes de
-                qualquer compra.
-              </Paragraph>
+              <Paragraph>Você finalizou a prestação de contas.</Paragraph>
               <Flex justifyContent="center">
                 <Button block href={'/'} type={'primary'}>
                   Voltar para o início
