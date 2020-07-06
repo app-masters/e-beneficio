@@ -49,7 +49,7 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
 
   const sameCPF = useMemo(() => {
     const CPF = (family?.dependents || []).find((d) => d.isResponsible)?.cpf;
-    return CPF && CPF === responsibleCPF;
+    return CPF && CPF.replace(/\D/g, '') === responsibleCPF.replace(/\D/g, '');
   }, [family, responsibleCPF]);
 
   return (

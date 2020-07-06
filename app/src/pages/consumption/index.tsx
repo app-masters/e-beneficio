@@ -89,7 +89,8 @@ const ProductConsumption: React.FC<{ family?: Family | null; loading?: boolean }
    */
   const onSubmitConsumption = () => {
     setConsumerInfo({ ...consumerInfo, error: false });
-    const verifyIfHaveSelected = dataSource?.filter((f) => Number(f.consume) > 0);
+    console.log(dataSource);
+    const verifyIfHaveSelected = (dataSource || []).filter((f) => Number(f.consume) > 0);
     if (verifyIfHaveSelected?.length === 0) {
       window.scrollTo(0, 0);
       notification.warning({ message: 'É necessário selecionar no mínimo 1 produto' });
