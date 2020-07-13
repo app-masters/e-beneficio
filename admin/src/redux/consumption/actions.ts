@@ -95,10 +95,6 @@ export const requestSaveConsumption = (
       // Start request - starting loading state
       dispatch(doSaveConsumption());
 
-      if (!item.proofImageUrl && !item.nfce) {
-        throw new Error('Image or NFCe are required');
-      }
-
       // Adding image as File on the form
       const file = item.proofImageUrl
         ? await fetch(item.proofImageUrl)
