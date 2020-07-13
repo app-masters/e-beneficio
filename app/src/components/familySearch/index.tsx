@@ -8,6 +8,9 @@ import { requestGetFamily } from '../../redux/family/actions';
 import { Family } from '../../interfaces/family';
 import moment from 'moment';
 import { Dependent } from '../../interfaces/dependent';
+import { env } from '../../env';
+
+const consumptionType = env.REACT_APP_CONSUMPTION_TYPE as 'ticket' | 'product';
 
 type ComponentProps = {
   onFamilySelect?: (id: Family['id']) => void;
@@ -19,6 +22,7 @@ type ComponentProps = {
  * @param props component props
  */
 export const FamilySearch: React.FC<ComponentProps> = (props) => {
+  const isTicket = consumptionType === 'ticket';
   const dispatch = useDispatch();
 
   // Local state
@@ -75,7 +79,7 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
             }}
           />
         </Form.Item>
-        {family && family.id && (
+        {family && family.id && isTicket && (
           <Form.Item
             label="CPF do responsável"
             validateStatus={responsibleCPF.length > 10 && !sameCPF ? 'error' : ''}
@@ -91,7 +95,7 @@ export const FamilySearch: React.FC<ComponentProps> = (props) => {
         )}
       </Form>
 
-      {!familyId && !familyLoading && family && familyDependent && sameCPF && (
+      {!familyId && !familyLoading && family && familyDependent && (sameCPF || !isTicket) && (
         <FamilyWrapper>
           <Alert
             type="info"
