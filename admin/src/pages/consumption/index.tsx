@@ -1,9 +1,8 @@
-import { CameraOutlined, QrcodeOutlined, WarningFilled, UploadOutlined, ReloadOutlined } from '@ant-design/icons';
-import { Alert, Button, Card, Form, Input, InputNumber, Modal, Typography, Divider, Spin, Upload } from 'antd';
+import { CameraOutlined, QrcodeOutlined, UploadOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Alert, Button, Card, Form, Input, InputNumber, Modal, Typography, Spin, Upload } from 'antd';
 import { useFormik } from 'formik';
 import { IdcardOutlined } from '@ant-design/icons';
-import React, { useEffect, useRef, useState } from 'react';
-import QrReader from 'react-qr-reader';
+import React, { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
 import Webcam from 'react-webcam';
@@ -17,7 +16,7 @@ import { PageContainer, FormImageContainer } from './styles';
 import { ConsumptionFamilySearch } from '../../components/consumptionFamilySearch';
 import { CameraUpload } from './cameraUpload';
 import { User } from '../../interfaces/user';
-import { logging } from '../../lib/logging';
+import { ModalQrCode } from './qrCodeReader';
 
 const { Dragger } = Upload;
 
@@ -30,15 +29,6 @@ const schema = yup.object().shape({
 });
 
 /**
- * Clear NFCe QRCode result
- * @param value url
- */
-const handleQRCode = (value: string | null) => {
-  if (!value) return null;
-  return value;
-};
-
-/**
  * Dashboard page component
  * @param props component props
  */
@@ -48,7 +38,6 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
   const cameraRef = useRef(null);
 
   // Local state
-  const [permission, setPermission] = useState<string>('');
   const [showQRCodeModal, setShowQRCodeModal] = useState(false);
   const [showCameraModal, setShowCameraModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
@@ -59,15 +48,6 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
   const family = useSelector<AppState, Family | null | undefined>((state) => state.familiesReducer.familyItem);
   const loading = useSelector<AppState, boolean>((state) => state.consumptionReducer.loading);
 
-  useEffect(() => {
-    navigator.permissions
-      .query({ name: 'camera' })
-      .then((value) => {
-        setPermission(value.state);
-      })
-      .catch((err) => logging.error(err));
-  }, []);
-
   const {
     handleSubmit,
     handleChange,
@@ -77,7 +57,8 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
     status,
     errors,
     touched,
-    setFieldValue
+    setFieldValue,
+    setStatus
   } = useFormik({
     initialValues: {
       nfce: '',
@@ -152,54 +133,13 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                       />
                     }
                   />
-                  <Modal
-                    okButtonProps={{ disabled: true }}
-                    okText="Confirmar"
-                    cancelText="Cancelar"
-                    onCancel={() => setShowQRCodeModal(false)}
-                    visible={showQRCodeModal}
-                  >
-                    <>
-                      {showQRCodeModal && // Necessary to disable the camera
-                        (permission !== 'denied' ? (
-                          <QrReader
-                            delay={200}
-                            resolution={800}
-                            onError={console.error}
-                            onScan={(item) => {
-                              const nfce = handleQRCode(item);
-                              if (nfce) {
-                                setFieldValue('nfce', nfce);
-                                setShowQRCodeModal(false);
-                              } else console.log(new Date().getTime(), 'reading...');
-                            }}
-                          />
-                        ) : (
-                          <>
-                            <Typography.Title level={3}>{' Acesso não permitido a câmera.'}</Typography.Title>
-                            <Divider />
-                            <Typography.Paragraph>
-                              Para continuar é necessário acesso a câmera do aparelho.
-                            </Typography.Paragraph>
-                            <Typography>
-                              <ul>
-                                <li>
-                                  Clique no ícone <WarningFilled /> próximo ao endereço do site.
-                                </li>
-                                <li>
-                                  Acesse <span style={{ color: 'blue' }}>Configurações do site</span>
-                                </li>
-                                <li>
-                                  Clique em <span style={{ color: 'blue' }}>Acessar sua câmera</span> e permita o
-                                  acesso.
-                                </li>
-                                <li>Clique em Fechar e em seguida clique no botão de leitura novamente.</li>
-                              </ul>
-                            </Typography>
-                          </>
-                        ))}
-                    </>
-                  </Modal>
+                  {showQRCodeModal && (
+                    <ModalQrCode
+                      onQrRead={(nfce) => setFieldValue('nfce', nfce)}
+                      onClose={() => setShowQRCodeModal(false)}
+                      onInvalid={setStatus}
+                    />
+                  )}
                 </Form.Item>
                 <Form.Item
                   label="Valor da compra"
@@ -362,7 +302,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                 !!(errors && Object.keys(errors).length > 0 && touched) ||
                 !family ||
                 invalidConsumptionValue ||
-                !(!!values.proofImageUrl || !!values.nfce) ||
+                !values.value ||
                 !values.acceptCheck
               }
               type="primary"
