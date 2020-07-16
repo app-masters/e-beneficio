@@ -127,7 +127,9 @@ export const requestSaveConsumption = (
       }
     } catch (error) {
       // Request failed: dispatch error
-      logging.error(error);
+      if (error && error.message.indexOf('409') < 0) {
+        logging.error(error);
+      }
       dispatch(doSaveConsumptionFailed(error));
       if (onFailure) onFailure(error);
     }
