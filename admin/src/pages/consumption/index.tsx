@@ -88,7 +88,13 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
             () => {
               Modal.success({ title: 'Consumo salvo com sucesso', onOk: () => history.push('/') });
             },
-            () => setStatus('Ocorreu um erro ao confirmar consumo.')
+            (error) => {
+              if (error && error.message.indexOf('409') > -1) {
+                setStatus('Essa nota fiscal já foi informada. QRCode repetido.');
+              } else {
+                setStatus('Ocorreu um erro ao confirmar consumo.');
+              }
+            }
           )
         );
       }
@@ -180,7 +186,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                     !!invalidValueMeta.error && !!invalidValueMeta.touched
                       ? invalidValueMeta.error
                       : invalidValueConsumption
-                      ? 'Valor maior que o valor da compra'
+                      ? 'Valor total será maior que valor possível do benefício'
                       : undefined
                   }
                 >
@@ -302,8 +308,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                 !!(errors && Object.keys(errors).length > 0 && touched) ||
                 !family ||
                 invalidConsumptionValue ||
-                !values.value ||
-                !values.acceptCheck
+                !values.value
               }
               type="primary"
             >
