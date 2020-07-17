@@ -23,6 +23,7 @@ const { Dragger } = Upload;
 const schema = yup.object().shape({
   nfce: yup.string().label('Nota fiscal eletrônica'),
   value: yup.number().label('Valor em reais').min(0).required(),
+  invalidValue: yup.number().label('Valor em reais'),
   proofImageUrl: yup.string().label('Link da imagem'),
   familyId: yup.string().label('Família').required('É preciso selecionar uma família ao digitar um NIS'),
   birthday: yup.string().label('Aniversário')
@@ -74,13 +75,13 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
     onSubmit: (values, { setStatus }) => {
       setStatus();
       const invalidConsumptionValue = !!(family && family.balance && values.value > 0 && values.value > family.balance);
-      if (!(!family || invalidConsumptionValue || !values.acceptCheck)) {
+      if (!(!family || invalidConsumptionValue)) {
         dispatch(
           requestSaveConsumption(
             {
               nfce: values.nfce,
               value: Number(values.value),
-              invalidValue: Number(values.value),
+              invalidValue: Number(values.invalidValue),
               proofImageUrl: values.proofImageUrl,
               familyId: values.familyId,
               reviewedAt: moment().toDate()
@@ -187,6 +188,8 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                       ? invalidValueMeta.error
                       : invalidValueConsumption
                       ? 'Valor total será maior que valor possível do benefício'
+                      : !!values.nfce
+                      ? 'Valor inválido definido pela nota fiscal'
                       : undefined
                   }
                 >
@@ -195,6 +198,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                     id="invalidValue"
                     name="invalidValue"
                     size="large"
+                    disabled={!!values.nfce}
                     onChange={(value) => setFieldValue('invalidValue', value)}
                     value={Number(values.invalidValue)}
                     decimalSeparator=","
@@ -213,7 +217,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                 >
                   <Button
                     size="large"
-                    style={{ width: '100%' }}
+                    style={{ width: '100%', marginTop: '20px' }}
                     onClick={() => setShowCameraModal(true)}
                     disabled={!!values.nfce}
                     icon={<CameraOutlined />}
