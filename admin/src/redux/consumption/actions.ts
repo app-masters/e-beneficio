@@ -108,6 +108,7 @@ export const requestSaveConsumption = (
       const data = new FormData();
       data.append('familyId', item.familyId.toString());
       data.append('value', item.value.toString());
+      data.append('invalidValue', item.invalidValue.toString());
       if (item.nfce) data.append('nfce', item.nfce);
       if (item.proofImageUrl && file) data.append('image', file);
 
