@@ -879,6 +879,7 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
       {
         model: db.consumptions,
         as: 'consumptions',
+        required: false,
         where: {
           [Sequelize.Op.and]: [
             {
