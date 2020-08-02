@@ -1,4 +1,4 @@
-import Sequelize, { Op, LogicType } from 'sequelize';
+import Sequelize, { Op } from 'sequelize';
 import db from '../schemas';
 import path from 'path';
 import fs from 'fs';
