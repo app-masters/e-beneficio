@@ -1,5 +1,5 @@
 import { CameraOutlined, QrcodeOutlined, UploadOutlined, ReloadOutlined } from '@ant-design/icons';
-import { Alert, Button, Card, Form, Input, InputNumber, Modal, Typography, Spin, Upload } from 'antd';
+import { Alert, Button, Card, Form, Input, InputNumber, Modal, Typography, Spin, Upload, Select } from 'antd';
 import { useFormik } from 'formik';
 import { IdcardOutlined } from '@ant-design/icons';
 import React, { useRef, useState } from 'react';
@@ -19,6 +19,7 @@ import { User } from '../../interfaces/user';
 import { ModalQrCode } from './qrCodeReader';
 
 const { Dragger } = Upload;
+const { Option } = Select;
 
 const schema = yup.object().shape({
   nfce: yup.string().label('Nota fiscal eletrônica'),
@@ -43,11 +44,13 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
   const [showCameraModal, setShowCameraModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [cameraFacingMode, setCameraFacingMode] = useState<'user' | 'environment'>('environment');
+  const [month, setMonth] = useState<string>(moment().month().toString());
 
   // Redux state
   const loggedUser = useSelector<AppState, User | undefined>((state) => state.authReducer.user);
   const family = useSelector<AppState, Family | null | undefined>((state) => state.familiesReducer.familyItem);
   const loading = useSelector<AppState, boolean>((state) => state.consumptionReducer.loading);
+  const error = useSelector<AppState, Error | undefined>((state) => state.consumptionReducer.error);
 
   const {
     handleSubmit,
@@ -323,7 +326,22 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
         {status && <Alert message="Erro no formulário" description={status} type="error" />}
       </Card>
       {loggedUser && loggedUser.role !== 'operator' && (
-        <Card title="Relatório de consumo Ticket" style={{ marginTop: '20px' }}>
+        <Card
+          title="Relatório de consumo Ticket"
+          style={{ marginTop: '20px' }}
+          extra={
+            <>
+              <Typography.Text>Mês base: </Typography.Text>
+              <Select disabled={loading} onSelect={(value) => setMonth(value)} value={month}>
+                {moment.months().map((item) => (
+                  <Option key={item} value={moment().month(item).format('M')}>
+                    {item}
+                  </Option>
+                ))}
+              </Select>
+            </>
+          }
+        >
           <Spin spinning={loading}>
             <Flex full gap>
               <div style={{ flex: 1 }}>
@@ -333,7 +351,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                   accept=".csv"
                   action={undefined}
                   showUploadList={false}
-                  customRequest={({ file }) => dispatch(requestTicketReportFile(file))}
+                  customRequest={({ file }) => dispatch(requestTicketReportFile(file, month.toString()))}
                 >
                   <p className="ant-upload-drag-icon">
                     <IdcardOutlined />
@@ -346,6 +364,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
               </div>
             </Flex>
           </Spin>
+          {error && <Alert message="Erro no envio" description={error.message} type="error" />}
         </Card>
       )}
     </PageContainer>

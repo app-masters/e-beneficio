@@ -1,4 +1,4 @@
-import Sequelize, { Op } from 'sequelize';
+import Sequelize, { Op, LogicType } from 'sequelize';
 import db from '../schemas';
 import path from 'path';
 import fs from 'fs';
@@ -851,19 +851,48 @@ type ReportItem = {
  * Generate report for Ticket file
  * @param filePath file absolute path
  * @param cityId logged user unique city ID
+ * @param month desired month number
  */
-export const generateTicketReport = async (filePath: string, cityId: NonNullable<City['id']>) => {
+export const generateTicketReport = async (filePath: string, cityId: NonNullable<City['id']>, month?: string) => {
   // Reading ticket file
-  const ticketFile: TicketItem[] = await csv({ delimiter: ',', flatKeys: true }).fromFile(filePath);
+  const ticketFile: TicketItem[] = await csv({ delimiter: ';', flatKeys: true }).fromFile(filePath);
+
+  const requiredFields = ['Id Adicional', 'Valor', 'Opera��o'];
+  const availableFields = Object.keys(ticketFile[0]);
+  console.log(availableFields);
+  for (const field of requiredFields) {
+    if (availableFields.indexOf(field) < 0) {
+      throw {
+        status: 412,
+        message: `O campo ${field} não está presente na planilha da Ticket enviada`
+      };
+    }
+  }
+
+  const chosenMonth = moment().month(Number(month) - 1);
 
   // Getting relevant info
   const families = await db.families.findAll({
     where: { cityId },
     include: [
       { model: db.dependents, as: 'dependents' },
-      { model: db.consumptions, as: 'consumptions' }
+      {
+        model: db.consumptions,
+        as: 'consumptions',
+        where: {
+          [Sequelize.Op.and]: [
+            {
+              createdAt: { [Sequelize.Op.gte]: chosenMonth.startOf('month').toDate() }
+            },
+            {
+              createdAt: { [Sequelize.Op.lte]: chosenMonth.endOf('month').toDate() }
+            }
+          ]
+        }
+      }
     ]
   });
+
   let declaredAllCount = 0;
   const allBenefits = await db.benefits.findAll({
     include: [{ model: db.institutions, as: 'institution', where: { cityId } }]
@@ -884,7 +913,6 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
       { id: 'hasConsumedSomething', title: 'Consumiu algo? (Ticket)' },
       { id: 'declaredValue', title: 'Valor declarado' },
       { id: 'consumedValue', title: 'Valor consumido (Ticket)' },
-      { id: 'balance', title: 'Saldo atual' },
       { id: 'invalidValue', title: 'Valor inválido declarado' },
       { id: 'nextBenefit', title: 'Valor bruto do benefício' },
       { id: 'nextBenefitWithDiscounts', title: 'Valor do benefício com os descontos' },
@@ -907,14 +935,12 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
     reportItem.numberOfDependents = family.dependents?.length || 0;
     reportItem.hasDeclaredSomething = (family.consumptions || []).length > 0;
 
-    // Getting family balance
-    const balance = await getFamilyDependentBalance(family, allBenefits);
-
-    reportItem.balance = balance as number;
     reportItem.declaredValue = family.consumptions?.reduce((sum, item) => sum + (item.value || 0), 0) || 0;
 
     // Dealing with true consumed values
-    const ticketPurchases = ticketFile.filter((item) => item['Id Adicional'] === family.responsibleNis);
+    const ticketPurchases = ticketFile.filter(
+      (item) => item['Id Adicional'] === family.responsibleNis && item['Operação'].toUpperCase() === 'DEBITO'
+    );
     reportItem.hasConsumedSomething = ticketPurchases.length > 0;
     reportItem.consumedValue = ticketPurchases.reduce((sum, item) => sum + Number(item['Valor']), 0);
     const hasDeclaredAll = Math.abs(reportItem.declaredValue - reportItem.consumedValue) < 1;
@@ -969,7 +995,6 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
     reportItem.declaredValue = reportItem.declaredValue.toFixed(2).replace('.', ',');
     reportItem.nextBenefit = reportItem.nextBenefit.toFixed(2).replace('.', ',');
     reportItem.nextBenefitWithDiscounts = reportItem.nextBenefitWithDiscounts.toFixed(2).replace('.', ',');
-    reportItem.balance = reportItem.balance.toFixed(2).replace('.', ',');
   }
   await csvFileWriter.writeRecords(report);
 
