@@ -845,6 +845,7 @@ type ReportItem = {
   declaredValue?: number | string;
   nisOnList?: string | boolean;
   nameOnList?: string | boolean;
+  dates?: string;
 };
 
 /**
@@ -859,7 +860,6 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
 
   const requiredFields = ['Id Adicional', 'Valor', 'Opera��o'];
   const availableFields = Object.keys(ticketFile[0]);
-  console.log(availableFields);
   for (const field of requiredFields) {
     if (availableFields.indexOf(field) < 0) {
       throw {
@@ -918,7 +918,8 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
       { id: 'nextBenefitWithDiscounts', title: 'Valor do benefício com os descontos' },
       { id: 'nisOnList', title: 'NIS nas exceções' },
       { id: 'nameOnList', title: 'Nome nas exceções' },
-      { id: 'createdAt', title: 'Data de criação' }
+      { id: 'createdAt', title: 'Data de criação' },
+      { id: 'dates', title: 'Datas de declaração' }
     ]
   });
 
@@ -934,6 +935,9 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
     reportItem.responsibleName = family.responsibleName;
     reportItem.numberOfDependents = family.dependents?.length || 0;
     reportItem.hasDeclaredSomething = (family.consumptions || []).length > 0;
+    reportItem.dates = (family.consumptions || [])
+      .map((consumption) => moment(consumption.createdAt as Date).format('DD/MM/YYYY'))
+      .join(' - ');
 
     reportItem.declaredValue = family.consumptions?.reduce((sum, item) => sum + (item.value || 0), 0) || 0;
 
@@ -942,7 +946,7 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
       (item) => item['Id Adicional'] === family.responsibleNis && item['Opera��o'].toUpperCase() === 'DEBITO'
     );
     reportItem.hasConsumedSomething = ticketPurchases.length > 0;
-    reportItem.consumedValue = ticketPurchases.reduce((sum, item) => sum + Number(item['Valor']), 0);
+    reportItem.consumedValue = ticketPurchases.reduce((sum, item) => sum + Number(item['Valor'].replace(',', '.')), 0);
     const hasDeclaredAll = Math.abs(reportItem.declaredValue - reportItem.consumedValue) < 1;
     reportItem.hasDeclaredAll = hasDeclaredAll;
     if (hasDeclaredAll) declaredAllCount++;
