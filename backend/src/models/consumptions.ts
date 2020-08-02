@@ -879,6 +879,7 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
       {
         model: db.consumptions,
         as: 'consumptions',
+        required: false,
         where: {
           [Sequelize.Op.and]: [
             {
@@ -947,7 +948,9 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
     );
     reportItem.hasConsumedSomething = ticketPurchases.length > 0;
     reportItem.consumedValue = ticketPurchases.reduce((sum, item) => sum + Number(item['Valor'].replace(',', '.')), 0);
-    const hasDeclaredAll = Math.abs(reportItem.declaredValue - reportItem.consumedValue) < 1;
+    const hasDeclaredAll =
+      Math.abs(reportItem.declaredValue - reportItem.consumedValue) < 1 ||
+      reportItem.declaredValue > reportItem.consumedValue;
     reportItem.hasDeclaredAll = hasDeclaredAll;
     if (hasDeclaredAll) declaredAllCount++;
 
