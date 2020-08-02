@@ -152,7 +152,11 @@ router.post('/report-ticket', async (req, res) => {
     }
 
     // Run the import function, the status will be monitored using the report function/route
-    const filePath = await consumptionModel.generateTicketReport(file.tempFilePath, req.user.cityId);
+    const filePath = await consumptionModel.generateTicketReport(
+      file.tempFilePath,
+      req.user.cityId,
+      req.query.month as string
+    );
     return res.sendFile(filePath);
   } catch (error) {
     logging.error(error);

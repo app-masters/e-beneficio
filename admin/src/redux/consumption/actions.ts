@@ -21,7 +21,7 @@ export const doSaveConsumptionSuccess = createAction<Consumption>('consumption/S
 export const doSaveConsumptionFailed = createAction<Error | undefined>('consumption/SAVE_FAILED');
 
 export const doGetTicketReportFile = createAction<void>('consumption/GET_TICKET_REPORT_FILE');
-export const doGetTicketReportFileSuccess = createAction<void>('consumption/GET_TICKET_REPORT_FILE');
+export const doGetTicketReportFileSuccess = createAction<void>('consumption/GET_TICKET_REPORT_FILE_SUCCESS');
 export const doGetTicketReportFileFailed = createAction<string | undefined>('consumption/GET_TICKET_REPORT_FAILED');
 
 /**
@@ -142,6 +142,7 @@ export const requestSaveConsumption = (
  */
 export const requestTicketReportFile = (
   file: File,
+  month?: string,
   onSuccess?: () => void,
   onFailure?: (error?: string) => void
 ): ThunkResult<void> => {
@@ -167,7 +168,8 @@ export const requestTicketReportFile = (
 
           // Request
           const response = await backend.post<string>(`/consumptions/report-ticket`, data, {
-            timeout: 1000 * 60 * 60 * 6
+            timeout: 1000 * 60 * 60 * 6,
+            params: { month }
           });
           if (response && response.data && response.status === 200) {
             const url = window.URL.createObjectURL(new Blob([response.data]));

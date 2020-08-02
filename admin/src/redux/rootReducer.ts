@@ -48,6 +48,7 @@ const appReducer = combineReducers({
  * Base Redux application component
  */
 const rootReducer = (state: CombinedState<TypeReducers> | undefined, action: AnyAction) => {
+  console.log(action);
   if (action.type === 'auth/USER_LOGOUT') {
     state = undefined;
   }
