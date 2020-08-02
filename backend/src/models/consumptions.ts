@@ -939,7 +939,7 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
 
     // Dealing with true consumed values
     const ticketPurchases = ticketFile.filter(
-      (item) => item['Id Adicional'] === family.responsibleNis && item['Operação'].toUpperCase() === 'DEBITO'
+      (item) => item['Id Adicional'] === family.responsibleNis && item['Opera��o'].toUpperCase() === 'DEBITO'
     );
     reportItem.hasConsumedSomething = ticketPurchases.length > 0;
     reportItem.consumedValue = ticketPurchases.reduce((sum, item) => sum + Number(item['Valor']), 0);
