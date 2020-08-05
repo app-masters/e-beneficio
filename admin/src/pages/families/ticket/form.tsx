@@ -279,7 +279,7 @@ export const DependentForm: React.FC<{
 }> = ({ onClose, onEdit, onCreate, item }) => {
   const isCreating = !!!item;
 
-  const { handleChange, values, errors, touched, getFieldMeta, submitForm, setFieldValue, getFieldProps } = useFormik({
+  const { handleChange, values, errors, touched, getFieldMeta, submitForm, setFieldValue } = useFormik({
     initialValues: item
       ? item
       : {
