@@ -17,6 +17,7 @@ import {
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import {
   requestGetDashboardFamily,
   requestStartImportReportSync,
@@ -163,7 +164,12 @@ export const FamiliesList: React.FC<{}> = () => {
 
             <Divider />
             <Row gutter={[16, 16]}>
-              <Col span={24} style={ColAlignRight}>
+              <Col span={12}>
+                <Link to={`/familias/lista`}>
+                  <Button>Ver lista completa</Button>
+                </Link>
+              </Col>
+              <Col span={12} style={ColAlignRight}>
                 <Typography.Text>{`Última atualização ${moment(
                   dashboardData?.lastCreatedDate
                 ).fromNow()}`}</Typography.Text>

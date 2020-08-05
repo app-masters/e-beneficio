@@ -303,6 +303,31 @@ export const requestGetPlaceFamilies = (placeStoreId: string | number): ThunkRes
 /**
  * Get family Thunk action
  */
+export const requestGetFamilies = (): ThunkResult<void> => {
+  return async (dispatch) => {
+    try {
+      // Start request - starting loading state
+      dispatch(doGetFamily());
+      // Request
+      const response = await backend.get<Family>(`/families`);
+      if (response && response.data) {
+        // Request finished
+        dispatch(doGetFamilySuccess(response.data)); // Dispatch result
+      } else {
+        // Request finished, but no item was found
+        dispatch(doGetFamilyFailed());
+      }
+    } catch (error) {
+      // Request failed: dispatch error
+      logging.error(error);
+      dispatch(doGetFamilyFailed(error));
+    }
+  };
+};
+
+/**
+ * Get family Thunk action
+ */
 export const requestGetFamily = (nis?: string, cityId?: string, id?: string): ThunkResult<void> => {
   return async (dispatch) => {
     try {

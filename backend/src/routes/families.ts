@@ -2,6 +2,7 @@ import express from 'express';
 import logging from '../utils/logging';
 import * as familyModel from '../models/families';
 import * as consumptionModel from '../models/consumptions';
+import * as dependentModel from '../models/dependents';
 
 const type = process.env.CONSUMPTION_TYPE as 'ticket' | 'product';
 
@@ -191,6 +192,7 @@ router.put('/:id/deactivate', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     if (!req.user?.cityId) throw Error('User without selected city');
+    await dependentModel.certifyDependentsByFamilyList(req.params.id, req.body.dependents);
     const item = await familyModel.updateById(req.params.id, req.body);
     res.send(item);
   } catch (error) {
