@@ -21,7 +21,6 @@ import { UserForm } from './user/form';
 import { InstitutionForm } from './institutions/form';
 import { InstitutionList } from './institutions/list';
 import { FamiliesList } from './families/list';
-import { FamiliesForm } from './families/form';
 import { ConsumptionForm } from './consumption';
 import { ReportList } from './report';
 import { ConsumptionFamilyList } from './report/product/consumptionFamily';
