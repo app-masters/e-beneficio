@@ -32,6 +32,9 @@ import { ProductForm } from './product/form';
 import { FamiliesForm as FamiliesFormProduct } from './families/product/form';
 import { FamiliesList as FamiliesListProduct } from './families/product/list';
 import { FamiliesInfo as FamiliesInfoProduct } from './families/product/info';
+import { FamiliesForm as FamiliesFormTicket } from './families/ticket/form';
+import { FamiliesList as FamiliesListTicket } from './families/ticket/list';
+import { FamiliesInfo as FamiliesInfoTicket } from './families/ticket/info';
 import { GroupList } from './groups/list';
 import { GroupForm } from './groups/form';
 
@@ -111,30 +114,28 @@ const PrivateRouter: React.FC<{}> = () => {
         <Route path="/origem-do-beneficio" component={InstitutionList} allowedRole="admin" />
         <Route path="/origem-do-beneficio/:id" component={InstitutionForm} allowedRole="admin" />
         {/* Families routes ticket*/}
-        <Route path="/familias" component={FamiliesList} allowedRole="admin" specificToType="ticket" />
-        <Route path="/familias/:id" component={FamiliesForm} allowedRole="admin" specificToType="ticket" />
+        <Route path="/familias" component={FamiliesList} allowedRole="admin" specificToType="ticket" exact />
+        <Route path="/familias/lista" component={FamiliesListTicket} allowedRole="admin" specificToType="ticket" />
+        {/* <Route path="/familias/:id" component={FamiliesForm} allowedRole="admin" specificToType="ticket" /> */}
         {/* Families routes product*/}
         <Route exact path="/familias" component={FamiliesListProduct} allowedRole="admin" specificToType="product" />
         <Route
           exact
           path="/familias/criar"
-          component={FamiliesFormProduct}
+          component={consumptionType === 'product' ? FamiliesFormProduct : FamiliesFormTicket}
           allowedRole="admin"
-          specificToType="product"
         />
         <Route
           exact
           path="/familias/:id/editar"
-          component={FamiliesFormProduct}
+          component={consumptionType === 'product' ? FamiliesFormProduct : FamiliesFormTicket}
           allowedRole="admin"
-          specificToType="product"
         />
         <Route
           exact
           path="/familias/:id/info"
-          component={FamiliesInfoProduct}
+          component={consumptionType === 'product' ? FamiliesInfoProduct : FamiliesInfoTicket}
           allowedRole="admin"
-          specificToType="product"
         />
         {/* Consumptions routes */}
         <Route path="/consumo" component={ConsumptionForm} allowedRole="admin" />

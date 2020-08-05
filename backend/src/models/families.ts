@@ -180,7 +180,7 @@ export const updateImportReport = (importReport: ImportReport, cityId: NonNullab
  * Get all items on the table without any filter
  */
 export const getAll = async (): Promise<SequelizeFamily[]> => {
-  return await db.families.findAll();
+  return await db.families.findAll({ include: [{ model: db.dependents, as: 'dependents' }] });
 };
 
 /**
@@ -228,7 +228,7 @@ export const findByCode = async (
 
   if (family && family.dependents) {
     const responsible = family.dependents?.find((f) => f.isResponsible);
-    if (!responsible) throw { status: 409, message: 'Familia sem responsável.' };
+    if (!responsible) return family;
     else family.dependents = [responsible];
   } else {
     throw { status: 409, message: 'Familia não encontrada.' };
@@ -254,7 +254,7 @@ export const findById = async (
 
   if (family && family.dependents) {
     const responsible = family.dependents?.find((f) => f.isResponsible);
-    if (!responsible) throw { status: 409, message: 'Familia sem responsável.' };
+    if (!responsible) return family;
     else family.dependents = [responsible];
   } else {
     throw { status: 409, message: 'Familia não encontrada.' };

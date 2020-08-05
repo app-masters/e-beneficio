@@ -65,7 +65,25 @@ const routes: RouteItem[] = [
     path: '/familias',
     icon: () => <IdcardOutlined />,
     name: 'Famílias',
-    allowedRoles: ['admin']
+    allowedRoles: ['admin'],
+    specificToType: 'product'
+  },
+  {
+    path: '/familias',
+    icon: () => <IdcardOutlined />,
+    name: 'Famílias',
+    allowedRoles: ['admin'],
+    specificToType: 'ticket',
+    children: [
+      {
+        path: '/',
+        name: 'Importação'
+      },
+      {
+        path: '/lista',
+        name: 'Lista de famílias'
+      }
+    ]
   },
   {
     path: '/relatorios',
