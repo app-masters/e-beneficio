@@ -44,9 +44,14 @@ export const FamiliesInfo: React.FC<RouteComponentProps<{ id: string }>> = (prop
       <Row gutter={[16, 16]}>
         <Col span={24}>
           <Card loading={familyLoading} title={<Typography.Title>Família</Typography.Title>}>
-            <Descriptions column={4} layout="vertical">
+            <Descriptions column={2} layout="vertical">
               <Descriptions.Item label="NIS do responsável">{family?.responsibleNis}</Descriptions.Item>
               <Descriptions.Item label="Nome do responsável">{family?.responsibleName}</Descriptions.Item>
+              <Descriptions.Item label="Endereço" span={2}>
+                {family?.address}
+              </Descriptions.Item>
+              <Descriptions.Item label="Telefone">{family?.phone}</Descriptions.Item>
+              <Descriptions.Item label="Telefone 2">{family?.phone2}</Descriptions.Item>
               <Descriptions.Item label="Incluido em">
                 {moment(family?.createdAt || '').format('DD/MM/YYYY')}
               </Descriptions.Item>
@@ -70,6 +75,7 @@ export const FamiliesInfo: React.FC<RouteComponentProps<{ id: string }>> = (prop
                         <Col span={24} md={12}>
                           <Row>{item.nis && `NIS: ${item.nis || ''}`}</Row>
                           <Row>{item.schoolName && `Escola: ${item.schoolName || ''}`}</Row>
+                          <Row>{item.birthday && `Nascimento: ${moment(item.birthday).format('DD/MM/YYYY')}`}</Row>
                         </Col>
                       </Row>
                     }

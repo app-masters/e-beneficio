@@ -30,12 +30,18 @@ import { requestSaveFamily, requestGetFamily } from '../../../redux/families/act
 
 const schema = yup.object().shape({
   responsibleName: yup.string().label('Nome do responsável').required(),
-  responsibleNis: yup.string().label('NIS do responsável').required()
+  responsibleNis: yup.string().label('NIS do responsável').required(),
+  phone: yup.string().label('Telefone principal').nullable(),
+  phone2: yup.string().label('Telefone sedundário').nullable(),
+  address: yup.string().label('Endereço').nullable()
 });
 
 const typeFamily = {
   responsibleNis: '',
   responsibleName: '',
+  address: '',
+  phone: '',
+  phone2: '',
   groupId: 1,
   dependents: []
 };
@@ -84,7 +90,6 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
     validationSchema: schema,
     onSubmit: (values, { setStatus }) => {
       setStatus();
-      console.log(values);
       const newFamily = {
         ...values,
         code: values.responsibleNis
@@ -124,6 +129,9 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
 
   const responsibleNameMeta = getFieldMeta('responsibleName');
   const responsibleNisMeta = getFieldMeta('responsibleNis');
+  const addressMeta = getFieldMeta('address');
+  const phoneMeta = getFieldMeta('phone');
+  const phone2Meta = getFieldMeta('phone2');
 
   return (
     <PageContainer>
@@ -160,6 +168,37 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
                   name="responsibleNis"
                   onChange={handleChange}
                   value={values.responsibleNis}
+                  onPressEnter={submitForm}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={[16, 16]}>
+            <Col span={24}>
+              <Form.Item label={'Endereço'} validateStatus={formValidation(addressMeta)} help={formHelper(addressMeta)}>
+                <Input
+                  id="address"
+                  name="address"
+                  onChange={handleChange}
+                  value={values.address}
+                  onPressEnter={submitForm}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={[16, 16]}>
+            <Col span={24} md={12}>
+              <Form.Item label={'Telefone'} validateStatus={formValidation(phoneMeta)} help={formHelper(phoneMeta)}>
+                <Input id="phone" name="phone" onChange={handleChange} value={values.phone} onPressEnter={submitForm} />
+              </Form.Item>
+            </Col>
+            <Col span={24} md={12}>
+              <Form.Item label={'Telefone 2'} validateStatus={formValidation(phone2Meta)} help={formHelper(phone2Meta)}>
+                <Input
+                  id="phone2"
+                  name="phone2"
+                  onChange={handleChange}
+                  value={values.phone2}
                   onPressEnter={submitForm}
                 />
               </Form.Item>

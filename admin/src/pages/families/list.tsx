@@ -168,6 +168,12 @@ export const FamiliesList: React.FC<{}> = () => {
                 <Link to={`/familias/lista`}>
                   <Button>Ver lista completa</Button>
                 </Link>
+                <Button
+                  onClick={() => dispatch(requestGetFileFamilies(moment().add(-1, 'month').toDate()))}
+                  style={{ marginLeft: '10px' }}
+                >
+                  Criados no último mês
+                </Button>
               </Col>
               <Col span={12} style={ColAlignRight}>
                 <Typography.Text>{`Última atualização ${moment(
