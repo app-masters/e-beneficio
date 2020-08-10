@@ -132,9 +132,6 @@ export const ConsumptionFamilySearch: React.FC<ComponentProps> = (props) => {
             <Descriptions.Item label="Data de nascimento">
               {moment(family.responsibleBirthday).format('DD/MM/YYYY')}
             </Descriptions.Item>
-            <Descriptions.Item label="Saldo disponível">
-              <Typography.Paragraph strong>{`R$${formatMoney(family.balance || 0)}`}</Typography.Paragraph>
-            </Descriptions.Item>
           </Descriptions>
         </FamilyWrapper>
       )}

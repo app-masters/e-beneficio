@@ -143,8 +143,7 @@ export const StepWithQRCode: React.FC<{ onBack: () => void; onFinish: () => void
     validationSchema: schema,
     onSubmit: (values, { setStatus }) => {
       setStatus();
-      const invalidConsumptionValue = !!(family && Number(values.value) > family.balance);
-      if (!loading && family && !invalidConsumptionValue) {
+      if (!loading && family) {
         const data = {
           nfce: values.nfce,
           value: Number(values.value),
@@ -172,20 +171,14 @@ export const StepWithQRCode: React.FC<{ onBack: () => void; onFinish: () => void
   const valueMeta = getFieldMeta('value');
   const nfceMeta = getFieldMeta('nfce');
 
-  const invalidConsumptionValue = !!(family && Number(values.value) > 0 && Number(values.value) > family.balance);
+  const invalidConsumptionValue = !!(family && Number(values.value) > 0);
   return (
     <Form layout="vertical" onSubmitCapture={handleSubmit}>
       {status && <Alert message="Erro no formulário" description={status} type="error" />}
       <Form.Item
         label="Valor total da compra"
         validateStatus={(!!valueMeta.error && !!valueMeta.touched) || invalidConsumptionValue ? 'error' : ''}
-        help={
-          !!valueMeta.error && !!valueMeta.touched
-            ? valueMeta.error
-            : invalidConsumptionValue
-            ? 'Valor maior que saldo disponível'
-            : undefined
-        }
+        help={!!valueMeta.error && !!valueMeta.touched ? valueMeta.error : undefined}
       >
         <InputNumber
           style={{ width: '100%' }}

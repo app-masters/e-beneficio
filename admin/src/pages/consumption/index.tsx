@@ -77,8 +77,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
     validationSchema: schema,
     onSubmit: (values, { setStatus }) => {
       setStatus();
-      const invalidConsumptionValue = !!(family && family.balance && values.value > 0 && values.value > family.balance);
-      if (!(!family || invalidConsumptionValue)) {
+      if (!!family) {
         dispatch(
           requestSaveConsumption(
             {
@@ -110,7 +109,6 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
   const imageMeta = getFieldMeta('proofImageUrl');
   const nfceMeta = getFieldMeta('nfce');
 
-  const invalidConsumptionValue = !!(family && family.balance && values.value > 0 && values.value > family.balance);
   const invalidValueConsumption = !!(values.value < values.invalidValue);
 
   return (
@@ -153,14 +151,8 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                 </Form.Item>
                 <Form.Item
                   label="Valor da compra"
-                  validateStatus={(!!valueMeta.error && !!valueMeta.touched) || invalidConsumptionValue ? 'error' : ''}
-                  help={
-                    !!valueMeta.error && !!valueMeta.touched
-                      ? valueMeta.error
-                      : invalidConsumptionValue
-                      ? 'Valor maior que saldo disponível'
-                      : undefined
-                  }
+                  validateStatus={!!valueMeta.error && !!valueMeta.touched ? 'error' : ''}
+                  help={!!valueMeta.error && !!valueMeta.touched ? valueMeta.error : undefined}
                 >
                   <InputNumber
                     style={{ width: '100%' }}
@@ -173,7 +165,6 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                     step={0.01}
                     precision={2}
                     min={0}
-                    // max={family?.balance}
                     formatter={(value) => {
                       if (value === '') return `R$ `;
                       return value && Number(value) !== 0 && !Number.isNaN(Number(value)) ? `R$ ${value}` : '';
