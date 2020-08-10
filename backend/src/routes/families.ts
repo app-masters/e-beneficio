@@ -224,8 +224,13 @@ router.get('/consumption', async (req, res) => {
 router.get('/list-file', async (req, res) => {
   try {
     if (!req.user?.cityId) throw Error('User without selected city');
-    const filePath = await familyModel.generateListFile(req.user.cityId);
-    res.sendFile(filePath);
+    if (req.query.date) {
+      const filePath = await familyModel.generateDateReport(req.user.cityId, req.query.date as string);
+      res.sendFile(filePath);
+    } else {
+      const filePath = await familyModel.generateListFile(req.user.cityId);
+      res.sendFile(filePath);
+    }
   } catch (error) {
     logging.error(error);
     res.status(500).send(error.message);

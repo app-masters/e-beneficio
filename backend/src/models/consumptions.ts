@@ -328,11 +328,8 @@ export const addConsumption = async (
     throw { status: 422, message: 'Família não encontrada' };
   }
 
-  const balance = await getFamilyDependentBalance(family);
-  if (balance && balance < Number(values.value)) {
-    // Insuficient balance
-    throw { status: 422, message: 'Saldo insuficiente' };
-  }
+  // Available balance is not checked anymore
+
   // Everything is ok, create it
   return db.consumptions.create({ ...values, placeStoreId });
 };

@@ -57,13 +57,13 @@ export const requestClearFamily = (): ThunkResult<void> => {
 /**
  * Get current import report Thunk action
  */
-export const requestGetFileFamilies = (): ThunkResult<void> => {
+export const requestGetFileFamilies = (date?: Date | string): ThunkResult<void> => {
   return async (dispatch) => {
     try {
       // Start request - starting loading state
       dispatch(doGetFileFamily());
       // Request
-      const response = await backend.get(`/families/list-file`);
+      const response = await backend.get(`/families/list-file`, { params: { date } });
       if (response && response.data) {
         // Request finished
         dispatch(doGetFileFamilySuccess(response.data)); // Dispatch result
@@ -148,7 +148,7 @@ export const requestStopImportReportSync = (): ThunkResult<void> => {
  * Get current import report Thunk action
  */
 export const requestGetImportReport = (): ThunkResult<void> => {
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
     try {
       // Start request - starting loading state
       dispatch(doGetImportReport());
@@ -169,6 +169,11 @@ export const requestGetImportReport = (): ThunkResult<void> => {
       logging.error(error);
       dispatch(doGetImportReportFailed(error));
       dispatch(requestStopImportReportSync());
+      const interval = getState().familiesReducer.importSyncInterval;
+      if (interval) {
+        // Another sync in progress, stop it
+        clearInterval(interval);
+      }
     }
   };
 };

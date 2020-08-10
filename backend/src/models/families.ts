@@ -974,6 +974,72 @@ export const importFamilyFromCadAndSislameCSV = async (
 };
 
 /**
+ * Generate CSV file with all families and dependents created after starting date
+ * @param cityId logged user unique ID
+ * @param startingDate initial creation date
+ */
+export const generateDateReport = async (cityId: NonNullable<City['id']>, startingDate: string | Date) => {
+  const families = await db.families.findAll({
+    where: { cityId, deactivatedAt: null },
+    include: [
+      {
+        model: db.dependents,
+        as: 'dependents',
+        required: true,
+        where: { deactivatedAt: null, createdAt: { [Sequelize.Op.gte]: startingDate } }
+      }
+    ]
+  });
+
+  const filePath = `${path.dirname(__dirname)}/../database/storage/families_list_${cityId}.csv`;
+  // Create file
+  fs.writeFileSync(filePath, undefined);
+  const csvFileWriter = createObjectCsvWriter({
+    path: filePath,
+    header: [
+      { id: 'school', title: 'ESCOLA' },
+      { id: 'responsibleName', title: 'TITULAR' },
+      { id: 'responsibleNis', title: 'NISTITULAR' },
+      { id: 'address', title: 'ENDEREÇO' },
+      { id: 'phone', title: 'TELEFONE' },
+      { id: 'phone2', title: 'TELEFONE 2' },
+      { id: 'dependents', title: 'DEPENDENTES' },
+      { id: 'reason', title: 'ALTERAÇÃO' }
+    ]
+  });
+  // Getting each family balance and adding it to the file
+  let fileFamilies = [];
+  for (const family of families) {
+    if (!family.dependents || family.dependents.length < 1) continue;
+    const yongerDepedent = family.dependents.sort((a, b) => moment(b.birthday).diff(moment(a.birthday)))[0];
+    fileFamilies.push({
+      responsibleName: family.responsibleName,
+      responsibleNis: family.responsibleNis,
+      phone: family.phone,
+      phone2: family.phone2,
+      address: family.address,
+      dependents: family.dependents.length,
+      school: yongerDepedent.schoolName,
+      reason:
+        moment(family.createdAt as Date).diff(moment(startingDate)) > 0
+          ? 'Nova família inserida'
+          : 'Novos dependentes inseridos'
+    });
+  }
+
+  // Sort File
+  fileFamilies = fileFamilies.sort((a, b) => {
+    const schoolCompare = a.reason?.localeCompare(b.reason || '') || 0;
+    if (schoolCompare === 0) {
+      return a.responsibleName?.localeCompare(b.responsibleName || '') || 0;
+    }
+    return schoolCompare;
+  });
+  await csvFileWriter.writeRecords(fileFamilies);
+  return path.resolve(filePath);
+};
+
+/**
  * Generate CSV file with all registered families
  * @param cityId logged user unique ID
  */
