@@ -77,9 +77,6 @@ export const FamilySearch: React.FC<ComponentProps> = () => {
                 <Descriptions.Item label="Data de nascimento">
                   {moment(family.responsibleBirthday).format('DD/MM/YYYY')}
                 </Descriptions.Item>
-                <Descriptions.Item label="Saldo disponível">
-                  <Typography.Paragraph strong>{`R$${formatMoney(family.balance || 0)}`}</Typography.Paragraph>
-                </Descriptions.Item>
                 <Descriptions.Item label="Endereço">{family.address}</Descriptions.Item>
                 <Descriptions.Item label="Telefone">{family.phone}</Descriptions.Item>
                 <Descriptions.Item label="Telefone 2">{family.phone2}</Descriptions.Item>
