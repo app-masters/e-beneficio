@@ -302,12 +302,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
           <Flex alignItems="center" justifyContent="flex-end">
             <Button
               htmlType="submit"
-              disabled={
-                !!(errors && Object.keys(errors).length > 0 && touched) ||
-                !family ||
-                invalidConsumptionValue ||
-                !values.value
-              }
+              disabled={!!(errors && Object.keys(errors).length > 0 && touched) || !family || !values.value}
               type="primary"
             >
               Confirmar consumo

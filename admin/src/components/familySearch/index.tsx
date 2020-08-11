@@ -6,7 +6,6 @@ import { AppState } from '../../redux/rootReducer';
 import { requestGetFamily } from '../../redux/families/actions';
 import { Family } from '../../interfaces/family';
 import moment from 'moment';
-import { formatMoney } from '../../utils/string';
 
 const { Text } = Typography;
 

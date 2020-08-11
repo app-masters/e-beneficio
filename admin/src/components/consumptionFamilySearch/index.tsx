@@ -8,7 +8,6 @@ import { requestGetFamily } from '../../redux/families/actions';
 import { Family } from '../../interfaces/family';
 import moment from 'moment';
 import { env } from '../../env';
-import { formatMoney } from '../../utils/string';
 
 type ComponentProps = {
   onFamilySelect?: (id: Family['id']) => void;
