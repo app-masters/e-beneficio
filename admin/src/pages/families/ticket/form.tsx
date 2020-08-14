@@ -65,8 +65,6 @@ export const FamiliesForm: React.FC<RouteComponentProps<{ id: string }>> = (prop
   React.useEffect(() => {
     if (props.match.params.id) {
       dispatch(requestGetFamily(undefined, undefined, props.match.params.id));
-    } else {
-      history.push('/families/list');
     }
   }, [history, dispatch, props]);
 
