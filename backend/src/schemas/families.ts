@@ -167,7 +167,7 @@ const hashids = new Hashids('', 6, 'ABCDEFGHJKMNPQRSTUVWXYZ23456789', '');
  */
 const afterCreate = async (family: SequelizeFamily, options: CreateOptions) => {
   // If the family doesn't have an option, hash one from its id
-  if (!family.code) {
+  if (!family.code || family.code === '') {
     family.code = hashids.encode(Number(family.id));
     await family.update({ code: family.code }, options);
   }
