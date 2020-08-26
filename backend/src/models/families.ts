@@ -1115,3 +1115,40 @@ export const getFamilyConsumption = async (id: number | string): Promise<Sequeli
   });
   return consumption;
 };
+
+type ProductFamilyFileItem = {
+  Rua: string;
+  Número: string;
+  Nome: string;
+  'Adultos na casa': string;
+  'Número de crianças': string;
+  'Total de Pessoas': string;
+  Telefone: string;
+  'Filho - Nome': string;
+};
+
+/**
+ * Import CSV file to create/update/delete families using the file values
+ * @param path CSV file path
+ * @param cityId logged user city ID
+ */
+export const importProductFamiliesFromFile = async (path: string, cityId: NonNullable<City['id']>): Promise<void> => {
+  let familyList: ProductFamilyFileItem[] = await csv({ delimiter: ';', flatKeys: true }).fromFile(path);
+  familyList = familyList.filter((item) => item['Nome'] && item['Nome'] !== '');
+  for (const item of familyList) {
+    const family = await db.families.create({
+      phone: item['Telefone'],
+      address: `Rua ${item['Rua']}, ${item['Número']} - Vila Sta. Terezinha`,
+      groupId: 5,
+      placeStoreId: 2,
+      cityId,
+      code: ''
+    });
+    await db.dependents.create({
+      name: item['Nome'],
+      isResponsible: true,
+      familyId: family.id as number,
+      birthday: moment().toDate()
+    });
+  }
+};
