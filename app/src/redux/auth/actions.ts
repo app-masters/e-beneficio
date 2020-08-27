@@ -42,7 +42,7 @@ export const requestLoginUser = (email: string, password: string): ThunkResult<v
           setAuthorization();
           setRefresh();
           logging.removePerson();
-          dispatch(doLoginUserFailed(new Error('Cargo não permitido.')));
+          dispatch(doLoginUserFailed(new Error('Função não permitida.')));
         } else {
           // Request finished
           setAuthorization(response.data.token);

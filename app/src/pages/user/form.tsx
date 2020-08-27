@@ -21,7 +21,7 @@ const schema = yup.object().shape({
   password: yup.string().label('Senha').required(),
   cpf: yup.string().label('CPF').required(),
   email: yup.string().label('Email').required(),
-  role: yup.string().label('Cargo').required()
+  role: yup.string().label('Função').required()
 });
 
 /**
@@ -182,7 +182,7 @@ export const UserForm: React.FC<RouteComponentProps<{ id: string }>> = (props) =
           </Form.Item>
 
           <Form.Item
-            label={'Cargo'}
+            label={'Função'}
             validateStatus={!!roleMeta.error && !!roleMeta.touched ? 'error' : ''}
             help={!!roleMeta.error && !!roleMeta.touched ? roleMeta.error : undefined}
           >
