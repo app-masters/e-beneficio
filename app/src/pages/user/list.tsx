@@ -57,7 +57,7 @@ export const UserList: React.FC<{}> = () => {
             render={(active: User['active']) => <Tag>{active ? 'Ativo' : 'Inativo'}</Tag>}
           />
           <Table.Column title="CPF" dataIndex="cpf" render={(data: User['cpf']) => formatCPF(data)} />
-          <Table.Column title="Cargo" dataIndex="role" render={(data: User['role']) => roleList[data]?.title || data} />
+          <Table.Column title="Função" dataIndex="role" render={(data: User['role']) => roleList[data]?.title || data} />
           <Table.Column
             title="Loja"
             dataIndex="placeStoreId"
