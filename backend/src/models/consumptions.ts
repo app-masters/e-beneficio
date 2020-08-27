@@ -188,8 +188,9 @@ export const getFamilyDependentBalanceTicket = async (family: Family, availableB
   // Calculating consumption
   const consumption = family.consumptions.reduce((sum, item) => sum + Number(item.value), 0);
 
+  const lastBenefitValue = (lastBenefit?.value || 0) * (family.dependents || []).length;
   // Discount invalid values from future months
-  const sumValue = family.consumptions.reduce((sum, consumption) => {
+  const invalidValue = family.consumptions.reduce((sum, consumption) => {
     if (consumption.createdAt && moment(consumption.createdAt).isBefore(moment(lastBenefit?.date))) {
       if (consumption.invalidValue) {
         // Check for the payment with money
@@ -207,7 +208,7 @@ export const getFamilyDependentBalanceTicket = async (family: Family, availableB
     return sum;
   }, 0);
 
-  return balance - consumption - sumValue;
+  return balance - consumption - Math.min(invalidValue, lastBenefitValue);
 };
 
 /**
@@ -955,21 +956,24 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
     const lastBenefit = allBenefits[allBenefits.length - 1];
     reportItem.nextBenefit = (lastBenefit.value || 0) * (family.dependents || []).length;
 
-    reportItem.invalidValue = (family.consumptions || []).reduce((sum, consumption) => {
-      if (consumption.invalidValue) {
-        // Check for the payment with money
-        const paidWithMoney =
-          consumption.purchaseData?.payment.reduce(
-            (sum, payment) =>
-              payment.name && payment.value && payment.name.toLocaleLowerCase().includes('dinheiro')
-                ? sum + payment.value
-                : sum,
-            0
-          ) || 0;
-        return sum + Math.max(Number(consumption.invalidValue) - paidWithMoney, 0);
-      }
-      return sum;
-    }, 0);
+    reportItem.invalidValue = Math.min(
+      (family.consumptions || []).reduce((sum, consumption) => {
+        if (consumption.invalidValue) {
+          // Check for the payment with money
+          const paidWithMoney =
+            consumption.purchaseData?.payment.reduce(
+              (sum, payment) =>
+                payment.name && payment.value && payment.name.toLocaleLowerCase().includes('dinheiro')
+                  ? sum + payment.value
+                  : sum,
+              0
+            ) || 0;
+          return sum + Math.max(Number(consumption.invalidValue) - paidWithMoney, 0);
+        }
+        return sum;
+      }, 0),
+      0
+    );
 
     reportItem.nameOnList = allowedNamesList.indexOf(family.responsibleName as string) > -1;
     reportItem.nisOnList = allowedNISList.indexOf(family.responsibleNis as string) > -1;
