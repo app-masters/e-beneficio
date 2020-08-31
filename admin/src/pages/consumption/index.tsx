@@ -167,7 +167,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                     min={0}
                     formatter={(value) => {
                       if (value === '') return `R$ `;
-                      return value && Number(value) !== 0 && !Number.isNaN(Number(value)) ? `R$ ${value}` : '';
+                      return value && !Number.isNaN(Number(value)) ? `R$ ${value}` : '';
                     }}
                     parser={(value) => (value ? value.replace(/(R)|(\$)/g, '').trim() : '')}
                   />
@@ -199,9 +199,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                     step={0.01}
                     min={0}
                     precision={2}
-                    formatter={(value) =>
-                      value && Number(value) !== 0 && !Number.isNaN(Number(value)) ? `R$ ${value}` : ''
-                    }
+                    formatter={(value) => (value && !Number.isNaN(Number(value)) ? `R$ ${value}` : '')}
                     parser={(value) => (value ? value.replace(/(R)|(\$)/g, '').trim() : '')}
                   />
                 </Form.Item>

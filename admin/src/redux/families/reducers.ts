@@ -27,7 +27,10 @@ import {
   doUploadSislameFilesFailed,
   doGetFileFamily,
   doGetFileFamilySuccess,
-  doGetFileFamilyFailed
+  doGetFileFamilyFailed,
+  doUploadFamilyUpdateFile,
+  doUploadFamilyUpdateFileSuccess,
+  doUploadFamilyUpdateFileFailed
 } from './actions';
 import { DashboardFamily } from '../../interfaces/dashboardFamily';
 import { Family, ImportReport } from '../../interfaces/family';
@@ -208,5 +211,18 @@ export default createReducer<FamilyReducerState>(initialState, (builder) =>
     .addCase(doGetFileFamilyFailed, (state, action) => {
       state.fileFamilyLoading = false;
       state.fileFamilyError = action.payload;
+    })
+    .addCase(doUploadFamilyUpdateFile, (state) => {
+      state.loading = true;
+      state.error = undefined;
+      state.uploadReport = undefined;
+    })
+    .addCase(doUploadFamilyUpdateFileSuccess, (state) => {
+      state.loading = false;
+      state.error = undefined;
+    })
+    .addCase(doUploadFamilyUpdateFileFailed, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
     })
 );

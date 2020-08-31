@@ -1152,3 +1152,62 @@ export const importProductFamiliesFromFile = async (path: string, cityId: NonNul
     });
   }
 };
+
+type TicketUpdateFileItem = {
+  TITULAR: string;
+  NISTITULAR: string;
+  DTNASCTIT: string;
+  DEPENDENTE: string;
+  NISDEPENDEN: string;
+  DTNASCDEP: string;
+  ESCOLA: string;
+};
+
+/**
+ * Import CSV file to create/update families using the file values
+ * @param path CSV file path
+ * @param cityId logged user city ID
+ */
+export const importTicketUpdateFamiliesFromFile = async (
+  path: string,
+  cityId: NonNullable<City['id']>
+): Promise<void> => {
+  const familyList: TicketUpdateFileItem[] = await csv({ delimiter: ';', flatKeys: true }).fromFile(path);
+
+  // Check if required fields are present
+  const requiredFields = ['TITULAR', 'NISTITULAR', 'DEPENDENTE', 'NISDEPENDEN', 'ESCOLA'];
+  const availableFields = Object.keys(familyList[0]);
+  const missingFields = requiredFields.reduce(
+    (missing, current) => (availableFields.indexOf(current) < 0 ? [...missing, current] : missing),
+    [] as string[]
+  );
+
+  if (missingFields.length > 0) {
+    throw { status: 412, message: `Campos necessários não estão presentes: ${missingFields.join(', ')}` };
+  }
+
+  for (const item of familyList) {
+    if (!item['NISTITULAR'] || !item['NISDEPENDEN']) continue;
+    const [family] = await db.families.findOrCreate({
+      where: { cityId, responsibleNis: item['NISTITULAR'] },
+      defaults: {
+        cityId,
+        code: '',
+        groupId: 1,
+        responsibleNis: item['NISTITULAR'],
+        responsibleName: item['TITULAR'],
+        responsibleBirthday: moment(item['DTNASCTIT'], 'DD/MM/YYYY').toDate()
+      }
+    });
+    await db.dependents.findOrCreate({
+      where: { nis: item['NISDEPENDEN'] },
+      defaults: {
+        familyId: family.id,
+        nis: item['NISDEPENDEN'],
+        name: item['DEPENDENTE'],
+        schoolName: item['ESCOLA'],
+        birthday: moment(item['DTNASCDEP'], 'DD/MM/YYYY').toDate()
+      }
+    });
+  }
+};

@@ -22,7 +22,8 @@ import {
   requestGetDashboardFamily,
   requestStartImportReportSync,
   requestUploadSislameFile,
-  requestGetFileFamilies
+  requestGetFileFamilies,
+  requestUploadFamilyUpdateFile
 } from '../../redux/families/actions';
 import { AppState } from '../../redux/rootReducer';
 import { PageContainer, ColAlignRight, CounterItem } from './styles';
@@ -438,6 +439,50 @@ export const FamiliesList: React.FC<{}> = () => {
           </Col>
         </Row>
       )}
+      <Row gutter={[16, 16]}>
+        <Col span={24}>
+          <Card title={'Atualizar Familias'}>
+            {error && (
+              <Alert
+                message="Erro no formulário"
+                description={error}
+                type="error"
+                style={{ marginBottom: spacing.default }}
+              />
+            )}
+            <>
+              <Spin spinning={loading || importReport?.inProgress}>
+                <Flex full gap>
+                  <div style={{ flex: 1 }}>
+                    <Dragger
+                      id="file"
+                      name="file"
+                      accept=".csv"
+                      action={undefined}
+                      showUploadList={false}
+                      customRequest={({ file }) =>
+                        dispatch(requestUploadFamilyUpdateFile(file, () => window.location.reload()))
+                      }
+                    >
+                      <p className="ant-upload-drag-icon">
+                        <IdcardOutlined />
+                      </p>
+                      <p className="ant-upload-text">Clique ou arraste um arquivo da base</p>
+                      <p className="ant-upload-hint">O arquivo precisa ser do tipo CSV</p>
+                      {familyFile && (
+                        <Tag
+                          color="processing"
+                          style={{ marginTop: spacing.default }}
+                        >{`Arquivo selectionado: ${familyFile.name}`}</Tag>
+                      )}
+                    </Dragger>
+                  </div>
+                </Flex>
+              </Spin>
+            </>
+          </Card>
+        </Col>
+      </Row>
     </PageContainer>
   );
 };
