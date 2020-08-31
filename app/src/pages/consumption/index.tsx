@@ -15,6 +15,9 @@ import { UploadOutlined, CameraOutlined, WarningFilled } from '@ant-design/icons
 import { CameraUpload } from './cameraUpload';
 import Webcam from 'react-webcam';
 import { spacing } from '../../styles/theme';
+import { VideoPermission } from '../../utils/camera';
+import { logging } from '../../lib/logging';
+import { isIOS } from '../../utils/platform';
 
 /**
  * Dashboard page component
@@ -73,16 +76,6 @@ const ProductConsumption: React.FC<{ family?: Family | null; loading?: boolean }
   );
 
   const dispatch = useDispatch();
-
-  //Request for permission to use camera.
-  React.useEffect(() => {
-    navigator.permissions
-      .query({ name: 'camera' })
-      .then((value) => {
-        setPermission(value.state);
-      })
-      .catch((err) => console.log(err));
-  }, []);
 
   /**
    * Function to change the consumed value
@@ -180,29 +173,45 @@ const ProductConsumption: React.FC<{ family?: Family | null; loading?: boolean }
         }}
         visible={showCameraModal}
       >
+        {showCamera ? (
+          <VideoPermission
+            onSuccess={() => setPermission('granted')}
+            onError={(error) => {
+              if (error.name === 'NotAllowedError') setPermission('denied');
+              else if (error.name === 'NotFoundError' || error.name === 'NoVideoInputDevicesError') {
+                setPermission('unsupported');
+              } else {
+                setPermission('unknown');
+                logging.error(error);
+              }
+            }}
+          />
+        ) : null}
         <FormImageContainer>
-          {permission === 'denied' ? (
-            <>
-              <Typography.Title level={3}>{' Acesso não permitido a câmera.'}</Typography.Title>
-              <Divider />
-              <Typography.Paragraph>Para continuar é necessário acesso a câmera do aparelho.</Typography.Paragraph>
-              <Typography>
-                <ul>
-                  <li>
-                    Clique no ícone <WarningFilled /> próximo ao endereço do site.
-                  </li>
-                  <li>
-                    Acesse <span style={{ color: 'blue' }}>Configurações do site</span>
-                  </li>
-                  <li>
-                    Clique em <span style={{ color: 'blue' }}>Acessar sua câmera</span> e permita o acesso.
-                  </li>
-                  <li>Clique em Fechar e em seguida clique no botão de leitura novamente.</li>
-                </ul>
-              </Typography>
-            </>
-          ) : showCamera ? (
-            <Webcam audio={false} width="100%" ref={cameraRef} />
+          {showCamera ? (
+            permission === 'denied' ? (
+              <Flex vertical>
+                <Typography.Title level={3}>{' Acesso não permitido a câmera.'}</Typography.Title>
+                <Divider />
+                <Typography.Paragraph>Para continuar é necessário acesso a câmera do aparelho.</Typography.Paragraph>
+                <Typography>
+                  <ul>
+                    <li>
+                      Clique no ícone <WarningFilled /> próximo ao endereço do site.
+                    </li>
+                    <li>
+                      Acesse <span style={{ color: 'blue' }}>Configurações do site</span>
+                    </li>
+                    <li>
+                      Clique em <span style={{ color: 'blue' }}>Acessar sua câmera</span> e permita o acesso.
+                    </li>
+                    <li>Clique em Fechar e em seguida clique no botão de leitura novamente.</li>
+                  </ul>
+                </Typography>
+              </Flex>
+            ) : permission === 'granted' ? (
+              <Webcam audio={false} width="100%" ref={cameraRef} />
+            ) : null
           ) : (
             <CameraUpload onSetImage={(image: string) => setConsumerInfo({ error: false, image })} />
           )}
@@ -212,12 +221,12 @@ const ProductConsumption: React.FC<{ family?: Family | null; loading?: boolean }
             <UploadOutlined />
             Enviar arquivo
           </Button>
-        ) : (
+        ) : !isIOS() ? (
           <Button onClick={() => setShowCamera(true)}>
             <CameraOutlined />
             Usar camera
           </Button>
-        )}
+        ) : null}
         <Typography.Paragraph style={{ marginTop: 10 }}>
           Na foto, mostrar:
           <ul>
