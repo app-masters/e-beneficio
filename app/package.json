@@ -34,6 +34,7 @@
     "rollbar": "^2.16.2",
     "styled-components": "^5.0.1",
     "typescript": "3.8.3",
+    "webrtc-adapter": "^7.7.0",
     "yup": "^0.28.3"
   },
   "devDependencies": {

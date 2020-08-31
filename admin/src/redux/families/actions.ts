@@ -13,6 +13,10 @@ export const doUploadFamilyFileSuccess = createAction<CSVReport>('families/UPLOA
 export const doUploadFamilyFileFailed = createAction<string | undefined>('families/UPLOAD_FAILED');
 export const doUploadFamilyFileRestart = createAction<void>('families/UPLOAD_RESTART');
 
+export const doUploadFamilyUpdateFile = createAction<void>('families/UPLOAD_UPDATE_FILE');
+export const doUploadFamilyUpdateFileSuccess = createAction<CSVReport>('families/UPLOAD_UPDATE_FILE_SUCCESS');
+export const doUploadFamilyUpdateFileFailed = createAction<string | undefined>('families/UPLOAD_UPDATE_FILE_FAILED');
+
 export const doUploadSislameFiles = createAction<void>('families/UPLOAD_SISLAME');
 export const doUploadSislameFilesSuccess = createAction<{ uploaded: boolean }>('families/UPLOAD_SISLAME_SUCCESS');
 export const doUploadSislameFilesFailed = createAction<string | undefined>('families/UPLOAD_SISLAME_FAILED');
@@ -410,6 +414,59 @@ export const requestSaveFamily = (
       error.message = error.response ? error.response.data : error.message;
       dispatch(doSaveFamilyFailed(error));
       if (onFailure) onFailure(error);
+    }
+  };
+};
+
+/**
+ * Save User Thunk action
+ */
+export const requestUploadFamilyUpdateFile = (
+  file: File,
+  onSuccess?: () => void,
+  onFailure?: (error?: string) => void
+): ThunkResult<void> => {
+  return async (dispatch) => {
+    /**
+     * Calls the failure functions
+     * @param error The error string
+     */
+    const onError = (error?: string) => {
+      dispatch(doUploadFamilyUpdateFileFailed(error));
+      if (onFailure) onFailure(error);
+    };
+
+    try {
+      if (file) {
+        // If the extension is correct
+        if (path.extname(file.name) === '.csv') {
+          // Start request - starting loading state
+          dispatch(doUploadFamilyUpdateFile());
+
+          const data = new FormData();
+          data.append('file', file);
+
+          // Request
+          const response = await backend.post<CSVReport>(`/families/file-update`, data, {
+            timeout: 1000 * 60 * 60 * 6
+          });
+          if (response && response.status === 200) {
+            // Request finished
+            dispatch(doUploadFamilyUpdateFileSuccess(response.data)); // Dispatch result
+            if (onSuccess) onSuccess();
+          } else {
+            // Request without response - probably won't happen, but cancel the request
+            onError(`Ocorreu um erro no servidor. Tente novamente.`);
+          }
+        } else {
+          onError(`O tipo de arquivo precisa ser .csv.`);
+        }
+      } else {
+        onError(`Nenhum arquivo encontrado.`);
+      }
+    } catch (error) {
+      logging.error(error);
+      onError(error.response?.data || error.message);
     }
   };
 };

@@ -189,10 +189,14 @@ export const getFamilyDependentBalanceTicket = async (family: Family, availableB
   const consumption = family.consumptions.reduce((sum, item) => sum + Number(item.value), 0);
 
   const lastBenefitValue = (lastBenefit?.value || 0) * (family.dependents || []).length;
+
   // Discount invalid values from future months
-  const invalidValue = family.consumptions.reduce((sum, consumption) => {
+  let totalInvalidValue = family.consumptions.reduce((sum, consumption) => {
     if (consumption.createdAt && moment(consumption.createdAt).isBefore(moment(lastBenefit?.date))) {
+      // Invalid value sums all the products tagged as invalid
       if (consumption.invalidValue) {
+        let invalidValue = Number(consumption.invalidValue);
+
         // Check for the payment with money
         const paidWithMoney =
           consumption.purchaseData?.payment.reduce(
@@ -202,13 +206,24 @@ export const getFamilyDependentBalanceTicket = async (family: Family, availableB
                 : sum,
             0
           ) || 0;
-        return sum + Math.max(Number(consumption.invalidValue) - paidWithMoney, 0);
+
+        // Invalid value does not include values paid with money
+        invalidValue = Math.max(invalidValue - paidWithMoney, 0);
+
+        // If the consumption is greater then the benefit, the diference
+        // is subtracted from the invalid value
+        invalidValue = invalidValue - Math.max(Number(consumption.value) - lastBenefitValue, 0);
+
+        return sum + invalidValue;
       }
     }
     return sum;
   }, 0);
 
-  return balance - consumption - Math.min(invalidValue, lastBenefitValue);
+  // Invalid value cannot be greater then the benefit value
+  totalInvalidValue = Math.min(totalInvalidValue, lastBenefitValue);
+
+  return balance - consumption - totalInvalidValue;
 };
 
 /**
@@ -956,24 +971,36 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
     const lastBenefit = allBenefits[allBenefits.length - 1];
     reportItem.nextBenefit = (lastBenefit.value || 0) * (family.dependents || []).length;
 
-    reportItem.invalidValue = Math.min(
-      (family.consumptions || []).reduce((sum, consumption) => {
-        if (consumption.invalidValue) {
-          // Check for the payment with money
-          const paidWithMoney =
-            consumption.purchaseData?.payment.reduce(
-              (sum, payment) =>
-                payment.name && payment.value && payment.name.toLocaleLowerCase().includes('dinheiro')
-                  ? sum + payment.value
-                  : sum,
-              0
-            ) || 0;
-          return sum + Math.max(Number(consumption.invalidValue) - paidWithMoney, 0);
-        }
-        return sum;
-      }, 0),
-      0
-    );
+    // Sum the invalid values of the family consumptions
+    reportItem.invalidValue = (family.consumptions || []).reduce((sum, consumption) => {
+      // Invalid value sums all the products tagged as invalid
+      if (consumption.invalidValue) {
+        let invalidValue = Number(consumption.invalidValue);
+
+        // Check for the payment with money
+        const paidWithMoney =
+          consumption.purchaseData?.payment.reduce(
+            (sum, payment) =>
+              payment.name && payment.value && payment.name.toLocaleLowerCase().includes('dinheiro')
+                ? sum + payment.value
+                : sum,
+            0
+          ) || 0;
+
+        // Invalid value does not include values paid with money
+        invalidValue = Math.max(invalidValue - paidWithMoney, 0);
+
+        // If the consumption is greater then the benefit, the diference
+        // is subtracted from the invalid value
+        invalidValue = invalidValue - Math.max(Number(consumption.value) - Number(reportItem.nextBenefit), 0);
+
+        return sum + invalidValue;
+      }
+      return sum;
+    }, 0);
+
+    // Invalid value cannot be greater then the benefit value
+    reportItem.invalidValue = Math.min(reportItem.invalidValue, reportItem.nextBenefit);
 
     reportItem.nameOnList = allowedNamesList.indexOf(family.responsibleName as string) > -1;
     reportItem.nisOnList = allowedNISList.indexOf(family.responsibleNis as string) > -1;
