@@ -168,6 +168,7 @@ const ProductConsumption: React.FC<{ family?: Family | null; loading?: boolean }
             // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
             // @ts-ignore
             const image = cameraRef.current.getScreenshot();
+            console.log(image);
             setShowCameraModal(false);
             setConsumerInfo({ error: false, image });
           }
@@ -211,7 +212,14 @@ const ProductConsumption: React.FC<{ family?: Family | null; loading?: boolean }
                 </Typography>
               </Flex>
             ) : permission === 'granted' ? (
-              <Webcam audio={false} width="100%" ref={cameraRef} videoConstraints={{ facingMode: cameraFacingMode }} />
+              <Webcam
+                screenshotQuality={0.85}
+                videoConstraints={{ facingMode: cameraFacingMode }}
+                audio={false}
+                width="100%"
+                ref={cameraRef}
+                screenshotFormat="image/png"
+              />
             ) : null
           ) : (
             <CameraUpload onSetImage={(image: string) => setConsumerInfo({ error: false, image })} />
