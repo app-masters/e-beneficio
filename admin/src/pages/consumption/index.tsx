@@ -256,6 +256,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                           audio={false}
                           width="100%"
                           ref={cameraRef}
+                          screenshotFormat="image/png"
                         />
                       ) : (
                         <CameraUpload onSetImage={(image: string) => setFieldValue('proofImageUrl', image)} />
