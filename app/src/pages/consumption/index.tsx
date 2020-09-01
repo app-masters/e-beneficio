@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Card, Typography, Table, Modal, Divider, notification } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
@@ -11,7 +11,7 @@ import { PageContainer, FormImageContainer } from './styles';
 import { NumberPicker } from '../../components/numberPicker';
 import { Consumption } from '../../interfaces/consumption';
 import { requestClearFamily } from '../../redux/family/actions';
-import { UploadOutlined, CameraOutlined, WarningFilled } from '@ant-design/icons';
+import { UploadOutlined, CameraOutlined, WarningFilled, ReloadOutlined } from '@ant-design/icons';
 import { CameraUpload } from './cameraUpload';
 import Webcam from 'react-webcam';
 import { spacing } from '../../styles/theme';
@@ -71,6 +71,7 @@ const ProductConsumption: React.FC<{ family?: Family | null; loading?: boolean }
   });
   const [showCameraModal, setShowCameraModal] = React.useState(false);
   const [showCamera, setShowCamera] = React.useState(false);
+  const [cameraFacingMode, setCameraFacingMode] = useState<'user' | 'environment'>('environment');
   const [dataSource, setDataSource] = React.useState<FamilyProductConsumption[] | undefined>(
     family?.balance as FamilyProductConsumption[]
   );
@@ -210,17 +211,23 @@ const ProductConsumption: React.FC<{ family?: Family | null; loading?: boolean }
                 </Typography>
               </Flex>
             ) : permission === 'granted' ? (
-              <Webcam audio={false} width="100%" ref={cameraRef} />
+              <Webcam audio={false} width="100%" ref={cameraRef} videoConstraints={{ facingMode: cameraFacingMode }} />
             ) : null
           ) : (
             <CameraUpload onSetImage={(image: string) => setConsumerInfo({ error: false, image })} />
           )}
         </FormImageContainer>
         {showCamera ? (
-          <Button onClick={() => setShowCamera(false)}>
-            <UploadOutlined />
-            Enviar arquivo
-          </Button>
+          <Flex justifyContent="space-between">
+            <Button onClick={() => setShowCamera(false)}>
+              <UploadOutlined />
+              Enviar arquivo
+            </Button>
+            <Button onClick={() => setCameraFacingMode(cameraFacingMode === 'user' ? 'environment' : 'user')}>
+              <ReloadOutlined style={{ fontSize: '0.6rem' }} />
+              Alternar câmera
+            </Button>
+          </Flex>
         ) : !isIOS() ? (
           <Button onClick={() => setShowCamera(true)}>
             <CameraOutlined />
