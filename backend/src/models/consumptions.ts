@@ -390,7 +390,16 @@ export const addConsumptionProduct = async (values: Consumption): Promise<Sequel
     }
   });
   //Get difference between available products and consumed products
-  const differenceProducts = listOfProductsAvailable.map((product) => {
+  let availableProducts: BenefitProduct[] = [];
+  for (const benefitProduct of listOfProductsAvailable) {
+    const availableList = listOfProductsAvailable.filter((item) => item.productId === benefitProduct.productId);
+    const totalAmount = availableList.reduce((total, current) => total + current.amount, 0);
+    const remaining = availableProducts.filter((item) => item.productId !== benefitProduct.productId);
+    availableProducts = [{ ...(benefitProduct.toJSON() as BenefitProduct), amount: totalAmount }, ...remaining];
+    console.log(availableProducts);
+  }
+
+  const differenceProducts = availableProducts.map((product) => {
     const items = productsFamilyConsumption.filter((f) => f.productId === product.productId);
     let amount = 0;
     if (items.length > 0)
@@ -410,6 +419,9 @@ export const addConsumptionProduct = async (values: Consumption): Promise<Sequel
       amountConsumed: amount ? amount : 0
     };
   });
+
+  console.log(differenceProducts);
+
   //Compare differenceProducts with the new products
   let canConsumeAll = true;
   values.products?.map((product) => {
@@ -417,6 +429,7 @@ export const addConsumptionProduct = async (values: Consumption): Promise<Sequel
     if (!prodDiff) {
       throw { status: 422, message: 'Produto não disponivel' };
     } else {
+      console.log(prodDiff);
       if (prodDiff.amountAvailable < product.amount) canConsumeAll = false;
     }
   });
