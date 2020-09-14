@@ -878,9 +878,15 @@ type ReportItem = {
  * Generate report for Ticket file
  * @param filePath file absolute path
  * @param cityId logged user unique city ID
- * @param month desired month number
+ * @param startDate desired start date
+ * @param endDate desired finish date
  */
-export const generateTicketReport = async (filePath: string, cityId: NonNullable<City['id']>, month?: string) => {
+export const generateTicketReport = async (
+  filePath: string,
+  cityId: NonNullable<City['id']>,
+  startDate?: string,
+  endDate?: string
+) => {
   // Reading ticket file
   const ticketFile: TicketItem[] = await csv({ delimiter: ';', flatKeys: true }).fromFile(filePath);
 
@@ -894,8 +900,8 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
       };
     }
   }
-
-  const chosenMonth = moment().month(Number(month) - 1);
+  console.log(startDate);
+  console.log(endDate);
 
   // Getting relevant info
   const families = await db.families.findAll({
@@ -909,10 +915,10 @@ export const generateTicketReport = async (filePath: string, cityId: NonNullable
         where: {
           [Sequelize.Op.and]: [
             {
-              createdAt: { [Sequelize.Op.gte]: chosenMonth.startOf('month').toDate() }
+              createdAt: { [Sequelize.Op.gte]: moment(startDate, 'DD-MM-YYYY').startOf('day').toDate() }
             },
             {
-              createdAt: { [Sequelize.Op.lte]: chosenMonth.endOf('month').toDate() }
+              createdAt: { [Sequelize.Op.lte]: moment(endDate, 'DD-MM-YYYY').endOf('day').toDate() }
             }
           ]
         }

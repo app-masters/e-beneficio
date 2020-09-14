@@ -1,5 +1,6 @@
 import { CameraOutlined, QrcodeOutlined, UploadOutlined, ReloadOutlined } from '@ant-design/icons';
-import { Alert, Button, Card, Form, Input, InputNumber, Modal, Typography, Spin, Upload, Select } from 'antd';
+import { Alert, Button, Card, Form, Input, InputNumber, Modal, Typography, Spin, Upload, DatePicker } from 'antd';
+import locale from 'antd/es/date-picker/locale/pt_BR';
 import { useFormik } from 'formik';
 import { IdcardOutlined } from '@ant-design/icons';
 import React, { useRef, useState } from 'react';
@@ -19,7 +20,6 @@ import { User } from '../../interfaces/user';
 import { ModalQrCode } from './qrCodeReader';
 
 const { Dragger } = Upload;
-const { Option } = Select;
 
 const schema = yup.object().shape({
   nfce: yup.string().label('Nota fiscal eletrônica'),
@@ -44,7 +44,8 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
   const [showCameraModal, setShowCameraModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [cameraFacingMode, setCameraFacingMode] = useState<'user' | 'environment'>('environment');
-  const [month, setMonth] = useState<string>(moment().month().toString());
+  const [start, setStart] = useState<string>(moment().startOf('month').format('DD-MM-YYYY'));
+  const [end, setEnd] = useState<string>(moment().endOf('month').format('DD-MM-YYYY'));
 
   // Redux state
   const loggedUser = useSelector<AppState, User | undefined>((state) => state.authReducer.user);
@@ -315,16 +316,34 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
           title="Relatório de consumo Ticket"
           style={{ marginTop: '20px' }}
           extra={
-            <>
-              <Typography.Text>Mês base: </Typography.Text>
-              <Select disabled={loading} onSelect={(value) => setMonth(value)} value={month}>
-                {moment.months().map((item) => (
-                  <Option key={item} value={moment().month(item).format('M')}>
-                    {item}
-                  </Option>
-                ))}
-              </Select>
-            </>
+            <Flex>
+              <Typography.Text style={{ margin: '5px' }}>Gerar relatório de </Typography.Text>
+              <DatePicker
+                locale={locale}
+                picker="date"
+                name="start"
+                format={'DD-MM-YYYY'}
+                value={moment(start, 'DD-MM-YYYY')}
+                onChange={(date) => {
+                  if (date) {
+                    setStart(date.format('DD-MM-YYYY'));
+                  }
+                }}
+              />
+              <Typography.Text style={{ margin: '5px' }}> até </Typography.Text>
+              <DatePicker
+                locale={locale}
+                picker="date"
+                name="end"
+                format={'DD-MM-YYYY'}
+                value={moment(end, 'DD-MM-YYYY')}
+                onChange={(date) => {
+                  if (date) {
+                    setEnd(date.format('DD-MM-YYYY'));
+                  }
+                }}
+              />
+            </Flex>
           }
         >
           <Spin spinning={loading}>
@@ -336,7 +355,7 @@ export const ConsumptionForm: React.FC<RouteComponentProps<{ id: string }>> = ()
                   accept=".csv"
                   action={undefined}
                   showUploadList={false}
-                  customRequest={({ file }) => dispatch(requestTicketReportFile(file, month.toString()))}
+                  customRequest={({ file }) => dispatch(requestTicketReportFile(file, start, end))}
                 >
                   <p className="ant-upload-drag-icon">
                     <IdcardOutlined />

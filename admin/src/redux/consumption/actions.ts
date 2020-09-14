@@ -142,7 +142,8 @@ export const requestSaveConsumption = (
  */
 export const requestTicketReportFile = (
   file: File,
-  month?: string,
+  start?: string,
+  end?: string,
   onSuccess?: () => void,
   onFailure?: (error?: string) => void
 ): ThunkResult<void> => {
@@ -169,7 +170,7 @@ export const requestTicketReportFile = (
           // Request
           const response = await backend.post<string>(`/consumptions/report-ticket`, data, {
             timeout: 1000 * 60 * 60 * 6,
-            params: { month }
+            params: { start, end }
           });
           if (response && response.data && response.status === 200) {
             const url = window.URL.createObjectURL(new Blob([response.data]));
