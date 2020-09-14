@@ -155,7 +155,8 @@ router.post('/report-ticket', async (req, res) => {
     const filePath = await consumptionModel.generateTicketReport(
       file.tempFilePath,
       req.user.cityId,
-      req.query.month as string
+      req.query.start as string,
+      req.query.end as string
     );
     return res.sendFile(filePath);
   } catch (error) {
