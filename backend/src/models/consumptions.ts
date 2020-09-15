@@ -900,8 +900,6 @@ export const generateTicketReport = async (
       };
     }
   }
-  console.log(startDate);
-  console.log(endDate);
 
   // Getting relevant info
   const families = await db.families.findAll({
@@ -1020,6 +1018,9 @@ export const generateTicketReport = async (
 
     // Invalid value cannot be greater then the benefit value
     reportItem.invalidValue = Math.min(reportItem.invalidValue, reportItem.nextBenefit);
+
+    // Invalid value cannot be less than zero
+    reportItem.invalidValue = Math.max(reportItem.invalidValue, 0);
 
     reportItem.nameOnList = allowedNamesList.indexOf(family.responsibleName as string) > -1;
     reportItem.nisOnList = allowedNISList.indexOf(family.responsibleNis as string) > -1;
