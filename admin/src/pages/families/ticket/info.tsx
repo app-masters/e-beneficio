@@ -1,15 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PageContainer } from './styles';
-import { List, Card, Row, Col, Typography, Descriptions, Button } from 'antd';
+import { List, Card, Row, Col, Typography, Descriptions, Button, Modal, Input } from 'antd';
 import { AppState } from '../../../redux/rootReducer';
 import { useSelector, useDispatch } from 'react-redux';
 import { Family } from '../../../interfaces/family';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
 import moment from 'moment';
 import { formatMoney } from '../../../utils/string';
-import { requestGetConsumptionFamily } from '../../../redux/consumption/actions';
+import { requestGetConsumptionFamily, requestDeleteConsumption } from '../../../redux/consumption/actions';
 import { Consumption } from '../../../interfaces/consumption';
-import { CameraOutlined } from '@ant-design/icons';
+import { CameraOutlined, DeleteOutlined, ExclamationCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { requestGetFamily } from '../../../redux/families/actions';
 
 /**
@@ -26,8 +26,41 @@ export const FamiliesInfo: React.FC<RouteComponentProps<{ id: string }>> = (prop
   );
   const consumptionLoading = useSelector<AppState, boolean>(({ consumptionReducer }) => consumptionReducer.loading);
 
-  // Redux actions
   const dispatch = useDispatch();
+
+  const [deleteReason, setDeleteReason] = useState<string>('');
+  const [reasonModal, setReasonModal] = useState<ReturnType<Modal['confirm']> | null>(null);
+  const [deletingId, setDeletingId] = useState<Consumption['id']>();
+
+  React.useEffect(() => {
+    if (reasonModal && deletingId && family) {
+      // Updating props of the modal using the provided text
+      reasonModal.update({
+        okButtonProps: {
+          disabled: deleteReason.length < 3
+        },
+        onOk: () => {
+          dispatch(requestDeleteConsumption(deletingId, deleteReason, family.id as number));
+        },
+        content: (
+          <>
+            <Input.TextArea
+              rows={3}
+              placeholder="Motivo"
+              defaultValue={''}
+              value={deleteReason}
+              onChange={(e) => {
+                setDeleteReason(e.target.value);
+              }}
+            />
+          </>
+        )
+      });
+    }
+  }, [setDeleteReason, deleteReason, reasonModal, dispatch, deletingId, family]);
+
+  // Redux actions
+
   const history = useHistory();
 
   React.useEffect(() => {
@@ -122,6 +155,38 @@ export const FamiliesInfo: React.FC<RouteComponentProps<{ id: string }>> = (prop
                       </a>
                     </div>
                   )}
+                  <div style={{ paddingLeft: 10 }}>
+                    <Button
+                      type="primary"
+                      danger
+                      onClick={() =>
+                        Modal.confirm({
+                          title: 'Você realmente quer excluir esse consumo?',
+                          icon: <ExclamationCircleOutlined />,
+                          content: `Consumo informado em ${moment(item.createdAt || moment()).format(
+                            'DD/MM/YYYY HH:mm'
+                          )}`,
+                          okText: 'Sim',
+                          okType: 'danger',
+                          cancelText: 'Não',
+                          onOk: () => {
+                            const modal = Modal.confirm({
+                              title: 'Qual o motivo da exclusão do consumo?',
+                              icon: <QuestionCircleOutlined />,
+                              okText: 'Excluir',
+                              okType: 'danger',
+                              cancelText: 'Cancelar'
+                            });
+                            setDeletingId(item.id);
+                            setReasonModal(modal);
+                          }
+                        })
+                      }
+                    >
+                      <DeleteOutlined />
+                      Excluir
+                    </Button>
+                  </div>
                 </List.Item>
               )}
             />

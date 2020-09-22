@@ -24,6 +24,10 @@ export const doGetTicketReportFile = createAction<void>('consumption/GET_TICKET_
 export const doGetTicketReportFileSuccess = createAction<void>('consumption/GET_TICKET_REPORT_FILE_SUCCESS');
 export const doGetTicketReportFileFailed = createAction<string | undefined>('consumption/GET_TICKET_REPORT_FAILED');
 
+export const doDeleteConsumption = createAction<void>('consumption/DELETE');
+export const doDeleteConsumptionSuccess = createAction<{ id: Consumption['id'] }>('consumption/DELETE_SUCCESS');
+export const doDeleteConsumptionFailed = createAction<Error | undefined>('consumption/DELETE_FAILED');
+
 /**
  * Get Consumption Thunk action
  */
@@ -195,6 +199,37 @@ export const requestTicketReportFile = (
     } catch (error) {
       logging.error(error);
       onError(error.message);
+    }
+  };
+};
+
+/**
+ * Delete Consumption Thunk action
+ */
+export const requestDeleteConsumption = (
+  consumptionId: NonNullable<Consumption['id']>,
+  reason: string,
+  familyId: NonNullable<Consumption['familyId']>
+): ThunkResult<void> => {
+  return async (dispatch) => {
+    try {
+      //Start request - starting loading state
+      dispatch(doDeleteConsumption());
+      // Request
+      const response = await backend.post<{ deleted: boolean }>(`/consumptions/delete/${consumptionId}`, { reason });
+
+      if (response && response.data) {
+        // Request finished
+        dispatch(doDeleteConsumptionSuccess({ id: consumptionId })); // Dispatch result
+        dispatch(requestGetConsumptionFamily(familyId));
+      } else {
+        // Request without response - probably won't happen, but cancel the request
+        dispatch(doDeleteConsumptionFailed());
+      }
+    } catch (error) {
+      // Request failed: dispatch error
+      logging.error(error);
+      dispatch(doDeleteConsumptionFailed(error));
     }
   };
 };

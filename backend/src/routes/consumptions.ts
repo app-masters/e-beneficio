@@ -165,4 +165,16 @@ router.post('/report-ticket', async (req, res) => {
   }
 });
 
+router.post('/delete/:id', async (req, res) => {
+  try {
+    if (!req.user?.cityId) throw Error('User without selected city');
+
+    await consumptionModel.deleteById(req.params.id, req.body.reason, req.user);
+    return res.send({ deleted: true });
+  } catch (error) {
+    logging.error(error);
+    return res.status(500).send(error.message);
+  }
+});
+
 export default router;

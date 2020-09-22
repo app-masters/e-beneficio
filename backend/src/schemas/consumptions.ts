@@ -1,5 +1,6 @@
 import { Sequelize, Model, DataTypes, BuildOptions, ModelCtor } from 'sequelize';
 import { Product } from './products';
+import { User } from './users';
 import { ConsumptionProducts } from './consumptionProducts';
 
 export interface PurchaseData {
@@ -27,6 +28,8 @@ export interface Consumption {
   proofImageUrl?: string;
   reviewedAt?: number | Date | null;
   purchaseData?: PurchaseData;
+  deletedBy?: User['id'];
+  deleteReason?: string;
   createdAt?: number | Date | null;
   updatedAt?: number | Date | null;
   deletedAt?: number | Date | null;
@@ -91,6 +94,18 @@ export const attributes = {
   purchaseData: {
     type: DataTypes.JSON,
     allowNull: true
+  },
+  deletedBy: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: 'Users',
+      id: 'id'
+    },
+    allowNull: true
+  },
+  deleteReason: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 };
 
@@ -102,7 +117,10 @@ const tableName = 'Consumptions';
  * @returns Schema - Sequelize model
  */
 export const initConsumptionSchema = (sequelize: Sequelize): SequelizeConsumptionModel => {
-  const Schema = sequelize.define(tableName, attributes, { timestamps: true }) as SequelizeConsumptionModel;
+  const Schema = sequelize.define(tableName, attributes, {
+    timestamps: true,
+    paranoid: true // Soft-delete
+  }) as SequelizeConsumptionModel;
 
   Schema.associate = (models): void => {
     // Sequelize relations
