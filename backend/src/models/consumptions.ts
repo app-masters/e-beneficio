@@ -10,6 +10,7 @@ import { Family } from '../schemas/families';
 import { BenefitProduct } from '../schemas/benefitProducts';
 import moment from 'moment';
 import logging from '../utils/logging';
+import { User } from '../schemas/users';
 import { Place } from '../schemas/places';
 import { City } from '../schemas/cities';
 import { Benefit } from '../schemas/benefits';
@@ -1055,4 +1056,20 @@ export const generateTicketReport = async (
 
   console.log(`[report] ${declaredAllCount} declared all`);
   return path.resolve(reportPath);
+};
+
+/**
+ * Soft delete a consumption
+ * @param id index of the desired consumption
+ * @param reason reason of the deletion
+ * @param user logged user
+ */
+export const deleteById = async (id: NonNullable<Consumption['id']>, reason: string, user: User) => {
+  const consumption = await db.consumptions.findByPk(id);
+  if (!consumption) throw { status: 404, message: 'not found' };
+
+  // Filling data about the deletion
+  await db.consumptions.update({ deletedBy: user.id, deleteReason: reason }, { where: { id } });
+
+  await db.consumptions.destroy({ where: { id } });
 };

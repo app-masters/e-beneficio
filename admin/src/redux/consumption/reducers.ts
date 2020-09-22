@@ -8,7 +8,10 @@ import {
   doSaveConsumptionFailed,
   doGetTicketReportFile,
   doGetTicketReportFileSuccess,
-  doGetTicketReportFileFailed
+  doGetTicketReportFileFailed,
+  doDeleteConsumption,
+  doDeleteConsumptionSuccess,
+  doDeleteConsumptionFailed
 } from './actions';
 import { Consumption } from '../../interfaces/consumption';
 
@@ -61,6 +64,18 @@ export default createReducer<ConsumptionReducerState>(initialState, {
     state.loading = false;
   },
   [doGetTicketReportFileFailed.toString()]: (state, action) => {
+    state.loading = false;
+    state.error = action.payload;
+  },
+  [doDeleteConsumption.toString()]: (state) => {
+    state.loading = true;
+    state.error = undefined;
+  },
+  [doDeleteConsumptionSuccess.toString()]: (state, action) => {
+    state.loading = false;
+    state.list = state.list.filter((item) => item.id !== action.id);
+  },
+  [doDeleteConsumptionFailed.toString()]: (state, action) => {
     state.loading = false;
     state.error = action.payload;
   }
