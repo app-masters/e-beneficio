@@ -177,6 +177,13 @@ export const updateImportReport = (importReport: ImportReport, cityId: NonNullab
 };
 
 /**
+ * Count all items on the table without any filter
+ */
+export const countAll = async (): Promise<number> => {
+  return await db.families.count();
+};
+
+/**
  * Get all items on the table without any filter
  */
 export const getAll = async (): Promise<SequelizeFamily[]> => {
