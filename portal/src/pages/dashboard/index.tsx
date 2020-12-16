@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Typography, Layout, Collapse, Button, Card, Col, Row } from 'antd';
 import {
   PageContainer,
@@ -13,10 +13,10 @@ import {
   FooterImageContainer,
   FooterImageWrapper
 } from './styles';
-import { FamilySearch } from '../../components/familySearch';
+// import { FamilySearch } from '../../components/familySearch';
 import { Flex } from '../../components/flex';
 import { env } from '../../env';
-import { ConsumptionForm } from './form';
+// import { ConsumptionForm } from './form';
 import { GithubOutlined } from '@ant-design/icons';
 
 const { Panel } = Collapse;
@@ -28,7 +28,7 @@ const { Footer } = Layout;
  * @param props component props
  */
 export const DashboardPage: React.FC<{}> = () => {
-  const [modal, setModal] = useState(false);
+  // const [modal, setModal] = useState(false);
   return (
     <PageContainer>
       <Layout style={{ backgroundColor: '#F9F9F9' }}>
@@ -45,16 +45,16 @@ export const DashboardPage: React.FC<{}> = () => {
               vulnerabilidade social
             </Title>
             <ActionContainer justify="center" gutter={[16, 16]}>
-              <Col xs={{ span: 24 }} lg={{ span: 4 }}>
+              {/* <Col xs={{ span: 24 }} lg={{ span: 4 }}>
                 <Button block href={'#situacao'} type={'primary'}>
                   Consultar situação
                 </Button>
-              </Col>
-              <Col xs={{ span: 24 }} lg={{ span: 4 }}>
+              </Col> */}
+              {/* <Col xs={{ span: 24 }} lg={{ span: 4 }}>
                 <Button block href={'#compra'} type={'primary'}>
                   Informar compra
                 </Button>
-              </Col>
+              </Col> */}
               <Col xs={{ span: 24 }} lg={{ span: 4 }}>
                 <Button block href={'#info'} type={'primary'}>
                   Informações
@@ -81,17 +81,23 @@ export const DashboardPage: React.FC<{}> = () => {
             </Card>
           </BodyContainer>
         </Container>
-        <Container>
+        {/* <Container>
           <BodyContainer id="situacao">
             <Title level={4}>Ver situação no programa</Title>
             {!modal && <FamilySearch askForConfirmation />}
           </BodyContainer>
-        </Container>
+        </Container> */}
         <Container>
           <BodyContainer id="info">
             <Title level={4}>Informações sobre o programa</Title>
             <Card size="small">
               <Collapse bordered={false} style={PanelStyle}>
+                <Panel header="Não consigo mais inserir os minhas compras" key="cant">
+                  <Paragraph>
+                    O último auxílio do programa foi distribuído em novembro, e todas as declarações foram encerradas no
+                    dia 04 de dezembro de 2020.
+                  </Paragraph>
+                </Panel>
                 <Panel header="O que é o programa?" key="what">
                   <Paragraph>
                     O programa e-Beneficio oferece suporte às famílias em situação de vulnerabilidade social que estejam
@@ -105,9 +111,9 @@ export const DashboardPage: React.FC<{}> = () => {
                   <Paragraph>
                     Após utilizar seu cartão, você pode soliciar a recarga do valor gasto se apenas foram comprados os
                     itens permitidos.
-                    <PanelActionContainer>
+                    {/* <PanelActionContainer>
                       <Button href={'#compra'}>Informar compra</Button>
-                    </PanelActionContainer>
+                    </PanelActionContainer> */}
                   </Paragraph>
                 </Panel>
                 <Panel header="Tenho direito ao benefício?" key="who">
@@ -116,9 +122,9 @@ export const DashboardPage: React.FC<{}> = () => {
                     beneficiários do Programa Bolsa Família e de alunos inscritos na rede municipal de ensino.
                   </Paragraph>
                   <Text>Para saber se você está incluído, faça a busca pelo NIS do responsável familiar.</Text>
-                  <PanelActionContainer>
+                  {/* <PanelActionContainer>
                     <Button href={'#situacao'}>Consultar situação pelo NIS</Button>
-                  </PanelActionContainer>
+                  </PanelActionContainer> */}
                 </Panel>
                 <Panel header="Acho que tenho direito mas não estou na lista" key="list">
                   <Paragraph>
@@ -174,7 +180,7 @@ export const DashboardPage: React.FC<{}> = () => {
             </Card>
           </BodyContainer>
         </Container>
-        <Container>
+        {/* <Container>
           <BodyContainer id="compra">
             <Title level={4}>Recarga do valor das compras</Title>
             <Card>
@@ -191,7 +197,7 @@ export const DashboardPage: React.FC<{}> = () => {
               </PanelActionContainer>
             </Card>
           </BodyContainer>
-        </Container>
+        </Container> */}
 
         <Container>
           <BodyContainer id="bought">

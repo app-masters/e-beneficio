@@ -1,12 +1,12 @@
 import Sequelize, { Op } from 'sequelize';
-import db from '../schemas';
+import db, { sequelize } from '../schemas';
 import path from 'path';
 import fs from 'fs';
 import csv from 'csvtojson';
 import { createObjectCsvWriter } from 'csv-writer';
 import { Consumption, SequelizeConsumption } from '../schemas/consumptions';
 import { PlaceStore } from '../schemas/placeStores';
-import { Family } from '../schemas/families';
+import { Family, SequelizeFamily } from '../schemas/families';
 import { BenefitProduct } from '../schemas/benefitProducts';
 import moment from 'moment';
 import logging from '../utils/logging';
@@ -18,6 +18,8 @@ import { Dependent } from '../schemas/depedents';
 import { scrapeNFCeData } from '../utils/nfceScraper';
 import { SequelizeProduct } from '../schemas/products';
 import { allowedNamesList, allowedNISList } from '../utils/constraints';
+import { countAll as countAllFamilies } from '../models/families';
+import { countAll as countAllDependents } from '../models/dependents';
 
 export type ProductBalance = {
   product: {
@@ -499,15 +501,15 @@ export const getPlaceConsumptionsReport = async (
  * @param placeStoreId place store unique ID
  */
 export const countFamilies = async (
-  dateStart: Date | string,
-  dateEnd: Date | string,
+  dateStart: Date | string | null,
+  dateEnd: Date | string | null,
   placeStoreId?: PlaceStore['id']
 ) => {
   const [data] = await db.consumptions.findAll({
     where: {
       [Sequelize.Op.and]: [
-        { createdAt: { [Sequelize.Op.gte]: dateStart } },
-        { createdAt: { [Sequelize.Op.lte]: dateEnd } },
+        dateStart ? { createdAt: { [Sequelize.Op.gte]: dateStart } } : {},
+        dateEnd ? { createdAt: { [Sequelize.Op.lte]: dateEnd } } : {},
         placeStoreId ? { placeStoreId } : {}
       ]
     },
@@ -518,25 +520,84 @@ export const countFamilies = async (
 };
 
 /**
+ * Count all items on the table without any filter
+ */
+export const countAll = async (): Promise<number> => {
+  return await db.consumptions.count();
+};
+
+/**
  * Sum the total consumption values in the period
  * @param dateStart period start
  * @param dateEnd period end
  * @param placeStoreId place store unique ID
  */
 export const sumConsumptions = async (
-  dateStart: Date | string,
-  dateEnd: Date | string,
+  dateStart: Date | string | null,
+  dateEnd: Date | string | null,
   placeStoreId?: PlaceStore['id']
 ) => {
   const [data] = await db.consumptions.findAll({
     where: {
       [Sequelize.Op.and]: [
-        { createdAt: { [Sequelize.Op.gte]: dateStart } },
-        { createdAt: { [Sequelize.Op.lte]: dateEnd } },
+        dateStart ? { createdAt: { [Sequelize.Op.gte]: dateStart } } : {},
+        dateEnd ? { createdAt: { [Sequelize.Op.lte]: dateEnd } } : {},
         placeStoreId ? { placeStoreId } : {}
       ]
     },
     attributes: [[Sequelize.fn('sum', Sequelize.col('value')), 'total']]
+  });
+
+  if (data) return (data.toJSON() as { total: number }).total || 0;
+  return 0;
+};
+
+/**
+ * Count how many unique families have consumptions
+ * @param dateStart period start
+ * @param dateEnd period end
+ * @param placeStoreId place store unique ID
+ * @param type query type
+ */
+export const countFamilyWithoutConsumptions = async () => {
+  const data = await db.families.findAll({
+    include: [
+      {
+        model: db.consumptions,
+        as: 'consumptions',
+        attributes: ['id']
+      }
+    ]
+  });
+  // [Sequelize.Op.and]: [Sequelize.where(Sequelize.col('consumptions.id'), null)]
+  // [Sequelize.where(Sequelize.col('consumptions.id'), null)]
+  if (data && data.length > 0) {
+    return data.filter((f) => f.consumptions?.length === 0).length;
+  }
+  return 0;
+};
+
+/**
+ * Count how many unique families have consumptions
+ * @param dateStart period start
+ * @param dateEnd period end
+ * @param placeStoreId place store unique ID
+ */
+export const countInvalidConsumptions = async (
+  dateStart: Date | string | null,
+  dateEnd: Date | string | null,
+  placeStoreId?: PlaceStore['id']
+) => {
+  const [data] = await db.consumptions.findAll({
+    where: {
+      [Sequelize.Op.and]: [
+        dateStart ? { createdAt: { [Sequelize.Op.gte]: dateStart } } : {},
+        dateEnd ? { createdAt: { [Sequelize.Op.lte]: dateEnd } } : {},
+        placeStoreId ? { placeStoreId } : {},
+        { invalidValue: { [Sequelize.Op.gt]: 0 } }
+      ]
+    },
+    attributes: [[Sequelize.fn('count', Sequelize.col('value')), 'total']]
   });
 
   if (data) return (data.toJSON() as { total: number }).total || 0;
@@ -550,6 +611,13 @@ export const sumConsumptions = async (
  */
 export const getConsumptionDashboardInfo = async (cityId: NonNullable<City['id']>, placeStoreId?: PlaceStore['id']) => {
   const dashboardReturn = {
+    familyCount: 0,
+    familyWithConsumption: 0,
+    consumptionCount: 0,
+    invalidConsumption: 0,
+    familyWithoutConsumption: 0,
+    dependentCount: 0,
+
     todayFamilies: 0,
     weekFamilies: 0,
     monthFamilies: 0,
@@ -565,6 +633,13 @@ export const getConsumptionDashboardInfo = async (cityId: NonNullable<City['id']
 
   // Await for all the promises
   [
+    dashboardReturn.familyCount,
+    dashboardReturn.familyWithConsumption,
+    dashboardReturn.consumptionCount,
+    dashboardReturn.invalidConsumption,
+    dashboardReturn.familyWithoutConsumption,
+    dashboardReturn.dependentCount,
+
     dashboardReturn.todayConsumption,
     dashboardReturn.weekConsumption,
     dashboardReturn.monthConsumption,
@@ -572,6 +647,12 @@ export const getConsumptionDashboardInfo = async (cityId: NonNullable<City['id']
     dashboardReturn.weekFamilies,
     dashboardReturn.monthFamilies
   ] = await Promise.all([
+    countAllFamilies(),
+    countFamilies(null, null, placeStoreId),
+    countAll(),
+    countInvalidConsumptions(startToday, today, placeStoreId),
+    countFamilyWithoutConsumptions(),
+    countAllDependents(),
     sumConsumptions(startToday, today, placeStoreId),
     sumConsumptions(startWeek, today, placeStoreId),
     sumConsumptions(startMonth, today, placeStoreId),

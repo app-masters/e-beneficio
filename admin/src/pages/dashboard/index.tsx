@@ -26,12 +26,13 @@ export const DashboardPage: React.FC<{}> = () => {
   useEffect(() => {
     dispatch(requestGetDashboard());
   }, [dispatch]);
+
   return (
     <PageContainer>
       <Card style={{ marginBottom: '16px' }}>
         <Typography.Text>{`Bem vindo ${user.name}`}</Typography.Text>
       </Card>
-      <Row gutter={16}>
+      <Row gutter={[16, 32]}>
         <Col span={24} md={8}>
           <Card>
             <Statistic
@@ -81,6 +82,72 @@ export const DashboardPage: React.FC<{}> = () => {
                 </Typography.Text>
               </>
             )}
+          </Card>
+        </Col>
+      </Row>
+      <Row gutter={[16, 16]}>
+        <Col span={24} md={8}>
+          <Card>
+            <Statistic
+              title="Total"
+              value={formatMoney(dashboard?.familyCount, 0)}
+              suffix={dashboard?.familyCount === 1 ? 'família cadastrada' : 'famílias cadastradas'}
+            />
+          </Card>
+        </Col>
+        <Col span={24} md={8}>
+          <Card>
+            <Statistic
+              title="Utilização"
+              value={formatMoney(dashboard?.familyWithConsumption, 0)}
+              suffix={
+                dashboard?.familyWithConsumption === 1
+                  ? 'família utilizou do auxilio'
+                  : 'famílias utilizaram do auxilio'
+              }
+            />
+          </Card>
+        </Col>
+        <Col span={24} md={8}>
+          <Card>
+            <Statistic
+              title="Não utilizado"
+              value={formatMoney(dashboard?.familyWithoutConsumption, 0)}
+              suffix={
+                dashboard?.familyWithoutConsumption === 1
+                  ? 'família não utilizou do auxilio'
+                  : 'famílias não utilizaram do auxilio'
+              }
+            />
+          </Card>
+        </Col>
+      </Row>
+      <Row gutter={[16, 16]}>
+        <Col span={24} md={8}>
+          <Card>
+            <Statistic
+              title="Dependentes"
+              value={formatMoney(dashboard?.dependentCount, 0)}
+              suffix={dashboard?.dependentCount === 1 ? 'dependente cadastrado' : 'dependentes cadastrados'}
+            />
+          </Card>
+        </Col>
+        <Col span={24} md={8}>
+          <Card>
+            <Statistic
+              title="Consumo"
+              value={formatMoney(dashboard?.consumptionCount, 0)}
+              suffix={dashboard?.consumptionCount === 1 ? 'nota fiscal declarada' : 'notas fiscais declaradas'}
+            />
+          </Card>
+        </Col>
+        <Col span={24} md={8}>
+          <Card>
+            <Statistic
+              title="Consumo inválido"
+              value={formatMoney(dashboard?.invalidConsumption, 0)}
+              suffix={dashboard?.invalidConsumption === 1 ? 'nota fiscal inválidada' : 'notas fiscais inválidadas'}
+            />
           </Card>
         </Col>
       </Row>
