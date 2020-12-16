@@ -1,4 +1,11 @@
 export type Dashboard = {
+  familyCount: number;
+  familyWithConsumption: number;
+  familyWithoutConsumption: number;
+  dependentCount: number;
+  consumptionCount: number;
+  invalidConsumption: number;
+
   todayFamilies: number;
   weekFamilies: number;
   monthFamilies: number;

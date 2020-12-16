@@ -6,6 +6,13 @@ import moment from 'moment';
 import { Family } from '../schemas/families';
 
 /**
+ * Count all items on the table without any filter
+ */
+export const countAll = async (): Promise<number> => {
+  return await db.dependents.count();
+};
+
+/**
  * Generate Dependent object from CSV files items
  * @param familyItem Family CSV item
  * @param sislameItem Sislame CSV item
