@@ -1,12 +1,12 @@
 import Sequelize, { Op } from 'sequelize';
-import db, { sequelize } from '../schemas';
+import db from '../schemas';
 import path from 'path';
 import fs from 'fs';
 import csv from 'csvtojson';
 import { createObjectCsvWriter } from 'csv-writer';
 import { Consumption, SequelizeConsumption } from '../schemas/consumptions';
 import { PlaceStore } from '../schemas/placeStores';
-import { Family, SequelizeFamily } from '../schemas/families';
+import { Family } from '../schemas/families';
 import { BenefitProduct } from '../schemas/benefitProducts';
 import moment from 'moment';
 import logging from '../utils/logging';
@@ -554,10 +554,6 @@ export const sumConsumptions = async (
 
 /**
  * Count how many unique families have consumptions
- * @param dateStart period start
- * @param dateEnd period end
- * @param placeStoreId place store unique ID
- * @param type query type
  */
 export const countFamilyWithoutConsumptions = async () => {
   const data = await db.families.findAll({
