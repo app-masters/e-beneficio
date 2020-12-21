@@ -145,7 +145,7 @@ export const DashboardPage: React.FC<{}> = () => {
           <Card>
             <Statistic
               title="Consumo inválido"
-              value={formatMoney(dashboard?.invalidConsumption, 0)}
+              value={`R$${formatMoney(dashboard?.invalidConsumption, 0)}`}
               suffix={dashboard?.invalidConsumption === 1 ? 'nota fiscal inválidada' : 'notas fiscais inválidadas'}
             />
           </Card>
