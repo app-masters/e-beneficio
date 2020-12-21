@@ -579,7 +579,7 @@ export const countFamilyWithoutConsumptions = async () => {
  * @param dateEnd period end
  * @param placeStoreId place store unique ID
  */
-export const countInvalidConsumptions = async (
+export const sumInvalidConsumptions = async (
   dateStart: Date | string | null,
   dateEnd: Date | string | null,
   placeStoreId?: PlaceStore['id']
@@ -593,7 +593,7 @@ export const countInvalidConsumptions = async (
         { invalidValue: { [Sequelize.Op.gt]: 0 } }
       ]
     },
-    attributes: [[Sequelize.fn('count', Sequelize.col('value')), 'total']]
+    attributes: [[Sequelize.fn('sum', Sequelize.col('invalidValue')), 'total']]
   });
 
   if (data) return (data.toJSON() as { total: number }).total || 0;
@@ -646,7 +646,7 @@ export const getConsumptionDashboardInfo = async (cityId: NonNullable<City['id']
     countAllFamilies(),
     countFamilies(null, null, placeStoreId),
     countAll(),
-    countInvalidConsumptions(startToday, today, placeStoreId),
+    sumInvalidConsumptions(startToday, today, placeStoreId),
     countFamilyWithoutConsumptions(),
     countAllDependents(),
     sumConsumptions(startToday, today, placeStoreId),
