@@ -25,7 +25,7 @@
     "react-qr-reader": "^2.2.1",
     "react-redux": "^7.2.0",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "3.4.1",
+    "react-scripts": "5.0.1",
     "react-webcam": "^5.0.1",
     "redux-persist": "^6.0.0",
     "redux-thunk": "^2.3.0",
