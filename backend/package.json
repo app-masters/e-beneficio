@@ -61,7 +61,7 @@
     "dataloader": "^2.0.0",
     "dotenv": "8.2.0",
     "eslint-plugin-jsdoc": "^23.0.0",
-    "express": "4.17.1",
+    "express": "4.17.3",
     "express-fileupload": "^1.1.7-alpha.3",
     "faker": "^4.1.0",
     "hashids": "^2.2.1",
